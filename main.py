@@ -57,18 +57,40 @@ async def process_message(update: Update, context: ContextTypes.DEFAULT_TYPE, te
     # 1. Always log to raw archive first (never lost)
     log_to_archive(user_id, text, source, timestamp)
 
-    # 2. Check if this is an update to an existing entry
-    related = find_related_entry(user_id, text)
+    # 2. Check if this is a Telegram reply to one of Behique's messages
+    replied_entry_id = None
+    if update.message.reply_to_message:
+        # Look up which entry this reply message ID maps to
+        replied_entry_id = context.bot_data.get(
+            str(update.message.reply_to_message.message_id)
+        )
 
-    if related:
-        # Update the living document
-        updated = update_entry(user_id, related["id"], text, timestamp)
-        response = build_update_response(updated, text)
+    if replied_entry_id:
+        # Direct reply — update that specific entry
+        updated = update_entry(user_id, replied_entry_id, text, timestamp)
+        if updated:
+            response = build_update_response(updated, text)
+        else:
+            # Fallback — save as new if entry not found
+            classification = classify_input(text)
+            entry = save_entry(user_id, text, classification, source, timestamp)
+            response = build_new_entry_response(entry)
     else:
-        # Classify and create new entry
-        classification = classify_input(text)
-        entry = save_entry(user_id, text, classification, source, timestamp)
-        response = build_new_entry_response(entry)
+        # 3. No reply — check AI context matching for related ideas
+        related = find_related_entry(user_id, text)
+        if related:
+            updated = update_entry(user_id, related["id"], text, timestamp)
+            response = build_update_response(updated, text)
+        else:
+            # Brand new idea
+            classification = classify_input(text)
+            entry = save_entry(user_id, text, classification, source, timestamp)
+            # Store the bot's reply message ID → entry ID mapping
+            sent = await update.message.reply_text(
+                build_new_entry_response(entry), parse_mode="Markdown"
+            )
+            context.bot_data[str(sent.message_id)] = entry["id"]
+            return
 
     await update.message.reply_text(response, parse_mode="Markdown")
 
