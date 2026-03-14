@@ -3,6 +3,7 @@ import os
 import uuid
 from datetime import datetime
 from openai import OpenAI
+from modules.notion_handler import save_to_notion, update_in_notion
 
 # ── STORAGE PATHS ──────────────────────────────────────────────────────────────
 DATA_DIR = "data"
@@ -126,6 +127,13 @@ def save_entry(user_id: str, text: str, classification: dict, source: str, times
 
     entries.append(entry)
     save_entries(entries)
+
+    # Persist to Notion (survives Railway redeployments)
+    notion_page_id = save_to_notion(entry)
+    if notion_page_id:
+        entry["notion_page_id"] = notion_page_id
+        save_entries(entries)  # Save again with notion_page_id
+
     return entry
 
 
@@ -143,6 +151,12 @@ def update_entry(user_id: str, entry_id: str, new_text: str, timestamp: str) -> 
             entry["updates"].append(update)
             entry["last_updated"] = timestamp
             save_entries(entries)
+
+            # Append update to Notion page if we have the page ID
+            notion_page_id = entry.get("notion_page_id")
+            if notion_page_id:
+                update_in_notion(notion_page_id, new_text, len(entry["updates"]))
+
             return entry
 
     return None
