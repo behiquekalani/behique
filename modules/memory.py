@@ -5,6 +5,13 @@ from datetime import datetime
 from openai import OpenAI
 from modules.notion_handler import save_to_notion, update_in_notion
 
+# ── LLM CLIENTS ────────────────────────────────────────────────────────────────
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://192.168.0.151:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+
+_ollama_client = OpenAI(api_key="ollama", base_url=f"{OLLAMA_HOST}/v1")
+_openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 # ── STORAGE PATHS ──────────────────────────────────────────────────────────────
 DATA_DIR = "data"
 ENTRIES_FILE = os.path.join(DATA_DIR, "entries.json")
@@ -66,8 +73,6 @@ def find_related_entry(user_id: str, text: str) -> dict | None:
         for e in recent
     ])
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
     system = """You are a memory matcher for a personal assistant.
 Given a new message and a list of recent ideas, determine if the new message is clearly
 a follow-up, update, or addition to one of the existing ideas.
@@ -79,9 +84,9 @@ Respond ONLY with JSON: {"match_id": "abc12345"} or {"match_id": null}"""
 
     user_msg = f"New message: \"{text}\"\n\nRecent ideas:\n{summaries}"
 
-    try:
+    def _try_match(client, model):
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": user_msg}
@@ -89,20 +94,23 @@ Respond ONLY with JSON: {"match_id": "abc12345"} or {"match_id": null}"""
             temperature=0,
             response_format={"type": "json_object"}
         )
-
         result = json.loads(response.choices[0].message.content)
         match_id_prefix = result.get("match_id")
-
         if not match_id_prefix:
             return None
-
-        # Find the full entry by ID prefix
         for entry in recent:
             if entry["id"].startswith(match_id_prefix):
                 return entry
-
         return None
 
+    # Try Ollama first (free, local), fall back to OpenAI
+    try:
+        return _try_match(_ollama_client, OLLAMA_MODEL)
+    except Exception:
+        pass
+
+    try:
+        return _try_match(_openai_client, "gpt-4o-mini")
     except Exception:
         return None
 
