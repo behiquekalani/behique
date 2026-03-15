@@ -1,7 +1,20 @@
 import os
+import json
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# ── CLIENTS ────────────────────────────────────────────────────────────────────
+# Primary: local Ollama on Computer 2 (free, LAN)
+# Fallback: OpenAI (if Computer 2 is offline)
+
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://192.168.0.151:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+
+ollama_client = OpenAI(
+    api_key="ollama",
+    base_url=f"{OLLAMA_HOST}/v1"
+)
+
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM_PROMPT = """You are Behique, an intelligent personal assistant for a creative, ADHD mind.
 
@@ -42,37 +55,47 @@ is_update_signal: set to true if the message sounds like it's adding to, modifyi
 """
 
 
+def _classify_with_client(client: OpenAI, model: str, text: str) -> dict:
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": text}
+        ],
+        temperature=0.2,
+        response_format={"type": "json_object"}
+    )
+
+    result = response.choices[0].message.content
+    classification = json.loads(result)
+
+    required = ["category", "niche", "life_pillar", "summary", "tags", "is_update_signal"]
+    for field in required:
+        if field not in classification:
+            raise ValueError(f"Missing field: {field}")
+
+    return classification
+
+
 def classify_input(text: str) -> dict:
+    # Try Ollama first (free, local)
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": text}
-            ],
-            temperature=0.2,
-            response_format={"type": "json_object"}
-        )
+        return _classify_with_client(ollama_client, OLLAMA_MODEL, text)
+    except Exception as ollama_err:
+        pass
 
-        result = response.choices[0].message.content
-        import json
-        classification = json.loads(result)
+    # Fallback to OpenAI
+    try:
+        return _classify_with_client(openai_client, "gpt-4o-mini", text)
+    except Exception:
+        pass
 
-        # Validate required fields
-        required = ["category", "niche", "life_pillar", "summary", "tags", "is_update_signal"]
-        for field in required:
-            if field not in classification:
-                raise ValueError(f"Missing field: {field}")
-
-        return classification
-
-    except Exception as e:
-        # Safe fallback
-        return {
-            "category": "PERSONAL",
-            "niche": "reflection",
-            "life_pillar": "general",
-            "summary": text[:100],
-            "tags": ["uncategorized"],
-            "is_update_signal": False
-        }
+    # Last resort safe fallback
+    return {
+        "category": "PERSONAL",
+        "niche": "reflection",
+        "life_pillar": "general",
+        "summary": text[:100],
+        "tags": ["uncategorized"],
+        "is_update_signal": False
+    }
