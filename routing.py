@@ -3,7 +3,7 @@
 routing.py — The Spine's Routing Layer
 Evaluates a task and routes it to the right model.
 
-80% Ollama (free) · 15% Sonnet · 5% Opus
+Best tool for the job: Ollama · ChatGPT · Sonnet · Opus
 
 Usage:
     from routing import route, complete
@@ -18,11 +18,19 @@ Usage:
 
 import os
 import json
+import logging
 import urllib.request
 import urllib.error
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+
+log = logging.getLogger("routing")
+if not log.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("[routing] %(levelname)s: %(message)s"))
+    log.addHandler(_h)
+    log.setLevel(os.environ.get("ROUTING_LOG_LEVEL", "WARNING").upper())
 
 
 # --- Configuration ---
@@ -57,7 +65,11 @@ class RouteResult:
 # Order matters: put specific patterns before broad ones.
 
 RULES: list[tuple[list[str], Tier, str]] = [
-    # Vault housekeeping → Ollama (free)
+    # Prompt engineering → ChatGPT FIRST (most specific, cross-model > self-prompting)
+    (["write a prompt", "draft prompt", "system prompt", "prompt for claude"], Tier.CHATGPT, "prompt drafting — ChatGPT writes better Claude prompts"),
+    (["improve this prompt", "optimize prompt", "prompt engineering"], Tier.CHATGPT, "prompt optimization"),
+
+    # Vault housekeeping → Ollama
     (["primer.md", "rewrite primer", "update primer"], Tier.OLLAMA, "vault housekeeping"),
     (["vault_index", "update vault", "update index"], Tier.OLLAMA, "vault housekeeping"),
     (["breadcrumb", "update breadcrumb"], Tier.OLLAMA, "vault housekeeping"),
@@ -73,16 +85,12 @@ RULES: list[tuple[list[str], Tier, str]] = [
     (["commit message", "changelog"], Tier.OLLAMA, "summarization"),
 
     # Simple extraction / formatting → Ollama
-    (["extract", "parse", "format", "reformat"], Tier.OLLAMA, "extraction"),
-    (["json", "csv", "markdown table"], Tier.OLLAMA, "formatting"),
-
-    # Prompt engineering → ChatGPT (cross-model prompting > self-prompting)
-    (["write a prompt", "draft prompt", "system prompt", "prompt for claude"], Tier.CHATGPT, "prompt drafting — ChatGPT writes better Claude prompts"),
-    (["improve this prompt", "optimize prompt", "prompt engineering"], Tier.CHATGPT, "prompt optimization"),
+    (["extract text", "extract data", "parse json", "parse csv", "reformat"], Tier.OLLAMA, "extraction"),
+    (["to json", "to csv", "to markdown table", "convert format"], Tier.OLLAMA, "formatting"),
 
     # Code generation → Sonnet
     (["write code", "implement", "build", "create function", "debug"], Tier.SONNET, "code generation"),
-    (["refactor", "fix bug", "add feature", "test"], Tier.SONNET, "code generation"),
+    (["refactor", "fix bug", "add feature", "write test", "run test"], Tier.SONNET, "code generation"),
     (["python", "javascript", "typescript", "react"], Tier.SONNET, "code generation"),
 
     # Architecture / strategy → Sonnet
@@ -107,10 +115,10 @@ def route(task: str) -> RouteResult:
     for keywords, tier, reason in RULES:
         if any(kw in task_lower for kw in keywords):
             model = _model_for_tier(tier)
+            log.info("routed to %s (%s) — matched '%s'", tier.value, reason, task[:80])
             return RouteResult(tier=tier, model=model, reason=reason, task=task)
 
-    # Default: if we can't classify it, use Ollama.
-    # Worst case it's slow or weak and the caller retries on Sonnet.
+    log.info("no rule matched — defaulting to ollama for: %s", task[:80])
     return RouteResult(
         tier=Tier.OLLAMA,
         model=_model_for_tier(Tier.OLLAMA),
@@ -190,7 +198,8 @@ def _call_ollama(prompt: str, system: str = "") -> Optional[str]:
         with urllib.request.urlopen(req, timeout=120) as resp:
             result = json.loads(resp.read())
             return result.get("response", "").strip() or None
-    except Exception:
+    except Exception as e:
+        log.warning("ollama call failed: %s", e)
         return None
 
 
@@ -225,7 +234,8 @@ def _call_openai(prompt: str, system: str = "") -> Optional[str]:
             choices = result.get("choices", [])
             if choices:
                 return choices[0]["message"]["content"].strip()
-    except Exception:
+    except Exception as e:
+        log.warning("openai call failed: %s", e)
         return None
     return None
 
@@ -261,7 +271,8 @@ def _call_anthropic(tier: Tier, prompt: str, system: str = "") -> Optional[str]:
             content = result.get("content", [])
             if content and content[0].get("type") == "text":
                 return content[0]["text"].strip()
-    except Exception:
+    except Exception as e:
+        log.warning("anthropic call failed: %s", e)
         return None
     return None
 
@@ -280,7 +291,8 @@ if __name__ == "__main__":
         print("  python3 routing.py 'design the n8n webhook architecture'")
         sys.exit(0)
 
-    task = " ".join(sys.argv[1:])
+    run_mode = "--run" in sys.argv
+    task = " ".join(a for a in sys.argv[1:] if a != "--run")
     result = route(task)
 
     print(f"Task:   {result.task}")
@@ -288,9 +300,8 @@ if __name__ == "__main__":
     print(f"Model:  {result.model}")
     print(f"Reason: {result.reason}")
 
-    if "--run" in sys.argv:
-        sys.argv.remove("--run")
-        task = " ".join(a for a in sys.argv[1:] if a != "--run")
+    if run_mode:
+        log.setLevel(logging.INFO)
         print(f"\nRunning on {result.model}...")
         response = complete(task)
         print(f"\nResponse:\n{response}")
