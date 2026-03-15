@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: OPENCLAW MIGRATION. OpenClaw v2026.3.13 running on Computer 1. Gateway live, Telegram ON, 5 custom skills ported (ceiba-accountability, idea-classifier, code-auditor, security-auditor, trends-scraper). 3 memory files loaded. Cloudflare tunnel DONE on Computer 2 (n8n.merchoo.shop). Computer 2 bridge doc written (COMPUTER2_MIND.md).
-Next action: Test OpenClaw via Telegram. Install OpenClaw on Computer 2. Build multi-machine agent delegation.
-Blocker: None — all infrastructure in place. Execution is the only gap.
-Session status: OPENCLAW ERA BEGINS — routing.py + 4-tier ChatGPT system + code-auditor skill all shipped same session
+Focus: MULTI-MACHINE BRIDGE OPERATIONAL. OpenClaw on both computers. Computer 1→2 command execution working via Node.js bridge (port 9876). n8n webhooks broken on Windows, bypassed with direct HTTP server.
+Next action: Persist bridge server as pm2 service. Build wrapper function so Ceiba can delegate tasks to Computer 2 natively. Then: revenue work.
+Blocker: Bridge server is ephemeral (running in PowerShell). Needs pm2 persistence.
+Session status: TWO MACHINES, ONE BRAIN — autonomous command execution confirmed
 
 ---
 
