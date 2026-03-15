@@ -19,11 +19,19 @@ Usage:
 import os
 import json
 import logging
+import ssl
 import urllib.request
 import urllib.error
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
+
+# Python 3.14 on macOS needs explicit cert handling
+try:
+    import certifi
+    _SSL_CTX = ssl.create_default_context(cafile=certifi.where())
+except ImportError:
+    _SSL_CTX = ssl.create_default_context()
 
 log = logging.getLogger("routing")
 if not log.handlers:
@@ -229,7 +237,7 @@ def _call_openai(prompt: str, system: str = "") -> Optional[str]:
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with urllib.request.urlopen(req, timeout=120, context=_SSL_CTX) as resp:
             result = json.loads(resp.read())
             choices = result.get("choices", [])
             if choices:
@@ -266,7 +274,7 @@ def _call_anthropic(tier: Tier, prompt: str, system: str = "") -> Optional[str]:
             },
             method="POST",
         )
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        with urllib.request.urlopen(req, timeout=120, context=_SSL_CTX) as resp:
             result = json.loads(resp.read())
             content = result.get("content", [])
             if content and content[0].get("type") == "text":
