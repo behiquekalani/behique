@@ -2,15 +2,9 @@ import json
 import os
 import uuid
 from datetime import datetime
-from openai import OpenAI
+
 from modules.notion_handler import save_to_notion, update_in_notion
-
-# ── LLM CLIENTS ────────────────────────────────────────────────────────────────
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://192.168.0.151:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
-
-_ollama_client = OpenAI(api_key="ollama", base_url=f"{OLLAMA_HOST}/v1")
-_openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from modules.routing import get_chat_clients_for_task
 
 # ── STORAGE PATHS ──────────────────────────────────────────────────────────────
 DATA_DIR = "data"
@@ -84,35 +78,34 @@ Respond ONLY with JSON: {"match_id": "abc12345"} or {"match_id": null}"""
 
     user_msg = f"New message: \"{text}\"\n\nRecent ideas:\n{summaries}"
 
-    def _try_match(client, model):
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_msg}
-            ],
-            temperature=0,
-            response_format={"type": "json_object"}
-        )
-        result = json.loads(response.choices[0].message.content)
-        match_id_prefix = result.get("match_id")
-        if not match_id_prefix:
-            return None
-        for entry in recent:
-            if entry["id"].startswith(match_id_prefix):
-                return entry
+    def _try_match_with_routing() -> dict | None:
+        """
+        Use the central router to pick clients/models for memory matching.
+        Mirrors the Allocator policy: Ollama first, OpenAI fallback.
+        """
+        for client, model in get_chat_clients_for_task("memory_match"):
+            try:
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": user_msg},
+                    ],
+                    temperature=0,
+                    response_format={"type": "json_object"},
+                )
+                result = json.loads(response.choices[0].message.content)
+                match_id_prefix = result.get("match_id")
+                if not match_id_prefix:
+                    continue
+                for entry in recent:
+                    if entry["id"].startswith(match_id_prefix):
+                        return entry
+            except Exception:
+                continue
         return None
 
-    # Try Ollama first (free, local), fall back to OpenAI
-    try:
-        return _try_match(_ollama_client, OLLAMA_MODEL)
-    except Exception:
-        pass
-
-    try:
-        return _try_match(_openai_client, "gpt-4o-mini")
-    except Exception:
-        return None
+    return _try_match_with_routing()
 
 
 # ── SAVE NEW ENTRY ─────────────────────────────────────────────────────────────
