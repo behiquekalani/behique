@@ -13,7 +13,9 @@ try:
 except ImportError:
     has_certifi = False
 
-NOTION_SECRET = "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"
+NOTION_SECRET = os.environ.get("NOTION_SECRET")
+if not NOTION_SECRET:
+    raise ValueError("NOTION_SECRET not set. Run: export NOTION_SECRET=your_token")
 
 def notion_request(method, endpoint, data=None):
     url = f"https://api.notion.com/v1/{endpoint}"
