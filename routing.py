@@ -30,18 +30,18 @@ from typing import Optional
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://192.168.0.151:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2")
 
-# Anthropic is called via API only when explicitly needed.
-# Claude Code / Cursor handle their own Claude calls — routing.py
-# is for the autonomous parts of the system (BehiqueBot, n8n jobs,
-# overnight pipelines) that need to pick a model themselves.
+# API keys — routing.py is for the autonomous parts of the system
+# (BehiqueBot, n8n jobs, overnight pipelines) that pick their own model.
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 
 
 class Tier(Enum):
-    """Model tiers, cheapest first."""
-    OLLAMA = "ollama"
-    SONNET = "sonnet"
-    OPUS = "opus"
+    """Model tiers — best tool for the job, not cheapest."""
+    OLLAMA = "ollama"       # Classification, tagging, simple extraction — not because cheap, because sufficient
+    CHATGPT = "chatgpt"     # Prompt drafting for Claude — cross-model prompting beats self-prompting
+    SONNET = "sonnet"       # Code gen, architecture, deep reasoning
+    OPUS = "opus"           # Rare, high-stakes creative/strategic
 
 
 @dataclass
@@ -75,6 +75,10 @@ RULES: list[tuple[list[str], Tier, str]] = [
     # Simple extraction / formatting → Ollama
     (["extract", "parse", "format", "reformat"], Tier.OLLAMA, "extraction"),
     (["json", "csv", "markdown table"], Tier.OLLAMA, "formatting"),
+
+    # Prompt engineering → ChatGPT (cross-model prompting > self-prompting)
+    (["write a prompt", "draft prompt", "system prompt", "prompt for claude"], Tier.CHATGPT, "prompt drafting — ChatGPT writes better Claude prompts"),
+    (["improve this prompt", "optimize prompt", "prompt engineering"], Tier.CHATGPT, "prompt optimization"),
 
     # Code generation → Sonnet
     (["write code", "implement", "build", "create function", "debug"], Tier.SONNET, "code generation"),
@@ -118,6 +122,8 @@ def route(task: str) -> RouteResult:
 def _model_for_tier(tier: Tier) -> str:
     if tier == Tier.OLLAMA:
         return OLLAMA_MODEL
+    elif tier == Tier.CHATGPT:
+        return "gpt-4o"
     elif tier == Tier.SONNET:
         return "claude-sonnet-4-6"
     elif tier == Tier.OPUS:
@@ -145,8 +151,11 @@ def complete(task: str, system: str = "", fallback: bool = True) -> str:
         # Ollama failed → try Sonnet
         if result.tier == Tier.OLLAMA and ANTHROPIC_API_KEY:
             response = _call(Tier.SONNET, task, system)
-        # Sonnet failed → try Ollama (maybe API is down, local still works)
-        elif result.tier == Tier.SONNET:
+        # ChatGPT failed → try Sonnet (both are cloud APIs, different providers)
+        elif result.tier == Tier.CHATGPT and ANTHROPIC_API_KEY:
+            response = _call(Tier.SONNET, task, system)
+        # Sonnet/Opus failed → try Ollama (API down, local still works)
+        elif result.tier in (Tier.SONNET, Tier.OPUS):
             response = _call(Tier.OLLAMA, task, system)
 
     return response or "[routing error: all models failed]"
@@ -155,6 +164,8 @@ def complete(task: str, system: str = "", fallback: bool = True) -> str:
 def _call(tier: Tier, prompt: str, system: str = "") -> Optional[str]:
     if tier == Tier.OLLAMA:
         return _call_ollama(prompt, system)
+    elif tier == Tier.CHATGPT:
+        return _call_openai(prompt, system)
     elif tier in (Tier.SONNET, Tier.OPUS):
         return _call_anthropic(tier, prompt, system)
     return None
@@ -181,6 +192,42 @@ def _call_ollama(prompt: str, system: str = "") -> Optional[str]:
             return result.get("response", "").strip() or None
     except Exception:
         return None
+
+
+def _call_openai(prompt: str, system: str = "") -> Optional[str]:
+    if not OPENAI_API_KEY:
+        return None
+
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+
+    payload = {
+        "model": "gpt-4o",
+        "messages": messages,
+        "max_tokens": 2000,
+        "temperature": 0.7,
+    }
+    try:
+        data = json.dumps(payload).encode()
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=data,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            result = json.loads(resp.read())
+            choices = result.get("choices", [])
+            if choices:
+                return choices[0]["message"]["content"].strip()
+    except Exception:
+        return None
+    return None
 
 
 def _call_anthropic(tier: Tier, prompt: str, system: str = "") -> Optional[str]:

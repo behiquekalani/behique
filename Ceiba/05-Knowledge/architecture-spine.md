@@ -80,17 +80,18 @@ An AI system needs exactly six things to function like a real intelligence. Not 
 **What it is:** The intelligence that decides which model handles which task, at what cost, at what quality.
 **What we have:** Nothing. Everything routes to Claude by default.
 **Why this matters:** Claude Max credits are finite. Anthropic can change terms. The system should not depend on any single model. Resilience requires routing.
-**The routing logic:**
+**The routing logic (best tool for the job, not cheapest):**
 ```
 Task → Complexity Score → Model Selection
-├── Simple classification (BehiqueBot categories) → Ollama llama3.2 (free, local, fast)
-├── Short memory operations (update primer.md) → Ollama llama3.2
-├── Complex reasoning (architecture decisions, strategy) → Claude Sonnet
-├── Code generation (new features, debugging) → Claude Sonnet
-├── Deep creative/strategic (rare, high-stakes) → Claude Opus
-└── Emergency fallback (credits gone) → Ollama only, graceful degradation
+├── Classification, tagging, extraction     → Ollama llama3.2 (sufficient, local)
+├── Vault housekeeping (primer, breadcrumbs) → Ollama llama3.2
+├── Prompt engineering for Claude            → ChatGPT gpt-4o (cross-model > self-prompting)
+├── Complex reasoning, architecture          → Claude Sonnet
+├── Code generation, debugging               → Claude Sonnet
+├── Deep creative/strategic (rare)           → Claude Opus
+└── Emergency fallback (all APIs down)       → Ollama only, graceful degradation
 ```
-**What this means in practice:** 80% of tasks should run on Ollama (free). 15% on Sonnet. 5% on Opus. Claude is for thinking. Not for updating a markdown file.
+**Principle:** Use the best model for each task. Ollama handles simple work not because it's cheap but because it's sufficient. ChatGPT writes better Claude prompts than Claude does. Claude handles code and reasoning where it genuinely excels. No Anthropic bias — route to whatever is actually best.
 **Target state:** A routing.py module that evaluates every task and sends it to the right model. ceiba_lite.py is the prototype of this — expand it.
 **Estimated build time:** 4-6 weeks for a robust router
 
