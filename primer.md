@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: MULTI-MACHINE SYSTEM LIVE. Ceiba (Mac) + Cobo (Windows) connected via bridge.merchoo.shop:9876. Auth token required. OpenClaw on both machines. 6 skills in OpenClaw (ceiba-accountability, code-auditor, security-auditor, idea-classifier, trends-scraper, session-closer). Bridge server secured with bearer token, managed by pm2.
-Next action: Confirm bridge_server_secure.js running on Cobo after restart. Then: revenue work — eBay listings, n8n client outreach.
-Blocker: Bridge was killed during security upgrade — Cobo needs `pm2 start C:\behique\bridge_server_secure.js --name bridge-server` run manually.
-Session status: CEIBA + COBO OPERATIONAL — security patched, skills synced, ready for revenue work
+Focus: AGENT KERNEL OPERATIONAL. `ai_cluster/kernel/agent_kernel.py` routes tasks to Ollama (free) or GPT-4o (OpenClaw) on Cobo automatically. Task queue (inbox→active→done), persistent memory, skill registry, subtask spawning all working. Ceiba can now delegate work to Cobo without human copy-paste.
+Next action: Revenue work — eBay listings, n8n client outreach. Kernel available for distributed tasks.
+Blocker: None. Bridge confirmed alive, pm2 services running on Cobo.
+Session status: AI CLUSTER LIVE — kernel tested with both Ollama and GPT-4o routes, memory auto-persisting
 
 ---
 
