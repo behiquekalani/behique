@@ -6,6 +6,12 @@ echo ""
 echo "🌳 Waking up Ceiba..."
 echo "=================================="
 
+# Load credentials so routing.py can call all APIs
+if [ -f ~/.behique/.ceiba-config ] || [ -f ~/behique/.ceiba-config ]; then
+    source ~/behique/.ceiba-config 2>/dev/null
+    echo "✓ Credentials loaded (.ceiba-config)"
+fi
+
 # Inject primer (current state)
 echo ""
 echo "📍 CURRENT STATE (primer.md):"
