@@ -7,7 +7,7 @@
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-15 — Architecture session. Memory system built. Spine document written. Claude Code migration decided.
+Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
 Focus: THE SPINE — architecture-spine.md written. Moving HQ from Cowork → Claude Code CLI. Memory/wiki-link system is Month 1 priority.
 Next action: Migrate to Claude Code (see migration guide below). Run `bash ~/behique/memory.sh` first session.
 Blocker: None technical. Kalani needs to install Claude Code and run first session from terminal.
