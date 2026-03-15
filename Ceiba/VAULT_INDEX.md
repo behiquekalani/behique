@@ -70,6 +70,7 @@
 |------|---------------------|
 | `screen-assistant-idea.md` | Idea capture — screen-aware AI assistant concept. |
 | `architecture-spine.md` | **READ THIS** — 6-part AI body framework + 4-month build plan. The north star for everything. |
+| `session-2026-03-15-capture.md` | **READ AFTER SPINE** — priority shifts, Allocator findings, stop hook design, credit burn causes. |
 | `system-map-render.jsx` | Interactive React system map — 9 nodes, click for status. Render in Cowork to view. |
 
 ---
