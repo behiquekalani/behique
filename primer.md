@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: MULTI-MACHINE BRIDGE OPERATIONAL. OpenClaw on both computers. Computer 1→2 command execution working via Node.js bridge (port 9876). n8n webhooks broken on Windows, bypassed with direct HTTP server.
-Next action: Persist bridge server as pm2 service. Build wrapper function so Ceiba can delegate tasks to Computer 2 natively. Then: revenue work.
-Blocker: Bridge server is ephemeral (running in PowerShell). Needs pm2 persistence.
-Session status: TWO MACHINES, ONE BRAIN — autonomous command execution confirmed
+Focus: MULTI-MACHINE SYSTEM LIVE. Ceiba (Mac) + Cobo (Windows) connected via bridge.merchoo.shop:9876. Auth token required. OpenClaw on both machines. 6 skills in OpenClaw (ceiba-accountability, code-auditor, security-auditor, idea-classifier, trends-scraper, session-closer). Bridge server secured with bearer token, managed by pm2.
+Next action: Confirm bridge_server_secure.js running on Cobo after restart. Then: revenue work — eBay listings, n8n client outreach.
+Blocker: Bridge was killed during security upgrade — Cobo needs `pm2 start C:\behique\bridge_server_secure.js --name bridge-server` run manually.
+Session status: CEIBA + COBO OPERATIONAL — security patched, skills synced, ready for revenue work
 
 ---
 
@@ -46,11 +46,13 @@ eBay Listing Assistant still pending API keys — pick back up after migration i
 - Ceiba Lite: `~/behique/ceiba_lite.py` — offline fallback on Ollama
 - Trends scraper: `~/behique/tools/trends_scraper.py` — proxy rotation, 35 categories
 - Obsidian vault: wired with HOME.md, project pages, MISSIONS.md
-- **Computer 2 (192.168.0.151)** — worker node LIVE:
-  - n8n running via pm2 → http://192.168.0.151:5678 (N8N_SECURE_COOKIE=false)
+- **Computer 2 "Cobo" (192.168.0.151)** — worker node LIVE:
+  - Bridge server: https://bridge.merchoo.shop (port 9876, bearer auth required)
+  - Auth token: 1ff88046093734c125030b1f7032ac0244f4d31b841f8d74f7378e50d1d0f318
+  - n8n running via pm2 → http://192.168.0.151:5678 (webhooks broken on Windows, bypassed)
   - Ollama (llama3.2) → http://192.168.0.151:11434 (OLLAMA_HOST=0.0.0.0)
+  - OpenClaw: @CeibaOC2Bot, GPT-4o, 3+ skills
   - Syncthing → ~/behique synced in real time with Mac
-  - Cowork working (VHDX sparse fix applied, Hyper-V enabled)
   - pm2-windows-startup installed, Syncthing scheduled task on login
 - Telegram notify relay: notify.py + LaunchAgent on Mac (queues messages from sandbox)
 
