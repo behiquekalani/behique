@@ -14,14 +14,20 @@ import urllib.request
 import urllib.error
 from datetime import datetime
 
-OLLAMA_URL = "http://127.0.0.1:11434/api/generate"
-MODEL = "qwen2.5:7b"
+try:
+    from routing import route
+    HAS_ROUTER = True
+except ImportError:
+    HAS_ROUTER = False
+
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://192.168.0.151:11434") + "/api/generate"
+MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2")
 BEHIQUE_PATH = os.path.expanduser("~/behique")
 
 BANNER = """
 ╔══════════════════════════════════════════════╗
 ║         CEIBA LITE — OFFLINE MODE            ║
-║   Running on Ollama · qwen2.5:7b · Local     ║
+║   Running on Ollama · llama3.2 · Local        ║
 ║   Full Ceiba unavailable (Claude Max limit)  ║
 ║   Type 'quit' to exit · 'status' for update  ║
 ╚══════════════════════════════════════════════╝
@@ -140,7 +146,11 @@ def main():
             show_status()
             continue
 
-        print("\nCeiba: ", end="", flush=True)
+        if HAS_ROUTER:
+            r = route(user_input)
+            print(f"\n[routed → {r.tier.value} ({r.reason})]")
+
+        print("Ceiba: ", end="", flush=True)
         response = ask_ollama(system_context, conversation_history, user_input)
         print(response)
         print()
