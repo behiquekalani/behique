@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: THE SPINE — architecture-spine.md written. Moving HQ from Cowork → Claude Code CLI. Memory/wiki-link system is Month 1 priority.
-Next action: Migrate to Claude Code (see migration guide below). Run `bash ~/behique/memory.sh` first session.
-Blocker: None technical. Kalani needs to install Claude Code and run first session from terminal.
-Session status: ARCHITECTURE COMPLETE — ready to migrate
+Focus: THE SPINE — routing.py v1 DONE. Keyword-based router, 3 tiers (Ollama/Sonnet/Opus), fallback chain, CLI test mode. ceiba_lite.py updated to use it.
+Next action: Merge worktree `sharp-raman` to main. Then: Cloudflare named tunnel on Computer 2 for n8n webhooks.
+Blocker: Cloudflare tunnel requires Computer 2 access (not remote from Mac).
+Session status: ROUTING LAYER SHIPPED — first real Spine component
 
 ---
 
