@@ -1,106 +1,58 @@
-# Computer 2 — Claude Code Session Instructions
-# Give these to Claude Code on Computer 2 (192.168.0.151)
-# Date: 2026-03-15
+# PASTE THIS INTO CLAUDE CODE ON COMPUTER 2
 
----
+You are running on Computer 2 (192.168.0.151), Kalani's Windows worker node. The main Ceiba instance is running on his Mac. Your job is one thing: get n8n a stable HTTPS webhook URL via a named Cloudflare tunnel.
 
-## CONTEXT
+## Step 1: Install cloudflared (if not installed)
+Run `winget install Cloudflare.cloudflared` or check if `cloudflared --version` already works.
 
-You are running on Computer 2, Kalani's Windows worker node. The main Ceiba instance is running on his Mac. You are the second agent — your job is infrastructure that the Mac can't do (Cloudflare tunnels, n8n config, Ollama management).
+## Step 2: Login to Cloudflare
+Run `cloudflared tunnel login` — this opens a browser for auth. Wait for Kalani to approve if needed.
 
-The project folder is `~/behique` (synced via Syncthing from Mac in real time).
-
----
-
-## YOUR TASKS (in order)
-
-### 1. Create a named Cloudflare tunnel for n8n
-
-n8n needs a stable HTTPS URL for Telegram webhooks. The current quick tunnel URL rotates on restart.
-
-```bash
-# Install cloudflared if not already installed
-# On Windows: winget install Cloudflare.cloudflared
-
-# Login to Cloudflare (opens browser)
-cloudflared tunnel login
-
-# Create the named tunnel
-cloudflared tunnel create behique-n8n
-
-# Create config file at ~/.cloudflared/config.yml:
+## Step 3: Create the named tunnel
 ```
+cloudflared tunnel create behique-n8n
+```
+Note the tunnel ID from the output.
 
+## Step 4: Create the config file
+Write `C:\Users\Kalani\.cloudflared\config.yml` with:
 ```yaml
 tunnel: behique-n8n
 credentials-file: C:\Users\Kalani\.cloudflared\<TUNNEL_ID>.json
-
 ingress:
-  - hostname: n8n.behique.dev
+  - hostname: behique-n8n.cfargotunnel.com
     service: http://localhost:5678
   - service: http_status:404
 ```
+Replace `<TUNNEL_ID>` with the actual ID from step 3.
 
-If Kalani doesn't have a domain yet, use the tunnel's default URL instead:
-```bash
-cloudflared tunnel route dns behique-n8n n8n-behique.cfargotunnel.com
+If Kalani has a custom domain, ask him. Otherwise use the tunnel's default URL.
+
+## Step 5: Route DNS
+```
+cloudflared tunnel route dns behique-n8n behique-n8n
 ```
 
-Then run:
-```bash
-cloudflared tunnel run behique-n8n
+## Step 6: Start the tunnel and register with pm2
 ```
-
-Register it with pm2 so it survives restarts:
-```bash
 pm2 start cloudflared -- tunnel run behique-n8n
 pm2 save
 ```
 
-### 2. Update n8n webhook URL
-
-Once the tunnel is live, go to n8n settings:
-- Open http://localhost:5678/settings
-- Set Webhook URL to the tunnel's HTTPS URL
-- Save and restart n8n: `pm2 restart n8n`
-
-### 3. Test the Telegram webhook
-
-The /spec workflow in n8n has a Telegram trigger node. Once the webhook URL is set:
-- Open the /spec workflow in n8n
-- Activate it
-- Send a test message to the bot on Telegram
-- Verify the webhook fires
-
-### 4. Report back
-
-After completing these tasks, update `~/behique/primer.md` LIVE STATE block:
+## Step 7: Update n8n webhook URL
+Go to http://localhost:5678/settings and set the Webhook URL to the tunnel's HTTPS URL. Then:
 ```
-Last update: [date] — Cloudflare named tunnel live on Computer 2.
-Focus: n8n webhooks now have stable HTTPS via behique-n8n tunnel.
-Next action: Test /spec workflow end-to-end with Telegram trigger.
-Blocker: [any blockers found]
-Session status: TUNNEL LIVE
+pm2 restart n8n
 ```
 
-Syncthing will sync primer.md back to Mac automatically.
+## Step 8: Test
+The /spec workflow in n8n has a Telegram trigger. Activate it and ask Kalani to send a test message to the bot.
 
----
+## Step 9: Update primer.md
+Edit `~/behique/primer.md` LIVE STATE block to reflect the tunnel is live. Syncthing will sync it to Mac.
 
-## WHAT NOT TO DO
-
-- Don't touch routing.py or ceiba_lite.py — Mac Ceiba handles those
-- Don't modify CLAUDE.md or vault files — those are Mac-managed
-- Don't install new Python packages without checking with Kalani
-- Don't create new projects or side-track into other tasks
-- Focus: tunnel, n8n webhook, test, report back. That's it.
-
----
-
-## SERVICES ALREADY RUNNING ON THIS MACHINE
-
-| Service | Manager | Port |
-|---------|---------|------|
-| n8n | pm2 | 5678 |
-| Ollama | system service | 11434 |
-| Syncthing | scheduled task | 8384 |
+## Rules
+- Do NOT touch routing.py, ceiba_lite.py, CLAUDE.md, or vault files
+- Do NOT install Python packages or start new projects
+- If something fails, troubleshoot it. Don't skip steps.
+- When done, stop. Don't look for more work.
