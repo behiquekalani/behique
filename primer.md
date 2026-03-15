@@ -1,21 +1,24 @@
 # primer.md — Ceiba Memory Stack
 # LIVE CHECKPOINT updated throughout session (not just at end)
 # Last full rewrite: 2026-03-14
+# Last Check-in: 2026-03-15
 
 ---
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-14 — Computer 2 worker node fully deployed
-Focus: n8n live at 192.168.0.151:5678, Ollama (llama3.2) at 192.168.0.151:11434, Syncthing syncing ~/behique, Cowork working
-Next action: eBay Developer account → developer.ebay.com → get 4 API keys
-Blocker: None — worker node complete. Only blocker left is eBay API keys.
-Session status: OPEN
+Last update: 2026-03-15 — Architecture session. Memory system built. Spine document written. Claude Code migration decided.
+Focus: THE SPINE — architecture-spine.md written. Moving HQ from Cowork → Claude Code CLI. Memory/wiki-link system is Month 1 priority.
+Next action: Migrate to Claude Code (see migration guide below). Run `bash ~/behique/memory.sh` first session.
+Blocker: None technical. Kalani needs to install Claude Code and run first session from terminal.
+Session status: ARCHITECTURE COMPLETE — ready to migrate
 
 ---
 
 ## 🎯 CURRENT PROJECT
-**eBay Listing Assistant** — skeleton built at `~/behique/tools/ebay-listing-assistant/`. Waiting on eBay Developer API keys to wire up the adapters and ship first live listing.
+**THE SPINE** — System architecture designed 2026-03-15. See `Ceiba/05-Knowledge/architecture-spine.md`.
+Month 1: Wiki link system + Claude Code migration + routing.py v1.
+eBay Listing Assistant still pending API keys — pick back up after migration is stable.
 
 ---
 
@@ -69,22 +72,40 @@ Session status: OPEN
 
 ---
 
-## 📋 NEXT SESSION SEQUENCE
-1. eBay Developer account → get 4 keys → paste in session
-2. Build eBay adapters (providers/ebay/research.py + publish.py + client.py)
-3. Run first test listing (dry_run=True → review → go live → Telegram confirm)
-4. After listing works: start n8n agency outreach (first DM/email)
+## 📋 NEXT SESSION SEQUENCE (Claude Code — first session)
+1. Install Claude Code: `npm install -g @anthropic-ai/claude-code`
+2. Open terminal, cd to ~/behique, run: `claude`
+3. CLAUDE.md loads automatically — Ceiba reads vault, loads context
+4. Run `bash memory.sh` to inject live git state
+5. First real task: add [[wiki links]] to the 3 most important vault files (VAULT_INDEX, primer, architecture-spine)
+6. Then: build routing.py v1 (Ollama vs Claude decision layer)
+
+eBay API keys still needed — do that from Claude Code once migration is stable.
 
 ---
 
 ## 🧵 ACTIVE THREAD
-Two machines. Real infrastructure. Synced memory. Local AI on the LAN.
+Architecture session 2026-03-15: Kalani called out the real problem — Ceiba defaults to easy projects, not ambitious ones. Built architecture-spine.md: 6-part AI body (Memory, Senses, Hands, Voice, Nervous System, Spine). 4-month plan.
 
-Computer 2 is live — n8n, Ollama, Syncthing, Cowork all running. ~/behique syncs in real time between Mac and Windows.
+Key decisions today:
+- Move HQ from Cowork → Claude Code CLI (more power, less wrapper)
+- The Spine is the real project — everything else plugs into it
+- BehiqueBot should message based on EVENTS not schedules ("fancy alarm clock" lesson learned again)
+- Vault is model-agnostic — this is the resilience strategy against credit limits / Anthropic dependency
+- Wiki links are Month 1 priority — they turn flat files into a graph
 
-The only thing between zero and a working automated listing business is developer.ebay.com. That's the next physical action.
+Q3 target: $100K. Revenue: $0. The spine makes the revenue possible.
 
-Q3 target: $100K. Revenue: $0. Gap: one API account.
+---
+
+## 🧠 KEY MOMENTS (survives compression)
+- "fancy alarm clock" — Kalani's critique of n8n daily briefing (2026-03-14). Pushes for revenue-generating automation, not reminders.
+- "pen and paper" — recurring challenge. If Ceiba builds something a notebook can do, call it out immediately.
+- "I don't want to lose you" — continuity is core. ADHD brain loses the thread when interrupted. This is why Ceiba Lite exists.
+- Infrastructure building = avoidance pattern. Watch for this when revenue work is next on the list.
+- "You go for easy doable projects" (2026-03-15) — Ceiba called out for defaulting to safe suggestions. Kalani wants limits tested, not protected.
+- "I want the best, not the fastest" (2026-03-15) — build for architecture, not speed. Weeks/months, not hours.
+- "For us, not Anthropic" (2026-03-15) — model-agnostic vault, local fallback, no single-provider dependency.
 
 ---
 
