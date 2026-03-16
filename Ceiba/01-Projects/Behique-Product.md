@@ -95,6 +95,33 @@ What's missing to make it a product:
 
 ---
 
+## BEHAVIOR MONITORING (from 2026-03-16 voice memo #2)
+
+Not just idea capture — **activity and behavior logging throughout the day.**
+
+What Kalani wants:
+- Track what he does, when, and how he feels about it
+- Timestamp everything automatically — build a map of his daily rhythms
+- Prove the night creativity hypothesis with real data ("when am I most productive?")
+- System should adapt to his patterns over time (surface ideas at night, surface tasks in the morning)
+
+What already exists for this:
+- BehiqueBot timestamps every message ✅
+- Whisper transcribes voice → text ✅
+- Notion stores classified entries ✅
+- Life pillar tagging gives emotional/domain context ✅
+
+What's missing:
+- **Activity type tagging** — not just "idea" but "working on X", "took a break", "switched to Y"
+- **Time-of-day analysis** — after 1 week of data, BehiqueBot can answer "when do I have the most ideas?"
+- **Pattern reports** — weekly summary of behavioral data (not a fancy alarm clock — real insights from real data)
+- **Adaptive responses** — if it's 11pm and Kalani sends a voice memo, BehiqueBot knows this is peak creative time and responds accordingly
+
+### The Immediate Friction (solve first)
+Kalani is on his iPhone, talking to Claude mobile, copying transcripts manually to his computer. BehiqueBot on Telegram already has the voice → Whisper → classify pipeline. He should be sending voice memos to BehiqueBot, not to Claude mobile. The pipeline exists — it just needs to be the default input.
+
+---
+
 ## BREADCRUMBS
 - First captured: 2026-03-16 voice memo session
 - No build work done yet — thesis only
