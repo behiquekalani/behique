@@ -7,11 +7,11 @@
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: AGENT KERNEL OPERATIONAL. `ai_cluster/kernel/agent_kernel.py` routes tasks to Ollama (free) or GPT-4o (OpenClaw) on Cobo automatically. Task queue (inbox→active→done), persistent memory, skill registry, subtask spawning all working. Ceiba can now delegate work to Cobo without human copy-paste.
-Next action: Revenue work — eBay listings, n8n client outreach. Kernel available for distributed tasks.
-Blocker: None. Bridge confirmed alive, pm2 services running on Cobo.
-Session status: AI CLUSTER LIVE — kernel tested with both Ollama and GPT-4o routes, memory auto-persisting
+Last update: 2026-03-16 — First Claude Code session. Idea capture only.
+Focus: Captured voice memo ideas — Discord content hub, content approval pipeline, localhost visual preview, iPhone as mobile node, Jarvis voice cowork vision. All logged in IDEAS_BACKLOG.md and architecture-spine.md.
+Next action: eBay Developer account (was due today 2026-03-16). Discord server setup. Revenue work.
+Blocker: eBay API keys still not obtained. No technical blocker — just needs to be done.
+Session status: Capture session — no code written, vault updated with new ideas and architecture additions
 
 ---
 
@@ -87,16 +87,16 @@ eBay API keys still needed — do that from Claude Code once migration is stable
 ---
 
 ## 🧵 ACTIVE THREAD
-Architecture session 2026-03-15: Kalani called out the real problem — Ceiba defaults to easy projects, not ambitious ones. Built architecture-spine.md: 6-part AI body (Memory, Senses, Hands, Voice, Nervous System, Spine). 4-month plan.
+Capture session 2026-03-16 (first Claude Code session): Kalani sent voice memo from iPhone with new ideas. No code built — pure idea capture. Key additions:
+- iPhone 13 Pro Max added as mobile Ceiba node (Senses body part)
+- Discord server as content hub — preview reels/animations before publishing
+- Content approval pipeline: generate → preview → approve via Discord/Telegram → publish
+- Jarvis endpoint vision: Discord voice cowork with Ceiba (Month 4+ goal)
+- Confirmed model-agnostic approach works for Jarvis — OpenAI Realtime for voice, Claude for brain, Ollama for simple tasks
 
-Key decisions today:
-- Move HQ from Cowork → Claude Code CLI (more power, less wrapper)
-- The Spine is the real project — everything else plugs into it
-- BehiqueBot should message based on EVENTS not schedules ("fancy alarm clock" lesson learned again)
-- Vault is model-agnostic — this is the resilience strategy against credit limits / Anthropic dependency
-- Wiki links are Month 1 priority — they turn flat files into a graph
+Pattern note: eBay developer account is now 4+ days as "next action" with zero technical blockers. The pattern is still active.
 
-Q3 target: $100K. Revenue: $0. The spine makes the revenue possible.
+Q3 target: $100K. Revenue: $0. eBay dev account is still one browser tab away.
 
 ---
 
