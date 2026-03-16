@@ -7,20 +7,20 @@
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 — Third Claude Code session. Memory crisis identified and being fixed.
-Focus: Session continuity broken — Claude Code doesn't persist between sessions. Fixing with proper session start hooks.
-Done today: eBay listing assistant merged to main (PR created + merged), Merchoo brand assets logged (3 logo variants, starfish design).
-Active now: Building session start hook so context auto-loads every session. Generating quest dashboard prompt for CodeGPT.
-Key issue: Kalani didn't know each session starts blank. Now he does. Fixing the automation gap.
+Last update: 2026-03-16 — Fourth Claude Code session. Quest dashboard built + eBay publisher upgraded.
+Focus: Quest dashboard v1.1 shipped (tabs, auto-progress, JSON import/export). eBay publisher upgraded with user tokens + error handling.
+Done today: quest-dashboard.html (2 versions), publisher.py + auth.py upgraded, session transcript saved.
+Active now: Nothing — session ending. Next: open dashboard in browser, get eBay sandbox keys.
+Key win: eBay API keys obtained! First real revenue blocker cleared.
 
 ---
 
 ## 🎯 CURRENT PROJECT
-**SESSION CONTINUITY FIX** — The memory files exist (vault, primer, observations, spine) but nothing forces a new session to load them. Building a session start hook that auto-injects context.
+**eBay Empire** — Publisher code is complete. Next blocker: sandbox API keys from developer.ebay.com + policy IDs from Seller Hub. Then test_sandbox() and first real listing.
 
-**SECONDARY:** Quest dashboard — Fallout/Elder Scrolls style visual tracker. CodeGPT prompt generated, Kalani building it in parallel.
+**Quest Dashboard** — BUILT. `quest-dashboard.html` in repo root. v1.1 has category tabs, auto-progress from objectives, JSON import/export. Open in browser to verify.
 
-**eBay Listing Assistant** — CODE COMPLETE. Merged to main 2026-03-16. Full pipeline: auth → research → content gen → publish → history. Blocked on eBay API keys only.
+**Session Continuity** — FIXED. SessionStart hook auto-loads vault context. Working as of this session.
 
 ---
 
@@ -34,20 +34,30 @@ Key issue: Kalani didn't know each session starts blank. Now he does. Fixing the
 - `wake.sh` — full context wake-up script
 - `Ceiba/VAULT_INDEX.md` — master index of everything
 - `Ceiba/04-Patterns/observations.md` — behavioral patterns, session history
-- `Ceiba/05-Knowledge/architecture-spine.md` — THE SPINE, 6-part system design
+- `Ceiba/06-Sessions/SES_2026_03_16_claude_code.md` — this session's full transcript
 - `tools/vault_grapher.py` — generates vault_graph.json + VAULT_GRAPH.md
 - `Ceiba/ceiba_dashboard.html` — interactive knowledge graph visualization (vis.js)
+
+### Quest Dashboard — BUILT
+- `quest-dashboard.html` — Fallout/Elder Scrolls RPG-style quest tracker
+- Auto-progress from objectives (no manual percentages)
+- Category tabs: ALL / MAIN / SIDE / FUTURE
+- JSON import (loads quests.json) + export button
+- Hardcoded fallback data if quests.json missing
 
 ### Skills (Claude Desktop chat, NOT Claude Code)
 - `ceiba.skill`, `professor.skill`, `the-allocator.skill`, `schedule.skill`
 - `session-tracker`, `session-closer`, `vault-architect`, `kernel` (in skills/ folder)
 - These are SKILL.md files for Claude Desktop — not Claude Code hooks
 
-### eBay Listing Assistant — MERGED TO MAIN
+### eBay Listing Assistant — CODE COMPLETE
 - `tools/ebay-listing-assistant/` — full pipeline
-- Auth (OAuth2), Research (Browse API), Content Gen (Claude/Ollama), Publisher (Inventory API), History (SQLite)
+- Auth: OAuth2 Client Credentials + User Token (EBAY_USER_TOKEN)
+- Research (Browse API), Content Gen (Claude/Ollama), Publisher (Inventory API), History (SQLite)
+- Publisher upgraded: EbayApiError, _api_call() wrapper, shipping defaults (PR 00901), test_sandbox()
+- Policy IDs from env vars: EBAY_FULFILLMENT_POLICY_ID, EBAY_PAYMENT_POLICY_ID, EBAY_RETURN_POLICY_ID
 - CLI: `python main.py list "product" --condition Used --dry-run`
-- Blocked on: eBay Developer account API keys
+- Blocked on: eBay Developer sandbox keys + Seller Hub policy IDs
 
 ### BehiqueBot — LIVE
 - Live on Railway, Telegram bot active
@@ -61,9 +71,9 @@ Key issue: Kalani didn't know each session starts blank. Now he does. Fixing the
 - AI Cluster kernel: `ai_cluster/kernel/agent_kernel.py` — task queue + routing
 - Bridge to Cobo: `bridge/dispatch.sh` — routes tasks to Ollama/GPT-4o/Claude
 - **Cobo (Computer 2)** — Windows gaming desktop, currently ONLINE
-  - Bridge server: https://bridge.merchoo.shop (port 9876)
+  - Bridge server: `bridge_server_secure.js` (port 9876, Bearer auth) — switched from insecure this session
   - n8n via pm2, Ollama (llama3.2), OpenClaw (@CeibaOC2Bot)
-  - Syncthing syncing ~/behique
+  - Syncthing syncing ~/behique (port 8384)
 - Shopify store: exists, monthly paid, no sales. Brand: **Merchoo** (Clothes Shop)
   - Logo: starfish design, 3 color variants (cyan, pink, brown)
   - Logo files on Cobo: `C:\Users\kalan\Desktop\Kalani-Business\Dropshipping\MERCHOO\logo`
@@ -76,35 +86,36 @@ Key issue: Kalani didn't know each session starts blank. Now he does. Fixing the
 - OPENAI_API_KEY: active
 - OBSIDIAN_API_KEY: port 27123
 - Webshare proxies: `~/Downloads/Webshare 10 proxies.txt`
-- eBay API keys: NOT YET — needed from developer.ebay.com
+- eBay API keys: GOT THEM (2026-03-16) — need sandbox keys + policy IDs next
 
 ---
 
 ## 🚧 OPEN BLOCKERS
-1. **eBay Developer account** — single gate to first revenue
-2. **Session continuity** — hook being built NOW so context auto-loads
+1. **eBay sandbox keys + policy IDs** — create policies in Seller Hub, get IDs for env vars
+2. **Quest dashboard verification** — open in browser, confirm it renders
 3. **n8n agency outreach** — zero clients, starts after eBay ships
 
 ---
 
 ## 📋 NEXT SESSION SEQUENCE
-1. Session hook should auto-load context (if hook is built and working)
-2. If not: run `bash memory.sh` then read primer.md, VAULT_INDEX.md, observations.md
-3. Check quest dashboard status (CodeGPT may have built it)
-4. Resume eBay blocker: developer.ebay.com account setup
-5. Update MISSIONS.md with current quest states
+1. Session hook should auto-load context
+2. Open quest-dashboard.html in browser — verify rendering
+3. eBay: create sandbox account → get test keys → run test_sandbox()
+4. eBay: create fulfillment/payment/return policies in Seller Hub → get policy IDs
+5. First real eBay listing attempt
 
 ---
 
 ## 🧵 ACTIVE THREAD
-Session 2026-03-16: Kalani discovered Claude Code doesn't persist memory between sessions. Previous sessions implied it did. Trust was damaged. Fixing it now with:
-1. Session start hook (auto-loads context)
-2. Updated primer.md (this file)
-3. Quest dashboard prompt for CodeGPT (Fallout/Elder Scrolls style)
+Session 2026-03-16 (4th Claude Code session):
+- Quest dashboard built from scratch (not ChatGPT's version)
+- v1.1 added: tabs, auto-progress, JSON import/export
+- eBay publisher upgraded: user tokens, error handling, shipping defaults, test_sandbox()
+- Did NOT duplicate ChatGPT's proposed ebay_api_publisher.py — upgraded existing files
+- Cursor handled Cobo security (bridge switch to secure version)
+- Kalani got eBay API keys — first real revenue blocker cleared
 
-The PR for `claude/ceiba-implementation-qDeCc` was merged to main. Contains: eBay listing assistant (13 files, 810 lines) + Merchoo brand asset logging.
-
-Pattern note: eBay developer account is now 6+ days as "next action" with zero technical blockers. Revenue still $0.
+Pattern note: eBay developer account blocker is now partially cleared (keys obtained). Still need sandbox keys and Seller Hub policy IDs before first listing. Revenue still $0.
 
 ---
 
