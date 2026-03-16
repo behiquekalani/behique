@@ -265,6 +265,56 @@ body::after {
   border-bottom: 1px solid var(--border);
 }
 
+/* Quest Tabs */
+.quest-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.quest-tab {
+  font-family: var(--heading);
+  font-size: 9px;
+  padding: 8px 16px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.quest-tab:hover {
+  border-color: var(--border-bright);
+  color: var(--text);
+}
+
+.quest-tab.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+/* Export Button */
+.export-btn {
+  font-family: var(--heading);
+  font-size: 8px;
+  padding: 8px 14px;
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  cursor: pointer;
+  letter-spacing: 1px;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.export-btn:hover {
+  box-shadow: 0 0 12px var(--gold-dim);
+  background: var(--gold-dim);
+}
+
 /* Quest Sections */
 .quest-section-title {
   font-family: var(--heading);
@@ -275,6 +325,10 @@ body::after {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.quest-section-title:first-child {
+  margin-top: 0;
 }
 
 .quest-section-title::after {
@@ -551,6 +605,12 @@ body::after {
   color: var(--cyan);
 }
 
+.footer-timestamp {
+  margin-top: 6px;
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
 /* ===== MOBILE ===== */
 @media (max-width: 900px) {
   .app {
@@ -621,6 +681,14 @@ body::after {
     <h1 class="quest-log-header">QUEST LOG</h1>
     <p class="quest-log-sub">Track active missions, objectives, and progress toward $100K.</p>
 
+    <div class="quest-tabs">
+      <button class="quest-tab active" data-filter="all">ALL</button>
+      <button class="quest-tab" data-filter="MAIN QUEST">MAIN</button>
+      <button class="quest-tab" data-filter="SIDE QUEST">SIDE</button>
+      <button class="quest-tab" data-filter="FUTURE QUEST">FUTURE</button>
+      <button class="export-btn" id="exportBtn">EXPORT JSON</button>
+    </div>
+
     <div id="questContainer"></div>
 
     <div class="completed-section">
@@ -630,6 +698,7 @@ body::after {
 
     <div class="footer">
       <span>Behique Systems</span> — Ceiba Navigator v1
+      <div class="footer-timestamp">Last updated: 2026-03-16</div>
     </div>
   </main>
 
@@ -649,13 +718,12 @@ const DATA = {
       name: "eBay Empire",
       type: "MAIN QUEST",
       status: "active",
-      progress: 35,
       objectives: [
         { text: "Build listing agent V1", done: true },
         { text: "List Goodfellas Funko Pops (3 sets)", done: false },
         { text: "List Hello Kitty cups", done: false },
         { text: "First sale on eBay", done: false },
-        { text: "Get eBay API keys", done: false },
+        { text: "Get eBay API keys", done: true },
         { text: "Build V2 auto-publisher", done: false },
         { text: "10 listings live", done: false }
       ],
@@ -665,7 +733,6 @@ const DATA = {
       name: "The Bridge",
       type: "MAIN QUEST",
       status: "active",
-      progress: 60,
       objectives: [
         { text: "Set up Comp2 (Cobo) as AI worker", done: true },
         { text: "Build bridge server", done: true },
@@ -679,7 +746,6 @@ const DATA = {
       name: "BehiqueBot",
       type: "SIDE QUEST",
       status: "active",
-      progress: 45,
       objectives: [
         { text: "Deploy bot on Railway", done: true },
         { text: "Telegram input + classification", done: true },
@@ -694,7 +760,6 @@ const DATA = {
       name: "The Vault",
       type: "SIDE QUEST",
       status: "active",
-      progress: 50,
       objectives: [
         { text: "Obsidian vault with wiki links", done: true },
         { text: "Vault graph scanner", done: true },
@@ -709,7 +774,6 @@ const DATA = {
       name: "Shopify Storefront",
       type: "FUTURE QUEST",
       status: "locked",
-      progress: 10,
       objectives: [
         { text: "Store exists + logo done", done: true },
         { text: "Feed eBay winners to Shopify", done: false },
@@ -721,7 +785,6 @@ const DATA = {
       name: "n8n Agency",
       type: "FUTURE QUEST",
       status: "locked",
-      progress: 0,
       objectives: [
         { text: "eBay pipeline proven", done: false },
         { text: "First client outreach", done: false },
@@ -745,6 +808,41 @@ const DATA = {
   }
 };
 
+// ===== AUTO-PROGRESS =====
+function calcProgress(quest) {
+  const total = quest.objectives.length;
+  if (total === 0) return 0;
+  const done = quest.objectives.filter(o => o.done).length;
+  return Math.round((done / total) * 100);
+}
+
+// ===== JSON IMPORT =====
+async function loadExternalData() {
+  try {
+    const res = await fetch('quests.json');
+    if (!res.ok) throw new Error('No external JSON');
+    return await res.json();
+  } catch {
+    return null; // fallback to built-in DATA
+  }
+}
+
+// ===== JSON EXPORT =====
+function exportJSON() {
+  const exportData = JSON.parse(JSON.stringify(DATA));
+  // Add computed progress to export for readability
+  exportData.quests.forEach(q => {
+    q.progress = calcProgress(q);
+  });
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quests.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ===== RENDER PLAYER =====
 function renderPlayer() {
   const p = DATA.player;
@@ -757,6 +855,7 @@ function renderPlayer() {
 // ===== RENDER STATS =====
 function renderStats() {
   const panel = document.getElementById('statsPanel');
+  panel.innerHTML = '';
   const labels = {
     quests_completed: 'Quests Done',
     quests_active: 'Active Quests',
@@ -782,8 +881,13 @@ function renderStats() {
 }
 
 // ===== RENDER QUESTS =====
-function renderQuests() {
+let currentFilter = 'all';
+
+function renderQuests(filter) {
+  currentFilter = filter || currentFilter;
   const container = document.getElementById('questContainer');
+  container.innerHTML = '';
+
   const groups = {
     'MAIN QUEST': [],
     'SIDE QUEST': [],
@@ -802,6 +906,7 @@ function renderQuests() {
 
   for (const [type, quests] of Object.entries(groups)) {
     if (quests.length === 0) continue;
+    if (currentFilter !== 'all' && currentFilter !== type) continue;
 
     const sectionTitle = document.createElement('div');
     sectionTitle.className = 'quest-section-title';
@@ -809,6 +914,7 @@ function renderQuests() {
     container.appendChild(sectionTitle);
 
     quests.forEach(q => {
+      const progress = calcProgress(q);
       const card = document.createElement('div');
       const statusClass = q.status === 'active' ? 'active-card' : q.status === 'locked' ? 'locked-card' : '';
       card.className = `quest-card ${statusClass}`;
@@ -827,9 +933,9 @@ function renderQuests() {
             <div class="expand-icon">▶</div>
           </div>
         </div>
-        <div class="quest-progress-label">${q.progress}%</div>
+        <div class="quest-progress-label">${progress}%</div>
         <div class="quest-progress-bar">
-          <div class="quest-progress-fill" data-progress="${q.progress}"></div>
+          <div class="quest-progress-fill" data-progress="${progress}"></div>
         </div>
         <div class="quest-objectives">
           <div class="quest-objectives-inner">
@@ -854,11 +960,19 @@ function renderQuests() {
       container.appendChild(card);
     });
   }
+
+  // Animate after render
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.quest-progress-fill').forEach(bar => {
+      bar.style.width = bar.dataset.progress + '%';
+    });
+  });
 }
 
 // ===== RENDER COMPLETED =====
 function renderCompleted() {
   const grid = document.getElementById('completedGrid');
+  grid.innerHTML = '';
   DATA.completedQuests.forEach(q => {
     const card = document.createElement('div');
     card.className = 'completed-card';
@@ -870,28 +984,42 @@ function renderCompleted() {
   });
 }
 
-// ===== ANIMATE =====
-function animateBars() {
-  // XP bar
+// ===== ANIMATE XP =====
+function animateXP() {
   const pct = (DATA.player.xp / DATA.player.xp_next_level) * 100;
   document.getElementById('xpFill').style.width = pct + '%';
+}
 
-  // Quest progress bars
-  document.querySelectorAll('.quest-progress-fill').forEach(bar => {
-    bar.style.width = bar.dataset.progress + '%';
+// ===== TAB HANDLERS =====
+document.querySelectorAll('.quest-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.quest-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderQuests(tab.dataset.filter);
+  });
+});
+
+// ===== EXPORT HANDLER =====
+document.getElementById('exportBtn').addEventListener('click', exportJSON);
+
+// ===== INIT =====
+async function init() {
+  const external = await loadExternalData();
+  if (external) {
+    Object.assign(DATA, external);
+  }
+
+  renderPlayer();
+  renderStats();
+  renderQuests('all');
+  renderCompleted();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(animateXP);
   });
 }
 
-// ===== INIT =====
-renderPlayer();
-renderStats();
-renderQuests();
-renderCompleted();
-
-// Trigger animations after paint
-requestAnimationFrame(() => {
-  requestAnimationFrame(animateBars);
-});
+init();
 </script>
 
 </body>
