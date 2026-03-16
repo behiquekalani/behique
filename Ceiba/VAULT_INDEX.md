@@ -32,6 +32,7 @@ tags: [system, index, graph]
 | [[Content-Funnel]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[North-Star]], [[Q3-2026]], [[n8n-Agency]] |
 | [[Book-to-Agent]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[Content-Funnel]], [[n8n-Agency]], [[Psychologist-Framework]] |
 | [[News-Intelligence-Bots]] | Idea | — |
+| [[Colmena66-AI]] | Research done | → [[BehiqueBot]], [[Behique-Product]], [[North-Star]], [[Q3-2026]] |
 | [[MISSIONS]] | Quest map | → all projects |
 
 ---
