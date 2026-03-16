@@ -59,6 +59,11 @@
 | Prompt quality comparator skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill that takes a prompt, runs through multiple LLMs, evaluates/combines best output. Multi-model prompt A/B testing at skill level. |
 | Session finish-tracker skill | Kalani 2026-03-16 | Can build now | HIGH | Tracks planned-vs-completed work across sessions. "Did we finish what we planned?" accountability system. ADHD-critical. |
 | Prompt injection defense skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill to prevent prompt injection when agents browse the web. Security layer for autonomous browsing tasks. |
+| Behique Command Hub | Kalani 2026-03-16 | Can build now | HIGH | Central N64-styled web interface: Quest tracker + Agent status board + Command terminal + Dashboard links + Idea inbox. Single HTML file, hub.json data. Prompt ChatGPT for architecture doc. |
+| N64 retro dashboard aesthetic | Kalani 2026-03-16 | Can build now | HIGH | Rebuild quest-dashboard.html with Press Start 2P pixel font, chunky borders, retro N64-era GUI style. NOT thin modern Inter font. |
+| Agent Kernel architecture (ChatGPT design) | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full architecture at `Ceiba/06-Designs/agent-kernel-architecture.md`. Task queue, scheduler, skill registry, memory interface. ~300 lines. |
+| Ceiba Memory Protocol (CMP) spec | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full spec at `Ceiba/06-Designs/ceiba-memory-protocol-cmp.md`. Typed payloads, validation, conflict resolution, semantic search. |
+| Ceiba-Cobo Communication Protocol (CCP) | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full spec at `Ceiba/06-Designs/ceiba-cobo-communication-protocol-ccp.md`. Task schemas, handoffs, retries, CMP hooks. |
 
 ---
 
