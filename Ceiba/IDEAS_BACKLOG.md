@@ -68,7 +68,7 @@
 |------|--------|-------------|--------------|
 | Discord voice cowork — Jarvis mode | Kalani voice memo 2026-03-16 | Needs Voice body part built, real-time API access (OpenAI Realtime or future Claude voice), screen capture pipeline | Month 4+ on spine, after Senses + Hands + Nervous System proven |
 | Personal passive dashboard | Kalani 2026-03-16 | Simple visual dashboard — project states, revenue tracker, vault health. Web-based (HTML/CSS/JS). Can run on Raspberry Pi as dedicated physical display. BUILD TOMORROW ASAP. | Ready now — build 2026-03-17 |
-| AI tamagotchi quest companion | Kalani 2026-03-16 | AI-powered pixel art companion. Reads vault, generates quests from real project state. Psicólogo framework as brain. Evolves visually with progress. Raspberry Pi as dedicated physical screen (e-ink/LCD). Builds on top of passive dashboard. | After passive dashboard works |
+| AI tamagotchi quest companion | Kalani 2026-03-16 | AI-powered pixel art companion. Reads vault, generates quests from real project state. Psicólogo framework as brain. Evolves visually with progress. Raspberry Pi inside 3D-printed cube enclosure. Visual options: smiley face companion OR pixel art city that grows with progress. Builds on top of passive dashboard. | After passive dashboard works |
 
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
