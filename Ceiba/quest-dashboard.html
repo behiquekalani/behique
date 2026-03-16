@@ -519,6 +519,89 @@ body {
 .quest-card.locked { opacity: 0.55; }
 .quest-card.locked .quest-card-header { background: var(--locked-header); }
 
+/* REWARD TIERS */
+.tier-common { color: #666666; }
+.tier-uncommon { color: #00e88f; }
+.tier-rare { color: #00e5ff; }
+.tier-epic { color: #b48cff; text-shadow: 0 0 8px rgba(180,140,255,0.5); }
+.tier-legendary { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.6); animation: legendaryPulse 2s ease-in-out infinite; }
+
+@keyframes legendaryPulse {
+  0%, 100% { text-shadow: 0 0 8px rgba(255,215,0,0.4); }
+  50% { text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.3); }
+}
+
+/* MISSION REWARD BADGE */
+.mission-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.mission-tier-badge.tier-1 { background: rgba(102,102,102,0.2); color: #888; }
+.mission-tier-badge.tier-2 { background: rgba(0,232,143,0.15); color: #00e88f; }
+.mission-tier-badge.tier-3 { background: rgba(0,229,255,0.15); color: #00e5ff; }
+.mission-tier-badge.tier-4 { background: rgba(180,140,255,0.2); color: #b48cff; border: 1px solid rgba(180,140,255,0.3); }
+.mission-tier-badge.tier-5 { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); animation: legendaryPulse 2s ease-in-out infinite; }
+
+/* DIFFICULTY BADGES */
+.diff-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.diff-very_easy { background: rgba(0,232,143,0.15); color: #00e88f; }
+.diff-easy { background: rgba(0,229,255,0.12); color: #00e5ff; }
+.diff-medium { background: rgba(255,200,87,0.15); color: #ffc857; }
+.diff-hard { background: rgba(255,120,80,0.15); color: #ff7850; }
+.diff-very_hard { background: rgba(255,60,60,0.15); color: #ff3c3c; }
+
+/* TIME ESTIMATE */
+.time-est {
+  font-size: 10px;
+  color: var(--text-light);
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* OBJECTIVE ROW (enhanced) */
+.objective {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 5px 0;
+}
+.objective .obj-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.obj-stars {
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+
+/* QUEST HEADER TIER */
+.quest-card-header .header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 /* MOBILE */
 @media (max-width: 900px) {
   body { padding: 12px; }
@@ -593,15 +676,18 @@ function transformData(json) {
       status: m.status,
       description: m.description || '',
       objectives: m.objectives,
-      reward: m.reward
+      reward: m.reward,
+      reward_tier: m.reward_tier || 1
     })),
     completedQuests: (json.completed_missions || []).map(m => ({
       name: m.name,
       reward: m.reward,
-      completed: m.completed || ''
+      completed: m.completed || '',
+      reward_tier: m.reward_tier || 1
     })),
     stats: json.stats || {},
-    habits: json.habits || []
+    habits: json.habits || [],
+    last_updated: json.last_updated || ''
   };
 }
 
@@ -826,13 +912,28 @@ function renderAll() {
   const compGrid = document.getElementById('completedGrid');
   compGrid.innerHTML = '';
   data.completedQuests.forEach(q => {
+    const cTier = q.reward_tier || 1;
     const card = document.createElement('div');
     card.className = 'completed-card';
-    card.innerHTML = `<span class="name">✓ ${q.name}</span><span class="reward">${q.reward}${q.completed ? ' · ' + q.completed : ''}</span>`;
+    card.innerHTML = `
+      <span class="name">✓ ${q.name}</span>
+      <span class="reward">
+        <span class="mission-tier-badge tier-${cTier}" style="font-size:9px;padding:1px 5px;">${TIER_NAMES[cTier]}</span>
+        ${q.reward}${q.completed ? ' · ' + q.completed : ''}
+      </span>`;
     compGrid.appendChild(card);
   });
 
   renderHabits();
+}
+
+const TIER_NAMES = { 1: 'Common', 2: 'Uncommon', 3: 'Rare', 4: 'Epic', 5: 'Legendary' };
+const DIFF_LABELS = { very_easy: 'V.Easy', easy: 'Easy', medium: 'Med', hard: 'Hard', very_hard: 'V.Hard' };
+
+function tierStars(tier) {
+  const t = tier || 1;
+  const colors = { 1: '#666', 2: '#00e88f', 3: '#00e5ff', 4: '#b48cff', 5: '#ffd700' };
+  return `<span class="obj-stars" style="color:${colors[t]}">${'★'.repeat(t)}${'☆'.repeat(5-t)}</span>`;
 }
 
 function renderQuests() {
@@ -843,6 +944,7 @@ function renderQuests() {
     const done = q.objectives.filter(o => o.done).length;
     const total = q.objectives.length;
     const isLocked = q.status === 'locked';
+    const mTier = q.reward_tier || 1;
 
     const card = document.createElement('div');
     card.className = 'quest-card' + (isLocked ? ' locked' : '');
@@ -850,9 +952,12 @@ function renderQuests() {
       <div class="quest-card-header">
         <div>
           <h3>${q.name}</h3>
-          <div class="quest-type">${q.type} QUEST${q.description ? ' · ' + q.description : ''}</div>
+          <div class="quest-type">${q.description || q.type + ' QUEST'}</div>
         </div>
-        <div style="font-size:12px;opacity:0.9">${isLocked ? '🔒 LOCKED' : pct + '%'}</div>
+        <div class="header-right">
+          <span class="mission-tier-badge tier-${mTier}">${TIER_NAMES[mTier] || 'Common'}</span>
+          <div style="font-size:12px;opacity:0.9">${isLocked ? '🔒 LOCKED' : pct + '%'}</div>
+        </div>
       </div>
       <div class="quest-card-body">
         <div class="quest-progress-row">
@@ -861,12 +966,21 @@ function renderQuests() {
         </div>
         <div class="quest-reward">✦ ${q.reward}</div>
         <div class="objectives">
-          ${q.objectives.map(o => `
+          ${q.objectives.map(o => {
+            const diff = o.difficulty || 'medium';
+            const time = o.time_est || '';
+            const oTier = o.reward_tier || 1;
+            return `
             <div class="objective ${o.done ? 'done' : ''}">
               <div class="checkbox"></div>
+              <span class="diff-badge diff-${diff}">${DIFF_LABELS[diff] || diff}</span>
               <span class="obj-text">${o.text}</span>
-            </div>
-          `).join('')}
+              <div class="obj-meta">
+                ${tierStars(oTier)}
+                ${time ? `<span class="time-est">${time}</span>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
         </div>
       </div>
     `;
