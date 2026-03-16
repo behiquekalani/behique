@@ -1,17 +1,17 @@
 # primer.md — Ceiba Memory Stack
 # LIVE CHECKPOINT updated throughout session (not just at end)
 # Last full rewrite: 2026-03-14
-# Last Check-in: 2026-03-15
+# Last Check-in: 2026-03-16
 
 ---
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 — Second Claude Code session. Major research sprint.
-Focus: Colmena66 + Government AI opportunity. Full ecosystem research compiled into Ceiba/01-Projects/Colmena66-AI.md.
-Key findings: Fideicomiso got $9.5M (Jan 2026), PR legislating AI Officer under PRITS, Pacífico already has pacifico.ai for FEMA compliance, SBIR/STTR matching grants up to $200K available.
-Next action: Planning session 2026-03-17 — define Colmena66 AI prototype scope and entry strategy.
-Session status: Research complete — 240+ data points compiled, ready for strategic planning tomorrow
+Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
+Focus: Product research engine build (amazon scrapers, scoring pipeline, eBay cross-reference) + agent kernel operational. Vault grapher created.
+Next action: Install Claude Code (`npm install -g @anthropic-ai/claude-code`), migrate HQ from Cowork → CLI, then add wiki links to vault files.
+Blocker: eBay Developer account — API keys still needed from developer.ebay.com.
+Session status: IDLE (auto-checkpoint)
 
 ---
 
@@ -87,22 +87,16 @@ eBay API keys still needed — do that from Claude Code once migration is stable
 ---
 
 ## 🧵 ACTIVE THREAD
-Research session 2026-03-16 (second Claude Code session): Kalani identified Colmena66 as a strategic entry point for AI + government play.
+Architecture session 2026-03-15: Kalani called out the real problem — Ceiba defaults to easy projects, not ambitious ones. Built architecture-spine.md: 6-part AI body (Memory, Senses, Hands, Voice, Nervous System, Spine). 4-month plan.
 
-**The play:** Enter Colmena66 as entrepreneur, build an AI prototype that replaces their manual processes (phone line, resource navigator, grant matching), show up with a working product. Dual benefit: access their resources/grants AND demonstrate AI capability to the ecosystem.
+Key decisions today:
+- Move HQ from Cowork → Claude Code CLI (more power, less wrapper)
+- The Spine is the real project — everything else plugs into it
+- BehiqueBot should message based on EVENTS not schedules ("fancy alarm clock" lesson learned again)
+- Vault is model-agnostic — this is the resilience strategy against credit limits / Anthropic dependency
+- Wiki links are Month 1 priority — they turn flat files into a graph
 
-**Why it's real:**
-- Pacífico Group (brother Brian) already has pacifico.ai doing AI compliance for FEMA
-- PR Senate filed AI legislation creating an AI Officer under PRITS
-- Fideicomiso (Colmena66's parent) just got $9.5M in January 2026
-- SBIR/STTR matching grants: $100K-$200K available through Colmena66's own program
-- Colmena66 has 240+ orgs in their network, 21,400+ people assisted, all navigated manually
-
-**Key quote from Kalani:** "el visualizador es un fancy alarm clock" — rejecting low-impact demo work in favor of real market plays. This is growth.
-
-Pattern note: eBay developer account is now 5+ days as "next action" with zero technical blockers. The pattern is still active.
-
-Q3 target: $100K. Revenue: $0.
+Q3 target: $100K. Revenue: $0. The spine makes the revenue possible.
 
 ---
 
