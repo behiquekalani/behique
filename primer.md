@@ -7,7 +7,7 @@
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 session 2 — Quest dashboard themed, quick lister built, Funko Pop listing ready, 12 ideas synced.
+Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
 Focus: eBay listings. Funko Pop Goodfellas listing saved at `tools/ebay-listing-assistant/listings/`. Kalani needs to paste into eBay form.
 Next action: **PASTE FUNKO POP LISTING ON EBAY.** File is at `listings/funko_pop_the_godfather_vito_corleone_mi_20260316_155205.txt`. Copy each section.
 Blocker: None for listing. OAuth consent flow needed for V2 auto-publish (`python3 ebay_oauth_token.py`). Cobo still on insecure bridge.
