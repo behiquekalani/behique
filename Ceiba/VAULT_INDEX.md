@@ -28,7 +28,11 @@ tags: [system, index, graph]
 | [[Google-Trends-Scraper]] | Rebuilding | → [[TOOL_Trends_Scraper]], [[SYS_AI_Cluster]] |
 | [[n8n-Agency]] | Not started | → [[TOOL_n8n]], [[SYS_Bridge]] |
 | [[Shopify-Store]] | Waiting | → [[eBay-Listing-Assistant]], [[DEC_Ebay_Before_Shopify]] |
+| [[Behique-Product]] | Idea | → [[BehiqueBot]], [[Psychologist-Framework]], [[North-Star]], [[Q3-2026]] |
+| [[Content-Funnel]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[North-Star]], [[Q3-2026]], [[n8n-Agency]] |
+| [[Book-to-Agent]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[Content-Funnel]], [[n8n-Agency]], [[Psychologist-Framework]] |
 | [[News-Intelligence-Bots]] | Idea | — |
+| [[Colmena66-AI]] | Research done | → [[BehiqueBot]], [[Behique-Product]], [[North-Star]], [[Q3-2026]] |
 | [[MISSIONS]] | Quest map | → all projects |
 
 ---
@@ -68,6 +72,7 @@ tags: [system, index, graph]
 | [[PAT_Infrastructure_Creep]] | Every session builds infra instead of revenue work |
 | [[PAT_Event_Not_Schedule]] | "Fancy alarm clock" — events not cron |
 | [[observations]] | Full behavioral patterns + session history |
+| [[competitive_intel]] | Competitor signals, gaps, edges, market patterns |
 
 ---
 
@@ -106,6 +111,8 @@ tags: [system, index, graph]
 | BehiqueBot | ✅ Live | Railway + Telegram |
 | n8n | ✅ Running | `192.168.0.151:5678` via pm2 |
 | Cloudflare tunnel | ✅ Named | `bridge.merchoo.shop` |
+| iPhone 13 Pro Max | 🆕 New node | Mobile input — Telegram, Discord, Claude Code |
+| Discord server | 📋 Planned | Content hub — reels/animation preview + approval |
 
 ---
 

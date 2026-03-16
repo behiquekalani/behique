@@ -7,11 +7,11 @@
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-15 — Auto checkpoint via Claude Code stop hook.
-Focus: AGENT KERNEL OPERATIONAL. `ai_cluster/kernel/agent_kernel.py` routes tasks to Ollama (free) or GPT-4o (OpenClaw) on Cobo automatically. Task queue (inbox→active→done), persistent memory, skill registry, subtask spawning all working. Ceiba can now delegate work to Cobo without human copy-paste.
-Next action: Revenue work — eBay listings, n8n client outreach. Kernel available for distributed tasks.
-Blocker: None. Bridge confirmed alive, pm2 services running on Cobo.
-Session status: AI CLUSTER LIVE — kernel tested with both Ollama and GPT-4o routes, memory auto-persisting
+Last update: 2026-03-16 — Second Claude Code session. Major research sprint.
+Focus: Colmena66 + Government AI opportunity. Full ecosystem research compiled into Ceiba/01-Projects/Colmena66-AI.md.
+Key findings: Fideicomiso got $9.5M (Jan 2026), PR legislating AI Officer under PRITS, Pacífico already has pacifico.ai for FEMA compliance, SBIR/STTR matching grants up to $200K available.
+Next action: Planning session 2026-03-17 — define Colmena66 AI prototype scope and entry strategy.
+Session status: Research complete — 240+ data points compiled, ready for strategic planning tomorrow
 
 ---
 
@@ -87,16 +87,22 @@ eBay API keys still needed — do that from Claude Code once migration is stable
 ---
 
 ## 🧵 ACTIVE THREAD
-Architecture session 2026-03-15: Kalani called out the real problem — Ceiba defaults to easy projects, not ambitious ones. Built architecture-spine.md: 6-part AI body (Memory, Senses, Hands, Voice, Nervous System, Spine). 4-month plan.
+Research session 2026-03-16 (second Claude Code session): Kalani identified Colmena66 as a strategic entry point for AI + government play.
 
-Key decisions today:
-- Move HQ from Cowork → Claude Code CLI (more power, less wrapper)
-- The Spine is the real project — everything else plugs into it
-- BehiqueBot should message based on EVENTS not schedules ("fancy alarm clock" lesson learned again)
-- Vault is model-agnostic — this is the resilience strategy against credit limits / Anthropic dependency
-- Wiki links are Month 1 priority — they turn flat files into a graph
+**The play:** Enter Colmena66 as entrepreneur, build an AI prototype that replaces their manual processes (phone line, resource navigator, grant matching), show up with a working product. Dual benefit: access their resources/grants AND demonstrate AI capability to the ecosystem.
 
-Q3 target: $100K. Revenue: $0. The spine makes the revenue possible.
+**Why it's real:**
+- Pacífico Group (brother Brian) already has pacifico.ai doing AI compliance for FEMA
+- PR Senate filed AI legislation creating an AI Officer under PRITS
+- Fideicomiso (Colmena66's parent) just got $9.5M in January 2026
+- SBIR/STTR matching grants: $100K-$200K available through Colmena66's own program
+- Colmena66 has 240+ orgs in their network, 21,400+ people assisted, all navigated manually
+
+**Key quote from Kalani:** "el visualizador es un fancy alarm clock" — rejecting low-impact demo work in favor of real market plays. This is growth.
+
+Pattern note: eBay developer account is now 5+ days as "next action" with zero technical blockers. The pattern is still active.
+
+Q3 target: $100K. Revenue: $0.
 
 ---
 
