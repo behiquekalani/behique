@@ -67,6 +67,7 @@
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
 | Discord voice cowork — Jarvis mode | Kalani voice memo 2026-03-16 | Needs Voice body part built, real-time API access (OpenAI Realtime or future Claude voice), screen capture pipeline | Month 4+ on spine, after Senses + Hands + Nervous System proven |
+| Personal visual dashboard (pixel art / lo-fi) | Kalani 2026-03-16 | Habitica-inspired visual layer — shows project state, progress, mood. NO RPG/quests/gamification. Tamagotchi-of-a-builder vibe. Pixel art aesthetic. Journal component possible. Text-based game layer later as enhancement, not core. Simple first → improve. | After one revenue project is live |
 
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
