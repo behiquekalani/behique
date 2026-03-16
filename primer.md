@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: Goodfellas Funko Pop set of 3 × qty 3 at $27.99/set. Photos taken, listing generated, Kalani posting.
-Next action: Confirm listing live → Hello Kitty cups next → keep listing inventory.
-Blocker: Cobo still offline (needs physical power-on). Not blocking eBay listings.
-Session status: ACTIVE — first listing going live
+Focus: eBay API keys obtained (Prod + Sandbox). V2 publisher + OAuth built. Quest dashboard v1 exists but needs pixel art rebuild.
+Next action: POST THE FUNKO POPS. Revenue $0 → $27.99. Then Hello Kitty cups. Then OAuth flow to activate V2.
+Blocker: Cobo running insecure bridge (needs switch to bridge_server_secure.js). Not blocking eBay listings.
+Session status: ACTIVE — transcript persistence built, backlog synced, primer updated
 
 ---
 
@@ -73,32 +73,41 @@ Session status: ACTIVE — first listing going live
 - OBSIDIAN_API_KEY: port 27123
 - Webshare proxies: `~/Downloads/Webshare 10 proxies.txt`
 - Bridge token: `~/.behique_bridge_token` (chmod 600)
-- eBay API keys: NOT YET — developer.ebay.com registration still pending
+- eBay API keys (Production): `~/.behique_ebay_keys` (chmod 600) — App ID, Dev ID, Cert ID
+- eBay API keys (Sandbox): `~/.behique_ebay_keys_sandbox` (chmod 600)
+- eBay OAuth tokens: `~/.behique_ebay_tokens.json` (NOT YET — needs OAuth consent flow)
 
 ---
 
 ## 🚧 OPEN BLOCKERS
 1. **Cobo offline** — needs physical power-on, no wake-on-LAN configured yet
-2. **eBay API keys** — registration at developer.ebay.com (unlocks V2 auto-publish + product research scoring)
+2. **eBay OAuth user token** — API keys obtained, but need to run OAuth consent flow (`python ebay_oauth_token.py`) to get user token for API calls
 3. **n8n agency outreach** — zero clients, starts after eBay pipeline proven
 
 ---
 
 ## 📋 IMMEDIATE NEXT STEPS
 1. ✅ eBay Listing Agent V1 built and tested
-2. → Kalani sends Hello Kitty cup photos + details → Ceiba generates first listing
-3. → Post first listing on eBay manually
-4. → Power on Cobo → wire eBay API keys (instructions at `bridge/cobo_instructions_2026-03-16.md`)
-5. → Build wake.sh/sleep.sh for Comp2 (READY in backlog, Kalani asked for it twice)
+2. ✅ eBay API keys obtained (Production + Sandbox)
+3. ✅ V2 publisher + OAuth token script built
+4. ✅ Quest dashboard v1 built (needs aesthetic rebuild)
+5. ✅ Transcript + image persistence system built
+6. → **POST THE FUNKO POPS ON EBAY** — revenue action #1
+7. → Hello Kitty cups listing next
+8. → Run OAuth consent flow to activate V2 API publisher
+9. → Switch Cobo to secure bridge (bridge_server_secure.js)
+10. → Rebuild quest dashboard with pixel art/Stardew Valley aesthetic
 
 ---
 
 ## 🧵 ACTIVE THREAD
-Session 2026-03-16: Kalani wants to list Hello Kitty cups on eBay. Built V1 listing agent that generates everything (title, description, pricing, shipping) — Kalani pastes into eBay form. Pipeline tested with mock data, works end-to-end. Profit of $2.12 per cup at $14.99 list price (auction strategy recommended for low sell-through items).
+Session 2026-03-16 (extended): Massive session. Got eBay API keys (Prod + Sandbox), built V2 publisher with OAuth + rate limiting + draft preview, built quest dashboard v1, relayed Comp2 transcript with vision session (Book-to-Agent, Colmena66, tamagotchi, content funnel). Cobo came online.
 
-Also captured: Telegram bot integration for V2, quest dashboard (Fallout/Skyrim style), multi-model A/B testing, dropship auto-lister, OpenClaw hub. All triaged to IDEAS_BACKLOG — none block today's work.
+Quest dashboard built but wrong aesthetic — Kalani wants pixel art/Habitica/Stardew Valley, not cyberpunk. ChatGPT prompt written for rebuild.
 
-Kalani flagged: "we're moving in circles" — memory is stale, primer.md was 2 days behind. Fixed.
+Kalani frustrated by memory loss: "its been demotivating me to work." Built transcript persistence system (`Ceiba/07-Transcripts/` + `Ceiba/08-Images/`). Synced all Comp2 ideas to IDEAS_BACKLOG.
+
+Revenue is still $0. Funko Pop listing generated. Everything is ready except Kalani pasting it into eBay's form.
 
 ---
 
