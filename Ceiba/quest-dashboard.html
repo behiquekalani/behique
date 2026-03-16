@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="neon">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behique — Quest Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ THEME: NEON (default) ============ */
+[data-theme="neon"] {
+  --primary: #00e88f;
+  --primary-light: #39ffb0;
+  --primary-dark: #00c878;
+  --primary-bg: rgba(0,232,143,0.08);
+  --header-bg: #00d4a0;
+  --bg: #0c0e14;
+  --bg-gradient1: rgba(0,232,143,0.04);
+  --bg-gradient2: rgba(0,229,255,0.03);
+  --card: #141820;
+  --border: #1e2430;
+  --text: #e0e4ec;
+  --text-light: #7a8299;
+  --done: #4a5068;
+  --gold: #ffc857;
+  --ring-track: #1e2430;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --accent: #00e5ff;
+  --ring-high: #00e88f;
+  --ring-mid: #00e5ff;
+  --ring-low: #2a3040;
+  --tab-active-text: #0c0e14;
+  --tab-glow: rgba(0,232,143,0.25);
+  --hover-glow: rgba(0,232,143,0.12);
+  --hover-border: rgba(0,232,143,0.3);
+  --locked-header: #2a2e38;
+  --completed-bg: rgba(255,200,87,0.05);
+  --completed-border: rgba(255,200,87,0.2);
+  --check-text: white;
+  --title-glow: 0 0 30px rgba(0,232,143,0.3);
+}
+
+/* ============ THEME: MONO (low dopamine) ============ */
+[data-theme="mono"] {
+  --primary: #ffffff;
+  --primary-light: #cccccc;
+  --primary-dark: #dddddd;
+  --primary-bg: rgba(255,255,255,0.04);
+  --header-bg: #222222;
+  --bg: #0a0a0a;
+  --bg-gradient1: rgba(255,255,255,0.01);
+  --bg-gradient2: rgba(255,255,255,0.01);
+  --card: #111111;
+  --border: #222222;
+  --text: #d0d0d0;
+  --text-light: #666666;
+  --done: #444444;
+  --gold: #999999;
+  --ring-track: #1a1a1a;
+  --shadow: 0 2px 8px rgba(0,0,0,0.5);
+  --accent: #aaaaaa;
+  --ring-high: #ffffff;
+  --ring-mid: #888888;
+  --ring-low: #222222;
+  --tab-active-text: #000000;
+  --tab-glow: rgba(255,255,255,0.1);
+  --hover-glow: rgba(255,255,255,0.05);
+  --hover-border: rgba(255,255,255,0.2);
+  --locked-header: #1a1a1a;
+  --completed-bg: rgba(255,255,255,0.03);
+  --completed-border: rgba(255,255,255,0.1);
+  --check-text: black;
+  --title-glow: none;
+}
+
+/* ============ THEME: PASTEL NEON ============ */
+[data-theme="pastel"] {
+  --primary: #7dffcd;
+  --primary-light: #a8ffe0;
+  --primary-dark: #5ce8b0;
+  --primary-bg: rgba(125,255,205,0.06);
+  --header-bg: #2a2040;
+  --bg: #0e0a18;
+  --bg-gradient1: rgba(125,255,205,0.03);
+  --bg-gradient2: rgba(180,140,255,0.03);
+  --card: #140f22;
+  --border: #231d35;
+  --text: #e8e0f8;
+  --text-light: #8878a8;
+  --done: #4a4060;
+  --gold: #ffd876;
+  --ring-track: #1e1830;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+  --accent: #b48cff;
+  --ring-high: #7dffcd;
+  --ring-mid: #ff8cc8;
+  --ring-low: #2a2040;
+  --tab-active-text: #0e0a18;
+  --tab-glow: rgba(125,255,205,0.2);
+  --hover-glow: rgba(180,140,255,0.12);
+  --hover-border: rgba(180,140,255,0.3);
+  --locked-header: #1e1830;
+  --completed-bg: rgba(255,216,118,0.05);
+  --completed-border: rgba(255,216,118,0.15);
+  --check-text: #0e0a18;
+  --title-glow: 0 0 30px rgba(125,255,205,0.2);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  background-image: radial-gradient(circle at 20% 50%, var(--bg-gradient1) 0%, transparent 50%),
+                     radial-gradient(circle at 80% 20%, var(--bg-gradient2) 0%, transparent 50%);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  transition: background 0.4s, color 0.3s;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.top-bar-left h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: var(--title-glow);
+}
+.top-bar-left .subtitle {
+  color: var(--accent);
+  font-size: 13px;
+}
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.top-bar-right .date {
+  color: var(--text-light);
+  font-size: 13px;
+}
+
+/* THEME SWITCHER */
+.theme-switcher {
+  display: flex;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px;
+}
+.theme-btn {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--text-light);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.theme-btn.active {
+  background: var(--primary);
+  color: var(--tab-active-text);
+}
+.theme-btn:hover:not(.active) {
+  color: var(--text);
+}
+
+/* OVERALL PROGRESS SECTION */
+.overview {
+  display: grid;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 20px;
+  margin-bottom: 28px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+.overview-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.overview-ring .label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* SVG DONUT */
+.donut {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.donut svg { transform: rotate(-90deg); }
+.donut .donut-text {
+  position: absolute;
+  font-weight: 700;
+  color: var(--text);
+}
+.donut .donut-text.large { font-size: 28px; }
+.donut .donut-text.medium { font-size: 20px; }
+.donut .donut-text.small { font-size: 16px; }
+
+/* BAR CHART */
+.bar-chart { display: flex; flex-direction: column; }
+.bar-chart h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--header-bg);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  opacity: 0.7;
+}
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex: 1;
+  padding-bottom: 24px;
+}
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+}
+.bar {
+  width: 100%;
+  max-width: 48px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+  transition: height 1s ease, background 0.3s;
+}
+.bar-label { font-size: 11px; color: var(--text-light); font-weight: 500; }
+.bar-value { font-size: 11px; color: var(--text); font-weight: 600; }
+
+/* STATS PANEL */
+.stats-panel { display: flex; flex-direction: column; gap: 10px; }
+.stats-panel h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stat-row .stat-label { color: var(--text-light); font-size: 13px; }
+.stat-row .stat-value { font-weight: 600; font-size: 13px; }
+
+/* TABS */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+.tab {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: var(--card);
+  color: var(--text-light);
+  transition: all 0.2s;
+}
+.tab.active {
+  background: var(--primary);
+  color: var(--tab-active-text);
+  border-color: var(--primary);
+  box-shadow: 0 0 15px var(--tab-glow);
+}
+.tab:hover:not(.active) {
+  background: var(--border);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tab .count {
+  background: rgba(0,0,0,0.1);
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  margin-left: 4px;
+}
+.tab.active .count { background: rgba(255,255,255,0.25); }
+
+/* QUEST GRID */
+.quest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+/* QUEST CARD */
+.quest-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+}
+.quest-card:hover {
+  box-shadow: 0 4px 20px var(--hover-glow);
+  border-color: var(--hover-border);
+}
+.quest-card-header {
+  background: var(--header-bg);
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+}
+.quest-card-header h3 { font-size: 15px; font-weight: 600; }
+.quest-card-header .quest-type {
+  font-size: 11px;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.quest-card-body { padding: 16px; }
+.quest-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.quest-progress-row .completion-text {
+  font-size: 12px;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+.quest-reward {
+  font-size: 12px;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* OBJECTIVES */
+.objectives { display: flex; flex-direction: column; gap: 6px; }
+.objective {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 0;
+}
+.objective .checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: all 0.2s;
+}
+.objective.done .checkbox {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.objective.done .checkbox::after {
+  content: '✓';
+  color: var(--check-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+.objective.done .obj-text {
+  text-decoration: line-through;
+  color: var(--done);
+}
+
+/* COMPLETED SECTION */
+.completed-section {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 2px solid var(--gold);
+}
+.completed-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.completed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.completed-card {
+  background: var(--completed-bg);
+  border: 1px solid var(--completed-border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+}
+.completed-card .name { font-weight: 600; font-size: 13px; }
+.completed-card .reward { font-size: 12px; color: var(--gold); font-style: italic; }
+
+/* HABIT TRACKER */
+.habit-section {
+  margin-top: 28px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+}
+.habit-section h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+.habit-grid {
+  display: grid;
+  grid-template-columns: 180px repeat(7, 1fr);
+  gap: 4px;
+  font-size: 12px;
+}
+.habit-grid .day-header {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-light);
+  padding: 4px;
+}
+.habit-grid .habit-name {
+  font-weight: 500;
+  padding: 6px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.habit-grid .habit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.habit-check {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.habit-check.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.habit-check.checked::after {
+  content: '✓';
+  color: var(--check-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 32px;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+/* LOCKED QUEST */
+.quest-card.locked { opacity: 0.55; }
+.quest-card.locked .quest-card-header { background: var(--locked-header); }
+
+/* MOBILE */
+@media (max-width: 900px) {
+  body { padding: 12px; }
+  .overview { grid-template-columns: 1fr; }
+  .quest-grid { grid-template-columns: 1fr; }
+  .habit-grid { grid-template-columns: 120px repeat(7, 1fr); font-size: 11px; }
+  .top-bar { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .top-bar-right { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>Behique — Quest Dashboard</h1>
+    <div class="subtitle">Kalani · Navigator · Level 3</div>
+  </div>
+  <div class="top-bar-right">
+    <div class="theme-switcher">
+      <button class="theme-btn active" data-theme="neon">⚡ Neon</button>
+      <button class="theme-btn" data-theme="mono">◐ Mono</button>
+      <button class="theme-btn" data-theme="pastel">✦ Pastel</button>
+    </div>
+    <div class="date" id="dateDisplay"></div>
+  </div>
+</div>
+
+<div class="overview">
+  <div class="overview-ring">
+    <div id="overallDonut"></div>
+    <div class="label" id="overallLabel"></div>
+  </div>
+  <div class="bar-chart">
+    <h3>Quest Progress</h3>
+    <div class="bars" id="barChart"></div>
+  </div>
+  <div class="stats-panel" id="statsPanel">
+    <h3>Stats</h3>
+  </div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="quest-grid" id="questGrid"></div>
+
+<div class="habit-section">
+  <h3>Habit Tracker — This Week</h3>
+  <div class="habit-grid" id="habitGrid"></div>
+</div>
+
+<div class="completed-section">
+  <h2>✦ Completed Quests</h2>
+  <div class="completed-grid" id="completedGrid"></div>
+</div>
+
+<div class="footer">
+  Behique Systems — Ceiba Navigator v2<br>
+  <span id="lastUpdated"></span>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const data = {
+  player: { name: "Kalani", title: "Behique", level: 3, xp: 340, xp_next: 500 },
+  quests: [
+    {
+      name: "eBay Empire",
+      type: "MAIN",
+      status: "active",
+      objectives: [
+        { text: "Build listing agent V1", done: true },
+        { text: "Get eBay API keys", done: true },
+        { text: "Build V2 auto-publisher", done: true },
+        { text: "List Goodfellas Funko Pops (3 sets)", done: false },
+        { text: "List Hello Kitty cups", done: false },
+        { text: "First sale on eBay", done: false },
+        { text: "Run OAuth consent flow", done: false },
+        { text: "10 listings live", done: false }
+      ],
+      reward: "Revenue stream unlocked"
+    },
+    {
+      name: "The Bridge",
+      type: "MAIN",
+      status: "active",
+      objectives: [
+        { text: "Set up Comp2 (Cobo) as AI worker", done: true },
+        { text: "Build bridge server", done: true },
+        { text: "Wire Syncthing between machines", done: true },
+        { text: "Switch to secure bridge", done: false },
+        { text: "Build wake.sh/sleep.sh power button", done: false },
+        { text: "Product research engine with real data", done: false }
+      ],
+      reward: "AI cluster online"
+    },
+    {
+      name: "BehiqueBot",
+      type: "SIDE",
+      status: "active",
+      objectives: [
+        { text: "Deploy bot on Railway", done: true },
+        { text: "Telegram input + classification", done: true },
+        { text: "Notion persistence", done: true },
+        { text: "Ollama-first classification", done: true },
+        { text: "Memory system", done: false },
+        { text: "Claude-powered check-ins", done: false }
+      ],
+      reward: "Accountability AI active"
+    },
+    {
+      name: "The Vault",
+      type: "SIDE",
+      status: "active",
+      objectives: [
+        { text: "Obsidian vault with wiki links", done: true },
+        { text: "Vault graph scanner", done: true },
+        { text: "vis.js dashboard", done: true },
+        { text: "Transcript persistence system", done: true },
+        { text: "Graph query layer", done: false },
+        { text: "Session auto-generator", done: false },
+        { text: "Create 35 ghost node files", done: false }
+      ],
+      reward: "Knowledge graph complete"
+    },
+    {
+      name: "Shopify Storefront",
+      type: "FUTURE",
+      status: "locked",
+      objectives: [
+        { text: "Store exists + logo done", done: true },
+        { text: "Feed eBay winners to Shopify", done: false },
+        { text: "First Shopify sale", done: false }
+      ],
+      reward: "Second revenue channel"
+    },
+    {
+      name: "n8n Agency",
+      type: "FUTURE",
+      status: "locked",
+      objectives: [
+        { text: "eBay pipeline proven", done: false },
+        { text: "First client outreach", done: false },
+        { text: "First paying client", done: false }
+      ],
+      reward: "Service business launched"
+    }
+  ],
+  completedQuests: [
+    { name: "Ceiba Memory Stack", reward: "Persistent AI memory" },
+    { name: "Product Research Engine V1", reward: "61 products scored" },
+    { name: "Trends Scraper", reward: "35 categories tracked" },
+    { name: "OpenClaw Migration", reward: "3 bots, 5 skills deployed" }
+  ],
+  stats: {
+    "Quests Completed": 4,
+    "Quests Active": 4,
+    "Tools Built": 14,
+    "Days Active": 14,
+    "Revenue": "$0"
+  },
+  habits: [
+    { name: "Code / Build", days: [true, true, true, true, true, true, true] },
+    { name: "List items on eBay", days: [false, false, false, false, false, false, false] },
+    { name: "Review quest progress", days: [false, false, false, true, false, false, false] },
+    { name: "Log ideas (BehiqueBot)", days: [true, true, false, true, true, false, false] },
+    { name: "Read / Learn", days: [false, true, false, false, true, false, false] },
+    { name: "Exercise", days: [false, false, false, false, false, false, false] }
+  ]
+};
+
+/* ============ THEME SYSTEM ============ */
+const themeColors = {
+  neon:   { high: '#00e88f', mid: '#00e5ff',  low: '#2a3040', track: '#1e2430' },
+  mono:   { high: '#ffffff', mid: '#888888',  low: '#222222', track: '#1a1a1a' },
+  pastel: { high: '#7dffcd', mid: '#ff8cc8',  low: '#2a2040', track: '#1e1830' }
+};
+
+let currentTheme = localStorage.getItem('behique-theme') || 'neon';
+
+function setTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('behique-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === theme);
+  });
+  // Re-render donuts with new colors
+  renderAll();
+}
+
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+});
+
+// Apply saved theme
+document.documentElement.setAttribute('data-theme', currentTheme);
+document.querySelectorAll('.theme-btn').forEach(b => {
+  b.classList.toggle('active', b.dataset.theme === currentTheme);
+});
+
+/* ============ HELPERS ============ */
+function calcProgress(objectives) {
+  if (!objectives.length) return 0;
+  return Math.round(objectives.filter(o => o.done).length / objectives.length * 100);
+}
+
+function createDonut(size, pct, textClass) {
+  const r = (size - 10) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (pct / 100) * circ;
+  const tc = themeColors[currentTheme];
+  const color = pct >= 60 ? tc.high : pct >= 30 ? tc.mid : tc.low;
+
+  const container = document.createElement('div');
+  container.className = 'donut';
+  container.innerHTML = `
+    <svg width="${size}" height="${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${tc.track}" stroke-width="8"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="8"
+        stroke-dasharray="${circ}" stroke-dashoffset="${circ}" stroke-linecap="round"
+        style="transition: stroke-dashoffset 1.2s ease;">
+      </circle>
+    </svg>
+    <span class="donut-text ${textClass}">${pct}%</span>
+  `;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      container.querySelector('circle:nth-child(2)').style.strokeDashoffset = offset;
+    });
+  });
+  return container;
+}
+
+/* ============ RENDER ============ */
+function renderAll() {
+  // Date
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toISOString().slice(0,10);
+
+  // Overall progress
+  const allObj = data.quests.flatMap(q => q.objectives);
+  const totalDone = allObj.filter(o => o.done).length;
+  const totalAll = allObj.length;
+  const overallPct = Math.round((totalDone / totalAll) * 100);
+
+  const overallEl = document.getElementById('overallDonut');
+  overallEl.innerHTML = '';
+  overallEl.appendChild(createDonut(140, overallPct, 'large'));
+  document.getElementById('overallLabel').textContent = `${totalDone} / ${totalAll} Objectives`;
+
+  // Bar chart
+  const barChart = document.getElementById('barChart');
+  barChart.innerHTML = '';
+  const maxObj = Math.max(...data.quests.map(q => q.objectives.length));
+  data.quests.filter(q => q.status === 'active').forEach(q => {
+    const done = q.objectives.filter(o => o.done).length;
+    const total = q.objectives.length;
+    const height = total > 0 ? (done / maxObj) * 120 : 0;
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    col.innerHTML = `
+      <div class="bar-value">${done}/${total}</div>
+      <div class="bar" style="height:${height}px"></div>
+      <div class="bar-label">${q.name.length > 10 ? q.name.slice(0,9)+'…' : q.name}</div>
+    `;
+    barChart.appendChild(col);
+  });
+
+  // Stats
+  const statsPanel = document.getElementById('statsPanel');
+  const existingH3 = statsPanel.querySelector('h3');
+  statsPanel.innerHTML = '';
+  statsPanel.appendChild(existingH3 || Object.assign(document.createElement('h3'), { textContent: 'Stats' }));
+  for (const [key, val] of Object.entries(data.stats)) {
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `<span class="stat-label">${key}</span><span class="stat-value">${val}</span>`;
+    statsPanel.appendChild(row);
+  }
+
+  // Quests
+  renderQuests();
+
+  // Completed
+  const compGrid = document.getElementById('completedGrid');
+  compGrid.innerHTML = '';
+  data.completedQuests.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'completed-card';
+    card.innerHTML = `<span class="name">✓ ${q.name}</span><span class="reward">${q.reward}</span>`;
+    compGrid.appendChild(card);
+  });
+
+  // Habits
+  renderHabits();
+}
+
+// Tabs
+const types = ['MAIN', 'SIDE', 'FUTURE'];
+const typeLabels = { MAIN: 'Main Quests', SIDE: 'Side Quests', FUTURE: 'Future' };
+const tabsEl = document.getElementById('tabs');
+let activeType = 'MAIN';
+
+types.forEach(type => {
+  const count = data.quests.filter(q => q.type === type).length;
+  const tab = document.createElement('div');
+  tab.className = 'tab' + (type === activeType ? ' active' : '');
+  tab.innerHTML = `${typeLabels[type]}<span class="count">${count}</span>`;
+  tab.onclick = () => {
+    activeType = type;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderQuests();
+  };
+  tabsEl.appendChild(tab);
+});
+
+function renderQuests() {
+  const grid = document.getElementById('questGrid');
+  grid.innerHTML = '';
+  data.quests.filter(q => q.type === activeType).forEach(q => {
+    const pct = calcProgress(q.objectives);
+    const done = q.objectives.filter(o => o.done).length;
+    const total = q.objectives.length;
+    const isLocked = q.status === 'locked';
+
+    const card = document.createElement('div');
+    card.className = 'quest-card' + (isLocked ? ' locked' : '');
+    card.innerHTML = `
+      <div class="quest-card-header">
+        <div>
+          <h3>${q.name}</h3>
+          <div class="quest-type">${q.type} QUEST</div>
+        </div>
+        <div style="font-size:12px;opacity:0.9">${isLocked ? '🔒 LOCKED' : '● ACTIVE'}</div>
+      </div>
+      <div class="quest-card-body">
+        <div class="quest-progress-row">
+          <div class="donut-slot"></div>
+          <div class="completion-text">${done} of ${total} objectives<br>completed</div>
+        </div>
+        <div class="quest-reward">✦ ${q.reward}</div>
+        <div class="objectives">
+          ${q.objectives.map(o => `
+            <div class="objective ${o.done ? 'done' : ''}">
+              <div class="checkbox"></div>
+              <span class="obj-text">${o.text}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+    card.querySelector('.donut-slot').appendChild(createDonut(70, pct, 'small'));
+  });
+}
+
+function renderHabits() {
+  const habitGrid = document.getElementById('habitGrid');
+  habitGrid.innerHTML = '<div></div>';
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayNames.forEach(d => {
+    habitGrid.innerHTML += `<div class="day-header">${d}</div>`;
+  });
+
+  data.habits.forEach((habit, hi) => {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'habit-name';
+    nameEl.textContent = habit.name;
+    habitGrid.appendChild(nameEl);
+
+    habit.days.forEach((checked, di) => {
+      const cell = document.createElement('div');
+      cell.className = 'habit-cell';
+      const check = document.createElement('div');
+      check.className = 'habit-check' + (checked ? ' checked' : '');
+      check.onclick = () => {
+        data.habits[hi].days[di] = !data.habits[hi].days[di];
+        check.classList.toggle('checked');
+      };
+      cell.appendChild(check);
+      habitGrid.appendChild(cell);
+    });
+  });
+}
+
+// Initial render
+renderAll();
+</script>
+</body>
+</html>

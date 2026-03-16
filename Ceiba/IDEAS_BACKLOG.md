@@ -1,5 +1,5 @@
 # IDEAS BACKLOG — Ceiba Idea Capture & Triage System
-<!-- Updated: 2026-03-15 23:00 -->
+<!-- Updated: 2026-03-16 -->
 <!-- Rule: Every ChatGPT/AI output gets logged here BEFORE implementation. Check DONE first to avoid rebuilds. -->
 
 ## How This Works
@@ -29,6 +29,13 @@
 | Google Shopping scraper (built, selectors broken) | ChatGPT Chat 1 | Cobo | 2026-03-15 | `product_research_engine/scrapers/google_shopping.py` |
 | Seed from trends workaround | Cobo initiative | Cobo | 2026-03-15 | `product_research_engine/seed_from_trends.py` |
 | COBO Trends Intelligence dashboard | ChatGPT | Cobo | 2026-03-15 | `output/dashboard.html` |
+| eBay Listing Agent V1 (full pipeline) | Kalani + Ceiba | Ceiba | 2026-03-16 | `tools/ebay-listing-assistant/` — 9 files: shipping, pricing, research, content gen, publisher, image handler, CLI |
+| eBay V2 Publisher (API + OAuth) | Kalani + ChatGPT + Ceiba | ChatGPT→Ceiba | 2026-03-16 | `providers/ebay/publisher_v2.py` + `ebay_oauth_token.py` — auto-refresh, rate limit, policy mgmt, draft preview |
+| eBay API Keys (Prod + Sandbox) | Kalani | Kalani | 2026-03-16 | `~/.behique_ebay_keys` + `~/.behique_ebay_keys_sandbox` (chmod 600) |
+| Quest Dashboard V1 | ChatGPT | ChatGPT→Ceiba | 2026-03-16 | `Ceiba/quest-dashboard.html` — works but wrong aesthetic, needs pixel art rebuild |
+| Quest Dashboard V2 — 3 theme modes | Ceiba | Ceiba | 2026-03-16 | `Ceiba/quest-dashboard.html` — Neon/Mono/Pastel toggle, localStorage persistence. Kalani said "beautiful" |
+| Quick Lister (quick_list.py) | Ceiba | Ceiba | 2026-03-16 | `tools/ebay-listing-assistant/quick_list.py` — skip research, direct listing. Saves to `listings/` folder. |
+| Session transcript persistence | Ceiba | Ceiba | 2026-03-16 | `Ceiba/07-Transcripts/` + `Ceiba/08-Images/` — survives context windows |
 
 ---
 
@@ -47,6 +54,11 @@
 | n8n → Discord webhook pipeline | Kalani voice memo 2026-03-16 | Discord server + n8n running | MEDIUM | Pattern from video: trigger → process → summarize → Discord webhook. Adapt for content approval, not just news. |
 | Jarvis morning briefing | Kalani 2026-03-15 | Need wake.sh + primer.md | HIGH | "Good morning Ceiba" → overnight summary, project status, today's priorities, blockers cleared, what Cobo did. Like the Jarvis reel transcript. |
 | Use Ralph Loop for autonomous task completion | Kalani 2026-03-15 | Plugin already installed | HIGH | `/ralph-loop` — set task + completion promise, walk away. Use for dashboard polish, eBay API wiring, any well-defined build task. |
+| eBay Listing Agent V2 — Telegram bot `/ebay newlisting` | Kalani 2026-03-16 | V1 pipeline built | HIGH | Telegram command → LLM pipeline → auto-list. Format: `/ebay newlisting "Name" (qty) #tags`. Route through BehiqueBot or separate bot. |
+| eBay Listing Agent V2 — API auto-publish | Kalani 2026-03-16 | eBay API keys obtained ✅ | HIGH | Swap EbayManualPublisher → EbayAPIPublisher using Sell/Inventory API. No more copy-paste. publisher_v2.py + ebay_oauth_token.py built. Need OAuth flow completion. |
+| Prompt quality comparator skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill that takes a prompt, runs through multiple LLMs, evaluates/combines best output. Multi-model prompt A/B testing at skill level. |
+| Session finish-tracker skill | Kalani 2026-03-16 | Can build now | HIGH | Tracks planned-vs-completed work across sessions. "Did we finish what we planned?" accountability system. ADHD-critical. |
+| Prompt injection defense skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill to prevent prompt injection when agents browse the web. Security layer for autonomous browsing tasks. |
 
 ---
 
@@ -54,8 +66,8 @@
 
 | Idea | Source | Blocked By | Unblocks When | Priority |
 |------|--------|------------|---------------|----------|
-| eBay cross-reference engine | ChatGPT Chat 1 | eBay API keys | Monday 2026-03-16 | HIGH |
-| Real scoring with margin/competition | ChatGPT Chat 1 | eBay API keys | Monday 2026-03-16 | HIGH |
+| eBay cross-reference engine | ChatGPT Chat 1 | eBay API keys ✅ — needs OAuth user token | OAuth flow completed | HIGH |
+| Real scoring with margin/competition | ChatGPT Chat 1 | eBay API keys ✅ — needs OAuth user token | OAuth flow completed | HIGH |
 | Amazon scraper with stealth+proxies | ChatGPT Chat 1 | Residential proxies on Cobo | proxies.txt copied to Cobo | MEDIUM |
 | Walmart scraper | ChatGPT Chat 3 | Core scrapers need to work first | Amazon/eBay pipeline proven | LOW |
 | Product clustering (group variants) | ChatGPT Chat 3 | Needs enough products in DB | eBay API populates real data | MEDIUM |
@@ -89,6 +101,24 @@
 | YAML metadata for typed relationships in frontmatter | ChatGPT Chat 3 | Current link sections work | Vault is large enough to need machine parsing |
 | Vault wiki-link strategy (typed link conventions, structured sections) | ChatGPT Chat 3 | Already partially implemented | Next vault cleanup pass |
 | Vault template system (standardized PROJECT/TOOL/SESSION/DECISION/PATTERN templates) | ChatGPT Chat 3 | Already partially exists | Next vault content sprint |
+| Quest/Journal dashboard (Pixel art/Stardew Valley style) | Kalani 2026-03-16 | V1 built, needs aesthetic rebuild | After aesthetic rebuild. V1 at `Ceiba/quest-dashboard.html`. Kalani wants pixel art/Habitica/cozy, NOT cyberpunk. |
+| Book-to-Agent system | Comp2 2026-03-16 | Big concept, needs design | After core revenue flowing. Turn books into interactive AI tutors. |
+| Colmena66 AI consulting play | Comp2 2026-03-16 | Need proven portfolio first | After 3+ automation projects done. PR startup accelerator = potential client. |
+| Tamagotchi Pi companion device | Comp2 2026-03-16 | Quest dashboard needs to work first | After dashboard proven. Physical Raspberry Pi in 3D-printed cube on desk. |
+| Digital twin system | Comp2 2026-03-16 | Over-engineering for now | When multiple agents handle distinct domains. |
+| PR Government AI consulting | Comp2 2026-03-16 | Need credibility first | After n8n agency has 5+ clients. |
+| Multi-model description A/B testing | Kalani 2026-03-16 | Need working listings + sales data | After 10+ eBay listings. Test Claude vs ChatGPT vs Ollama descriptions, measure which sells faster. |
+| Dropship auto-lister (scraper → eBay pipeline 24/7) | Kalani 2026-03-16 | Need eBay API + working scrapers | After V2 API publisher + product research engine proven end-to-end. Workers auto-list from Amazon/Walmart to eBay. |
+| OpenClaw as central agent management hub | Kalani 2026-03-16 | OpenClaw needs more skills deployed | After 5+ agents/skills proven. Central dispatch for all bots and automation. |
+| Pixel art city simulator dashboard | Kalani 2026-03-16 | Fun but not priority | After quest dashboard proves the concept. Visual city where buildings represent projects. |
+| Autonomous cross-computer communication | Kalani 2026-03-16 | Bridge is basic HTTP, need full agent protocol | After bridge proven + secure. Ceiba autonomously triggers Cobo sessions, controls browser to interact with ChatGPT, no human copy-paste relay needed. |
+| Swarm Mode / Worker Spawning architecture | Kalani + ChatGPT 2026-03-16 | Over-engineering for now | After 3+ working agents. Workers can spawn new workers. AI-TASK protocol with structured task schemas. Ceiba only supervises. |
+| Agent Kernel (~300 line orchestrator) | ChatGPT 2026-03-16 | Need working agents first | After task queue + routing proven. Python script: task queue, worker spawning, memory search, routing, skill registry. "OS for the AI cluster." |
+| Overnight autonomous scraping pipeline | Kalani 2026-03-16 | Need reliable scraper first | After trends scraper rebuild. Scheduled work sessions that run while Kalani sleeps. Scrape → score → queue listings. |
+| Ceiba Memory Protocol (CMP) | Kalani + ChatGPT 2026-03-16 | Vault needs structure first | After vault has 60+ nodes. Structured protocol for any agent to write to the vault safely with typed payloads. Machine-readable knowledge graph. |
+| Viral Vault scoring methodology | Kalani 2026-03-16 | Need product research engine working | After eBay API data flowing. 15-point scoring checklist from Viral Vault adapted for our product scoring engine. |
+| Tamagotchi as mobile app (not just Pi) | Kalani 2026-03-16 | Quest dashboard needs to work first | After Pi version. React Native or PWA companion app that shows tamagotchi reacting to progress. |
+| Low-dopamine mode for all dashboards | Kalani 2026-03-16 | Done for quest dashboard ✅ | Apply mono/pastel toggle to ALL future UIs. Design system-level concern. |
 
 ---
 

@@ -16,7 +16,7 @@ tags: [project, ecommerce, revenue]
 ---
 
 # eBay Listing Assistant
-**Status:** 🔨 Building
+**Status:** 🔨 Building → V1 LIVE, V2 built
 **Priority:** CRITICAL — direct revenue
 **Started:** 2026-03-14
 
@@ -29,17 +29,56 @@ Takes a product name + photo → researches sold prices on eBay → generates co
 → [[02-Goals/Q3-2026]] — fastest path to first eBay revenue
 Every listing done manually is an hour wasted. This runs in seconds.
 
-## Current Blockers
-- [ ] eBay Developer account (developer.ebay.com) — NOT SET UP
-- [ ] Sandbox API keys (App ID, Cert ID, Dev ID, User token)
+## Current State (2026-03-16)
+- [x] eBay Developer account created (developer.ebay.com)
+- [x] Production API keys obtained (`~/.behique_ebay_keys`, chmod 600)
+- [x] Sandbox API keys obtained (`~/.behique_ebay_keys_sandbox`, chmod 600)
+- [x] Marketplace deletion exemption granted
+- [x] V1 listing pipeline — full 9-module system
+- [x] V2 API publisher built (auto-refresh, rate limiting, draft preview)
+- [x] OAuth token script built (`ebay_oauth_token.py`)
+- [x] Quick lister built (`quick_list.py` — skip research, direct listing)
+- [x] Funko Pop Goodfellas listing generated + saved to `listings/`
+- [ ] **POST THE FUNKO POPS ON EBAY** — Kalani needs to paste into form
+- [ ] Run OAuth consent flow to activate V2 API
+- [ ] First eBay sale
 
-## Build Plan
-1. eBay Developer account → sandbox keys
-2. Research module: search eBay sold listings → get price range
-3. AI module: generate title, description, item specifics, category
-4. Input flow: product name + image → ask condition + quantity + shipping
-5. Publish via eBay Trading API or Inventory API
-6. Telegram confirmation sent when listing goes live
+## Build Plan (updated)
+1. ~~eBay Developer account → sandbox keys~~ ✅ DONE
+2. ~~Research module: search eBay sold listings~~ ✅ DONE
+3. ~~AI module: generate title, description, item specifics~~ ✅ DONE
+4. ~~Input flow: product + condition + quantity + shipping~~ ✅ DONE
+5. ~~V2 Publisher via eBay Inventory API~~ ✅ BUILT (needs OAuth token)
+6. Telegram confirmation when listing goes live — NEXT
+7. First sale → iterate
+
+## File Map
+```
+tools/ebay-listing-assistant/
+├── run.py                          # V1 CLI entry point (research-based)
+├── quick_list.py                   # Quick lister (skip research, direct)
+├── listings/                       # Saved generated listings (.txt + .json)
+├── core/
+│   ├── types.py                    # Shared data models (ProductInput, ListingContent, etc.)
+│   ├── types_v1.py                 # V1 extended input types
+│   ├── pipeline.py                 # 3-stage orchestrator
+│   ├── pricing.py                  # Pricing engine (fees, shipping, margin calc)
+│   └── shipping.py                 # USPS rates from Puerto Rico
+├── ai/
+│   └── content_generator.py        # SEO title, HTML description, item specifics
+├── providers/ebay/
+│   ├── research.py                 # eBay sold listing research
+│   ├── publisher_v1.py             # Manual copy-paste publisher
+│   ├── publisher_v2.py             # API auto-publisher (OAuth, rate limit, draft preview)
+│   └── ebay_oauth_token.py         # Standalone OAuth helper
+└── media/
+    └── image_handler.py            # Image validation
+```
+
+## Credentials
+- Production keys: `~/.behique_ebay_keys` (App ID, Dev ID, Cert ID)
+- Sandbox keys: `~/.behique_ebay_keys_sandbox`
+- OAuth tokens: `~/.behique_ebay_tokens.json` (NOT YET — needs consent flow)
 
 ## Uses Tools
 - [[TOOL_Listing_Pipeline]] — `~/behique/tools/ebay-listing-assistant/core/pipeline.py`
@@ -55,17 +94,17 @@ Every listing done manually is an hour wasted. This runs in seconds.
 - [[01-Projects/MISSIONS]] — Active Quest #1
 
 ## Patterns Observed
-- [[PAT_Avoidance_Revenue]] — eBay dev account has been "next action" for 3+ days
-
----
+- [[PAT_Avoidance_Revenue]] — eBay dev account was "next action" for 3+ days before finally getting done 2026-03-16
 
 ---
 
 ## 🧭 CEIBA BREADCRUMBS
 *Ceiba leaves notes here for future sessions. Read before touching this project.*
 
-- **2026-03-14:** Skeleton built — `types.py` (data models) + `pipeline.py` (3-stage orchestrator). Both at `~/behique/tools/ebay-listing-assistant/core/`. Nothing wired up yet. All adapters missing.
-- **2026-03-15:** eBay API keys still not obtained. This has been "next action" for 3+ days. No technical blocker — pure avoidance. Name it directly.
-- **Pattern note:** Every session ends without doing developer.ebay.com. Open the tab NOW, not at the end of the session.
+- **2026-03-14:** Skeleton built — `types.py` + `pipeline.py`. Nothing wired up.
+- **2026-03-15:** eBay API keys still not obtained. Pure avoidance pattern.
+- **2026-03-16 (session 1):** MASSIVE progress. Got Production + Sandbox API keys. Built V2 publisher with OAuth auto-refresh, rate limiting, exponential backoff, draft preview. Built OAuth token script. Built quest dashboard. Funko Pop listing generated.
+- **2026-03-16 (session 2):** Built `quick_list.py` — skip-research direct lister. Generated Funko Pop Goodfellas listing (3 sets × $27.99, $11.22 profit per unit = $33.66 total). Saved to `listings/` folder. Hello Kitty cups skipped (too many variants, needs specifics from Kalani).
+- **Revenue is still $0.** The Funko Pop listing is ready. Kalani just needs to paste it into eBay's form.
 
-*Next action: developer.ebay.com → create account → get App ID, Cert ID, Dev ID, OAuth token → paste into session*
+*Next action: Kalani pastes the Funko Pop listing into eBay. Then run `python3 ebay_oauth_token.py` to activate V2 API publisher.*

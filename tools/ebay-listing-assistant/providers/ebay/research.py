@@ -1,139 +1,141 @@
 """
-eBay research adapter — pulls sold listing data via Browse API.
-Feeds ResearchResult into the pipeline.
+eBay Research Adapter — Pulls comparable sold listing data.
 
-Uses: Browse API /item_summary/search with filter=buyingOptions:{FIXED_PRICE},soldItems
-Docs: https://developer.ebay.com/api-docs/buy/browse/resources/item_summary/methods/search
+V1: Web-based research. Ceiba searches eBay sold listings and feeds structured data
+    through parse_comp_data(). No API keys needed.
+V2: Swap to eBay Finding API / Marketplace Insights API.
 """
 
-import logging
 import statistics
-from collections import Counter
-
-import requests
-
+from urllib.parse import quote_plus
 from core.types import ProductInput, ResearchResult
-from providers.ebay.auth import EbayAuth
-
-logger = logging.getLogger(__name__)
 
 
-class EbayResearchAdapter:
+class EbayWebResearch:
     """
-    Stage 1 adapter: researches sold listings on eBay.
-    Returns pricing data, category info, and sample titles.
-    """
+    V1 research adapter — generates search URLs and parses manually-gathered data.
 
-    def __init__(self, auth: EbayAuth, max_results: int = 50):
-        self.auth = auth
-        self.max_results = max_results
+    Usage (in Ceiba session):
+        research = EbayWebResearch()
+        url = research.build_search_url(product)  # Ceiba searches this
+        result = research.parse_comp_data(         # Ceiba fills from search results
+            sold_prices=[12.99, 15.50, 11.00, ...],
+            titles=["Hello Kitty Mug ...", ...],
+            specifics={"Brand": "Sanrio", ...},
+            category_id="40281",
+            category_name="Coffee Mugs",
+        )
+    """
 
     def get_sold_data(self, product: ProductInput) -> ResearchResult:
         """
-        Search eBay for completed/sold listings matching the product.
-        Extracts pricing stats, category, and common item specifics.
+        Pipeline adapter interface.
+
+        In V1, this is called with pre-populated data via from_dict().
+        In V2, this would make actual API calls.
         """
-        items = self._search_sold(product.name, product.category_hint)
+        raise NotImplementedError(
+            "V1 uses parse_comp_data() with Ceiba-gathered data. "
+            "Call build_search_url() first, then parse_comp_data() with results."
+        )
 
-        if not items:
-            raise ValueError(f"No sold listings found for: {product.name}")
+    def build_search_url(self, product: ProductInput, sold_only: bool = True) -> str:
+        """
+        Build eBay search URL for sold/completed listings.
 
-        prices = [self._extract_price(item) for item in items if self._extract_price(item)]
+        Args:
+            product: The product to research
+            sold_only: If True, filter to sold items only (default)
 
-        if not prices:
-            raise ValueError(f"No valid prices found for: {product.name}")
+        Returns:
+            eBay search URL with sold listing filters
+        """
+        query = quote_plus(product.name)
+        base = "https://www.ebay.com/sch/i.html"
+        params = f"_nkw={query}&_sop=13"  # Sort by price + shipping lowest first
 
-        # Extract category from first result
-        category_id = items[0].get("categoryId", "")
-        category_name = items[0].get("categoryPath", "Unknown")
-        if "/" in category_name:
-            category_name = category_name.split("/")[-1].strip()
+        if sold_only:
+            params += "&LH_Complete=1&LH_Sold=1"  # Completed AND sold
 
-        # Collect titles from top sellers
-        sample_titles = [item.get("title", "") for item in items[:10]]
+        # Add condition filter if specified
+        condition_map = {
+            "New": "1000",
+            "Used": "3000",
+            "Refurbished": "2000",
+            "For Parts": "7000",
+        }
+        if product.condition in condition_map:
+            params += f"&LH_ItemCondition={condition_map[product.condition]}"
 
-        # Extract common item specifics
-        common_specifics = self._extract_common_specifics(items)
+        return f"{base}?{params}"
 
-        # Shipping costs
-        shipping_costs = []
-        for item in items:
-            shipping = item.get("shippingOptions", [{}])
-            if shipping:
-                cost = shipping[0].get("shippingCost", {}).get("value")
-                if cost:
-                    shipping_costs.append(float(cost))
+    def build_active_url(self, product: ProductInput) -> str:
+        """Build URL for currently active listings (competition check)."""
+        query = quote_plus(product.name)
+        return f"https://www.ebay.com/sch/i.html?_nkw={query}&_sop=12"
+
+    def parse_comp_data(
+        self,
+        sold_prices: list[float],
+        titles: list[str] = None,
+        specifics: dict = None,
+        category_id: str = "",
+        category_name: str = "",
+        active_listing_count: int = 0,
+        shipping_costs: list[float] = None,
+    ) -> ResearchResult:
+        """
+        Convert raw comp data into a structured ResearchResult.
+
+        Args:
+            sold_prices: List of final sold prices from eBay search
+            titles: Sample titles from top-selling listings
+            specifics: Common item specifics (e.g., {"Brand": "Sanrio"})
+            category_id: eBay category ID
+            category_name: Human-readable category name
+            active_listing_count: Number of active competing listings
+            shipping_costs: List of shipping costs from sold listings
+        """
+        if not sold_prices:
+            raise ValueError("Need at least one sold price to calculate comps")
+
+        prices = sorted(sold_prices)
+        avg_shipping = 0.0
+        if shipping_costs:
+            avg_shipping = statistics.mean(shipping_costs)
+
+        # Calculate sell-through rate if we have active listing count
+        sell_through = None
+        if active_listing_count > 0 and len(sold_prices) > 0:
+            # Rough estimate: sold in last 90 days / (sold + active)
+            sell_through = len(sold_prices) / (len(sold_prices) + active_listing_count)
 
         return ResearchResult(
             category_id=category_id,
             category_name=category_name,
-            avg_sold_price=statistics.mean(prices),
-            min_sold_price=min(prices),
-            max_sold_price=max(prices),
-            median_sold_price=statistics.median(prices),
-            sample_titles=sample_titles,
-            common_specifics=common_specifics,
-            avg_shipping_cost=statistics.mean(shipping_costs) if shipping_costs else 0.0,
-            sell_through_rate=None,  # Requires separate active listings query
-            raw_listings=items[:5],  # Keep first 5 for debug
+            avg_sold_price=round(statistics.mean(prices), 2),
+            min_sold_price=round(min(prices), 2),
+            max_sold_price=round(max(prices), 2),
+            median_sold_price=round(statistics.median(prices), 2),
+            sample_titles=titles or [],
+            common_specifics=specifics or {},
+            avg_shipping_cost=round(avg_shipping, 2),
+            sell_through_rate=round(sell_through, 3) if sell_through is not None else None,
         )
 
-    def _search_sold(self, query: str, category_hint: str = None) -> list[dict]:
-        """Call Browse API search for sold items."""
-        url = f"{self.auth.api_base}/buy/browse/v1/item_summary/search"
-
-        params = {
-            "q": query,
-            "filter": "buyingOptions:{FIXED_PRICE}",
-            "sort": "-price",
-            "limit": self.max_results,
-        }
-
-        if category_hint:
-            params["category_ids"] = category_hint
-
-        headers = self.auth.get_headers()
-
-        logger.info(f"Searching eBay sold: '{query}' (limit={self.max_results})")
-        resp = requests.get(url, headers=headers, params=params, timeout=20)
-        resp.raise_for_status()
-
-        data = resp.json()
-        items = data.get("itemSummaries", [])
-        logger.info(f"Found {len(items)} sold listings")
-
-        return items
-
-    def _extract_price(self, item: dict) -> float | None:
-        """Pull price from item summary."""
-        price_info = item.get("price", {})
-        value = price_info.get("value")
-        if value:
-            try:
-                return float(value)
-            except (ValueError, TypeError):
-                return None
-        return None
-
-    def _extract_common_specifics(self, items: list[dict]) -> dict:
+    @classmethod
+    def from_dict(cls, data: dict) -> ResearchResult:
         """
-        Find the most common item specifics across sold listings.
-        Returns e.g. {"Brand": "Sony", "Color": "Black"}
+        Create ResearchResult directly from a dict.
+        Useful when Ceiba has already gathered all the data.
         """
-        specifics_counter: dict[str, Counter] = {}
-
-        for item in items:
-            for aspect in item.get("itemAffinity", []):
-                name = aspect.get("localizedName", "")
-                value = aspect.get("localizedValue", "")
-                if name and value:
-                    if name not in specifics_counter:
-                        specifics_counter[name] = Counter()
-                    specifics_counter[name][value] += 1
-
-        # Return the most common value for each specific
-        return {
-            name: counter.most_common(1)[0][0]
-            for name, counter in specifics_counter.items()
-            if counter
-        }
+        instance = cls()
+        return instance.parse_comp_data(
+            sold_prices=data.get("sold_prices", []),
+            titles=data.get("titles", []),
+            specifics=data.get("specifics", {}),
+            category_id=data.get("category_id", ""),
+            category_name=data.get("category_name", ""),
+            active_listing_count=data.get("active_listing_count", 0),
+            shipping_costs=data.get("shipping_costs", []),
+        )
