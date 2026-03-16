@@ -1,0 +1,1 @@
+Async Python enables the use of coroutines and asynchronous generators, simplifying concurrent programming and reducing the complexity of handling asynchronous operations.

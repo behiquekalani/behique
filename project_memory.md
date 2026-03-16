@@ -46,3 +46,15 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com> (files: setup_notion.p
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com> (files: .gitignore,tools/setup_notion.py,)
 - [2026-03-15 10:43] [main] a0d1bdf: auto: session checkpoint 2026-03-15 10:43:03 (files: primer.md,)
+- [2026-03-15 12:14] [main] 903008a: merge: resolve project_memory.md conflict (keep both histories) (files: modules/memory.py,project_memory.md,)
+- [2026-03-15 12:51] [main] 848cbdb: feat: code-auditor skill — ChatGPT-drafted, bug-finding focused
+
+Prompt engineered by ChatGPT (cross-model prompting). Assumes bugs exist,
+follows execution paths, includes subtle real-world examples for each of
+7 bug classes. First skill built using the routing system's offloading principle.
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com> (files: skills/code-auditor/SKILL.md,)
+- [2026-03-15 13:19] [main] 36da3c8: auto: session checkpoint 2026-03-15 13:19:22 (files: primer.md,)
+- [2026-03-15 15:02] [main] 7e84380: auto: session checkpoint 2026-03-15 15:02:38 (files: primer.md,)
+- [2026-03-15 15:10] [main] 68b49b6: auto: session checkpoint 2026-03-15 15:10:42 (files: primer.md,)
+- [2026-03-15 15:43] [main] e75556d: auto: session checkpoint 2026-03-15 15:43:48 (files: primer.md,)

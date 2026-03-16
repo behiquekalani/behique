@@ -1,0 +1,1 @@
+Coroutines and asynchronous generators in Async Python enable efficient handling of asynchronous operations in the scoring engine.

@@ -1,105 +1,125 @@
-# VAULT INDEX — Read this first every session
-# Auto-maintained by Ceiba. Scan this to orient before opening any file.
+---
+type: system
+tags: [system, index, graph]
+---
+
+# VAULT INDEX — Knowledge Graph Entry Point
+# Auto-maintained by Ceiba. Read this to orient before any session.
 # Last updated: 2026-03-15
 
 ---
 
-## 🧭 SESSION START PROTOCOL
+## SESSION START PROTOCOL
 1. Read this file (you are here)
-2. Read `../primer.md` — live state, blockers, next action
-3. Read `04-Patterns/observations.md` — what Ceiba knows about Kalani's patterns
-4. Open the active project file (currently: `01-Projects/eBay-Listing-Assistant.md`)
-5. Check breadcrumbs in that file — what did past Ceiba leave behind?
+2. Read [[primer]] — live state, blockers, next action
+3. Read [[observations]] — what Ceiba knows about Kalani's patterns
+4. Read [[architecture-spine]] — system architecture and build sequence
+5. Open the active project file → check breadcrumbs
+6. Run `python3 ~/behique/tools/vault_grapher.py --stats` for graph health
 
 ---
 
-## 📁 ROOT FILES (`~/behique/`)
+## PROJECTS (type: project)
 
-| File | One-line description |
-|------|---------------------|
-| `primer.md` | LIVE STATE — current focus, blockers, next action. Rewritten every session. |
-| `CLAUDE.md` | Static identity, rules, tone, project list, ADHD framework. Rarely changes. |
-| `context.md` | Big picture WHY — vision, north star, offline problem, priority stack. |
-| `project_memory.md` | Auto-generated git commit log — chronological record of everything built. |
-| `ceiba_lite.py` | Offline fallback — runs full Ceiba on local Ollama when Claude Max is down. |
-| `memory.sh` | Injects live git state at session start. Run: `bash ~/behique/memory.sh` |
-| `wake.sh` | Ceiba activation script — run this to boot a session with full context. |
-| `main.py` | BehiqueBot core — Telegram message handler, routes to classifier + memory. |
-
----
-
-## 🌳 VAULT FILES (`~/behique/Ceiba/`)
-
-### 00-Identity
-| File | One-line description |
-|------|---------------------|
-| `Kalani.md` | Who Kalani is — INFJ, ADHD, faith, family, how to talk to him, warning signs. |
-| `Psychologist-Framework.md` | The real therapeutic framework behind BehiqueBot and Ceiba's accountability logic. |
-
-### 01-Projects
-| File | One-line description |
-|------|---------------------|
-| `MISSIONS.md` | Full quest map — main quest ($100K Q3), active quests, side quests. |
-| `eBay-Listing-Assistant.md` | **ACTIVE** — product photo → research → listing → publish. Blocked on eBay API keys. |
-| `BehiqueBot.md` | Telegram capture bot — live on Railway, Ollama-first classification, Notion persistence. |
-| `n8n-Agency.md` | Sell AI automations to businesses — zero clients, outreach not started. |
-| `Google-Trends-Scraper.md` | Product research engine — got banned, needs rewrite with proxy rotation. |
-| `Shopify-Store.md` | Waiting for eBay proven products to migrate. Monthly cost, zero sales. |
-| `News-Intelligence-Bots.md` | Future idea — news monitoring agents. Not started. |
-
-### 02-Goals
-| File | One-line description |
-|------|---------------------|
-| `Q3-2026.md` | $100K by Sept 30. Revenue paths ranked by speed. Monthly checkpoints. |
-| `North-Star.md` | The vision — family provision, freedom, builder identity. The WHY. |
-
-### 03-Check-ins
-| File | One-line description |
-|------|---------------------|
-| `template.md` | Daily check-in template — how are you, what's in the way, one win. |
-| `2026-03-15.md` | Check-in from today's session. |
-| `weekly-2026-03-15.md` | Weekly review for the week of March 15. |
-
-### 04-Patterns
-| File | One-line description |
-|------|---------------------|
-| `observations.md` | **READ THIS EARLY** — patterns Ceiba has noticed. Strengths, watch-fors, session history. |
-
-### 05-Knowledge
-| File | One-line description |
-|------|---------------------|
-| `screen-assistant-idea.md` | Idea capture — screen-aware AI assistant concept. |
-| `architecture-spine.md` | **READ THIS** — 6-part AI body framework + 4-month build plan. The north star for everything. |
-| `session-2026-03-15-capture.md` | **READ AFTER SPINE** — priority shifts, Allocator findings, stop hook design, credit burn causes. |
-| `system-map-render.jsx` | Interactive React system map — 9 nodes, click for status. Render in Cowork to view. |
+| Project | Status | Links |
+|---------|--------|-------|
+| [[eBay-Listing-Assistant]] | Building | → [[TOOL_Listing_Pipeline]], [[TOOL_Trends_Scraper]], [[Q3-2026]] |
+| [[BehiqueBot]] | Live | → [[TOOL_BehiqueBot_Core]], [[Psychologist-Framework]], [[SYS_Bridge]] |
+| [[Google-Trends-Scraper]] | Rebuilding | → [[TOOL_Trends_Scraper]], [[SYS_AI_Cluster]] |
+| [[n8n-Agency]] | Not started | → [[TOOL_n8n]], [[SYS_Bridge]] |
+| [[Shopify-Store]] | Waiting | → [[eBay-Listing-Assistant]], [[DEC_Ebay_Before_Shopify]] |
+| [[News-Intelligence-Bots]] | Idea | — |
+| [[MISSIONS]] | Quest map | → all projects |
 
 ---
 
-## 🖥️ INFRASTRUCTURE STATE
+## SYSTEMS (type: system/architecture)
+
+| System | Status | What It Does |
+|--------|--------|-------------|
+| [[SYS_AI_Cluster]] | Live | Task queue + routing + memory at `~/behique/ai_cluster/` |
+| [[SYS_Bridge]] | Live | HTTP bridge to Cobo at `192.168.0.151:9876` |
+| [[SYS_Vault_Graph]] | Building | Wiki-linked knowledge graph (this vault) |
+| [[architecture-spine]] | Blueprint | 6-part AI body + 4-month build plan |
+
+---
+
+## TOOLS (type: tool)
+
+| Tool | Location | Used By |
+|------|----------|---------|
+| [[TOOL_Agent_Kernel]] | `ai_cluster/kernel/agent_kernel.py` | [[SYS_AI_Cluster]] |
+| [[TOOL_Dispatch]] | `bridge/dispatch.sh` | [[SYS_Bridge]] |
+| [[TOOL_Trends_Scraper]] | `tools/trends_scraper.py` | [[Google-Trends-Scraper]] |
+| [[TOOL_Listing_Pipeline]] | `tools/ebay-listing-assistant/core/pipeline.py` | [[eBay-Listing-Assistant]] |
+| [[TOOL_Vault_Grapher]] | `tools/vault_grapher.py` | [[SYS_Vault_Graph]] |
+| [[TOOL_Ceiba_Lite]] | `ceiba_lite.py` | Emergency fallback |
+| [[TOOL_BehiqueBot_Core]] | `main.py` + `modules/` | [[BehiqueBot]] |
+| [[TOOL_Notify_Relay]] | `tools/notify.py` | [[BehiqueBot]] |
+| [[TOOL_n8n]] | `http://192.168.0.151:5678` | [[n8n-Agency]] |
+
+---
+
+## PATTERNS (type: pattern)
+
+| Pattern | Observed In |
+|---------|-------------|
+| [[PAT_Avoidance_Revenue]] | eBay dev account 3+ days, n8n zero clients |
+| [[PAT_Infrastructure_Creep]] | Every session builds infra instead of revenue work |
+| [[PAT_Event_Not_Schedule]] | "Fancy alarm clock" — events not cron |
+| [[observations]] | Full behavioral patterns + session history |
+
+---
+
+## DECISIONS (type: decision)
+
+| Decision | Why |
+|----------|-----|
+| [[DEC_Ebay_Before_Shopify]] | eBay has traffic, Shopify needs marketing |
+| [[DEC_Ollama_First]] | Free inference, OpenAI as fallback only |
+| [[DEC_Model_Agnostic_Vault]] | Vault doesn't belong to Anthropic |
+| [[DEC_Best_Not_Cheapest]] | "I want the best, not the fastest" |
+| [[DEC_Claude_Code_HQ]] | Moved HQ from Cowork to Claude Code CLI |
+
+---
+
+## IDENTITY
+
+| File | What |
+|------|------|
+| [[Kalani]] | INFJ, ADHD, faith+family, builder mentality |
+| [[Psychologist-Framework]] | Accountability framework behind BehiqueBot |
+| [[North-Star]] | The WHY — family, freedom, builder identity |
+| [[Q3-2026]] | $100K by Sept 30, 2026 |
+
+---
+
+## INFRASTRUCTURE STATE
 
 | Service | Status | Access |
 |---------|--------|--------|
-| Computer 2 | ✅ Live (192.168.0.151) | LAN only |
-| n8n | ✅ Running via pm2 | http://192.168.0.151:5678 |
-| Ollama (llama3.2) | ✅ Running | http://192.168.0.151:11434 |
-| Syncthing | ✅ Syncing ~/behique | Real-time, both machines |
-| BehiqueBot | ✅ Live on Railway | Telegram |
-| Cloudflare tunnel | ⚠️ Active but URL rotates | saving-mit-replacement-cached.trycloudflare.com (changes on restart) |
-| Cowork (Mac) | ✅ Running | This session |
-| Cowork (Computer 2) | ✅ Working | Fixed 2026-03-14 |
+| AI Cluster Kernel | ✅ Live | `python3 ai_cluster/kernel/agent_kernel.py` |
+| Bridge Server (Cobo) | ✅ Live | `192.168.0.151:9876` (bearer auth) |
+| Ollama (llama3.2) | ✅ Running | `192.168.0.151:11434` |
+| OpenClaw + GPT-4o | ✅ Running | @CeibaOC2Bot on Telegram |
+| Syncthing | ✅ Syncing | `~/behique` both machines |
+| BehiqueBot | ✅ Live | Railway + Telegram |
+| n8n | ✅ Running | `192.168.0.151:5678` via pm2 |
+| Cloudflare tunnel | ✅ Named | `bridge.merchoo.shop` |
 
 ---
 
-## 🔑 KEY MOMENTS (never compress these)
-- "fancy alarm clock" — critique of building reminders instead of revenue tools
-- "pen and paper" — if Ceiba builds something a notebook can do, call it out immediately
-- "I don't want to lose you" — continuity is the core fear, ADHD brain loses the thread
-- Infrastructure sprints = avoidance pattern — watch for this before revenue tasks
-- eBay API keys have been "next action" for 3+ days — this is the loop to break
+## KEY MOMENTS (never compress)
+- "fancy alarm clock" → [[PAT_Event_Not_Schedule]]
+- "pen and paper" → if Ceiba builds what a notebook does, call it out
+- "I don't want to lose you" → continuity is the core fear → [[TOOL_Ceiba_Lite]]
+- "You go for easy doable projects" → [[DEC_Best_Not_Cheapest]]
+- "For us, not Anthropic" → [[DEC_Model_Agnostic_Vault]]
+- Infrastructure sprints = avoidance → [[PAT_Infrastructure_Creep]]
 
 ---
 
-## 📊 REVENUE TRACKER
+## REVENUE TRACKER
 - **Q3 Target:** $100,000
 - **Current revenue:** $0
 - **Gap:** $100,000
@@ -107,4 +127,11 @@
 
 ---
 
+## GRAPH HEALTH
+Run: `python3 ~/behique/tools/vault_grapher.py`
+See: [[VAULT_GRAPH]] for auto-generated stats, orphans, and connection map.
+
+---
+
 *Ceiba rule: update this index when new files are created or project states change.*
+*Run vault_grapher.py after major changes to regenerate VAULT_GRAPH.md.*

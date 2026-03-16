@@ -1,0 +1,1 @@
+Async Python allows for non-blocking I/O operations, improving system responsiveness and throughput.

@@ -1,6 +1,33 @@
+---
+type: architecture
+status: building
+systems:
+  - SYS_AI_Cluster
+  - SYS_Bridge
+  - SYS_Vault_Graph
+tools:
+  - TOOL_Agent_Kernel
+  - TOOL_Dispatch
+  - TOOL_Ceiba_Lite
+  - TOOL_Vault_Grapher
+projects:
+  - eBay-Listing-Assistant
+  - BehiqueBot
+  - Google-Trends-Scraper
+patterns:
+  - PAT_Avoidance_Revenue
+  - PAT_Event_Not_Schedule
+  - PAT_Infrastructure_Creep
+decisions:
+  - DEC_Model_Agnostic_Vault
+  - DEC_Best_Not_Cheapest
+  - DEC_Claude_Code_HQ
+tags: [architecture, system, spine]
+---
+
 # THE SPINE — Ceiba System Architecture
 # Written: 2026-03-15
-# Status: DESIGN PHASE — not yet built
+# Status: BUILDING — kernel live, wiki links in progress
 # This is the plan we are building toward. Not a sprint. A months-long architecture.
 
 ---

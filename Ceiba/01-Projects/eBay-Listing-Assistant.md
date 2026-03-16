@@ -1,3 +1,20 @@
+---
+type: project
+status: building
+priority: critical
+tools:
+  - TOOL_Listing_Pipeline
+  - TOOL_Trends_Scraper
+systems:
+  - SYS_AI_Cluster
+  - SYS_Bridge
+patterns:
+  - PAT_Avoidance_Revenue
+decisions:
+  - DEC_Ebay_Before_Shopify
+tags: [project, ecommerce, revenue]
+---
+
 # eBay Listing Assistant
 **Status:** 🔨 Building
 **Priority:** CRITICAL — direct revenue
@@ -24,10 +41,21 @@ Every listing done manually is an hour wasted. This runs in seconds.
 5. Publish via eBay Trading API or Inventory API
 6. Telegram confirmation sent when listing goes live
 
-## Related
-→ [[Google-Trends-Scraper]] — feeds product ideas into this tool
-→ [[Shopify-Store]] — eBay winners migrate here automatically
-→ [[01-Projects/MISSIONS]] — Active Quest #1
+## Uses Tools
+- [[TOOL_Listing_Pipeline]] — `~/behique/tools/ebay-listing-assistant/core/pipeline.py`
+- [[TOOL_Trends_Scraper]] — feeds product ideas into this tool
+- [[SYS_AI_Cluster]] — GPT-4o generates listing content via kernel
+
+## Key Decisions
+- [[DEC_Ebay_Before_Shopify]] — eBay winners migrate to Shopify, not the other way
+
+## Related Projects
+- [[Google-Trends-Scraper]] — product research pipeline
+- [[Shopify-Store]] — eBay winners migrate here
+- [[01-Projects/MISSIONS]] — Active Quest #1
+
+## Patterns Observed
+- [[PAT_Avoidance_Revenue]] — eBay dev account has been "next action" for 3+ days
 
 ---
 

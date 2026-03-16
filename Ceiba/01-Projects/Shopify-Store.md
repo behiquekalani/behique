@@ -1,3 +1,17 @@
+---
+type: project
+status: waiting
+tools:
+  - TOOL_Listing_Pipeline
+systems:
+  - SYS_AI_Cluster
+patterns:
+  - PAT_Sequence_Matters
+decisions:
+  - DEC_Ebay_Before_Shopify
+tags: [project, ecommerce, revenue]
+---
+
 # Shopify Store
 **Status:** ⏸ Waiting for products
 **Priority:** Medium — feeds from eBay
@@ -28,10 +42,16 @@ Google Trends → eBay listing → product sells → migrate to Shopify → scal
 - Price sync between eBay and Shopify
 - Inventory alerts when stock gets low
 
-## Related
-→ [[eBay-Listing-Assistant]] — primary feeder
-→ [[Google-Trends-Scraper]] — product research engine
-→ [[02-Goals/Q3-2026]] — Month 3 target: Shopify live with proven products
+## Uses Tools
+- [[TOOL_Listing_Pipeline]] — auto-migrate eBay winners
+
+## Related Projects
+- [[eBay-Listing-Assistant]] — primary feeder
+- [[Google-Trends-Scraper]] — product research engine
+- [[02-Goals/Q3-2026]] — Month 3 target: Shopify live with proven products
+
+## Key Decisions
+- [[DEC_Ebay_Before_Shopify]] — don't activate until 3+ products proven on eBay
 
 ---
 

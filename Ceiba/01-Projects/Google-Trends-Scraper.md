@@ -1,5 +1,19 @@
+---
+type: project
+status: rebuilding
+tools:
+  - TOOL_Trends_Scraper
+systems:
+  - SYS_AI_Cluster
+patterns:
+  - PAT_Kamikaze_Scraping
+decisions:
+  - DEC_Proxy_Rotation
+tags: [project, scraping, research]
+---
+
 # Google Trends Scraper
-**Status:** 🔨 Rebuilt (needs testing)
+**Status:** 🔨 Rebuilding (Cobo refactoring with concurrency + batching)
 **Priority:** HIGH — feeds entire product pipeline
 **First version:** Got banned (no proxy rotation, no rate limiting)
 
@@ -39,10 +53,17 @@ Edit SEARCH_CATEGORIES in the script to customize.
 Webshare rotating proxies — 10 available. Username: mmqgymcq
 Refresh from Webshare dashboard if they expire.
 
-## Related
-→ [[eBay-Listing-Assistant]] — uses scraper output for product research
-→ [[Shopify-Store]] — long-term migration of proven products
-→ [[01-Projects/MISSIONS]] — Primary Side Quest A
+## Uses Tools
+- [[TOOL_Trends_Scraper]] — `~/behique/tools/trends_scraper.py`
+- [[SYS_AI_Cluster]] — scoring via Ollama, overnight automation
+
+## Related Projects
+- [[eBay-Listing-Assistant]] — uses scraper output for product research
+- [[Shopify-Store]] — long-term migration of proven products
+- [[01-Projects/MISSIONS]] — Primary Side Quest A
+
+## Key Decisions
+- [[DEC_Proxy_Rotation]] — 10 Webshare proxies, rotate aggressively
 
 ---
 

@@ -1,3 +1,16 @@
+---
+type: pattern
+projects:
+  - eBay-Listing-Assistant
+  - BehiqueBot
+  - n8n-Agency
+sessions:
+  - SES_2026_03_13
+  - SES_2026_03_14
+  - SES_2026_03_15
+tags: [pattern, accountability, behavioral]
+---
+
 # Ceiba — Pattern Observations
 *Written by Ceiba, not Kalani. Updated as patterns are noticed.*
 *Related: [[03-Check-ins/template]] | [[00-Identity/Psychologist-Framework]]*

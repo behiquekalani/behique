@@ -1,3 +1,15 @@
+---
+type: project
+status: not_started
+tools:
+  - TOOL_n8n
+systems:
+  - SYS_Bridge
+patterns:
+  - PAT_Avoidance_Revenue
+tags: [project, agency, revenue]
+---
+
 # n8n Automation Agency
 **Status:** 🔲 Not started
 **Priority:** HIGH — fastest path to significant revenue
@@ -33,9 +45,16 @@ Small and medium businesses in Puerto Rico (and beyond) waste hours on repetitiv
 - Real estate: form submission → CRM entry → follow-up email sequence
 - E-commerce: abandoned cart → reminder email → discount code at 24h
 
-## Related
-→ [[01-Projects/MISSIONS]] — Primary Side Quest B
-→ [[02-Goals/Q3-2026]] — Month 1 target: first $1K
+## Uses Tools
+- [[TOOL_n8n]] — `http://192.168.0.151:5678` on Cobo
+- [[SYS_Bridge]] — Ceiba triggers workflows on Cobo
+
+## Related Projects
+- [[01-Projects/MISSIONS]] — Primary Side Quest B
+- [[02-Goals/Q3-2026]] — Month 1 target: first $1K
+
+## Patterns Observed
+- [[PAT_Avoidance_Revenue]] — zero clients, outreach not started
 
 ---
 

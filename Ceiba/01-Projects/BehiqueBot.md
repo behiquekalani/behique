@@ -1,3 +1,19 @@
+---
+type: project
+status: live
+tools:
+  - TOOL_BehiqueBot_Core
+  - TOOL_Notify_Relay
+systems:
+  - SYS_Bridge
+  - SYS_AI_Cluster
+patterns:
+  - PAT_Event_Not_Schedule
+decisions:
+  - DEC_Ollama_First
+tags: [project, bot, accountability]
+---
+
 # BehiqueBot
 **Status:** ✅ Live on Railway
 **Priority:** Ongoing — foundation tool
@@ -35,9 +51,21 @@ Telegram message → classify_input() → save_entry() → Notion + local JSON
 - ID: 323501e0a68481fc822ad813448de602
 - Properties: Name, Category, Pillar, Status, Raw Text, Source, Created
 
-## Related
-→ [[00-Identity/Psychologist-Framework]] — framework behind classification
-→ [[01-Projects/MISSIONS]] — foundation for BehiqueBot SaaS (long-term)
+## Uses Tools
+- [[TOOL_BehiqueBot_Core]] — `~/behique/main.py`, classifier, memory, Notion handler
+- [[TOOL_Notify_Relay]] — `~/behique/tools/notify.py` + LaunchAgent
+- [[SYS_Bridge]] — Cobo runs Ollama for classification
+
+## Key Decisions
+- [[DEC_Ollama_First]] — Ollama primary, OpenAI fallback only (saves money)
+- [[DEC_Event_Not_Schedule]] — messages based on events, not cron ("fancy alarm clock" lesson)
+
+## Related Projects
+- [[00-Identity/Psychologist-Framework]] — framework behind classification
+- [[01-Projects/MISSIONS]] — foundation for BehiqueBot SaaS (long-term)
+
+## Patterns Observed
+- [[PAT_Event_Not_Schedule]] — "fancy alarm clock" critique, push for event-driven messaging
 
 ## Next Phase
 - Proactive scheduler — morning briefing + evening check-in via n8n on Computer 2
