@@ -172,6 +172,38 @@ Everything connects. Book-to-Agent is the engine. Everything else is a deploymen
 
 ---
 
+## BUILDING BLOCKS MODEL — Visual + Business (2026-03-16)
+
+Each book = a building block. Each block = a thinking lens. Users collect and stack them.
+
+### The block system:
+- Each block is a standalone agent/filter
+- Blocks can run solo (just "The ONE Thing" lens) or stack (Focus + Revenue combined)
+- Stacking = the system merges two frameworks into one response lens
+- Users build their own cognitive toolkit by collecting blocks
+
+### Ebook-to-Block pipeline:
+```
+Free ebook (teaches the framework)
+    ↓
+Reader gets value, wants it automated
+    ↓
+Paid product = the living block in Behique
+    ↓
+Each ebook = one block unlocked
+    ↓
+More ebooks = more blocks = deeper product engagement
+```
+
+### Why this is a business model, not just a feature:
+- Each ebook is a marketing asset AND a product expansion
+- Users who buy one block want more (collection mechanic)
+- Authors can create official blocks for their books (partnerships)
+- Community can create blocks (marketplace)
+- Blocks are recurring value — not a one-time download
+
+---
+
 ## BREADCRUMBS
 - Captured: 2026-03-16 voice memo session
 - Born from the personality filters idea in [[Behique-Product]]
