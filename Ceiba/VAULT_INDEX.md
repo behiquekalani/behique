@@ -71,6 +71,7 @@ tags: [system, index, graph]
 | [[PAT_Infrastructure_Creep]] | Every session builds infra instead of revenue work |
 | [[PAT_Event_Not_Schedule]] | "Fancy alarm clock" — events not cron |
 | [[observations]] | Full behavioral patterns + session history |
+| [[competitive_intel]] | Competitor signals, gaps, edges, market patterns |
 
 ---
 
