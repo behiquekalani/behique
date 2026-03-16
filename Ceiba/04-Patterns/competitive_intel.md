@@ -61,6 +61,42 @@ For every competitor signal, capture:
 - Auto-generated emails — nice to have, not core
 - "100x'd my life" marketing energy — focus on what actually ships
 
+### 002 — FocusLab Weekly Dashboard (2026-03-16)
+**Source:** Instagram reel — @mindsetstack60
+**Who:** MindsetStack, productivity content creator (7.7K followers)
+
+**What they built:**
+- Google Sheets weekly dashboard called "FocusLab Weekly"
+- Daily task lists with checkboxes (strikethrough on completion)
+- Daily completion % as donut charts (Sun–Sat)
+- Overall Progress bar chart (tasks completed per day of week)
+- Habit Tracker grid: wake 6am, no alcohol, cold shower, 1hr social media limit, budget tracking, gym, reading, English
+- Weekly progress % per habit with horizontal bar visualization
+- Overall weekly completion % (showed 39%)
+
+**Gap — what they have that we don't:**
+- [ ] Visual dashboard for task/habit completion
+- [ ] Daily completion percentage tracking
+- [ ] Habit tracker with streak visualization
+- [ ] Weekly progress overview at a glance
+
+**Edge — what we have that they don't:**
+- Data already flows in automatically via BehiqueBot (his is 100% manual entry)
+- Psychologist-backed framework (his habits are generic self-improvement)
+- Ceiba can spot patterns and warn on drops (his spreadsheet is static)
+- Voice memos + auto-classification (he types every checkbox)
+
+**Steal — prioritized improvements:**
+1. **Build a dashboard that auto-populates from BehiqueBot data** — tasks sent via Telegram become the checklist, completions update the %
+2. **Habit tracker tied to accountability framework** — not generic habits, habits from Kalani's psychologist
+3. **Weekly completion visualization** — donut charts or progress bars, generated from real data
+4. **Pattern detection on the data** — Ceiba flags when completion drops 2+ days in a row
+
+**Ignore:**
+- Google Sheets as the platform — fine for him, we want something connected to the bot
+- Manual data entry — the whole point is automation
+- Generic habit lists — ours come from clinical framework
+
 ---
 
 ## PATTERN TRACKER
@@ -74,6 +110,9 @@ Patterns that emerge across multiple competitors:
 | Shared knowledge base | OpenClaw | 1 | HIGH |
 | Proactive task execution | OpenClaw | 1 | MEDIUM |
 | Social account integration | OpenClaw | 1 | LOW |
+| Visual life dashboard | FocusLab | 1 | HIGH |
+| Habit tracking + streaks | FocusLab | 1 | HIGH |
+| Daily/weekly completion % | FocusLab | 1 | MEDIUM |
 
 *When a pattern appears 3+ times across competitors, it becomes a confirmed market signal.*
 
