@@ -106,6 +106,8 @@ tags: [system, index, graph]
 | BehiqueBot | ✅ Live | Railway + Telegram |
 | n8n | ✅ Running | `192.168.0.151:5678` via pm2 |
 | Cloudflare tunnel | ✅ Named | `bridge.merchoo.shop` |
+| iPhone 13 Pro Max | 🆕 New node | Mobile input — Telegram, Discord, Claude Code |
+| Discord server | 📋 Planned | Content hub — reels/animation preview + approval |
 
 ---
 

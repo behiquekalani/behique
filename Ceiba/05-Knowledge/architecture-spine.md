@@ -64,6 +64,7 @@ An AI system needs exactly six things to function like a real intelligence. Not 
 **What we have:** One sense — Kalani typing in Cowork/Claude Code.
 **What we need:**
 - BehiqueBot (Telegram) — voice and text from Kalani, anywhere, anytime ✅ exists but passive
+- iPhone 13 Pro Max — mobile node, Claude Code via browser/app, voice memos to BehiqueBot, Discord access for content approval on the go
 - File watcher — detect when new files appear in ~/behique (new code, new ideas)
 - Web sensors — market data, product prices, eBay sold listings (the trends scraper was this)
 - n8n event triggers — external signals that reach Ceiba without Kalani initiating
@@ -89,7 +90,8 @@ An AI system needs exactly six things to function like a real intelligence. Not 
 - "Computer 2 found 3 products last night that match your criteria — want to see them?"
 - "You haven't opened the eBay file in 4 days. eBay or avoidance?"
 - "n8n picked up a competitor dropped their price on the item you're watching."
-**Target state:** BehiqueBot messages Kalani when there is *something to say*, based on real events — not on a schedule.
+- Discord server — content hub for AI-generated reels/animations, preview channel, approval workflow via reactions/commands
+**Target state:** BehiqueBot messages Kalani when there is *something to say*, based on real events — not on a schedule. Discord serves as the visual content review layer — content goes there for preview before publishing.
 **Estimated build time:** 6-8 weeks (requires Hands + Nervous System to work first)
 
 ### 5. NERVOUS SYSTEM — The Connections
