@@ -21,7 +21,15 @@ tags: [project, ecommerce, revenue]
 
 ## What It Is
 Shopify store — logo done, setup done, no sales yet.
+**Brand name:** Merchoo (Clothes Shop)
 Strategy: use eBay as the testing ground. Products that sell well on eBay → migrate to Shopify for higher margins and brand building.
+
+## Brand Assets
+- **Logo:** Starfish design with "MERCHOO — CLOTHES SHOP" text
+- **Color variants:** Cyan (turquoise), Pink, Brown
+- **Logo location (Cobo):** `C:\Users\kalan\Desktop\Kalani-Business\Dropshipping\MERCHOO\logo`
+- **Status:** Logo finalized, 3 color variants ready
+- **TODO:** Copy logos to Ceiba assets once Cobo is back online
 
 ## Why eBay First
 eBay has built-in traffic. No marketing needed to validate a product.
