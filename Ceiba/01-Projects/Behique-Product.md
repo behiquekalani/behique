@@ -122,6 +122,37 @@ Kalani is on his iPhone, talking to Claude mobile, copying transcripts manually 
 
 ---
 
+## PERSONALITY FILTERS — Book-Trained Thinking Frameworks (2026-03-16)
+
+Core idea: books that changed how Kalani thinks become **toggleable filters** in Behique. Not chatbot personas — thinking frameworks that shape how the system responds, prioritizes, and challenges the user.
+
+### How it works:
+- User selects a filter (or the system suggests one based on context)
+- Every response from Behique runs through that framework's lens
+- The filter affects prioritization, questioning style, and what gets surfaced
+
+### First filters:
+| Filter | Source | What It Does |
+|--------|--------|-------------|
+| **Psychologist** | Kalani's real psychologist framework | Default — accountability, ADHD-aware, emotional check-ins |
+| **The ONE Thing** | Gary Keller | Forces single-focus: "what's the ONE thing that makes everything else easier?" |
+| **Hormozi** | Alex Hormozi / $100M Offers | Revenue lens: "does this make money? how fast?" |
+| **Stoic** | Marcus Aurelius / Ryan Holiday | Control filter: "is this in your control? then act. if not, let go." |
+
+### Why this is different:
+- Productivity apps give you features. This gives you **frameworks.**
+- Users aren't just organizing tasks — they're choosing how to THINK about them
+- Each filter is trained on real book content, not a summary — the system actually applies the philosophy
+- This is the "more than a calendar" differentiator. No other app does this.
+
+### Technical approach:
+- Each filter = a system prompt + curated knowledge base from the book
+- Could use RAG (book content as embeddings) or distilled prompt engineering
+- Filters can stack or be exclusive depending on the use case
+- BehiqueBot already has classification logic — filters are an extension of the same routing
+
+---
+
 ## BREADCRUMBS
 - First captured: 2026-03-16 voice memo session
 - No build work done yet — thesis only
