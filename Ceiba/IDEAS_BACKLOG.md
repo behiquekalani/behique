@@ -40,6 +40,9 @@
 | Graph query layer (graph_query.py) | ChatGPT Chat 3 | vault_graph.json exists | MEDIUM | neighbors(), find_by_type(), tools_for_project(), graph_context() — lets Ceiba query graph programmatically |
 | Session auto-generator (session_logger.py) | ChatGPT Chat 3 | vault exists | MEDIUM | Auto-creates structured SES_ files with links to projects, tools, decisions, patterns |
 | ceiba_run.py orchestrator | ChatGPT Chat 3 | graph + session logger built | LOW | One-command: rebuild graph → generate embeddings → log session → output Claude prompt context |
+| wake.sh / sleep.sh for Comp2 | Kalani 2026-03-15 | Can build now | HIGH | One script to start all services (Ollama, bridge, Obsidian API), one to stop them. "Power button" for the AI cluster. |
+| Jarvis morning briefing | Kalani 2026-03-15 | Need wake.sh + primer.md | HIGH | "Good morning Ceiba" → overnight summary, project status, today's priorities, blockers cleared, what Cobo did. Like the Jarvis reel transcript. |
+| Use Ralph Loop for autonomous task completion | Kalani 2026-03-15 | Plugin already installed | HIGH | `/ralph-loop` — set task + completion promise, walk away. Use for dashboard polish, eBay API wiring, any well-defined build task. |
 
 ---
 
