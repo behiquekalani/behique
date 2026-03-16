@@ -204,6 +204,51 @@ More ebooks = more blocks = deeper product engagement
 
 ---
 
+## EVOLUTION PATH — Book-to-Agent → Person-to-Agent (2026-03-16)
+
+The long-term vision beyond books. A book is one data source — an author's thinking, compressed. But the same engine that extracts a framework from a book can extract a framework from a PERSON given enough data.
+
+```
+Book-to-Agent (v1 — current)
+    - Input: one book
+    - Output: thinking framework agent
+        ↓
+Person-to-Agent (v2 — future)
+    - Input: all available data about a person
+    - Output: digital twin that thinks, reacts, and patterns like them
+```
+
+### Data sources for Person-to-Agent (digital twin):
+- **Virtual:** writing, speeches, interviews, social media, public decisions, beliefs
+- **Biometric:** heart rate, sleep patterns, stress markers, movement (wearables, biomedical sensors)
+- **Behavioral:** when they're creative, when they shut down, decision patterns under pressure
+- **Cognitive:** how they reason through problems, which frameworks they reach for
+- **Emotional:** triggers, motivators, personality type, communication style
+
+### Why this matters:
+- Famous people: imagine a Steve Jobs agent that doesn't quote him — it thinks like him about YOUR problem
+- Personal use: your own digital twin as a mirror — "what would I normally do here?" for self-awareness
+- Deceased people: preserve thinking patterns, not just words (families, historical figures)
+- Professionals: a doctor's clinical reasoning digitized for training, a coach's methodology scaled
+
+### What already exists (proof of concept):
+Ceiba's vault IS a partial digital twin of Kalani:
+- [[observations]] — behavioral patterns, strengths, watch-fors
+- [[Psychologist-Framework]] — clinical thinking model applied to him
+- [[primer.md]] — live state, decisions, active threads
+- Night creativity pattern — documented and proven tonight
+- Avoidance patterns — identified, named, tracked
+
+The missing layer is biometric data. When that comes in (Apple Health, wearables), the twin gets physical, not just cognitive.
+
+### This stays in FUTURE until:
+- Book-to-Agent v1 is proven (manual extraction → working agent)
+- Building blocks model validated (users actually collect + use filters)
+- Biomedical data pipeline designed (Apple Health API, wearable integrations)
+- Ethical framework defined (consent, data ownership, privacy)
+
+---
+
 ## BREADCRUMBS
 - Captured: 2026-03-16 voice memo session
 - Born from the personality filters idea in [[Behique-Product]]
