@@ -1,0 +1,106 @@
+---
+type: project
+status: idea
+related:
+  - BehiqueBot
+  - Psychologist-Framework
+  - Kalani
+  - North-Star
+tags: [project, product, revenue, core]
+---
+
+# Behique — The Product
+# Captured: 2026-03-16 (voice memo)
+# Status: IDEA — thesis defined, no build yet
+
+---
+
+## THE THESIS
+
+Take the psychological systems and coping strategies designed for people with ADD — and build them into a product that anyone can use.
+
+**Not marketed as "for ADD people"** — that makes non-ADD people self-select out, even though they'd benefit just as much.
+
+---
+
+## THE INSIGHT
+
+Kalani didn't find out he had ADD until last year, at 37. He spent his whole life developing workarounds without knowing why he needed them. Those workarounds, systematized, ARE the product.
+
+If he needed them without knowing he had ADD — so does everyone else.
+
+---
+
+## THE VISUAL METAPHOR
+
+Like the auto-sort mods in Minecraft — you press a button and everything goes to the right place automatically. Not manual organization. Intelligent routing of your thoughts, tasks, and attention.
+
+---
+
+## WHAT IT IS NOT
+
+- Not a calendar
+- Not another productivity app
+- Not a to-do list with a skin
+- Not "for ADD people" (even though it's born from ADD)
+
+---
+
+## WHAT IT IS
+
+A smart external brain that handles the cognitive overhead you've been doing manually your whole life.
+
+- Thought goes in (text, voice, any format) → system routes it automatically
+- No decision fatigue about where things belong
+- Categories, priorities, and connections handled by the system
+- You interact with it like a person, not like software
+
+---
+
+## POSITIONING
+
+Lead with the universal benefit. Let ADD people recognize themselves in it, but don't gate it behind a diagnosis.
+
+"Everyone's brain drops things. This catches them."
+
+---
+
+## WHY THIS MATTERS (connection to [[North-Star]])
+
+This isn't a side project. This is the thing that connects:
+- The psychologist's framework → systematized into product logic
+- BehiqueBot → the working prototype of the capture + classify engine
+- Kalani's personal experience → the authenticity that marketing can't fake
+- The $100K Q3 target → this is a product people would pay for
+
+---
+
+## WHAT ALREADY EXISTS (from [[BehiqueBot]])
+
+BehiqueBot is the v0 of this product:
+- Voice + text input via Telegram ✅
+- Auto-classification into 5 categories (CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL) ✅
+- Life pillar tagging (health, wealth, relationships, general) ✅
+- Immutable seed + living updates per idea ✅
+- Notion persistence ✅
+- Ollama-first, OpenAI fallback ✅
+
+What's missing to make it a product:
+- The "auto-sort" feeling — user shouldn't even see the classification, just trust it
+- Retrieval — "what did I say about X last week?" (memory query layer)
+- Cross-idea connections — "this idea connects to that one" (graph, not list)
+- Multi-platform — not just Telegram (Discord, web app, mobile app eventually)
+- The accountability layer — not just capture, but follow-through tracking
+- Onboarding that doesn't mention ADD
+
+---
+
+## BREADCRUMBS
+- First captured: 2026-03-16 voice memo session
+- No build work done yet — thesis only
+- Next step: define the MVP feature set that separates this from BehiqueBot
+- Connection to [[Psychologist-Framework]] is the secret weapon — real clinical logic, not productivity theater
+
+---
+
+*[[BehiqueBot]] [[Psychologist-Framework]] [[Kalani]] [[North-Star]] [[Q3-2026]]*

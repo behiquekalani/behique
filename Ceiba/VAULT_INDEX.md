@@ -28,6 +28,7 @@ tags: [system, index, graph]
 | [[Google-Trends-Scraper]] | Rebuilding | → [[TOOL_Trends_Scraper]], [[SYS_AI_Cluster]] |
 | [[n8n-Agency]] | Not started | → [[TOOL_n8n]], [[SYS_Bridge]] |
 | [[Shopify-Store]] | Waiting | → [[eBay-Listing-Assistant]], [[DEC_Ebay_Before_Shopify]] |
+| [[Behique-Product]] | Idea | → [[BehiqueBot]], [[Psychologist-Framework]], [[North-Star]], [[Q3-2026]] |
 | [[News-Intelligence-Bots]] | Idea | — |
 | [[MISSIONS]] | Quest map | → all projects |
 
