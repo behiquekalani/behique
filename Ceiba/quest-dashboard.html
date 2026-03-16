@@ -4,7 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Behique — Quest Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+/* ============ VHS SCANLINE OVERLAY ============ */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(rgba(255,255,255,0.02) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+  animation: flicker 0.15s infinite alternate;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: -2px;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(rgba(255,0,0,0.02) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+.vhs-tracking-line {
+  position: fixed;
+  top: -2px; left: 0;
+  width: 100%; height: 2px;
+  background: rgba(255,255,255,0.1);
+  pointer-events: none;
+  z-index: 10000;
+  animation: tracking 8s linear infinite;
+}
+@keyframes tracking {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.975; }
+}
+
+/* ============ GLITCH HOVER ============ */
+.panel, .card, .pixel-box, .quest-card {
+  transition: transform 0.2s ease, text-shadow 0.3s ease, box-shadow 0.3s ease;
+}
+.panel:hover, .card:hover, .pixel-box:hover, .quest-card:hover {
+  text-shadow: 1px 0 rgba(255,0,255,0.3), -1px 0 rgba(0,255,255,0.3);
+  box-shadow: 0 0 12px rgba(255,192,203,0.15);
+}
+.glitch-active { animation: glitchShift 0.2s; }
+@keyframes glitchShift {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-2px,1px); }
+  50% { transform: translate(2px,-1px); }
+  75% { transform: translate(-1px,2px); }
+  100% { transform: translate(0,0); }
+}
+
+/* ============ BLACKLETTER MISSION TITLES ============ */
+.quest-title, .mission-title, .quest-card-header .quest-name {
+  font-family: 'UnifrakturMaguntia', serif;
+  font-size: 1.1em;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+</style>
 <style>
 /* ============ PIXEL BORDER UTIL ============ */
 /* Uses box-shadow to create chunky pixel borders */
@@ -855,6 +922,7 @@ body.font-large h2, body.font-large h3 { font-size: 22px; }
 </style>
 </head>
 <body>
+<div class="vhs-tracking-line"></div>
 
 <div class="top-bar">
   <div class="top-bar-left">
@@ -1387,6 +1455,14 @@ function renderHabits() {
     });
   });
 }
+
+/* ============ GLITCH HOVER TRIGGER ============ */
+document.querySelectorAll('.panel, .card, .pixel-box, .quest-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    el.classList.add('glitch-active');
+    setTimeout(() => el.classList.remove('glitch-active'), 200);
+  });
+});
 </script>
 </body>
 </html>
