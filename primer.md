@@ -8,10 +8,10 @@
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: First eBay listing today. V1 agent generates title/description/pricing, Kalani pastes into eBay form.
-Next action: Kalani sends Hello Kitty cup photos → Ceiba researches comps → generates listing → Kalani posts.
-Blocker: Cobo is unreachable (192.168.0.151 not responding to ping). Needs physical power-on.
-Session status: ACTIVE — building + listing
+Focus: Goodfellas Funko Pop set of 3 × qty 3 at $27.99/set. Photos taken, listing generated, Kalani posting.
+Next action: Confirm listing live → Hello Kitty cups next → keep listing inventory.
+Blocker: Cobo still offline (needs physical power-on). Not blocking eBay listings.
+Session status: ACTIVE — first listing going live
 
 ---
 
