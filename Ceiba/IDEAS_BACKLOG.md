@@ -66,6 +66,10 @@
 
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
+| Discord voice cowork — Jarvis mode | Kalani voice memo 2026-03-16 | Needs Voice body part built, real-time API access (OpenAI Realtime or future Claude voice), screen capture pipeline | Month 4+ on spine, after Senses + Hands + Nervous System proven |
+
+| Idea | Source | Why Not Now | Revisit When |
+|------|--------|-------------|--------------|
 | Memory ingestion protocol (auto-tag sessions) | ChatGPT Chat 4 | Vault needs more content first | Vault has 60+ real nodes |
 | Real embeddings for vault search | ChatGPT Chat 4 | Need enough content to make it useful | Vault has 60+ real nodes |
 | Self-healing vault (auto-detect stale links) | ChatGPT Chat 4 | vault_grapher already handles this partially | After ghost nodes created |

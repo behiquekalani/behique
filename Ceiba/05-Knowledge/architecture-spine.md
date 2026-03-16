@@ -204,6 +204,20 @@ ONGOING — Revenue
 
 ---
 
+## THE JARVIS ENDPOINT — Discord Voice Cowork (Month 4+)
+
+The end goal for the Voice body part. Kalani and Ceiba on a Discord call — screen shared, voice bidirectional, working together in real time.
+
+**Stepping stones (buildable now → ideal):**
+1. **Text-based Discord bot** — Ceiba responds in a channel (webhook, n8n) ← buildable now
+2. **Voice transcription loop** — Kalani speaks → Whisper transcribes → Ceiba processes → TTS responds in voice channel ← buildable with OpenAI Realtime API
+3. **Screen awareness** — periodic screenshots of shared screen → sent to vision model for context ← buildable with GPT-4o vision or Claude vision
+4. **Full Jarvis** — real-time audio + screen stream + vault context + event awareness ← requires real-time voice API (OpenAI Realtime or future Claude voice)
+
+**Depends on:** All 5 other body parts working. Without Memory, Ceiba is just a voice assistant. Without Senses, it can't see the screen. Without Hands, it can't act on what it sees. This is the capstone, not the starting point.
+
+---
+
 ## WHAT THIS BECOMES
 
 When all six parts exist and are connected:
