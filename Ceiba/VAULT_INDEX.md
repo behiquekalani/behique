@@ -30,6 +30,7 @@ tags: [system, index, graph]
 | [[Shopify-Store]] | Waiting | → [[eBay-Listing-Assistant]], [[DEC_Ebay_Before_Shopify]] |
 | [[Behique-Product]] | Idea | → [[BehiqueBot]], [[Psychologist-Framework]], [[North-Star]], [[Q3-2026]] |
 | [[Content-Funnel]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[North-Star]], [[Q3-2026]], [[n8n-Agency]] |
+| [[Book-to-Agent]] | Idea | → [[Behique-Product]], [[BehiqueBot]], [[Content-Funnel]], [[n8n-Agency]], [[Psychologist-Framework]] |
 | [[News-Intelligence-Bots]] | Idea | — |
 | [[MISSIONS]] | Quest map | → all projects |
 
