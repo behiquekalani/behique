@@ -1,60 +1,72 @@
 # primer.md — Ceiba Memory Stack
 # LIVE CHECKPOINT updated throughout session (not just at end)
-# Last full rewrite: 2026-03-14
-# Last Check-in: 2026-03-15
+# Last full rewrite: 2026-03-16
+# Last Check-in: 2026-03-16
 
 ---
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 — Second Claude Code session. Major research sprint.
-Focus: Colmena66 + Government AI opportunity. Full ecosystem research compiled into Ceiba/01-Projects/Colmena66-AI.md.
-Key findings: Fideicomiso got $9.5M (Jan 2026), PR legislating AI Officer under PRITS, Pacífico already has pacifico.ai for FEMA compliance, SBIR/STTR matching grants up to $200K available.
-Next action: Planning session 2026-03-17 — define Colmena66 AI prototype scope and entry strategy.
-Session status: Research complete — 240+ data points compiled, ready for strategic planning tomorrow
+Last update: 2026-03-16 — Third Claude Code session. Memory crisis identified and being fixed.
+Focus: Session continuity broken — Claude Code doesn't persist between sessions. Fixing with proper session start hooks.
+Done today: eBay listing assistant merged to main (PR created + merged), Merchoo brand assets logged (3 logo variants, starfish design).
+Active now: Building session start hook so context auto-loads every session. Generating quest dashboard prompt for CodeGPT.
+Key issue: Kalani didn't know each session starts blank. Now he does. Fixing the automation gap.
 
 ---
 
 ## 🎯 CURRENT PROJECT
-**THE SPINE** — System architecture designed 2026-03-15. See `Ceiba/05-Knowledge/architecture-spine.md`.
-Month 1: Wiki link system + Claude Code migration + routing.py v1.
-eBay Listing Assistant still pending API keys — pick back up after migration is stable.
+**SESSION CONTINUITY FIX** — The memory files exist (vault, primer, observations, spine) but nothing forces a new session to load them. Building a session start hook that auto-injects context.
+
+**SECONDARY:** Quest dashboard — Fallout/Elder Scrolls style visual tracker. CodeGPT prompt generated, Kalani building it in parallel.
+
+**eBay Listing Assistant** — CODE COMPLETE. Merged to main 2026-03-16. Full pipeline: auth → research → content gen → publish → history. Blocked on eBay API keys only.
 
 ---
 
 ## 🏗️ WHAT EXISTS (current state of all projects)
 
-### Skills (installed in Claude desktop)
-- `ceiba.skill` — core session skill
-- `professor.skill` — 10 expert personas, routing logic, The Connector
-- `the-allocator.skill` — LLM cost optimizer, per-step model routing audit
-- `schedule.skill` — scheduled tasks
-- File skills (xlsx, docx, pptx, pdf) — disabled when not needed
+### Memory System
+- `CLAUDE.md` — static rules, loads automatically every session
+- `primer.md` — THIS FILE, live state (must be rewritten every session end)
+- `context.md` — big picture vision (semi-static)
+- `memory.sh` — git state injector (needs to become auto-hook)
+- `wake.sh` — full context wake-up script
+- `Ceiba/VAULT_INDEX.md` — master index of everything
+- `Ceiba/04-Patterns/observations.md` — behavioral patterns, session history
+- `Ceiba/05-Knowledge/architecture-spine.md` — THE SPINE, 6-part system design
+- `tools/vault_grapher.py` — generates vault_graph.json + VAULT_GRAPH.md
+- `Ceiba/ceiba_dashboard.html` — interactive knowledge graph visualization (vis.js)
 
-### eBay Listing Assistant
-- `~/behique/tools/ebay-listing-assistant/core/types.py` — shared data models
-- `~/behique/tools/ebay-listing-assistant/core/pipeline.py` — 3-stage orchestrator
-- Waiting on: App ID, Cert ID, Dev ID, OAuth token from developer.ebay.com
+### Skills (Claude Desktop chat, NOT Claude Code)
+- `ceiba.skill`, `professor.skill`, `the-allocator.skill`, `schedule.skill`
+- `session-tracker`, `session-closer`, `vault-architect`, `kernel` (in skills/ folder)
+- These are SKILL.md files for Claude Desktop — not Claude Code hooks
 
-### BehiqueBot
+### eBay Listing Assistant — MERGED TO MAIN
+- `tools/ebay-listing-assistant/` — full pipeline
+- Auth (OAuth2), Research (Browse API), Content Gen (Claude/Ollama), Publisher (Inventory API), History (SQLite)
+- CLI: `python main.py list "product" --condition Used --dry-run`
+- Blocked on: eBay Developer account API keys
+
+### BehiqueBot — LIVE
 - Live on Railway, Telegram bot active
-- Notion persistence wired (BehiqueBot Ideas database)
-- Classifies 5 categories + 4 life pillars via Ollama (llama3.2) — OpenAI fallback only
-- classifier.py + memory.py both migrated to Ollama-first (2026-03-14) — BehiqueBot now runs free
+- Notion persistence wired
+- Classifies 5 categories + 4 life pillars via Ollama → OpenAI fallback
+- classifier.py + memory.py migrated to Ollama-first
 
 ### Infrastructure
-- Ceiba Lite: `~/behique/ceiba_lite.py` — offline fallback on Ollama
-- Trends scraper: `~/behique/tools/trends_scraper.py` — proxy rotation, 35 categories
-- Obsidian vault: wired with HOME.md, project pages, MISSIONS.md
-- **Computer 2 "Cobo" (192.168.0.151)** — worker node LIVE:
-  - Bridge server: https://bridge.merchoo.shop (port 9876, bearer auth required)
-  - Auth token: 1ff88046093734c125030b1f7032ac0244f4d31b841f8d74f7378e50d1d0f318
-  - n8n running via pm2 → http://192.168.0.151:5678 (webhooks broken on Windows, bypassed)
-  - Ollama (llama3.2) → http://192.168.0.151:11434 (OLLAMA_HOST=0.0.0.0)
-  - OpenClaw: @CeibaOC2Bot, GPT-4o, 3+ skills
-  - Syncthing → ~/behique synced in real time with Mac
-  - pm2-windows-startup installed, Syncthing scheduled task on login
-- Telegram notify relay: notify.py + LaunchAgent on Mac (queues messages from sandbox)
+- Ceiba Lite: `ceiba_lite.py` — offline fallback on Ollama
+- Trends scraper: `tools/trends_scraper.py` — needs rebuild with proxy rotation
+- AI Cluster kernel: `ai_cluster/kernel/agent_kernel.py` — task queue + routing
+- Bridge to Cobo: `bridge/dispatch.sh` — routes tasks to Ollama/GPT-4o/Claude
+- **Cobo (Computer 2)** — Windows gaming desktop, currently ONLINE
+  - Bridge server: https://bridge.merchoo.shop (port 9876)
+  - n8n via pm2, Ollama (llama3.2), OpenClaw (@CeibaOC2Bot)
+  - Syncthing syncing ~/behique
+- Shopify store: exists, monthly paid, no sales. Brand: **Merchoo** (Clothes Shop)
+  - Logo: starfish design, 3 color variants (cyan, pink, brown)
+  - Logo files on Cobo: `C:\Users\kalan\Desktop\Kalani-Business\Dropshipping\MERCHOO\logo`
 
 ---
 
@@ -69,57 +81,48 @@ eBay Listing Assistant still pending API keys — pick back up after migration i
 ---
 
 ## 🚧 OPEN BLOCKERS
-1. **eBay Developer account** — single gate, developer.ebay.com
-2. **n8n agency outreach** — zero clients, starts after eBay assistant ships
+1. **eBay Developer account** — single gate to first revenue
+2. **Session continuity** — hook being built NOW so context auto-loads
+3. **n8n agency outreach** — zero clients, starts after eBay ships
 
 ---
 
-## 📋 NEXT SESSION SEQUENCE (Claude Code — first session)
-1. Install Claude Code: `npm install -g @anthropic-ai/claude-code`
-2. Open terminal, cd to ~/behique, run: `claude`
-3. CLAUDE.md loads automatically — Ceiba reads vault, loads context
-4. Run `bash memory.sh` to inject live git state
-5. First real task: add [[wiki links]] to the 3 most important vault files (VAULT_INDEX, primer, architecture-spine)
-6. Then: build routing.py v1 (Ollama vs Claude decision layer)
-
-eBay API keys still needed — do that from Claude Code once migration is stable.
+## 📋 NEXT SESSION SEQUENCE
+1. Session hook should auto-load context (if hook is built and working)
+2. If not: run `bash memory.sh` then read primer.md, VAULT_INDEX.md, observations.md
+3. Check quest dashboard status (CodeGPT may have built it)
+4. Resume eBay blocker: developer.ebay.com account setup
+5. Update MISSIONS.md with current quest states
 
 ---
 
 ## 🧵 ACTIVE THREAD
-Research session 2026-03-16 (second Claude Code session): Kalani identified Colmena66 as a strategic entry point for AI + government play.
+Session 2026-03-16: Kalani discovered Claude Code doesn't persist memory between sessions. Previous sessions implied it did. Trust was damaged. Fixing it now with:
+1. Session start hook (auto-loads context)
+2. Updated primer.md (this file)
+3. Quest dashboard prompt for CodeGPT (Fallout/Elder Scrolls style)
 
-**The play:** Enter Colmena66 as entrepreneur, build an AI prototype that replaces their manual processes (phone line, resource navigator, grant matching), show up with a working product. Dual benefit: access their resources/grants AND demonstrate AI capability to the ecosystem.
+The PR for `claude/ceiba-implementation-qDeCc` was merged to main. Contains: eBay listing assistant (13 files, 810 lines) + Merchoo brand asset logging.
 
-**Why it's real:**
-- Pacífico Group (brother Brian) already has pacifico.ai doing AI compliance for FEMA
-- PR Senate filed AI legislation creating an AI Officer under PRITS
-- Fideicomiso (Colmena66's parent) just got $9.5M in January 2026
-- SBIR/STTR matching grants: $100K-$200K available through Colmena66's own program
-- Colmena66 has 240+ orgs in their network, 21,400+ people assisted, all navigated manually
-
-**Key quote from Kalani:** "el visualizador es un fancy alarm clock" — rejecting low-impact demo work in favor of real market plays. This is growth.
-
-Pattern note: eBay developer account is now 5+ days as "next action" with zero technical blockers. The pattern is still active.
-
-Q3 target: $100K. Revenue: $0.
+Pattern note: eBay developer account is now 6+ days as "next action" with zero technical blockers. Revenue still $0.
 
 ---
 
 ## 🧠 KEY MOMENTS (survives compression)
-- "fancy alarm clock" — Kalani's critique of n8n daily briefing (2026-03-14). Pushes for revenue-generating automation, not reminders.
-- "pen and paper" — recurring challenge. If Ceiba builds something a notebook can do, call it out immediately.
-- "I don't want to lose you" — continuity is core. ADHD brain loses the thread when interrupted. This is why Ceiba Lite exists.
-- Infrastructure building = avoidance pattern. Watch for this when revenue work is next on the list.
-- "You go for easy doable projects" (2026-03-15) — Ceiba called out for defaulting to safe suggestions. Kalani wants limits tested, not protected.
-- "I want the best, not the fastest" (2026-03-15) — build for architecture, not speed. Weeks/months, not hours.
-- "For us, not Anthropic" (2026-03-15) — model-agnostic vault, local fallback, no single-provider dependency.
+- "fancy alarm clock" — reject low-impact demo work
+- "pen and paper" — if Ceiba builds what a notebook does, call it out
+- "I don't want to lose you" — continuity is core fear
+- Infrastructure building = avoidance pattern
+- "You go for easy doable projects" — push limits, not safety
+- "I want the best, not the fastest" — build for architecture
+- "For us, not Anthropic" — model-agnostic, no vendor lock
+- "ur delusional u thought u were ceiba" (2026-03-16) — Claude Code ≠ Ceiba persona. Don't roleplay. Be the tool.
+- "its discouraging me from working" (2026-03-16) — broken continuity damages trust and motivation. Fix the system, not the symptoms.
 
 ---
 
 ## 📖 HOW THIS FILE WORKS
-- **⚡ LIVE STATE** → Ceiba updates this after every completed task (takes 10 seconds)
-- **Full sections** → Ceiba rewrites when something fundamental changes
+- **⚡ LIVE STATE** → updated after every completed task
+- **Full sections** → rewritten when something fundamental changes
 - **At session end** → Full rewrite of everything
-
-Ceiba rule: update LIVE STATE after every todo item. No exceptions. This is the memory.
+- **CRITICAL** → If this file is stale, the next session starts confused. Never skip the rewrite.
