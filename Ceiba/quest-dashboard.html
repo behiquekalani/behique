@@ -580,114 +580,105 @@ body {
 </div>
 
 <script>
-/* ============ DATA ============ */
-const data = {
-  player: { name: "Kalani", title: "Behique", level: 3, xp: 340, xp_next: 500 },
-  quests: [
-    {
-      name: "eBay Empire",
-      type: "MAIN",
-      status: "active",
-      objectives: [
-        { text: "Build listing agent V1", done: true },
-        { text: "Get eBay API keys", done: true },
-        { text: "Build V2 auto-publisher", done: true },
-        { text: "List Goodfellas Funko Pops (3 sets)", done: false },
-        { text: "List Hello Kitty cups", done: false },
-        { text: "First sale on eBay", done: false },
-        { text: "Run OAuth consent flow", done: false },
-        { text: "10 listings live", done: false }
-      ],
-      reward: "Revenue stream unlocked"
-    },
-    {
-      name: "The Bridge",
-      type: "MAIN",
-      status: "active",
-      objectives: [
-        { text: "Set up Comp2 (Cobo) as AI worker", done: true },
-        { text: "Build bridge server", done: true },
-        { text: "Wire Syncthing between machines", done: true },
-        { text: "Switch to secure bridge", done: false },
-        { text: "Build wake.sh/sleep.sh power button", done: false },
-        { text: "Product research engine with real data", done: false }
-      ],
-      reward: "AI cluster online"
-    },
-    {
-      name: "BehiqueBot",
-      type: "SIDE",
-      status: "active",
-      objectives: [
-        { text: "Deploy bot on Railway", done: true },
-        { text: "Telegram input + classification", done: true },
-        { text: "Notion persistence", done: true },
-        { text: "Ollama-first classification", done: true },
-        { text: "Memory system", done: false },
-        { text: "Claude-powered check-ins", done: false }
-      ],
-      reward: "Accountability AI active"
-    },
-    {
-      name: "The Vault",
-      type: "SIDE",
-      status: "active",
-      objectives: [
-        { text: "Obsidian vault with wiki links", done: true },
-        { text: "Vault graph scanner", done: true },
-        { text: "vis.js dashboard", done: true },
-        { text: "Transcript persistence system", done: true },
-        { text: "Graph query layer", done: false },
-        { text: "Session auto-generator", done: false },
-        { text: "Create 35 ghost node files", done: false }
-      ],
-      reward: "Knowledge graph complete"
-    },
-    {
-      name: "Shopify Storefront",
-      type: "FUTURE",
-      status: "locked",
-      objectives: [
-        { text: "Store exists + logo done", done: true },
-        { text: "Feed eBay winners to Shopify", done: false },
-        { text: "First Shopify sale", done: false }
-      ],
-      reward: "Second revenue channel"
-    },
-    {
-      name: "n8n Agency",
-      type: "FUTURE",
-      status: "locked",
-      objectives: [
-        { text: "eBay pipeline proven", done: false },
-        { text: "First client outreach", done: false },
-        { text: "First paying client", done: false }
-      ],
-      reward: "Service business launched"
-    }
+/* ============ DATA — loads from quests.json, falls back to inline ============ */
+let data = null;
+
+// Transform quests.json format → dashboard format
+function transformData(json) {
+  return {
+    player: json.player,
+    quests: json.missions.map(m => ({
+      name: m.name,
+      type: m.type,
+      status: m.status,
+      description: m.description || '',
+      objectives: m.objectives,
+      reward: m.reward
+    })),
+    completedQuests: (json.completed_missions || []).map(m => ({
+      name: m.name,
+      reward: m.reward,
+      completed: m.completed || ''
+    })),
+    stats: json.stats || {},
+    habits: json.habits || []
+  };
+}
+
+// Inline fallback (auto-generated from quests.json)
+const FALLBACK_DATA = transformData({
+  "player": { "name": "Kalani", "title": "Behique", "level": 3, "xp": 420, "xp_next": 500 },
+  "missions": [
+    { "id": "ebay-empire", "name": "eBay Empire", "type": "MAIN", "status": "active", "description": "From $0 to revenue. List products, make sales, automate.", "reward": "First revenue stream online", "objectives": [
+      { "text": "Build listing agent V1", "done": true }, { "text": "Get eBay API keys (Prod + Sandbox)", "done": true }, { "text": "Build V2 auto-publisher", "done": true }, { "text": "Build quick_list.py", "done": true }, { "text": "Generate Funko Pop listing", "done": true },
+      { "text": "Post Funko Pops on eBay", "done": false }, { "text": "Run OAuth consent flow", "done": false }, { "text": "First eBay sale", "done": false }, { "text": "Build Telegram bot /ebay newlisting", "done": false }, { "text": "Activate V2 API auto-publish", "done": false }, { "text": "10 listings live", "done": false }, { "text": "List Hello Kitty cups", "done": false }, { "text": "eBay cross-reference engine", "done": false }, { "text": "Multi-model A/B testing", "done": false }, { "text": "AI title generator", "done": false }, { "text": "Dropship auto-lister", "done": false }
+    ]},
+    { "id": "product-research", "name": "Product Research Engine", "type": "MAIN", "status": "active", "description": "Find winning products automatically.", "reward": "Automated product discovery", "objectives": [
+      { "text": "Research engine core", "done": true }, { "text": "Scoring engine", "done": true }, { "text": "Product normalizer", "done": true }, { "text": "Trends adapter", "done": true }, { "text": "Seed from trends", "done": true }, { "text": "Trends dashboard", "done": true },
+      { "text": "Real scoring with margin data", "done": false }, { "text": "Amazon scraper w/ stealth", "done": false }, { "text": "Viral Vault scoring", "done": false }, { "text": "Product clustering", "done": false }, { "text": "Walmart scraper", "done": false }, { "text": "AI price predictor", "done": false }, { "text": "Overnight scraping pipeline", "done": false }
+    ]},
+    { "id": "the-bridge", "name": "The Bridge", "type": "MAIN", "status": "active", "description": "Two-machine AI cluster. Cobo does heavy lifting.", "reward": "AI cluster fully operational", "objectives": [
+      { "text": "Comp2 (Cobo) setup", "done": true }, { "text": "Bridge server", "done": true }, { "text": "Syncthing wired", "done": true },
+      { "text": "Secure bridge", "done": false }, { "text": "wake.sh / sleep.sh", "done": false }, { "text": "Jarvis morning briefing", "done": false }, { "text": "Autonomous cross-computer comms", "done": false }, { "text": "Swarm Mode", "done": false }, { "text": "Agent Kernel", "done": false }
+    ]},
+    { "id": "ceiba-vault", "name": "Ceiba Memory Vault", "type": "SIDE", "status": "active", "description": "Knowledge graph. No more amnesia.", "reward": "Persistent AI memory system", "objectives": [
+      { "text": "Obsidian vault", "done": true }, { "text": "Graph scanner", "done": true }, { "text": "vis.js dashboard", "done": true }, { "text": "Session hooks", "done": true }, { "text": "Security hook", "done": true }, { "text": "Context loader", "done": true }, { "text": "vault-architect skill", "done": true }, { "text": "Transcript persistence", "done": true },
+      { "text": "35 ghost nodes", "done": false }, { "text": "Graph query layer", "done": false }, { "text": "Session auto-generator", "done": false }, { "text": "ceiba_run.py", "done": false }, { "text": "Ceiba Memory Protocol", "done": false }, { "text": "Memory ingestion", "done": false }, { "text": "Real embeddings", "done": false }, { "text": "Self-healing vault", "done": false }, { "text": "Graph-aware prompting", "done": false }, { "text": "YAML metadata", "done": false }, { "text": "Vault templates", "done": false }
+    ]},
+    { "id": "behiquebot", "name": "BehiqueBot", "type": "SIDE", "status": "active", "description": "Accountability bot on psychologist's framework.", "reward": "Accountability AI 24/7", "objectives": [
+      { "text": "Deploy on Railway", "done": true }, { "text": "Telegram classification", "done": true }, { "text": "Notion persistence", "done": true }, { "text": "Ollama-first", "done": true },
+      { "text": "Memory system", "done": false }, { "text": "Claude check-ins", "done": false }, { "text": "Session finish-tracker", "done": false }
+    ]},
+    { "id": "quest-dashboard", "name": "Quest Dashboard", "type": "SIDE", "status": "active", "description": "Visual progress tracker. Dopamine from data.", "reward": "Motivation system deployed", "objectives": [
+      { "text": "Dashboard V1", "done": true }, { "text": "3 themes (Neon/Mono/Pastel)", "done": true }, { "text": "Low-dopamine mono mode", "done": true },
+      { "text": "Load from quests.json", "done": false }, { "text": "FocusLab Weekly layout", "done": false }, { "text": "Habit persistence", "done": false }, { "text": "JSON import/export", "done": false }, { "text": "Tamagotchi Pi", "done": false }, { "text": "Tamagotchi app", "done": false }, { "text": "Pixel art city", "done": false }
+    ]},
+    { "id": "ai-skills", "name": "AI Skills & Tooling", "type": "SIDE", "status": "active", "description": "Skills that make Ceiba more capable.", "reward": "AI capabilities expanded", "objectives": [
+      { "text": "vault-architect skill", "done": true },
+      { "text": "Prompt quality comparator", "done": false }, { "text": "Prompt injection defense", "done": false }, { "text": "Ralph Loop usage", "done": false }, { "text": "Unified CLI orchestrator", "done": false }, { "text": "Multi-model vault agent", "done": false }
+    ]},
+    { "id": "revenue-diversification", "name": "Revenue Diversification", "type": "FUTURE", "status": "locked", "description": "After eBay proves the model — expand everywhere.", "reward": "Multiple income streams", "objectives": [
+      { "text": "Shopify store exists", "done": true },
+      { "text": "Feed eBay winners to Shopify", "done": false }, { "text": "First Shopify sale", "done": false }, { "text": "n8n Agency outreach", "done": false }, { "text": "First paying client", "done": false }, { "text": "AI ebook", "done": false }, { "text": "AI video content", "done": false }, { "text": "Book-to-Agent", "done": false }, { "text": "Colmena66", "done": false }, { "text": "PR Gov AI consulting", "done": false }, { "text": "Digital twin system", "done": false }
+    ]}
   ],
-  completedQuests: [
-    { name: "Ceiba Memory Stack", reward: "Persistent AI memory" },
-    { name: "Product Research Engine V1", reward: "61 products scored" },
-    { name: "Trends Scraper", reward: "35 categories tracked" },
-    { name: "OpenClaw Migration", reward: "3 bots, 5 skills deployed" }
+  "completed_missions": [
+    { "name": "Ceiba Memory Stack", "reward": "Persistent AI memory", "completed": "2026-03-15" },
+    { "name": "Product Research V1", "reward": "61 products scored", "completed": "2026-03-15" },
+    { "name": "Trends Scraper", "reward": "35 categories tracked", "completed": "2026-03-14" },
+    { "name": "OpenClaw Migration", "reward": "3 bots, 5 skills", "completed": "2026-03-15" }
   ],
-  stats: {
-    "Quests Completed": 4,
-    "Quests Active": 4,
-    "Tools Built": 14,
-    "Days Active": 14,
-    "Revenue": "$0"
-  },
-  habits: [
-    { name: "Code / Build", days: [true, true, true, true, true, true, true] },
-    { name: "List items on eBay", days: [false, false, false, false, false, false, false] },
-    { name: "Review quest progress", days: [false, false, false, true, false, false, false] },
-    { name: "Log ideas (BehiqueBot)", days: [true, true, false, true, true, false, false] },
-    { name: "Read / Learn", days: [false, true, false, false, true, false, false] },
-    { name: "Exercise", days: [false, false, false, false, false, false, false] }
+  "stats": { "Missions Completed": 4, "Missions Active": 7, "Missions Locked": 1, "Tools Built": 18, "Ideas Captured": 65, "Days Active": 14, "Revenue": "$0" },
+  "habits": [
+    { "name": "Code / Build", "days": [true, true, true, true, true, true, true] },
+    { "name": "List on eBay", "days": [false, false, false, false, false, false, false] },
+    { "name": "Review progress", "days": [false, false, false, true, false, false, true] },
+    { "name": "Log ideas", "days": [true, true, false, true, true, false, true] },
+    { "name": "Read / Learn", "days": [false, true, false, false, true, false, false] },
+    { "name": "Exercise", "days": [false, false, false, false, false, false, false] }
   ]
-};
+});
+
+// Try to load quests.json, fall back to inline data
+async function loadData() {
+  try {
+    const resp = await fetch('quests.json');
+    if (resp.ok) {
+      const json = await resp.json();
+      data = transformData(json);
+      console.log('Loaded from quests.json');
+    } else {
+      data = FALLBACK_DATA;
+      console.log('Using inline fallback data');
+    }
+  } catch (e) {
+    data = FALLBACK_DATA;
+    console.log('Using inline fallback data (fetch failed)');
+  }
+  initDashboard();
+}
+
+loadData();
 
 /* ============ THEME SYSTEM ============ */
 const themeColors = {
@@ -697,6 +688,7 @@ const themeColors = {
 };
 
 let currentTheme = localStorage.getItem('behique-theme') || 'neon';
+let activeType = 'MAIN';
 
 function setTheme(theme) {
   currentTheme = theme;
@@ -705,7 +697,6 @@ function setTheme(theme) {
   document.querySelectorAll('.theme-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.theme === theme);
   });
-  // Re-render donuts with new colors
   renderAll();
 }
 
@@ -713,7 +704,6 @@ document.querySelectorAll('.theme-btn').forEach(btn => {
   btn.addEventListener('click', () => setTheme(btn.dataset.theme));
 });
 
-// Apply saved theme
 document.documentElement.setAttribute('data-theme', currentTheme);
 document.querySelectorAll('.theme-btn').forEach(b => {
   b.classList.toggle('active', b.dataset.theme === currentTheme);
@@ -752,16 +742,46 @@ function createDonut(size, pct, textClass) {
   return container;
 }
 
-/* ============ RENDER ============ */
+/* ============ INIT & RENDER ============ */
+function initDashboard() {
+  // Player info
+  if (data.player) {
+    document.querySelector('.top-bar-left .subtitle').textContent =
+      `${data.player.name} · ${data.player.title} · Level ${data.player.level} · ${data.player.xp}/${data.player.xp_next} XP`;
+  }
+
+  // Build tabs
+  const types = ['MAIN', 'SIDE', 'FUTURE'];
+  const typeLabels = { MAIN: 'Main Quests', SIDE: 'Side Quests', FUTURE: 'Future' };
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = '';
+
+  types.forEach(type => {
+    const count = data.quests.filter(q => q.type === type).length;
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (type === activeType ? ' active' : '');
+    tab.innerHTML = `${typeLabels[type]}<span class="count">${count}</span>`;
+    tab.onclick = () => {
+      activeType = type;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderQuests();
+    };
+    tabsEl.appendChild(tab);
+  });
+
+  renderAll();
+}
+
 function renderAll() {
-  // Date
   document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
-  document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toISOString().slice(0,10);
+  document.getElementById('lastUpdated').textContent = 'Last updated: ' + (data.last_updated || new Date().toISOString().slice(0,10));
 
-  // Overall progress
-  const allObj = data.quests.flatMap(q => q.objectives);
+  // Overall progress (active missions only)
+  const activeQuests = data.quests.filter(q => q.status === 'active');
+  const allObj = activeQuests.flatMap(q => q.objectives);
   const totalDone = allObj.filter(o => o.done).length;
   const totalAll = allObj.length;
   const overallPct = Math.round((totalDone / totalAll) * 100);
@@ -771,29 +791,28 @@ function renderAll() {
   overallEl.appendChild(createDonut(140, overallPct, 'large'));
   document.getElementById('overallLabel').textContent = `${totalDone} / ${totalAll} Objectives`;
 
-  // Bar chart
+  // Bar chart — all active missions
   const barChart = document.getElementById('barChart');
   barChart.innerHTML = '';
-  const maxObj = Math.max(...data.quests.map(q => q.objectives.length));
-  data.quests.filter(q => q.status === 'active').forEach(q => {
+  const maxObj = Math.max(...activeQuests.map(q => q.objectives.length));
+  activeQuests.forEach(q => {
     const done = q.objectives.filter(o => o.done).length;
     const total = q.objectives.length;
     const height = total > 0 ? (done / maxObj) * 120 : 0;
     const col = document.createElement('div');
     col.className = 'bar-col';
+    const shortName = q.name.length > 12 ? q.name.slice(0,11) + '…' : q.name;
     col.innerHTML = `
       <div class="bar-value">${done}/${total}</div>
       <div class="bar" style="height:${height}px"></div>
-      <div class="bar-label">${q.name.length > 10 ? q.name.slice(0,9)+'…' : q.name}</div>
+      <div class="bar-label">${shortName}</div>
     `;
     barChart.appendChild(col);
   });
 
   // Stats
   const statsPanel = document.getElementById('statsPanel');
-  const existingH3 = statsPanel.querySelector('h3');
-  statsPanel.innerHTML = '';
-  statsPanel.appendChild(existingH3 || Object.assign(document.createElement('h3'), { textContent: 'Stats' }));
+  statsPanel.innerHTML = '<h3>Stats</h3>';
   for (const [key, val] of Object.entries(data.stats)) {
     const row = document.createElement('div');
     row.className = 'stat-row';
@@ -801,7 +820,6 @@ function renderAll() {
     statsPanel.appendChild(row);
   }
 
-  // Quests
   renderQuests();
 
   // Completed
@@ -810,33 +828,12 @@ function renderAll() {
   data.completedQuests.forEach(q => {
     const card = document.createElement('div');
     card.className = 'completed-card';
-    card.innerHTML = `<span class="name">✓ ${q.name}</span><span class="reward">${q.reward}</span>`;
+    card.innerHTML = `<span class="name">✓ ${q.name}</span><span class="reward">${q.reward}${q.completed ? ' · ' + q.completed : ''}</span>`;
     compGrid.appendChild(card);
   });
 
-  // Habits
   renderHabits();
 }
-
-// Tabs
-const types = ['MAIN', 'SIDE', 'FUTURE'];
-const typeLabels = { MAIN: 'Main Quests', SIDE: 'Side Quests', FUTURE: 'Future' };
-const tabsEl = document.getElementById('tabs');
-let activeType = 'MAIN';
-
-types.forEach(type => {
-  const count = data.quests.filter(q => q.type === type).length;
-  const tab = document.createElement('div');
-  tab.className = 'tab' + (type === activeType ? ' active' : '');
-  tab.innerHTML = `${typeLabels[type]}<span class="count">${count}</span>`;
-  tab.onclick = () => {
-    activeType = type;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    renderQuests();
-  };
-  tabsEl.appendChild(tab);
-});
 
 function renderQuests() {
   const grid = document.getElementById('questGrid');
@@ -853,9 +850,9 @@ function renderQuests() {
       <div class="quest-card-header">
         <div>
           <h3>${q.name}</h3>
-          <div class="quest-type">${q.type} QUEST</div>
+          <div class="quest-type">${q.type} QUEST${q.description ? ' · ' + q.description : ''}</div>
         </div>
-        <div style="font-size:12px;opacity:0.9">${isLocked ? '🔒 LOCKED' : '● ACTIVE'}</div>
+        <div style="font-size:12px;opacity:0.9">${isLocked ? '🔒 LOCKED' : pct + '%'}</div>
       </div>
       <div class="quest-card-body">
         <div class="quest-progress-row">
@@ -906,9 +903,6 @@ function renderHabits() {
     });
   });
 }
-
-// Initial render
-renderAll();
 </script>
 </body>
 </html>
