@@ -15,9 +15,9 @@ created: 2026-03-16
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: Vault infra + Dashboard HABITS tab.
-Done this session: vault_templates.py (7 templates + CLI), typed relationships (61 edges), graph_query.py rels, morning_briefing fix, design docs fixed, orphans 12→0, HABITS tab (8 habits, streaks, 7-day heatmap, localStorage), Dashboard V3.1. Backlog 46 DONE.
-Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.** Then redeploy BehiqueBot with /ebay command.
+Focus: Graph-aware context engine + Dashboard V3.2 upgrades.
+Done this session: vault_context_engine.py (graph-aware context loading via typed relationships), MAP hover-triggered path highlighting, 3-theme toggle (Neon/Mono/Pastel) on Command Hub, quests.json external loading (60/92 objectives, 65%), quest data sync (18 newly marked done).
+Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.**
 Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 
 ---
@@ -42,14 +42,16 @@ Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 - V2: `publisher_v2.py` + `ebay_oauth_token.py` → auto-publish via API
 - Telegram `/ebay` command: `modules/ebay_command.py` — wired into main.py
 
-### Behique Command Hub (V3 — 5 tabs)
+### Behique Command Hub (V3.2 — 6 tabs)
 - `Ceiba/behique-hub.html` — N64 retro pixel aesthetic, Press Start 2P font
 - **HUB tab**: live hub.json data (cluster, session, git, backlog, vault, focus)
-- **QUESTS tab**: original quest cards with Easy→Hard, Hard→Easy, By Progress sort + Type/Status filters
+- **QUESTS tab**: quest cards with Easy→Hard, Hard→Easy, By Progress sort + Type/Status filters
 - **BROWSE tab**: flat search/sort all objectives (difficulty, reward, time, name), hide done toggle
-- **MAP tab**: vis.js force-directed quest dependency graph — nodes sized by progress, click to inspect
+- **MAP tab**: vis.js force-directed quest dependency graph — hover-triggered path highlighting, click to inspect
 - **COMPLETED tab**: trophy room with stats (hours invested, reward stars, hard+ count)
-- Auto-refresh from hub.json every 30s
+- **HABITS tab**: 8 habits, click-to-toggle, 7-day mini heatmap, streak counter, localStorage persistence
+- 3-theme toggle: NEON (default N64), MONO (low-dopamine), PASTEL (soft warm)
+- Loads quests from `quests.json` (external, editable) + hub.json auto-refresh every 30s
 
 ### Memory Ingestion Protocol (NEW)
 - `tools/memory_ingest.py` — extracts decisions/ideas/blockers/mood from sessions+transcripts+git
@@ -59,7 +61,7 @@ Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 - Ingestion log prevents duplicate processing
 
 ### Vault & Knowledge Graph
-- 85 nodes, 301 edges (262 wiki + 39 typed), health score 90/100
+- 85 nodes, 334 edges (273 wiki + 61 typed), health score 90/100
 - `vault_grapher.py` — parses YAML frontmatter relationships, builds typed edge graph (uses_tool, uses_system, follows_pattern, implements_decision, relates_to_project, logged_in_session)
 - `vault_healer.py` — self-healing (missing targets, orphans, dead links, frontmatter)
 - `vault_templates.py` — 7 templates (project/tool/decision/pattern/design/check-in/knowledge), auto-upgrades stubs, smart type detection
@@ -69,8 +71,9 @@ Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 
 ### Ceiba Unified CLI
 - `tools/ceiba` — single entry point for all tools
-- Commands: start, briefing, graph, session, export, ingest, heal, template, wake, sleep, list, status
-- Aliases: g, s, l, st, i, h, t
+- Commands: start, briefing, graph, session, export, ingest, heal, template, context, wake, sleep, list, status
+- Aliases: g, s, l, st, i, h, t, ctx, c
+- `ceiba context "eBay"` — graph-aware vault context loading via typed relationships
 
 ### BehiqueBot
 - Live on Railway, Telegram bot active
