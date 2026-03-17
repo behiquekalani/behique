@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba — Interface</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: 'Courier New', monospace;
+  }
+
+  .container {
+    position: relative;
+    width: 600px;
+    height: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  canvas#gridBg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    opacity: 0.15;
+  }
+
+  .face-container {
+    position: relative;
+    z-index: 1;
+    width: 400px;
+    height: 500px;
+  }
+
+  canvas#face {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Glow pulse behind the face */
+  .glow-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,255,120,0.15) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+  }
+
+  /* Status bar */
+  .status-bar {
+    position: relative;
+    z-index: 2;
+    margin-top: 30px;
+    text-align: center;
+    color: #00ff78;
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  .status-bar .name {
+    font-size: 28px;
+    letter-spacing: 8px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(0,255,120,0.6), 0 0 40px rgba(0,255,120,0.3);
+  }
+
+  .status-bar .state {
+    font-size: 11px;
+    letter-spacing: 4px;
+    opacity: 0.5;
+    animation: statusBlink 4s ease-in-out infinite;
+  }
+
+  @keyframes statusBlink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Expression label */
+  .expression-label {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+  }
+
+  .expression-label button {
+    background: rgba(0,255,120,0.1);
+    border: 1px solid rgba(0,255,120,0.3);
+    color: #00ff78;
+    padding: 8px 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .expression-label button:hover {
+    background: rgba(0,255,120,0.25);
+    border-color: #00ff78;
+    text-shadow: 0 0 10px rgba(0,255,120,0.5);
+  }
+
+  .expression-label button.active {
+    background: rgba(0,255,120,0.3);
+    border-color: #00ff78;
+    box-shadow: 0 0 15px rgba(0,255,120,0.2);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gridBg"></canvas>
+
+<div class="container">
+  <div class="face-container">
+    <div class="glow-orb"></div>
+    <canvas id="face" width="800" height="1000"></canvas>
+  </div>
+  <div class="status-bar">
+    <div class="name">CEIBA</div>
+    <div class="state">systems online — awaiting input</div>
+  </div>
+</div>
+
+<div class="expression-label">
+  <button onclick="setExpression('neutral')" class="active">Neutral</button>
+  <button onclick="setExpression('thinking')">Thinking</button>
+  <button onclick="setExpression('speaking')">Speaking</button>
+  <button onclick="setExpression('alert')">Alert</button>
+</div>
+
+<script>
+// ============================================
+// CEIBA FACE — Wireframe Grid Head (E.N.D. style)
+// ============================================
+
+const canvas = document.getElementById('face');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;
+const H = canvas.height;
+
+// Background grid
+const bgCanvas = document.getElementById('gridBg');
+const bgCtx = bgCanvas.getContext('2d');
+bgCanvas.width = window.innerWidth;
+bgCanvas.height = window.innerHeight;
+
+// State
+let currentExpression = 'neutral';
+let expressionT = 0; // transition progress
+let blinkTimer = 0;
+let blinkState = 0; // 0=open, 1=closing, 2=closed, 3=opening
+let speakPhase = 0;
+let time = 0;
+let breathPhase = 0;
+
+// Expression targets
+const expressions = {
+  neutral:  { eyeOpen: 1.0, browAngle: 0, mouthOpen: 0, mouthWidth: 0.6, pupilY: 0, glowIntensity: 0.8 },
+  thinking: { eyeOpen: 0.7, browAngle: -0.15, mouthOpen: 0, mouthWidth: 0.5, pupilY: -0.2, glowIntensity: 0.6 },
+  speaking: { eyeOpen: 1.0, browAngle: 0.05, mouthOpen: 0.4, mouthWidth: 0.7, pupilY: 0, glowIntensity: 1.0 },
+  alert:    { eyeOpen: 1.2, browAngle: 0.1, mouthOpen: 0.1, mouthWidth: 0.5, pupilY: 0, glowIntensity: 1.2 }
+};
+
+let current = { ...expressions.neutral };
+let target = { ...expressions.neutral };
+
+function setExpression(name) {
+  currentExpression = name;
+  target = { ...expressions[name] };
+  document.querySelectorAll('.expression-label button').forEach(b => b.classList.remove('active'));
+  document.querySelector(`button[onclick="setExpression('${name}')"]`).classList.add('active');
+
+  // Update status text
+  const states = {
+    neutral: 'systems online — awaiting input',
+    thinking: 'processing — analyzing patterns',
+    speaking: 'transmitting — voice active',
+    alert: 'alert — anomaly detected'
+  };
+  document.querySelector('.status-bar .state').textContent = states[name];
+}
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function updateState(dt) {
+  time += dt;
+  breathPhase += dt * 1.2;
+  speakPhase += dt * 12;
+
+  // Smooth interpolation to target
+  const speed = 0.06;
+  for (let key in current) {
+    current[key] = lerp(current[key], target[key], speed);
+  }
+
+  // Blink logic
+  blinkTimer -= dt;
+  if (blinkTimer <= 0 && blinkState === 0) {
+    blinkState = 1;
+    blinkTimer = 0.08;
+  }
+  if (blinkState === 1 && blinkTimer <= 0) {
+    blinkState = 2;
+    blinkTimer = 0.05;
+  }
+  if (blinkState === 2 && blinkTimer <= 0) {
+    blinkState = 3;
+    blinkTimer = 0.08;
+  }
+  if (blinkState === 3 && blinkTimer <= 0) {
+    blinkState = 0;
+    blinkTimer = 2.5 + Math.random() * 4;
+  }
+
+  // Speaking mouth modulation
+  if (currentExpression === 'speaking') {
+    target.mouthOpen = 0.2 + Math.abs(Math.sin(speakPhase)) * 0.4;
+  }
+}
+
+// ============================================
+// HEAD GEOMETRY — 3D wireframe grid
+// ============================================
+
+function generateHeadPoints() {
+  const points = [];
+  const rows = 28;
+  const cols = 22;
+
+  for (let i = 0; i <= rows; i++) {
+    for (let j = 0; j <= cols; j++) {
+      const u = j / cols;           // 0-1 horizontal
+      const v = i / rows;           // 0-1 vertical
+
+      // Angle around the head
+      const angle = (u - 0.5) * Math.PI * 1.1;
+
+      // Head profile — radius varies with height
+      let radius;
+      if (v < 0.1) {
+        // Top of skull
+        radius = 120 * Math.sin(v / 0.1 * Math.PI * 0.5);
+      } else if (v < 0.45) {
+        // Cranium — wide
+        radius = 120 + 15 * Math.sin((v - 0.1) / 0.35 * Math.PI);
+      } else if (v < 0.6) {
+        // Temples narrowing
+        radius = 120 - 10 * ((v - 0.45) / 0.15);
+      } else if (v < 0.75) {
+        // Cheeks
+        radius = 110 - 20 * ((v - 0.6) / 0.15);
+      } else if (v < 0.9) {
+        // Jaw narrowing
+        radius = 90 - 40 * ((v - 0.75) / 0.15);
+      } else {
+        // Chin
+        radius = 50 - 30 * ((v - 0.9) / 0.1);
+      }
+
+      const x = Math.sin(angle) * radius;
+      const z = Math.cos(angle) * radius;
+      const y = (v - 0.45) * 550;
+
+      points.push({ x, y, z, u, v, baseX: x, baseY: y, baseZ: z });
+    }
+  }
+  return { points, rows, cols };
+}
+
+const head = generateHeadPoints();
+
+function projectPoint(p, breathOffset) {
+  const scale = 1.8;
+  const py = p.y + breathOffset;
+  const perspective = 600 / (600 + p.z);
+  return {
+    x: W / 2 + p.x * perspective * scale,
+    y: H / 2 + py * perspective * scale,
+    z: p.z,
+    perspective
+  };
+}
+
+function drawHead(breathOffset) {
+  const { points, rows, cols } = head;
+  const total = (rows + 1) * (cols + 1);
+
+  // Animate points subtly
+  for (let i = 0; i < total; i++) {
+    const p = points[i];
+    const wave = Math.sin(time * 2 + p.v * 8 + p.u * 5) * 1.5;
+    p.x = p.baseX + wave * 0.3;
+    p.y = p.baseY + wave * 0.2;
+  }
+
+  // Draw horizontal lines
+  for (let i = 0; i <= rows; i++) {
+    ctx.beginPath();
+    for (let j = 0; j <= cols; j++) {
+      const idx = i * (cols + 1) + j;
+      const p = projectPoint(points[idx], breathOffset);
+      const depth = (points[idx].z + 150) / 300;
+
+      if (j === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    const rowV = points[i * (cols + 1)].v;
+    const alpha = 0.15 + 0.2 * Math.sin(time + rowV * 6);
+    ctx.strokeStyle = `rgba(0, 255, 120, ${alpha * current.glowIntensity})`;
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+  }
+
+  // Draw vertical lines
+  for (let j = 0; j <= cols; j++) {
+    ctx.beginPath();
+    for (let i = 0; i <= rows; i++) {
+      const idx = i * (cols + 1) + j;
+      const p = projectPoint(points[idx], breathOffset);
+
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    const colU = j / cols;
+    const alpha = 0.1 + 0.15 * Math.abs(colU - 0.5) * 2;
+    ctx.strokeStyle = `rgba(0, 255, 120, ${alpha * current.glowIntensity})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+}
+
+// ============================================
+// FACIAL FEATURES
+// ============================================
+
+function drawEyes(breathOffset) {
+  const eyeY = H / 2 - 40 + breathOffset;
+  const eyeSpacing = 75;
+  const eyeWidth = 50;
+  const baseEyeHeight = 22;
+
+  // Blink factor
+  let blinkFactor = 1;
+  if (blinkState === 1) blinkFactor = lerp(1, 0, 1 - blinkTimer / 0.08);
+  if (blinkState === 2) blinkFactor = 0;
+  if (blinkState === 3) blinkFactor = lerp(0, 1, 1 - blinkTimer / 0.08);
+
+  const eyeHeight = baseEyeHeight * current.eyeOpen * blinkFactor;
+
+  [-1, 1].forEach(side => {
+    const cx = W / 2 + side * eyeSpacing;
+    const cy = eyeY;
+
+    // Eye socket glow
+    const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 60);
+    grad.addColorStop(0, `rgba(0, 255, 120, ${0.15 * current.glowIntensity})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(cx - 60, cy - 60, 120, 120);
+
+    // Eye shape — angular, not round
+    ctx.beginPath();
+    ctx.moveTo(cx - eyeWidth, cy);
+    ctx.quadraticCurveTo(cx - eyeWidth * 0.5, cy - eyeHeight, cx, cy - eyeHeight * 0.9);
+    ctx.quadraticCurveTo(cx + eyeWidth * 0.5, cy - eyeHeight, cx + eyeWidth, cy);
+    ctx.quadraticCurveTo(cx + eyeWidth * 0.5, cy + eyeHeight, cx, cy + eyeHeight * 0.9);
+    ctx.quadraticCurveTo(cx - eyeWidth * 0.5, cy + eyeHeight, cx - eyeWidth, cy);
+    ctx.closePath();
+
+    ctx.strokeStyle = `rgba(0, 255, 120, ${0.8 * current.glowIntensity})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = `rgba(0, 255, 120, ${0.05 * current.glowIntensity})`;
+    ctx.fill();
+
+    // Pupil / iris
+    if (eyeHeight > 3) {
+      const pupilR = Math.min(eyeHeight * 0.55, 12);
+      const pupilY = cy + current.pupilY * 8;
+
+      // Iris ring
+      ctx.beginPath();
+      ctx.arc(cx, pupilY, pupilR + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(0, 255, 120, ${0.4 * current.glowIntensity})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Pupil core
+      const pupilGrad = ctx.createRadialGradient(cx, pupilY, 0, cx, pupilY, pupilR);
+      pupilGrad.addColorStop(0, `rgba(0, 255, 120, ${0.9 * current.glowIntensity})`);
+      pupilGrad.addColorStop(0.5, `rgba(0, 255, 120, ${0.4 * current.glowIntensity})`);
+      pupilGrad.addColorStop(1, `rgba(0, 255, 120, ${0.1 * current.glowIntensity})`);
+      ctx.beginPath();
+      ctx.arc(cx, pupilY, pupilR, 0, Math.PI * 2);
+      ctx.fillStyle = pupilGrad;
+      ctx.fill();
+
+      // Scan line through iris
+      ctx.beginPath();
+      ctx.moveTo(cx - pupilR, pupilY);
+      ctx.lineTo(cx + pupilR, pupilY);
+      ctx.strokeStyle = `rgba(0, 255, 120, ${0.6 * current.glowIntensity})`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+
+    // Brow
+    const browY = cy - eyeHeight - 15;
+    const browAngle = current.browAngle * side;
+    ctx.beginPath();
+    ctx.moveTo(cx - eyeWidth * 0.8, browY + browAngle * 30);
+    ctx.quadraticCurveTo(cx, browY - 8 + browAngle * 15, cx + eyeWidth * 0.8, browY - browAngle * 20);
+    ctx.strokeStyle = `rgba(0, 255, 120, ${0.5 * current.glowIntensity})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+}
+
+function drawNose(breathOffset) {
+  const cx = W / 2;
+  const cy = H / 2 + 25 + breathOffset;
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - 25);
+  ctx.lineTo(cx - 12, cy + 10);
+  ctx.moveTo(cx, cy - 25);
+  ctx.lineTo(cx + 12, cy + 10);
+  // Nostril hints
+  ctx.moveTo(cx - 12, cy + 10);
+  ctx.quadraticCurveTo(cx - 18, cy + 15, cx - 8, cy + 14);
+  ctx.moveTo(cx + 12, cy + 10);
+  ctx.quadraticCurveTo(cx + 18, cy + 15, cx + 8, cy + 14);
+
+  ctx.strokeStyle = `rgba(0, 255, 120, ${0.25 * current.glowIntensity})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function drawMouth(breathOffset) {
+  const cx = W / 2;
+  const cy = H / 2 + 80 + breathOffset;
+  const mouthW = 55 * current.mouthWidth;
+  const mouthH = 5 + current.mouthOpen * 25;
+
+  // Upper lip
+  ctx.beginPath();
+  ctx.moveTo(cx - mouthW, cy);
+  ctx.quadraticCurveTo(cx - mouthW * 0.3, cy - 6, cx, cy - 3);
+  ctx.quadraticCurveTo(cx + mouthW * 0.3, cy - 6, cx + mouthW, cy);
+  ctx.strokeStyle = `rgba(0, 255, 120, ${0.6 * current.glowIntensity})`;
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  // Lower lip
+  ctx.beginPath();
+  ctx.moveTo(cx - mouthW, cy);
+  ctx.quadraticCurveTo(cx - mouthW * 0.3, cy + mouthH, cx, cy + mouthH + 2);
+  ctx.quadraticCurveTo(cx + mouthW * 0.3, cy + mouthH, cx + mouthW, cy);
+  ctx.strokeStyle = `rgba(0, 255, 120, ${0.5 * current.glowIntensity})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Mouth interior glow when open
+  if (current.mouthOpen > 0.1) {
+    ctx.beginPath();
+    ctx.moveTo(cx - mouthW * 0.8, cy + 1);
+    ctx.quadraticCurveTo(cx, cy + mouthH * 0.7, cx + mouthW * 0.8, cy + 1);
+    ctx.fillStyle = `rgba(0, 255, 120, ${0.05 * current.mouthOpen * current.glowIntensity})`;
+    ctx.fill();
+  }
+}
+
+// ============================================
+// BACKGROUND GRID
+// ============================================
+
+function drawBackgroundGrid() {
+  bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+  const spacing = 40;
+  const offset = (time * 15) % spacing;
+
+  bgCtx.strokeStyle = 'rgba(0, 255, 120, 0.3)';
+  bgCtx.lineWidth = 0.5;
+
+  // Vertical
+  for (let x = -spacing + offset; x < bgCanvas.width + spacing; x += spacing) {
+    bgCtx.beginPath();
+    bgCtx.moveTo(x, 0);
+    bgCtx.lineTo(x, bgCanvas.height);
+    bgCtx.stroke();
+  }
+
+  // Horizontal
+  for (let y = -spacing + offset * 0.5; y < bgCanvas.height + spacing; y += spacing) {
+    bgCtx.beginPath();
+    bgCtx.moveTo(0, y);
+    bgCtx.lineTo(bgCanvas.width, y);
+    bgCtx.stroke();
+  }
+}
+
+// ============================================
+// SCANLINE EFFECT
+// ============================================
+
+function drawScanlines() {
+  const scanY = (time * 80) % (H + 100) - 50;
+
+  const grad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+  grad.addColorStop(0, 'transparent');
+  grad.addColorStop(0.5, `rgba(0, 255, 120, ${0.06 * current.glowIntensity})`);
+  grad.addColorStop(1, 'transparent');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, scanY - 30, W, 60);
+
+  // CRT scanlines
+  for (let y = 0; y < H; y += 3) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    ctx.fillRect(0, y, W, 1);
+  }
+}
+
+// ============================================
+// HEX DATA OVERLAY — scrolling data fragments
+// ============================================
+
+const dataFragments = [];
+function spawnDataFragment() {
+  if (dataFragments.length > 8) return;
+  const side = Math.random() > 0.5 ? 1 : -1;
+  dataFragments.push({
+    x: W / 2 + side * (180 + Math.random() * 80),
+    y: H * 0.2 + Math.random() * H * 0.5,
+    text: '0x' + Math.floor(Math.random() * 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0'),
+    life: 1.0,
+    speed: 0.003 + Math.random() * 0.005
+  });
+}
+
+function drawDataFragments() {
+  ctx.font = '10px Courier New';
+  for (let i = dataFragments.length - 1; i >= 0; i--) {
+    const f = dataFragments[i];
+    f.life -= f.speed;
+    f.y -= 0.3;
+    if (f.life <= 0) { dataFragments.splice(i, 1); continue; }
+    ctx.fillStyle = `rgba(0, 255, 120, ${f.life * 0.3})`;
+    ctx.fillText(f.text, f.x, f.y);
+  }
+}
+
+// ============================================
+// MAIN LOOP
+// ============================================
+
+let lastTime = performance.now();
+
+function render(now) {
+  const dt = (now - lastTime) / 1000;
+  lastTime = now;
+
+  updateState(dt);
+
+  // Breathing
+  const breath = Math.sin(breathPhase) * 3;
+
+  // Clear
+  ctx.clearRect(0, 0, W, H);
+
+  // Center glow
+  const centerGlow = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, 350);
+  centerGlow.addColorStop(0, `rgba(0, 255, 120, ${0.04 * current.glowIntensity})`);
+  centerGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = centerGlow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw layers
+  drawHead(breath);
+  drawEyes(breath);
+  drawNose(breath);
+  drawMouth(breath);
+  drawScanlines();
+
+  // Data fragments
+  if (Math.random() < 0.03) spawnDataFragment();
+  drawDataFragments();
+
+  // Background
+  drawBackgroundGrid();
+
+  requestAnimationFrame(render);
+}
+
+// Handle resize
+window.addEventListener('resize', () => {
+  bgCanvas.width = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
+});
+
+// Start
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
