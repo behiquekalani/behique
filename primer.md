@@ -8,17 +8,17 @@ created: 2026-03-16
 # primer.md — Ceiba Memory Stack
 # LIVE CHECKPOINT updated throughout session (not just at end)
 # Last full rewrite: 2026-03-16 (session 4 — continued from compaction)
-# Last Check-in: 2026-03-16
+# Last Check-in: 2026-03-17
 
 ---
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-17 — Auto checkpoint via Claude Code stop hook.
-Focus: Graph-aware context engine + Dashboard V3.2 + Vault cleanup.
-Done: vault_context_engine.py, MAP hover paths, 3-theme toggle, quests.json loading, vault wiki-link cleanup (health 95→99), 18 quest objectives synced (60/92, 65%).
+Focus: Trending products data collected today (04:14). No new code changes since last session.
 Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.**
-Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
+Blocker: Revenue = $0 — Funko Pop listing READY at `listings/`, needs manual paste into eBay.
+Session status: IDLE (auto-checkpoint)
 
 ---
 
