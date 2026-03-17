@@ -40,6 +40,22 @@ Kalani is building an AI body — a multi-model system where each model does wha
 - **Skills system** — SKILL.md files for reusable Claude instructions (code-auditor, security-auditor, etc.)
 - **OpenClaw** — JUST installed on Computer 1. Open-source AI agent that may replace some of the custom infrastructure.
 
+## How to Start Computer 2 (Cobo)
+
+**Physical startup sequence:**
+1. Power on the machine
+2. Open **Cursor**
+3. Run **Node.js** — this starts the bridge server on port 9876
+4. Bridge becomes reachable at `192.168.0.151:9876` / `bridge.merchoo.shop`
+
+**If you close Cursor or the Node process, the bridge dies.** Cobo becomes unreachable even though the machine is still on. This happened 2026-03-16.
+
+**Services that should be running:**
+- Bridge server (Node.js via Cursor) — port 9876
+- Ollama — port 11434 (OLLAMA_HOST=0.0.0.0)
+- n8n — port 5678 (via pm2)
+- Syncthing — file sync with Mac
+
 ## What Computer 2 Does
 
 1. **Runs Ollama** — serves llama3.2 at http://localhost:11434 (accessible from network at 192.168.0.151:11434)
