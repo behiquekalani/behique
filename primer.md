@@ -14,7 +14,7 @@ created: 2026-03-16
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 — Session 5 continued.
+Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
 Focus: Vault infra + Dashboard HABITS tab.
 Done this session: vault_templates.py (7 templates + CLI), typed relationships (61 edges), graph_query.py rels, morning_briefing fix, design docs fixed, orphans 12→0, HABITS tab (8 habits, streaks, 7-day heatmap, localStorage), Dashboard V3.1. Backlog 46 DONE.
 Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.** Then redeploy BehiqueBot with /ebay command.
