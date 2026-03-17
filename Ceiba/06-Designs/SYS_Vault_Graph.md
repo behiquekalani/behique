@@ -11,5 +11,5 @@ vault_grapher.py scans all .md files in Ceiba/, extracts [[wiki links]], builds 
 
 ## Links
 - [[TOOL_Vault_Grapher]]
-- [[VAULT_INDEX.md]]
+- [[VAULT_INDEX]]
 - [[DEC_Model_Agnostic_Vault]]

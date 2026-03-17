@@ -11,4 +11,4 @@ vault_grapher.py scans Ceiba/*.md, extracts [[wiki links]], builds vault_graph.j
 
 ## Links
 - [[SYS_Vault_Graph]]
-- [[VAULT_INDEX.md]]
+- [[VAULT_INDEX]]

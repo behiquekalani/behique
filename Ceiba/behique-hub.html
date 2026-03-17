@@ -506,14 +506,86 @@ body::after {
 .map-info.visible { display: block; }
 .map-info h3 { font-size: 10px; color: var(--gold); margin-bottom: 8px; }
 .map-info .map-info-meta { font-size: 7px; color: var(--text-dim); margin-bottom: 8px; }
+
+/* ============ THEME TOGGLE ============ */
+.theme-toggle {
+  position: absolute;
+  top: 8px;
+  right: 40px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+.theme-btn {
+  font-family: var(--pixel);
+  font-size: 6px;
+  padding: 3px 6px;
+  border: 2px solid var(--border2);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.theme-btn:hover { border-color: var(--gold); color: var(--text); }
+.theme-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.1); }
+
+/* ============ MONO THEME (low-dopamine) ============ */
+[data-theme="mono"] {
+  --bg: #111;
+  --bg2: #1a1a1a;
+  --card: #222;
+  --border: #555;
+  --border2: #444;
+  --text: #ccc;
+  --text-dim: #777;
+  --gold: #aaa;
+  --green: #999;
+  --red: #888;
+  --cyan: #aaa;
+  --purple: #888;
+  --orange: #999;
+}
+[data-theme="mono"] body::after { display: none; }
+[data-theme="mono"] .header { border-color: #555; }
+[data-theme="mono"] .header h1 { text-shadow: none; }
+[data-theme="mono"] .header::before,
+[data-theme="mono"] .header::after { display: none; }
+[data-theme="mono"] .quest-card { border-left-color: #666; }
+[data-theme="mono"] .health-fill { background: #888 !important; }
+
+/* ============ PASTEL THEME ============ */
+[data-theme="pastel"] {
+  --bg: #f4f0ec;
+  --bg2: #ebe5df;
+  --card: #fff;
+  --border: #d4a5a5;
+  --border2: #c9b8d4;
+  --text: #3d3d3d;
+  --text-dim: #8a8a8a;
+  --gold: #c9955d;
+  --green: #7db88f;
+  --red: #d4a5a5;
+  --cyan: #7baac9;
+  --purple: #b8a5d4;
+  --orange: #d4b88f;
+}
+[data-theme="pastel"] body::after { display: none; }
+[data-theme="pastel"] .header { border-color: #c9b8d4; }
+[data-theme="pastel"] .header h1 { color: #7d6b5d; text-shadow: none; }
+[data-theme="pastel"] .header::before,
+[data-theme="pastel"] .header::after { display: none; }
+[data-theme="pastel"] .tab.active { border-color: #c9955d; color: #7d6b5d; }
+[data-theme="pastel"] .quest-type-badge.MAIN { background: #d4a5a5; color: #fff; }
+[data-theme="pastel"] .quest-type-badge.SIDE { background: #7baac9; color: #fff; }
+[data-theme="pastel"] .quest-type-badge.FUTURE { background: #b8a5d4; color: #fff; }
 </style>
 </head>
 <body>
 <div class="hub" id="app"><div class="loading">LOADING HUB DATA...</div></div>
 
 <script>
-/* ============ QUEST DATA ============ */
-const QUEST_DATA = {
+/* ============ QUEST DATA (loaded from quests.json) ============ */
+let QUEST_DATA = {
   missions: [
     { id: "ebay-empire", name: "eBay Empire", type: "MAIN", status: "active", description: "From $0 to revenue.", reward: "First revenue stream", reward_tier: 5, objectives: [
       { text: "Build listing agent V1", done: true, difficulty: "hard", time_est: "6h", reward_tier: 3 },
@@ -631,6 +703,23 @@ const DIFF_ORDER = { very_easy: 1, easy: 2, medium: 3, hard: 4, very_hard: 5 };
 const DIFF_LABELS = { very_easy: 'VERY EASY', easy: 'EASY', medium: 'MEDIUM', hard: 'HARD', very_hard: 'VERY HARD' };
 const TAB_LIST = ['hub','quests','browse','map','completed','habits'];
 
+/* ============ THEME SYSTEM ============ */
+let currentTheme = localStorage.getItem('hub_theme') || 'neon';
+function setTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem('hub_theme', theme);
+  if (theme === 'neon') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+  renderApp();
+}
+// Apply saved theme on load
+if (currentTheme !== 'neon') {
+  document.documentElement.setAttribute('data-theme', currentTheme);
+}
+
 function parseTimeToMinutes(t) {
   if (!t) return 999;
   const s = t.toLowerCase().trim();
@@ -644,7 +733,7 @@ function parseTimeToMinutes(t) {
 }
 
 /* ============ QUEST DEPENDENCIES ============ */
-const QUEST_DEPS = [
+let QUEST_DEPS = [
   // [from, to, label] — "from" feeds into / unlocks "to"
   ["ebay-empire", "product-research", "product data"],
   ["ebay-empire", "revenue-diversification", "winners feed"],
@@ -680,6 +769,22 @@ async function loadHubData() {
   } catch(e) { return null; }
 }
 
+async function loadQuestData() {
+  try {
+    const resp = await fetch('./quests.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('not found');
+    const data = await resp.json();
+    if (data.missions) {
+      QUEST_DATA.missions = data.missions;
+      QUEST_DATA.completed_missions = data.completed_missions || QUEST_DATA.completed_missions;
+    }
+    if (data.dependencies) {
+      QUEST_DEPS = data.dependencies;
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
 function healthClass(pct) {
   if (pct >= 70) return 'high';
   if (pct >= 40) return 'mid';
@@ -691,6 +796,11 @@ function renderApp() {
   const app = document.getElementById('app');
   app.innerHTML = `
     <div class="header">
+      <div class="theme-toggle">
+        <button class="theme-btn ${currentTheme==='neon'?'active':''}" onclick="setTheme('neon')">NEON</button>
+        <button class="theme-btn ${currentTheme==='mono'?'active':''}" onclick="setTheme('mono')">MONO</button>
+        <button class="theme-btn ${currentTheme==='pastel'?'active':''}" onclick="setTheme('pastel')">PASTEL</button>
+      </div>
       <h1>BEHIQUE COMMAND HUB</h1>
       <div class="subtitle">CEIBA + COBO AI CLUSTER</div>
       <div class="timestamp">${hubData ? 'DATA: ' + hubData.generated_local : ''} | AUTO-REFRESH: 30s</div>
@@ -712,7 +822,7 @@ function renderApp() {
     <div class="refresh-bar">
       <button onclick="doRefresh()">\u21BB REFRESH</button>
     </div>
-    <div class="footer">BEHIQUE COMMAND HUB v3.1 \u2022 CEIBA + COBO \u2022 ${new Date().getFullYear()}</div>
+    <div class="footer">BEHIQUE COMMAND HUB v3.2 \u2022 CEIBA + COBO \u2022 ${new Date().getFullYear()}</div>
   `;
   renderHubTab();
   renderQuestsTab();
@@ -998,7 +1108,7 @@ function renderMapTab() {
       <div class="map-legend-item"><div class="map-legend-dot" style="background:#ff3366"></div>MAIN QUEST</div>
       <div class="map-legend-item"><div class="map-legend-dot" style="background:#00d4ff"></div>SIDE QUEST</div>
       <div class="map-legend-item"><div class="map-legend-dot" style="background:#b388ff"></div>FUTURE</div>
-      <div class="map-legend-item" style="font-size:5px;color:var(--text-dim)">NODE SIZE = PROGRESS | CLICK TO INSPECT</div>
+      <div class="map-legend-item" style="font-size:5px;color:var(--text-dim)">NODE SIZE = PROGRESS | HOVER = PATHS | CLICK = INSPECT</div>
     </div>
     <div id="quest-graph"></div>
     <div class="map-info" id="map-info"></div>
@@ -1083,6 +1193,85 @@ function renderMapTab() {
   };
 
   questNetwork = new vis.Network(container, data, options);
+
+  // Hover handler — highlight connected paths
+  questNetwork.on('hoverNode', function(params) {
+    const hoveredId = params.node;
+    // Find all connected node IDs (direct dependencies)
+    const connectedNodes = new Set([hoveredId]);
+    const connectedEdges = new Set();
+
+    QUEST_DEPS.forEach((dep, i) => {
+      if (dep[0] === hoveredId || dep[1] === hoveredId) {
+        connectedNodes.add(dep[0]);
+        connectedNodes.add(dep[1]);
+        connectedEdges.add('e' + i);
+      }
+    });
+
+    // Walk 2nd-degree connections for full path visibility
+    const firstDegree = new Set(connectedNodes);
+    QUEST_DEPS.forEach((dep, i) => {
+      if (firstDegree.has(dep[0]) || firstDegree.has(dep[1])) {
+        connectedNodes.add(dep[0]);
+        connectedNodes.add(dep[1]);
+        connectedEdges.add('e' + i);
+      }
+    });
+
+    // Dim non-connected nodes
+    const updatedNodes = nodes.map(n => {
+      if (connectedNodes.has(n.id)) {
+        const isHovered = n.id === hoveredId;
+        return {
+          id: n.id,
+          opacity: 1,
+          borderWidth: isHovered ? 5 : 3,
+          shadow: { enabled: true, color: isHovered ? '#ffd70088' : (n.color.background || '#333') + '44', size: isHovered ? 25 : 15, x: 0, y: 0 },
+          font: { ...n.font, color: '#eee' }
+        };
+      } else {
+        return {
+          id: n.id,
+          opacity: 0.15,
+          borderWidth: 1,
+          shadow: { enabled: false },
+          font: { ...n.font, color: '#333' }
+        };
+      }
+    });
+    data.nodes.update(updatedNodes);
+
+    // Highlight connected edges, dim others
+    const updatedEdges = edges.map(e => {
+      if (connectedEdges.has(e.id)) {
+        return { id: e.id, color: { color: '#e94560', highlight: '#ffd700' }, width: 3, font: { ...e.font, color: '#e94560' } };
+      } else {
+        return { id: e.id, color: { color: '#53348322' }, width: 0.5, font: { ...e.font, color: 'transparent' } };
+      }
+    });
+    data.edges.update(updatedEdges);
+  });
+
+  // Blur handler — restore all nodes
+  questNetwork.on('blurNode', function(params) {
+    const restoredNodes = nodes.map(n => ({
+      id: n.id,
+      opacity: 1,
+      borderWidth: 3,
+      shadow: n.shadow,
+      font: n.font
+    }));
+    data.nodes.update(restoredNodes);
+
+    const restoredEdges = edges.map(e => ({
+      id: e.id,
+      color: e.color,
+      width: e.width,
+      font: e.font
+    }));
+    data.edges.update(restoredEdges);
+  });
 
   // Click handler — show quest details
   questNetwork.on('click', function(params) {
@@ -1361,12 +1550,21 @@ function renderHabitsTab() {
 
 /* ============ INIT ============ */
 async function doRefresh() {
-  hubData = await loadHubData();
+  await Promise.all([
+    loadHubData().then(d => { hubData = d; }),
+    loadQuestData()
+  ]);
   renderApp();
 }
 
 doRefresh();
-setInterval(async () => { hubData = await loadHubData(); renderHubTab(); }, 30000);
+setInterval(async () => {
+  await Promise.all([
+    loadHubData().then(d => { hubData = d; }),
+    loadQuestData()
+  ]);
+  renderHubTab();
+}, 30000);
 </script>
 </body>
 </html>

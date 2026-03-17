@@ -38,10 +38,10 @@ python3 tools/vault_grapher.py [options]
 - Python 3.x standard library
 
 ## Used By
-- [[01-Projects/project_name]] — how it's used
+- [[SYS_Vault_Graph]] — graph infrastructure
 
 ## Related Tools
-- [[TOOL_name]] — related tool
+- [[TOOL_Vault_Grapher]] — core tool
 
 ---
 

@@ -27,6 +27,9 @@ Usage:
     ceiba template --list              # Show available vault templates
     ceiba template project "My Proj"   # Create vault file from template
     ceiba template --apply-missing     # Upgrade stub files to templates
+    ceiba context "eBay"               # Graph-aware vault context for topic
+    ceiba context --prompt "debug bridge" # Context from natural language
+    ceiba context --cwd tools/ebay     # Context from working directory
     ceiba list "Product" 29.99         # Quick eBay listing
     ceiba status                       # One-line system status
 """
@@ -169,6 +172,36 @@ def cmd_template(args):
     run_tool(cmd)
 
 
+def cmd_context(args):
+    """Graph-aware vault context."""
+    cmd = [sys.executable, os.path.join(TOOLS, "vault_context_engine.py")]
+    if "--prompt" in args:
+        idx = args.index("--prompt")
+        if idx + 1 < len(args):
+            cmd.extend(["--prompt", args[idx + 1]])
+    elif "--cwd" in args:
+        idx = args.index("--cwd")
+        if idx + 1 < len(args):
+            cmd.extend(["--cwd", args[idx + 1]])
+    elif args:
+        cmd.append(args[0])
+    else:
+        print("Usage: ceiba context <topic>")
+        print("       ceiba context --prompt \"natural language\"")
+        print("       ceiba context --cwd path/to/dir")
+        return
+    # Pass through flags
+    if "--json" in args:
+        cmd.append("--json")
+    if "--format" in args:
+        cmd.append("--format")
+    if "--top" in args:
+        idx = args.index("--top")
+        if idx + 1 < len(args):
+            cmd.extend(["--top", args[idx + 1]])
+    run_tool(cmd)
+
+
 def cmd_list(args):
     """Quick eBay listing."""
     if not args:
@@ -271,6 +304,9 @@ COMMANDS = {
     "h": cmd_heal,
     "template": cmd_template,
     "t": cmd_template,
+    "context": cmd_context,
+    "ctx": cmd_context,
+    "c": cmd_context,
 }
 
 

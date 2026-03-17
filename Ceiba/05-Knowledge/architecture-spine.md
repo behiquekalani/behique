@@ -256,4 +256,4 @@ Equal importance to the plan:
 
 *This document is the north star for system architecture. Update it as decisions are made. Link to it from every project file that is part of the system.*
 
-*[[primer.md]] [[VAULT_INDEX.md]] [[BehiqueBot.md]] [[Computer-2]] [[ceiba_lite.py]]*
+*[[primer]] [[VAULT_INDEX]] [[BehiqueBot]] [[Computer-2]] [[TOOL_Ceiba_Lite]]*

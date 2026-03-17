@@ -11,4 +11,4 @@ The vault (Obsidian notes, markdown files) is model-agnostic. Any AI can read it
 
 ## Links
 - [[SYS_Vault_Graph]]
-- [[VAULT_INDEX.md]]
+- [[VAULT_INDEX]]

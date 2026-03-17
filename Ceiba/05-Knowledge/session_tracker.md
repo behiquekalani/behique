@@ -38,10 +38,10 @@ python3 tools/session_tracker.py [options]
 - Python 3.x standard library
 
 ## Used By
-- [[01-Projects/project_name]] — how it's used
+- [[BehiqueBot]] — session tracking
 
 ## Related Tools
-- [[TOOL_name]] — related tool
+- [[TOOL_Dispatch]] — kernel dispatch
 
 ---
 

@@ -124,4 +124,4 @@ The vault belongs to Kalani. Not to Anthropic.
 
 ---
 
-*[[architecture-spine.md]] [[primer.md]] [[VAULT_INDEX.md]]*
+*[[architecture-spine]] [[primer]] [[VAULT_INDEX]]*

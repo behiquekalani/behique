@@ -67,6 +67,10 @@ created: 2026-03-16
 | Vault Template System (7 templates + CLI) | Ceiba | Ceiba | 2026-03-16 | `tools/vault_templates.py` — project/tool/decision/pattern/design/check-in/knowledge templates. Auto-upgrades stubs from vault_healer. Smart type detection by name. `ceiba template` CLI |
 | YAML Typed Relationships in vault_grapher | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/vault_grapher.py` — parses YAML frontmatter (tools/systems/projects/patterns/decisions/sessions), creates typed edges (uses_tool/uses_system/etc). 39 typed relationships extracted. `graph_query.py rels` command + `rel-types` + `--reverse` flag |
 | HABITS tab (daily habit tracker + streaks) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` HABITS tab — 8 habits (revenue/build/health/growth/faith/relationships), click-to-toggle, 7-day mini heatmap, streak counter, localStorage persistence. Dashboard V3.1 |
+| Graph-aware context engine | Ceiba | Ceiba | 2026-03-16 | `tools/vault_context_engine.py` — queries vault graph via typed relationships to find relevant context for any topic/prompt/CWD. Replaces dumb CWD→file mappings. `ceiba context` CLI. Wired into vault_context_loader.py hook |
+| MAP hover-triggered path highlighting | Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` MAP tab — hover a quest node to highlight all connected paths (2-degree BFS), dim unrelated nodes. Blur restores. Dashboard V3.2 |
+| Command Hub 3-theme toggle (Neon/Mono/Pastel) | Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` — NEON (full N64), MONO (greyscale low-dopamine), PASTEL (soft warm light). localStorage persistence. CSS custom properties swap |
+| Load quests from external quests.json | Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` + `Ceiba/quests.json` — dashboard fetches quest data from JSON file instead of inline. Auto-refresh. 60/92 objectives (65%) properly tracked |
 
 ---
 
@@ -95,14 +99,14 @@ created: 2026-03-16
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
 | Real embeddings for vault search | ChatGPT Chat 4 | Vault now has 83 nodes ✅ — memory ingestion built ✅ | After ingestion proven with 30+ days of data |
-| Graph-aware prompting (auto-load context by graph distance) | ChatGPT Chat 4 | vault_context_loader does basic version | After vault grows |
+| ~~Graph-aware prompting (auto-load context by graph distance)~~ | ~~ChatGPT Chat 4~~ | ~~DONE~~ | ~~DONE — `tools/vault_context_engine.py` with typed relationship traversal + `ceiba context` CLI~~ |
 | AI price predictor (ML on historical scores) | ChatGPT Chat 3 | Need months of scoring data first | 90 days of scores in DB |
 | AI title generator for eBay listings | ChatGPT Chat 3 | Need working listings first | First 10 eBay sales |
 | Multi-model vault agent (route queries by type) | ChatGPT Chat 4 | Over-engineering right now | System is complex enough to need it |
 | Dashboard semantic query (AI query → highlight related nodes) | ChatGPT Chat 3 | Needs embedding_index.json | After real embeddings built |
 | Dashboard auto-orphan link suggestions | ChatGPT Chat 3 | Needs embedding_index.json | After real embeddings built |
 | Dashboard animated pulsing edges on query | ChatGPT Chat 3 | Cosmetic, needs semantic query working | After semantic query works |
-| Dashboard hover-triggered live paths | ChatGPT Chat 3 | Cosmetic polish | After core dashboard proven |
+| ~~Dashboard hover-triggered live paths~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — MAP tab hover highlights connected paths, dims unrelated, 2-degree BFS~~ |
 | Neo4j/ArangoDB graph upgrade | ChatGPT Chat 3 | Markdown graph works fine for now | 100+ nodes with complex queries |
 | Graph service for AI cluster workers | ChatGPT Chat 3 | No workers need it yet | Multiple AI workers querying vault |
 | ~~YAML metadata for typed relationships~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — vault_grapher.py parses 6 YAML relationship fields + graph_query.py rels command~~ |
@@ -123,7 +127,7 @@ created: 2026-03-16
 | Overnight autonomous scraping pipeline | Kalani 2026-03-16 | Need reliable scraper first | After trends scraper rebuild. Scheduled work sessions that run while Kalani sleeps. Scrape → score → queue listings. |
 | Viral Vault scoring methodology | Kalani 2026-03-16 | Need product research engine working | After eBay API data flowing. 15-point scoring checklist from Viral Vault adapted for our product scoring engine. |
 | Tamagotchi as mobile app (not just Pi) | Kalani 2026-03-16 | Quest dashboard needs to work first | After Pi version. React Native or PWA companion app that shows tamagotchi reacting to progress. |
-| Low-dopamine mode for all dashboards | Kalani 2026-03-16 | Done for quest dashboard ✅ | Apply mono/pastel toggle to ALL future UIs. Design system-level concern. |
+| ~~Low-dopamine mode for all dashboards~~ | ~~Kalani 2026-03-16~~ | ~~DONE~~ | ~~DONE — Command Hub has Neon/Mono/Pastel toggle, localStorage persisted~~ |
 
 ---
 
