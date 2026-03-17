@@ -15,8 +15,8 @@ created: 2026-03-16
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: Graph-aware context engine + Dashboard V3.2 upgrades.
-Done this session: vault_context_engine.py (graph-aware context loading via typed relationships), MAP hover-triggered path highlighting, 3-theme toggle (Neon/Mono/Pastel) on Command Hub, quests.json external loading (60/92 objectives, 65%), quest data sync (18 newly marked done).
+Focus: Graph-aware context engine + Dashboard V3.2 + Vault cleanup.
+Done: vault_context_engine.py, MAP hover paths, 3-theme toggle, quests.json loading, vault wiki-link cleanup (health 95→99), 18 quest objectives synced (60/92, 65%).
 Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.**
 Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 
@@ -61,7 +61,7 @@ Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 - Ingestion log prevents duplicate processing
 
 ### Vault & Knowledge Graph
-- 85 nodes, 334 edges (273 wiki + 61 typed), health score 90/100
+- 85 nodes, 249 edges, health score 99/100 (was 95, cleaned wiki-links)
 - `vault_grapher.py` — parses YAML frontmatter relationships, builds typed edge graph (uses_tool, uses_system, follows_pattern, implements_decision, relates_to_project, logged_in_session)
 - `vault_healer.py` — self-healing (missing targets, orphans, dead links, frontmatter)
 - `vault_templates.py` — 7 templates (project/tool/decision/pattern/design/check-in/knowledge), auto-upgrades stubs, smart type detection
