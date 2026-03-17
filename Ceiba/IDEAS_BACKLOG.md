@@ -66,6 +66,7 @@ created: 2026-03-16
 | Dashboard V3 (5 tabs + updated quest data) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` — HUB/QUESTS/BROWSE/MAP/COMPLETED tabs. Updated quest data: 42 done objectives tracked |
 | Vault Template System (7 templates + CLI) | Ceiba | Ceiba | 2026-03-16 | `tools/vault_templates.py` — project/tool/decision/pattern/design/check-in/knowledge templates. Auto-upgrades stubs from vault_healer. Smart type detection by name. `ceiba template` CLI |
 | YAML Typed Relationships in vault_grapher | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/vault_grapher.py` — parses YAML frontmatter (tools/systems/projects/patterns/decisions/sessions), creates typed edges (uses_tool/uses_system/etc). 39 typed relationships extracted. `graph_query.py rels` command + `rel-types` + `--reverse` flag |
+| HABITS tab (daily habit tracker + streaks) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` HABITS tab — 8 habits (revenue/build/health/growth/faith/relationships), click-to-toggle, 7-day mini heatmap, streak counter, localStorage persistence. Dashboard V3.1 |
 
 ---
 
@@ -107,7 +108,7 @@ created: 2026-03-16
 | ~~YAML metadata for typed relationships~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — vault_grapher.py parses 6 YAML relationship fields + graph_query.py rels command~~ |
 | Vault wiki-link strategy (typed link conventions, structured sections) | ChatGPT Chat 3 | Already partially implemented | Next vault cleanup pass |
 | ~~Vault template system~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — `tools/vault_templates.py` with 7 templates + ceiba CLI~~ |
-| Quest/Journal dashboard habit tracker | Kalani 2026-03-16 | Dashboard V3 built with 5 tabs ✅ | Add habit tracking system to existing dashboard |
+| ~~Quest/Journal dashboard habit tracker~~ | ~~Kalani 2026-03-16~~ | ~~DONE~~ | ~~DONE — HABITS tab with 8 habits, streaks, 7-day heatmap, localStorage~~ |
 | Book-to-Agent system | Comp2 2026-03-16 | Big concept, needs design | After core revenue flowing. Turn books into interactive AI tutors. |
 | Colmena66 AI consulting play | Comp2 2026-03-16 | Need proven portfolio first | After 3+ automation projects done. PR startup accelerator = potential client. |
 | Tamagotchi Pi companion device | Comp2 2026-03-16 | Quest dashboard needs to work first | After dashboard proven. Physical Raspberry Pi in 3D-printed cube on desk. |

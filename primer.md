@@ -14,9 +14,9 @@ created: 2026-03-16
 
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
-Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: Vault infrastructure upgrades — template system, typed relationships, graph query layer.
-Done this session: vault_templates.py (7 templates + stub upgrade + ceiba CLI), vault_grapher.py YAML typed relationships (61 typed edges, 6 edge types), graph_query.py rels/rel-types/reverse commands, morning_briefing.py vault collector fixed + typed stats, design doc frontmatter fixed (type:unknown→design), orphans 12→0, backlog 44 DONE.
+Last update: 2026-03-16 — Session 5 continued.
+Focus: Vault infra + Dashboard HABITS tab.
+Done this session: vault_templates.py (7 templates + CLI), typed relationships (61 edges), graph_query.py rels, morning_briefing fix, design docs fixed, orphans 12→0, HABITS tab (8 habits, streaks, 7-day heatmap, localStorage), Dashboard V3.1. Backlog 46 DONE.
 Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.** Then redeploy BehiqueBot with /ebay command.
 Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 
