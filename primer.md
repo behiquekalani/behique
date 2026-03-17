@@ -15,8 +15,8 @@ created: 2026-03-16
 ## ⚡ LIVE STATE
 <!-- Ceiba updates this block after every completed task. 5 lines max. -->
 Last update: 2026-03-16 — Auto checkpoint via Claude Code stop hook.
-Focus: Dashboard upgrades (Browse tab, MAP graph, filters) + Memory Ingestion Protocol + backlog cleanup.
-Done this session: Dashboard V3 (5 tabs: HUB/QUESTS/BROWSE/MAP/COMPLETED), vis.js quest graph, memory_ingest.py (11 CMP entries), ceiba CLI expanded (ingest/heal), backlog updated with 4 new DONE entries.
+Focus: Vault infrastructure upgrades — template system, typed relationships, graph query layer.
+Done this session: vault_templates.py (7 templates + stub upgrade + ceiba CLI), vault_grapher.py YAML typed relationships (61 typed edges, 6 edge types), graph_query.py rels/rel-types/reverse commands, morning_briefing.py vault collector fixed + typed stats, design doc frontmatter fixed (type:unknown→design), orphans 12→0, backlog 44 DONE.
 Next action: **PASTE FUNKO POP LISTING ON EBAY. Revenue is $0.** Then redeploy BehiqueBot with /ebay command.
 Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 
@@ -59,16 +59,18 @@ Revenue: **$0.** Funko Pop listing still at `listings/`. Post it.
 - Ingestion log prevents duplicate processing
 
 ### Vault & Knowledge Graph
-- 85+ nodes, 323 edges, health score 90/100
+- 85 nodes, 301 edges (262 wiki + 39 typed), health score 90/100
+- `vault_grapher.py` — parses YAML frontmatter relationships, builds typed edge graph (uses_tool, uses_system, follows_pattern, implements_decision, relates_to_project, logged_in_session)
 - `vault_healer.py` — self-healing (missing targets, orphans, dead links, frontmatter)
-- `graph_query.py` — 8 query methods (neighbors, search, shortest_path, hubs, context)
+- `vault_templates.py` — 7 templates (project/tool/decision/pattern/design/check-in/knowledge), auto-upgrades stubs, smart type detection
+- `graph_query.py` — 10+ query methods (neighbors, search, shortest_path, hubs, context, rels, rel-types, reverse rels)
 - `session_logger.py` — auto-generates SES_ vault files
-- `ceiba heal` / `ceiba heal --fix` CLI
+- `ceiba heal` / `ceiba heal --fix` / `ceiba template` CLI
 
 ### Ceiba Unified CLI
 - `tools/ceiba` — single entry point for all tools
-- Commands: start, briefing, graph, session, export, ingest, heal, wake, sleep, list, status
-- Aliases: g, s, l, st, i, h
+- Commands: start, briefing, graph, session, export, ingest, heal, template, wake, sleep, list, status
+- Aliases: g, s, l, st, i, h, t
 
 ### BehiqueBot
 - Live on Railway, Telegram bot active
