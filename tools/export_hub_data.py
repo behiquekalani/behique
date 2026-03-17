@@ -231,6 +231,43 @@ def collect_cobo():
         return {"online": False}
 
 
+def collect_revenue():
+    """Revenue tracking — counts listings, sales, and profit."""
+    listings_dir = os.path.join(BEHIQUE, "tools", "ebay-listing-assistant", "listings")
+    revenue_file = os.path.join(BEHIQUE, "Ceiba", "revenue.json")
+
+    # Count generated listings
+    listings_ready = 0
+    try:
+        for f in os.listdir(listings_dir):
+            if f.endswith('.txt'):
+                listings_ready += 1
+    except Exception:
+        pass
+
+    # Load revenue tracking file if it exists
+    revenue_data = {
+        "current": "$0",
+        "listings_ready": listings_ready,
+        "listings_live": 0,
+        "total_sales": 0,
+        "total_profit": "$0",
+        "note": f"{listings_ready} listing(s) generated, waiting to be posted on eBay",
+    }
+
+    try:
+        if os.path.exists(revenue_file):
+            with open(revenue_file) as f:
+                saved = json.load(f)
+                revenue_data.update(saved)
+                # Always refresh listings_ready count
+                revenue_data["listings_ready"] = listings_ready
+    except Exception:
+        pass
+
+    return revenue_data
+
+
 def export():
     """Collect all data and write hub.json."""
     hub = {
@@ -244,7 +281,7 @@ def export():
         "bridge": collect_bridge(),
         "primer": collect_primer(),
         "cobo": collect_cobo(),
-        "revenue": {"current": 0, "note": "Funko Pop listing ready, not yet posted"},
+        "revenue": collect_revenue(),
     }
     return hub
 

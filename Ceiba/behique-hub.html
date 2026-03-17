@@ -242,10 +242,79 @@ body::after {
   padding: 12px;
   margin-top: 16px;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
-.revenue-amount { font-size: 24px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
-.revenue-label { font-size: 7px; color: var(--text-dim); margin-top: 4px; }
-.revenue-note { font-size: 7px; color: var(--orange); margin-top: 6px; }
+.revenue-banner::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 200%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,215,0,0.06) 50%, transparent 100%);
+  animation: revenueSweep 4s ease-in-out infinite;
+}
+@keyframes revenueSweep { 0% { transform: translateX(-50%); } 100% { transform: translateX(50%); } }
+.revenue-amount { font-size: 24px; color: var(--gold); text-shadow: 2px 2px 0 #000; position: relative; }
+.revenue-label { font-size: 7px; color: var(--text-dim); margin-top: 4px; position: relative; }
+.revenue-note { font-size: 7px; color: var(--orange); margin-top: 6px; position: relative; }
+.revenue-breakdown {
+  display: flex; gap: 20px; justify-content: center; margin-top: 10px;
+  position: relative;
+}
+.revenue-stat { text-align: center; }
+.revenue-stat-num { font-size: 11px; font-weight: bold; }
+.revenue-stat-label { font-size: 6px; color: var(--text-dim); margin-top: 2px; }
+
+/* ============ CEIBA FACE WIDGET ============ */
+.ceiba-face-widget {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  background: var(--bg2);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 16px;
+}
+.ceiba-face-canvas {
+  width: 64px; height: 64px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.ceiba-face-canvas .eye {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--green);
+}
+.ceiba-face-canvas .eye.left { top: 22px; left: 17px; }
+.ceiba-face-canvas .eye.right { top: 22px; right: 17px; }
+.ceiba-face-canvas .mouth {
+  position: absolute;
+  bottom: 18px; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 3px;
+  background: var(--green);
+  border-radius: 2px;
+}
+.ceiba-face-canvas .glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,255,136,0.15) 0%, transparent 70%);
+  animation: faceGlow 3s ease-in-out infinite;
+}
+@keyframes faceGlow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+.ceiba-face-status { flex: 1; }
+.ceiba-face-name { font-size: 10px; color: var(--green); margin-bottom: 4px; }
+.ceiba-face-mood { font-size: 7px; color: var(--text-dim); }
+.ceiba-face-uptime { font-size: 6px; color: var(--cyan); margin-top: 4px; }
 
 /* ============ QUEST STYLES ============ */
 .quest-filters {
@@ -645,11 +714,11 @@ let QUEST_DATA = {
       { text: "ceiba_run.py orchestrator", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
       { text: "CMP (Ceiba Memory Protocol)", done: true, difficulty: "hard", time_est: "6h", reward_tier: 4 },
       { text: "Self-healing vault", done: true, difficulty: "medium", time_est: "3h", reward_tier: 2 },
-      { text: "Memory ingestion protocol", done: false, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Memory ingestion protocol", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
       { text: "Real embeddings search", done: false, difficulty: "hard", time_est: "6h", reward_tier: 4 },
-      { text: "Graph-aware prompting", done: false, difficulty: "hard", time_est: "4h", reward_tier: 4 },
-      { text: "YAML typed relationships", done: false, difficulty: "easy", time_est: "2h", reward_tier: 1 },
-      { text: "Vault template system", done: false, difficulty: "easy", time_est: "1h", reward_tier: 1 }
+      { text: "Graph-aware context engine", done: true, difficulty: "hard", time_est: "4h", reward_tier: 4 },
+      { text: "YAML typed relationships", done: true, difficulty: "easy", time_est: "2h", reward_tier: 1 },
+      { text: "Vault template system", done: true, difficulty: "easy", time_est: "1h", reward_tier: 1 }
     ]},
     { id: "behiquebot", name: "BehiqueBot", type: "SIDE", status: "active", reward: "24/7 accountability AI", reward_tier: 4, objectives: [
       { text: "Deploy on Railway", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
@@ -678,8 +747,11 @@ let QUEST_DATA = {
       { text: "Behique Command Hub (N64)", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
       { text: "Quest filters + sort", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
       { text: "Browse tab (search+sort all)", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
-      { text: "Load from quests.json", done: false, difficulty: "easy", time_est: "30m", reward_tier: 1 },
-      { text: "Habit tracker", done: false, difficulty: "medium", time_est: "3h", reward_tier: 2 }
+      { text: "Load from quests.json", done: true, difficulty: "easy", time_est: "30m", reward_tier: 1 },
+      { text: "Habit tracker", done: true, difficulty: "medium", time_est: "3h", reward_tier: 2 },
+      { text: "MAP hover path highlighting", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Ceiba face widget on HUB", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Revenue tracker on HUB", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 }
     ]},
     { id: "revenue-diversification", name: "Revenue Diversification", type: "FUTURE", status: "locked", reward: "Multiple income streams", reward_tier: 5, objectives: [
       { text: "Shopify store + logo", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
@@ -822,7 +894,7 @@ function renderApp() {
     <div class="refresh-bar">
       <button onclick="doRefresh()">\u21BB REFRESH</button>
     </div>
-    <div class="footer">BEHIQUE COMMAND HUB v3.2 \u2022 CEIBA + COBO \u2022 ${new Date().getFullYear()}</div>
+    <div class="footer">BEHIQUE COMMAND HUB v3.3 \u2022 CEIBA + COBO \u2022 ${new Date().getFullYear()}</div>
   `;
   renderHubTab();
   renderQuestsTab();
@@ -866,11 +938,43 @@ function renderHubTab() {
   const pct = session.completion_pct||0;
   const bt = (backlog.done||0)+(backlog.ready||0)+(backlog.blocked||0)+(backlog.future||0)+(backlog.killed||0);
 
+  // Calculate quest stats for Ceiba face mood
+  let totalObjs = 0, doneObjs = 0;
+  QUEST_DATA.missions.forEach(m => { m.objectives.forEach(o => { totalObjs++; if(o.done) doneObjs++; }); });
+  const questPct = Math.round(doneObjs/totalObjs*100);
+  const moodEmoji = questPct >= 70 ? '⚡' : questPct >= 40 ? '🔧' : '💤';
+  const moodText = questPct >= 70 ? 'FOCUSED — systems nominal' : questPct >= 40 ? 'BUILDING — progress steady' : 'IDLE — awaiting orders';
+  const mouthShape = questPct >= 60 ? 'border-radius: 0 0 8px 8px; height: 6px;' : 'height: 3px;';
+
   document.getElementById('tab-hub').innerHTML = `
+    <div class="ceiba-face-widget">
+      <div class="ceiba-face-canvas">
+        <div class="glow"></div>
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="mouth" style="${mouthShape}"></div>
+      </div>
+      <div class="ceiba-face-status">
+        <div class="ceiba-face-name">${moodEmoji} CEIBA ONLINE</div>
+        <div class="ceiba-face-mood">${moodText}</div>
+        <div class="ceiba-face-uptime">VAULT: ${vault.nodes||0} nodes • ${vault.edges||0} edges • HEALTH: ${vault.health||'?'}/100</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:14px;color:var(--gold)">${questPct}%</div>
+        <div style="font-size:6px;color:var(--text-dim)">QUESTS</div>
+        <div style="font-size:8px;color:var(--cyan);margin-top:2px">${doneObjs}/${totalObjs}</div>
+      </div>
+    </div>
     <div class="revenue-banner">
       <div class="revenue-amount">${revenue.current||'$0'}</div>
       <div class="revenue-label">LIFETIME REVENUE</div>
       ${revenue.note?`<div class="revenue-note">${revenue.note}</div>`:''}
+      <div class="revenue-breakdown">
+        <div class="revenue-stat"><div class="revenue-stat-num" style="color:var(--cyan)">${revenue.listings_ready||0}</div><div class="revenue-stat-label">LISTINGS READY</div></div>
+        <div class="revenue-stat"><div class="revenue-stat-num" style="color:var(--orange)">${revenue.listings_live||0}</div><div class="revenue-stat-label">LIVE ON EBAY</div></div>
+        <div class="revenue-stat"><div class="revenue-stat-num" style="color:var(--green)">${revenue.total_sales||0}</div><div class="revenue-stat-label">SALES</div></div>
+        <div class="revenue-stat"><div class="revenue-stat-num" style="color:var(--gold)">${revenue.total_profit||'$0'}</div><div class="revenue-stat-label">PROFIT</div></div>
+      </div>
     </div>
     <div class="grid">
       <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDDA5\uFE0F</span><h2>Cluster</h2></div><div class="panel-body">

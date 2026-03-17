@@ -30,6 +30,8 @@ import os
 import re
 import sys
 import json
+import time
+import hashlib
 import argparse
 from collections import defaultdict
 from pathlib import Path
@@ -106,8 +108,33 @@ TOPIC_KEYWORDS = {
 class VaultContextEngine:
     """Graph-aware context loader for the vault."""
 
+    # In-memory cache: hash → (timestamp, results)
+    _cache = {}
+    _CACHE_TTL = 300  # 5 minutes
+
     def __init__(self, graph_path=None):
         self.graph = VaultGraph(graph_path) if graph_path else VaultGraph()
+
+    def _cache_key(self, *args) -> str:
+        """Create a stable cache key from arguments."""
+        raw = json.dumps(args, sort_keys=True, default=str)
+        return hashlib.md5(raw.encode()).hexdigest()
+
+    def _get_cached(self, key: str):
+        """Return cached result if fresh, else None."""
+        if key in self._cache:
+            ts, results = self._cache[key]
+            if time.time() - ts < self._CACHE_TTL:
+                return results
+            del self._cache[key]
+        return None
+
+    def _set_cached(self, key: str, results):
+        """Store results in cache. Evict oldest if cache > 50 entries."""
+        if len(self._cache) > 50:
+            oldest_key = min(self._cache, key=lambda k: self._cache[k][0])
+            del self._cache[oldest_key]
+        self._cache[key] = (time.time(), results)
 
     def context_for(self, topic: str, top_n: int = 7, include_content: bool = False) -> list:
         """
@@ -116,6 +143,13 @@ class VaultContextEngine:
         Returns list of dicts:
           [{"node": name, "path": abs_path, "score": float, "type": str, "via": str}, ...]
         """
+        # Check cache first (skip if content requested — always fresh)
+        if not include_content:
+            cache_key = self._cache_key("context_for", topic, top_n)
+            cached = self._get_cached(cache_key)
+            if cached is not None:
+                return cached
+
         candidates = {}  # node_name → {score, via}
 
         # 1. Direct node resolution
@@ -205,29 +239,63 @@ class VaultContextEngine:
                 except Exception:
                     entry["content"] = ""
 
+        # Cache result (only if no content — content makes it too large)
+        if not include_content:
+            cache_key = self._cache_key("context_for", topic, top_n)
+            self._set_cached(cache_key, result)
+
         return result
 
     def context_for_prompt(self, prompt: str, top_n: int = 7) -> list:
         """
         Extract topics from a natural language prompt and find relevant context.
-        Combines results from all detected topics.
+        Combines results from all detected topics with fusion scoring.
         """
+        # Cache check
+        cache_key = self._cache_key("context_for_prompt", prompt, top_n)
+        cached = self._get_cached(cache_key)
+        if cached is not None:
+            return cached
+
         topics = self._extract_topics(prompt)
         if not topics:
             # Fallback: use the whole prompt as a search query
             return self.context_for(prompt, top_n=top_n)
 
-        # Merge results from all topics
-        all_results = {}
+        # Fusion scoring: nodes that appear in multiple topic queries get boosted
+        node_hits = defaultdict(list)  # node → list of (result, topic)
         for topic in topics:
             results = self.context_for(topic, top_n=top_n * 2)
             for r in results:
-                node = r["node"]
-                if node not in all_results or r["score"] > all_results[node]["score"]:
-                    all_results[node] = r
+                node_hits[r["node"]].append((r, topic))
+
+        # Merge with fusion boost: +15% per additional topic match
+        all_results = {}
+        for node, hits in node_hits.items():
+            best = max(hits, key=lambda h: h[0]["score"])
+            result = best[0].copy()
+            fusion_boost = 1.0 + 0.15 * (len(hits) - 1)
+            result["score"] = round(result["score"] * fusion_boost, 3)
+            if len(hits) > 1:
+                result["via"] += f" +fusion({len(hits)} topics)"
+            all_results[node] = result
 
         merged = sorted(all_results.values(), key=lambda x: -x["score"])
-        return merged[:top_n]
+        result = merged[:top_n]
+
+        self._set_cached(cache_key, result)
+        return result
+
+    def context_summary(self, topic: str, top_n: int = 5) -> str:
+        """
+        One-liner context summary for a topic — useful for quick lookups.
+        Returns formatted string: "topic → node1 (type), node2 (type), ..."
+        """
+        results = self.context_for(topic, top_n=top_n)
+        if not results:
+            return f"{topic} → (no matches)"
+        items = [f"{r['node']} ({r['type']}, {r['score']})" for r in results]
+        return f"{topic} → {', '.join(items)}"
 
     def context_for_cwd(self, cwd: str, top_n: int = 7) -> list:
         """
@@ -295,24 +363,56 @@ class VaultContextEngine:
             candidates[node] = {"score": score, "via": via}
 
     def _extract_topics(self, prompt: str) -> list:
-        """Extract likely topic names from a prompt."""
+        """Extract likely topic names from a prompt using multi-strategy NLP."""
         topics = []
         prompt_lower = prompt.lower()
 
-        # Check keyword map
+        # 1. Check keyword map (highest priority)
         for keyword in TOPIC_KEYWORDS:
             if keyword in prompt_lower:
                 topics.append(keyword)
 
-        # Extract quoted strings
+        # 2. Extract quoted strings
         quoted = re.findall(r'"([^"]+)"', prompt)
         topics.extend(quoted)
 
-        # Extract capitalized words that might be project names
+        # 3. Extract CamelCase words (project names like BehiqueBot, OpenClaw)
         caps = re.findall(r'\b[A-Z][a-zA-Z]+(?:[A-Z][a-zA-Z]+)+\b', prompt)
         topics.extend(caps)
 
-        return topics
+        # 4. Extract hyphenated compound terms (ebay-listing, vault-graph)
+        hyphenated = re.findall(r'\b[a-zA-Z]+-[a-zA-Z]+(?:-[a-zA-Z]+)*\b', prompt)
+        topics.extend(hyphenated)
+
+        # 5. Extract file/tool references (.py files, path fragments)
+        files = re.findall(r'\b[\w_]+\.(?:py|sh|js|html|json|md)\b', prompt)
+        for f in files:
+            # Strip extension and use as topic
+            name = f.rsplit('.', 1)[0]
+            topics.append(name)
+
+        # 6. Extract action→domain patterns ("list on ebay" → ebay, "fix the bridge" → bridge)
+        action_patterns = [
+            r'(?:list|sell|post|publish)\s+(?:on\s+)?(\w+)',
+            r'(?:fix|debug|update|upgrade|build|deploy)\s+(?:the\s+)?(\w+)',
+            r'(?:check|scan|query|search)\s+(?:the\s+)?(\w+)',
+        ]
+        for pattern in action_patterns:
+            matches = re.findall(pattern, prompt_lower)
+            for m in matches:
+                if m not in ('the', 'a', 'an', 'it', 'this', 'that', 'my', 'our'):
+                    topics.append(m)
+
+        # 7. Deduplicate while preserving order
+        seen = set()
+        unique = []
+        for t in topics:
+            t_lower = t.lower()
+            if t_lower not in seen:
+                seen.add(t_lower)
+                unique.append(t)
+
+        return unique
 
 
 # ============ CLI ============
