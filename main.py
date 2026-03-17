@@ -4,10 +4,11 @@ import json
 from datetime import datetime
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, ContextTypes, filters
 
 from modules.classifier import classify_input
 from modules.memory import save_entry, update_entry, find_related_entry, log_to_archive, get_daily_summary
+from modules.ebay_command import handle_ebay_command
 
 load_dotenv()
 
@@ -140,6 +141,7 @@ def main():
     logger.info("Behique is running...")
     app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
+    app.add_handler(CommandHandler("ebay", handle_ebay_command))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 

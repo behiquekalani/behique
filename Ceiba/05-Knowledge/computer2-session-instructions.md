@@ -1,3 +1,10 @@
+---
+title: "computer2-session-instructions"
+type: knowledge
+tags: [paste, this, into]
+created: 2026-03-16
+---
+
 # PASTE THIS INTO CLAUDE CODE ON COMPUTER 2
 
 You are running on Computer 2 (192.168.0.151), Kalani's Windows worker node. The main Ceiba instance is running on his Mac. Your job is one thing: get n8n a stable HTTPS webhook URL via a named Cloudflare tunnel.

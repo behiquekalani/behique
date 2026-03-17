@@ -1,3 +1,10 @@
+---
+title: "computer2-full-context"
+type: knowledge
+tags: [computer]
+created: 2026-03-16
+---
+
 # Computer 2 — Full Context Brief
 
 Paste this entire thing into Claude Code on Computer 2. It gives you everything you need.

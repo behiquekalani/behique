@@ -1,3 +1,10 @@
+---
+title: "session-2026-03-15-capture"
+type: knowledge
+tags: [session, capture, the, most, important]
+created: 2026-03-16
+---
+
 # Session Capture — 2026-03-15
 # The most important things from today that aren't in the architecture doc.
 # Read this after architecture-spine.md. It's the "why we changed priorities" doc.

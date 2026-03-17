@@ -1,3 +1,10 @@
+---
+title: "News-Intelligence-Bots"
+type: project
+tags: [news, intelligence, bots]
+created: 2026-03-16
+---
+
 # News Intelligence Bots
 
 Status: Idea — not started

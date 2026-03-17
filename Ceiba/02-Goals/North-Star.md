@@ -1,3 +1,10 @@
+---
+title: "North-Star"
+type: goal
+tags: [north, star]
+created: 2026-03-16
+---
+
 # North Star
 
 ## The Vision

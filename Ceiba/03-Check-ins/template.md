@@ -1,3 +1,10 @@
+---
+title: "template"
+type: session
+tags: [daily, check-in, template]
+created: 2026-03-16
+---
+
 # Daily Check-In Template
 *Copy this file, rename to YYYY-MM-DD.md, fill in honestly*
 *Related: [[04-Patterns/observations]] | [[01-Projects/MISSIONS]]*

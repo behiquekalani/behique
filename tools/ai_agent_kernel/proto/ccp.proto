@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package ccp;
+
+// Task lifecycle status
+enum TaskStatus {
+    UNKNOWN = 0;
+    PENDING = 1;
+    RUNNING = 2;
+    COMPLETED = 3;
+    FAILED = 4;
+    PERMANENTLY_FAILED = 5;
+}
+
+// Header: attached to every message
+message Header {
+    string version = 1;        // e.g. "1.0"
+    string message_id = 2;     // UUID
+    string timestamp = 3;      // ISO8601 UTC string
+    string source = 4;         // "Ceiba" or "Cobo"
+    string destination = 5;    // "Ceiba" or "Cobo"
+    string correlation_id = 6; // groups messages in a task lifecycle
+}
+
+// Task: sent by Ceiba to start work on Cobo
+message Task {
+    string task_id = 1;
+    string task_type = 2;               // e.g. "browser_action", "scrape", "shell", "skill"
+    string description = 3;
+    map<string, string> parameters = 4;
+    int32 timeout_ms = 5;               // max execution time
+    string priority = 6;                // "low", "medium", "high", "critical"
+    bool memory_hook = 7;               // if true, log to CMP
+}
+
+// Status update: sent by Cobo during execution
+message TaskStatusUpdate {
+    string task_id = 1;
+    TaskStatus status = 2;
+    int32 progress = 3;    // 0-100
+    string detail = 4;     // human-readable progress info
+}
+
+// Result: sent by Cobo when task completes
+message TaskResult {
+    string task_id = 1;
+    bool success = 2;
+    string result_json = 3;             // JSON stringified result
+    int64 runtime_ms = 4;
+    map<string, string> metadata = 5;   // extra context (executor, file paths, etc.)
+}
+
+// Error: sent by Cobo on failure
+message TaskError {
+    string task_id = 1;
+    int32 error_code = 2;
+    string message = 3;
+    bool retryable = 4;
+}
+
+// Retry request: sent by Ceiba after a retryable failure
+message RetryRequest {
+    string task_id = 1;
+    string reason = 2;
+    int32 attempt = 3;
+    int32 max_attempts = 4;
+}
+
+// Heartbeat: keeps stream alive, either direction
+message Heartbeat {
+    string source = 1;
+    string status = 2;      // "alive", "busy", "draining"
+    string timestamp = 3;
+}
+
+// Envelope: wraps all message types on the stream
+message TaskMessage {
+    Header header = 1;
+
+    oneof body {
+        Task              task_init       = 2;
+        TaskStatusUpdate  status_update   = 3;
+        TaskResult        result          = 4;
+        TaskError         error           = 5;
+        RetryRequest      retry_request   = 6;
+        Heartbeat         heartbeat       = 7;
+    }
+}
+
+// Service: single bidirectional stream
+service CeibaCobo {
+    rpc TaskStream (stream TaskMessage) returns (stream TaskMessage);
+}

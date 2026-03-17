@@ -1,3 +1,15 @@
+---
+title: "ceiba-cobo-grpc-prototype"
+type: design
+tags: [ceiba-cobo, communication, protocol:]
+
+projects:
+  - Computer-2
+systems:
+  - SYS_Bridge
+created: 2026-03-16
+---
+
 # Ceiba-Cobo Communication Protocol: Protobuf + gRPC Streaming Prototype
 
 ---

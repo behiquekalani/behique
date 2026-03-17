@@ -1,3 +1,10 @@
+---
+title: "MISSIONS"
+type: project
+tags: [missions, kalani's, framed, like, last]
+created: 2026-03-16
+---
+
 # MISSIONS — Kalani's Project Map
 # Framed like a game because that's how your brain works best
 # Last updated: 2026-03-14 by Ceiba

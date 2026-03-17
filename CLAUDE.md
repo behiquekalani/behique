@@ -1,3 +1,10 @@
+---
+title: "CLAUDE"
+type: unknown
+tags: [claude.md, static, who, you, are]
+created: 2026-03-16
+---
+
 # CLAUDE.md — Static Rules & Identity
 # Who you are talking to: Kalani
 # Last updated: manually (this file does not auto-update)

@@ -1,3 +1,10 @@
+---
+title: "COMPUTER2_MIND"
+type: system
+tags: [computer, paste, this, entire, this]
+created: 2026-03-16
+---
+
 # Computer 2 — Full Operating Context
 # Paste this entire document into Claude Code on Computer 2.
 # This gives you everything you need to operate as part of the system.

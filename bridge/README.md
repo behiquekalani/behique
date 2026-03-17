@@ -1,3 +1,10 @@
+---
+title: "README"
+type: system
+tags: [bridge]
+created: 2026-03-16
+---
+
 # Bridge
 
 Shared task queue between Computer 1 and Computer 2.

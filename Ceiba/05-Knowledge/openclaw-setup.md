@@ -1,3 +1,10 @@
+---
+title: "openclaw-setup"
+type: knowledge
+tags: [openclaw, setup]
+created: 2026-03-16
+---
+
 # OpenClaw Setup — Both Computers
 
 ## Computer 1 (Mac — Kalani's main machine)

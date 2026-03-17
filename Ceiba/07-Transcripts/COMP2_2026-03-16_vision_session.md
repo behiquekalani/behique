@@ -1,3 +1,10 @@
+---
+title: "COMP2_2026-03-16_vision_session"
+type: unknown
+tags: [comp2, session, transcript]
+created: 2026-03-16
+---
+
 # Comp2 Session Transcript Summary — 2026-03-16
 ## ChatGPT on Cobo (relayed by Kalani)
 

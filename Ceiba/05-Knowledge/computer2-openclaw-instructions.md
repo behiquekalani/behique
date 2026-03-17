@@ -1,3 +1,10 @@
+---
+title: "computer2-openclaw-instructions"
+type: knowledge
+tags: [instructions, for, claude]
+created: 2026-03-16
+---
+
 # Instructions for Claude Code on Computer 2
 
 You are setting up OpenClaw on this machine. This machine runs Ollama (llama3.2) and serves as the local AI server on the network at 192.168.0.151.

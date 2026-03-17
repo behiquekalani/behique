@@ -1,3 +1,17 @@
+---
+title: "ceiba-cobo-communication-protocol-ccp"
+type: design
+tags: [ceiba–cobo, communication, protocol]
+
+projects:
+  - Computer-2
+  - Spine-Architecture
+systems:
+  - SYS_Bridge
+  - SYS_AI_Cluster
+created: 2026-03-16
+---
+
 # Ceiba–Cobo Communication Protocol (CCP) Specification
 **Source:** ChatGPT (2026-03-16)
 **Status:** DESIGN — needs implementation

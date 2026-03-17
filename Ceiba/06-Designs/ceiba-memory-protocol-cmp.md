@@ -1,3 +1,15 @@
+---
+title: "ceiba-memory-protocol-cmp"
+type: design
+tags: [ceiba, memory, protocol]
+
+projects:
+  - Spine-Architecture
+systems:
+  - SYS_AI_Cluster
+created: 2026-03-16
+---
+
 # Ceiba Memory Protocol (CMP) Specification
 **Source:** ChatGPT (2026-03-16)
 **Status:** DESIGN — needs implementation

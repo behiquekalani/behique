@@ -1,3 +1,10 @@
+---
+title: "screen-assistant-idea"
+type: knowledge
+tags: [idea:, real-time, screen]
+created: 2026-03-16
+---
+
 # Idea: Real-Time Screen Assistant
 
 **Captured:** 2026-03-14

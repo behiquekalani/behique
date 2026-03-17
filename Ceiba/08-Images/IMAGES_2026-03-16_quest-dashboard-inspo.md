@@ -1,3 +1,10 @@
+---
+title: "IMAGES_2026-03-16_quest-dashboard-inspo"
+type: unknown
+tags: [quest, dashboard, inspiration]
+created: 2026-03-16
+---
+
 # Quest Dashboard Inspiration — 2026-03-16
 ## Source: @mindsetstack60 on Instagram — "FocusLab Weekly" Google Sheets template
 

@@ -1,0 +1,296 @@
+#!/usr/bin/env python3
+"""
+ceiba — Unified CLI for the Behique AI Cluster
+
+Usage:
+    ceiba start                        # Full session startup (graph + hub + briefing)
+    ceiba start --plan "Fix bugs"      # Startup with planned tasks
+    ceiba briefing                     # Morning intelligence briefing
+    ceiba briefing --short             # Compact briefing
+    ceiba graph stats                  # Vault graph statistics
+    ceiba graph search "eBay"          # Search vault nodes
+    ceiba graph hubs                   # Most connected nodes
+    ceiba graph neighbors NODE         # Node connections
+    ceiba graph context TOPIC          # BFS context around topic
+    ceiba graph path START END         # Shortest path
+    ceiba session start "task1,task2"  # Start session tracking
+    ceiba session log "Did X" --type completed
+    ceiba session report               # Forensics report
+    ceiba session drift                # Quick drift check
+    ceiba export                       # Export hub.json for dashboards
+    ceiba wake                         # Cluster health check (wake.sh)
+    ceiba sleep                        # Session teardown (sleep.sh)
+    ceiba ingest                       # Ingest today's session into CMP
+    ceiba ingest --all                 # Ingest all available dates
+    ceiba heal                         # Vault health report
+    ceiba heal --fix                   # Auto-fix vault issues
+    ceiba template --list              # Show available vault templates
+    ceiba template project "My Proj"   # Create vault file from template
+    ceiba template --apply-missing     # Upgrade stub files to templates
+    ceiba list "Product" 29.99         # Quick eBay listing
+    ceiba status                       # One-line system status
+"""
+
+import os
+import sys
+import json
+import subprocess
+import time
+from pathlib import Path
+
+BEHIQUE = os.path.expanduser("~/behique")
+TOOLS = os.path.join(BEHIQUE, "tools")
+
+
+def run_tool(cmd, cwd=None):
+    """Run a tool and stream output."""
+    try:
+        result = subprocess.run(
+            cmd,
+            cwd=cwd or BEHIQUE,
+            timeout=60,
+        )
+        return result.returncode == 0
+    except subprocess.TimeoutExpired:
+        print("⚠️  Timed out")
+        return False
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return False
+
+
+def cmd_start(args):
+    """Full session startup."""
+    cmd = [sys.executable, os.path.join(TOOLS, "ceiba_run.py")]
+    if "--plan" in args:
+        idx = args.index("--plan")
+        if idx + 1 < len(args):
+            cmd.extend(["--plan", args[idx + 1]])
+    if "--skip-graph" in args:
+        cmd.append("--skip-graph")
+    if "--skip-briefing" in args:
+        cmd.append("--skip-briefing")
+    run_tool(cmd)
+
+
+def cmd_briefing(args):
+    """Morning intelligence briefing."""
+    cmd = [sys.executable, os.path.join(TOOLS, "morning_briefing.py")]
+    if "--short" in args:
+        cmd.append("--short")
+    if "--json" in args:
+        cmd.append("--json")
+    run_tool(cmd)
+
+
+def cmd_graph(args):
+    """Vault graph queries."""
+    if not args:
+        args = ["stats"]
+    cmd = [sys.executable, os.path.join(TOOLS, "graph_query.py")] + args
+    run_tool(cmd)
+
+
+def cmd_session(args):
+    """Session tracking."""
+    if not args:
+        args = ["drift"]
+    cmd = [sys.executable, os.path.join(TOOLS, "session_tracker.py")] + args
+    run_tool(cmd)
+
+
+def cmd_export(args):
+    """Export hub.json."""
+    run_tool([sys.executable, os.path.join(TOOLS, "export_hub_data.py")])
+
+
+def cmd_wake(args):
+    """Cluster health check."""
+    wake = os.path.join(BEHIQUE, "bridge", "wake.sh")
+    if os.path.exists(wake):
+        run_tool(["bash", wake] + args)
+    else:
+        print("❌ bridge/wake.sh not found")
+
+
+def cmd_sleep(args):
+    """Session teardown."""
+    sleep = os.path.join(BEHIQUE, "bridge", "sleep.sh")
+    if os.path.exists(sleep):
+        run_tool(["bash", sleep] + args)
+    else:
+        print("❌ bridge/sleep.sh not found")
+
+
+def cmd_ingest(args):
+    """Memory ingestion."""
+    cmd = [sys.executable, os.path.join(TOOLS, "memory_ingest.py")]
+    if "--all" in args:
+        cmd.append("--all")
+    if "--dry-run" in args:
+        cmd.append("--dry-run")
+    if "--json" in args:
+        cmd.append("--json")
+    if "--date" in args:
+        idx = args.index("--date")
+        if idx + 1 < len(args):
+            cmd.extend(["--date", args[idx + 1]])
+    run_tool(cmd)
+
+
+def cmd_heal(args):
+    """Vault self-healer."""
+    cmd = [sys.executable, os.path.join(TOOLS, "vault_healer.py")]
+    if "--fix" in args:
+        cmd.append("--fix")
+    if "--json" in args:
+        cmd.append("--json")
+    run_tool(cmd)
+
+
+def cmd_template(args):
+    """Vault template system."""
+    cmd = [sys.executable, os.path.join(TOOLS, "vault_templates.py")]
+    if "--list" in args:
+        cmd.append("--list")
+    elif "--apply-missing" in args:
+        cmd.append("--apply-missing")
+        if "--dry-run" in args:
+            cmd.append("--dry-run")
+    elif len(args) >= 2:
+        cmd.extend(args[:2])
+        if "--dry-run" in args:
+            cmd.append("--dry-run")
+    else:
+        print('Usage: ceiba template <type> "Name"')
+        print('       ceiba template --list')
+        print('       ceiba template --apply-missing')
+        return
+    run_tool(cmd)
+
+
+def cmd_list(args):
+    """Quick eBay listing."""
+    if not args:
+        print("Usage: ceiba list \"Product Name\" --price 29.99")
+        return
+    cmd = [sys.executable, os.path.join(TOOLS, "ebay-listing-assistant", "quick_list.py")] + args
+    run_tool(cmd)
+
+
+def cmd_status(args):
+    """One-line system status."""
+    status_parts = []
+
+    # Git
+    try:
+        branch = subprocess.run(
+            ["git", "branch", "--show-current"],
+            capture_output=True, text=True, cwd=BEHIQUE, timeout=5
+        ).stdout.strip()
+        commits = len([l for l in subprocess.run(
+            ["git", "log", "--oneline", "--since=midnight"],
+            capture_output=True, text=True, cwd=BEHIQUE, timeout=5
+        ).stdout.strip().split("\n") if l])
+        uncommitted = len([l for l in subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True, text=True, cwd=BEHIQUE, timeout=5
+        ).stdout.strip().split("\n") if l])
+        status_parts.append(f"git:{branch} {commits}c {uncommitted}u")
+    except Exception:
+        pass
+
+    # Vault
+    graph_path = os.path.join(BEHIQUE, "Ceiba", "vault_graph.json")
+    if os.path.exists(graph_path):
+        try:
+            with open(graph_path) as f:
+                data = json.load(f)
+            nodes = len(data.get("nodes", {}))
+            missing = data.get("stats", {}).get("missing_targets", 0)
+            status_parts.append(f"vault:{nodes}n/{missing}m")
+        except Exception:
+            pass
+
+    # CMP
+    cmp_path = os.path.join(TOOLS, "ai_agent_kernel", "cmp.db")
+    if os.path.exists(cmp_path):
+        try:
+            import sqlite3
+            conn = sqlite3.connect(cmp_path)
+            total = conn.execute("SELECT COUNT(*) FROM memories").fetchone()[0]
+            today = conn.execute(
+                "SELECT COUNT(*) FROM memories WHERE date(timestamp) = date('now')"
+            ).fetchone()[0]
+            conn.close()
+            status_parts.append(f"cmp:{total}/{today}t")
+        except Exception:
+            pass
+
+    # Cobo
+    try:
+        result = subprocess.run(
+            ["ping", "-c", "1", "-W", "2", "192.168.0.151"],
+            capture_output=True, timeout=5
+        )
+        cobo = "🟢" if result.returncode == 0 else "🔴"
+        status_parts.append(f"cobo:{cobo}")
+    except Exception:
+        status_parts.append("cobo:?")
+
+    # Primer age
+    primer = os.path.join(BEHIQUE, "primer.md")
+    if os.path.exists(primer):
+        age_min = int((time.time() - os.path.getmtime(primer)) / 60)
+        status_parts.append(f"primer:{age_min}m")
+
+    # Revenue
+    status_parts.append("rev:$0")
+
+    print(f"  ⚡ {' | '.join(status_parts)}")
+
+
+COMMANDS = {
+    "start": cmd_start,
+    "briefing": cmd_briefing,
+    "brief": cmd_briefing,
+    "graph": cmd_graph,
+    "g": cmd_graph,
+    "session": cmd_session,
+    "s": cmd_session,
+    "export": cmd_export,
+    "wake": cmd_wake,
+    "sleep": cmd_sleep,
+    "list": cmd_list,
+    "l": cmd_list,
+    "status": cmd_status,
+    "st": cmd_status,
+    "ingest": cmd_ingest,
+    "i": cmd_ingest,
+    "heal": cmd_heal,
+    "h": cmd_heal,
+    "template": cmd_template,
+    "t": cmd_template,
+}
+
+
+def main():
+    args = sys.argv[1:]
+
+    if not args or args[0] in ("-h", "--help", "help"):
+        print(__doc__)
+        return
+
+    cmd = args[0].lower()
+    rest = args[1:]
+
+    handler = COMMANDS.get(cmd)
+    if handler:
+        handler(rest)
+    else:
+        print(f"❌ Unknown command: {cmd}")
+        print(f"   Available: {', '.join(sorted(set(k for k in COMMANDS if len(k) > 2)))}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,3 +1,10 @@
+---
+title: "ARCHITECTURE"
+type: system
+tags: [ceiba, cobo, built:, 2026-03-15, status:]
+created: 2026-03-16
+---
+
 # Ceiba + Cobo — Distributed AI Cluster Architecture
 # Built: 2026-03-15
 # Status: OPERATIONAL — kernel tested, all routes working

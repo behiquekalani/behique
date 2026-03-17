@@ -1,3 +1,10 @@
+---
+title: "HOME"
+type: unknown
+tags: [ceiba]
+created: 2026-03-16
+---
+
 # 🌳 CEIBA — Command Center
 *Named after the sacred Taíno ceiba tree. The axis that connects all worlds.*
 

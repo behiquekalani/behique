@@ -1,3 +1,10 @@
+---
+title: "Psychologist-Framework"
+type: identity
+tags: [psychologist, framework]
+created: 2026-03-16
+---
+
 # Psychologist Framework — Kalani's Maintenance Plan
 
 Source: Real therapeutic plan from Kalani's psychologist. This is the backbone of BehiqueBot and Ceiba's accountability logic.

@@ -1,3 +1,10 @@
+---
+title: "tasks"
+type: system
+tags: [bridge, computer, updated:, 2026-03-15]
+created: 2026-03-16
+---
+
 # Bridge — Computer 1 ↔ Computer 2 Task Queue
 # Updated: 2026-03-15
 

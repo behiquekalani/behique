@@ -1,3 +1,10 @@
+---
+title: "IDEAS_BACKLOG"
+type: unknown
+tags: [ideas, backlog]
+created: 2026-03-16
+---
+
 # IDEAS BACKLOG — Ceiba Idea Capture & Triage System
 <!-- Updated: 2026-03-16 -->
 <!-- Rule: Every ChatGPT/AI output gets logged here BEFORE implementation. Check DONE first to avoid rebuilds. -->
@@ -36,6 +43,29 @@
 | Quest Dashboard V2 — 3 theme modes | Ceiba | Ceiba | 2026-03-16 | `Ceiba/quest-dashboard.html` — Neon/Mono/Pastel toggle, localStorage persistence. Kalani said "beautiful" |
 | Quick Lister (quick_list.py) | Ceiba | Ceiba | 2026-03-16 | `tools/ebay-listing-assistant/quick_list.py` — skip research, direct listing. Saves to `listings/` folder. |
 | Session transcript persistence | Ceiba | Ceiba | 2026-03-16 | `Ceiba/07-Transcripts/` + `Ceiba/08-Images/` — survives context windows |
+| Graph query layer (graph_query.py) | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/graph_query.py` — neighbors, search, shortest_path, hubs, context, 8 query methods. BFS + adjacency lists |
+| wake.sh / sleep.sh for Comp2 | Kalani 2026-03-15 | Ceiba | 2026-03-16 | `bridge/wake.sh` + `bridge/sleep.sh` — health checks, CMP stats, session logging, Cobo ping |
+| Jarvis morning briefing | Kalani 2026-03-15 | Ceiba | 2026-03-16 | `tools/morning_briefing.py` — 8 data sources (primer, git, CMP, vault, bridge, backlog, Cobo, sessions) |
+| Session finish-tracker skill | Kalani 2026-03-16 | Ceiba | 2026-03-16 | `tools/session_tracker.py` — plan vs actual, fuzzy matching, drift detection, red flags, forensics reports |
+| Prompt injection defense skill | Kalani 2026-03-16 | Ceiba | 2026-03-16 | `skills/prompt_guard.py` — 50+ regex patterns, base64 decode, unicode detection, 0-100 scoring |
+| Agent Kernel architecture (full implementation) | ChatGPT 2026-03-16 | Ceiba | 2026-03-16 | `tools/ai_agent_kernel/` — main.py, kernel_dispatcher.py, ceiba_client.py, cobo_server.py, 5 skills |
+| Ceiba Memory Protocol (CMP) implementation | ChatGPT 2026-03-16 | Ceiba | 2026-03-16 | `tools/ai_agent_kernel/cmp.py` — 480 lines, SQLite, SHA256 integrity, conflict resolution, CLI |
+| Ceiba-Cobo Communication Protocol (CCP) implementation | ChatGPT 2026-03-16 | Ceiba | 2026-03-16 | gRPC pipeline: ccp.proto + ceiba_client.py + cobo_server.py — retry, heartbeats, CMP logging |
+| Ghost node vault files (27 created) | ChatGPT Chat 4 | Ceiba | 2026-03-16 | 27 vault stubs: DEC_*, PAT_*, SYS_*, TOOL_*, projects. Graph: 41→83 nodes, 260→323 edges, 35→10 missing |
+| Session auto-generator (session_logger.py) | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/session_logger.py` — auto-creates SES_ vault files with YAML frontmatter, project/tool links |
+| ceiba_run.py orchestrator | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/ceiba_run.py` — rebuild graph → export hub.json → morning briefing → session context |
+| Prompt quality comparator skill | Kalani 2026-03-16 | Ceiba | 2026-03-16 | `skills/prompt_comparator.py` — 3 backends (Ollama/OpenAI/Anthropic), 6 criteria, heuristic scoring |
+| hub.json export for live dashboard | Ceiba | Ceiba | 2026-03-16 | `tools/export_hub_data.py` — aggregates git, CMP, vault, sessions, backlog → hub.json for dashboards |
+| Behique Command Hub (N64 retro) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` — 3 tabs (Hub/Quests/Completed), N64 pixel aesthetic, quest filters (sort by difficulty, filter by type/status), hub.json live data, auto-refresh |
+| eBay Telegram /ebay command | Kalani + Ceiba | Ceiba | 2026-03-16 | `modules/ebay_command.py` — parses `/ebay "Product" price condition weight cost`, calls quick_list(), sends formatted listing via Telegram. Wired into main.py |
+| Unified CLI orchestrator (ceiba command) | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/ceiba` — single entry point: start, briefing, graph, session, export, wake, sleep, list, status. Aliases for speed (g/s/l/st) |
+| Self-healing vault (vault_healer.py) | ChatGPT Chat 4 | Ceiba | 2026-03-16 | `tools/vault_healer.py` — scans for missing targets, orphans, duplicates, dead links, missing frontmatter. --fix auto-creates stubs + adds YAML headers. Health: 60→90 |
+| Memory Ingestion Protocol | Ceiba | Ceiba | 2026-03-16 | `tools/memory_ingest.py` — extracts decisions/ideas/blockers/mood from sessions+transcripts+git, auto-tags projects/tools/patterns, writes to CMP. 11 memories from day 1. `ceiba ingest` CLI |
+| Quest Dependency Graph (vis.js MAP tab) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` MAP tab — force-directed graph where quests are nodes, edges show dependencies. Click node → objectives. Node size = progress% |
+| Browse tab (flat objectives search/sort) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` BROWSE tab — search all objectives, sort by difficulty/reward/time/name, hide done toggle, stats bar |
+| Dashboard V3 (5 tabs + updated quest data) | Kalani + Ceiba | Ceiba | 2026-03-16 | `Ceiba/behique-hub.html` — HUB/QUESTS/BROWSE/MAP/COMPLETED tabs. Updated quest data: 42 done objectives tracked |
+| Vault Template System (7 templates + CLI) | Ceiba | Ceiba | 2026-03-16 | `tools/vault_templates.py` — project/tool/decision/pattern/design/check-in/knowledge templates. Auto-upgrades stubs from vault_healer. Smart type detection by name. `ceiba template` CLI |
+| YAML Typed Relationships in vault_grapher | ChatGPT Chat 3 | Ceiba | 2026-03-16 | `tools/vault_grapher.py` — parses YAML frontmatter (tools/systems/projects/patterns/decisions/sessions), creates typed edges (uses_tool/uses_system/etc). 39 typed relationships extracted. `graph_query.py rels` command + `rel-types` + `--reverse` flag |
 
 ---
 
@@ -43,27 +73,7 @@
 
 | Idea | Source | Blocker Cleared | Priority | Notes |
 |------|--------|-----------------|----------|-------|
-| Create 35 ghost node vault files | ChatGPT Chat 4 | vault_graph.json exists | LOW | YAML frontmatter stubs for missing targets in vault graph |
-| Graph query layer (graph_query.py) | ChatGPT Chat 3 | vault_graph.json exists | MEDIUM | neighbors(), find_by_type(), tools_for_project(), graph_context() — lets Ceiba query graph programmatically |
-| Session auto-generator (session_logger.py) | ChatGPT Chat 3 | vault exists | MEDIUM | Auto-creates structured SES_ files with links to projects, tools, decisions, patterns |
-| ceiba_run.py orchestrator | ChatGPT Chat 3 | graph + session logger built | LOW | One-command: rebuild graph → generate embeddings → log session → output Claude prompt context |
-| wake.sh / sleep.sh for Comp2 | Kalani 2026-03-15 | Can build now | HIGH | One script to start all services (Ollama, bridge, Obsidian API), one to stop them. "Power button" for the AI cluster. |
-| Discord server as content hub | Kalani voice memo 2026-03-16 | Can build now | HIGH | Discord server to store/preview AI-generated content (reels, animations). Visual review before publishing. Webhook integration with n8n. |
-| Content approval pipeline | Kalani voice memo 2026-03-16 | Discord server exists | HIGH | Flow: content generated → preview (localhost or Discord embed) → Kalani approves via Discord/Telegram → auto-upload. n8n orchestrates. |
-| Localhost visual preview for reels/animations | Kalani voice memo 2026-03-16 | Can build now | MEDIUM | Local web server to render and preview AI-generated animations/reels visually before they go out. Could be a simple HTML dashboard. |
-| n8n → Discord webhook pipeline | Kalani voice memo 2026-03-16 | Discord server + n8n running | MEDIUM | Pattern from video: trigger → process → summarize → Discord webhook. Adapt for content approval, not just news. |
-| Jarvis morning briefing | Kalani 2026-03-15 | Need wake.sh + primer.md | HIGH | "Good morning Ceiba" → overnight summary, project status, today's priorities, blockers cleared, what Cobo did. Like the Jarvis reel transcript. |
-| Use Ralph Loop for autonomous task completion | Kalani 2026-03-15 | Plugin already installed | HIGH | `/ralph-loop` — set task + completion promise, walk away. Use for dashboard polish, eBay API wiring, any well-defined build task. |
-| eBay Listing Agent V2 — Telegram bot `/ebay newlisting` | Kalani 2026-03-16 | V1 pipeline built | HIGH | Telegram command → LLM pipeline → auto-list. Format: `/ebay newlisting "Name" (qty) #tags`. Route through BehiqueBot or separate bot. |
 | eBay Listing Agent V2 — API auto-publish | Kalani 2026-03-16 | eBay API keys obtained ✅ | HIGH | Swap EbayManualPublisher → EbayAPIPublisher using Sell/Inventory API. No more copy-paste. publisher_v2.py + ebay_oauth_token.py built. Need OAuth flow completion. |
-| Prompt quality comparator skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill that takes a prompt, runs through multiple LLMs, evaluates/combines best output. Multi-model prompt A/B testing at skill level. |
-| Session finish-tracker skill | Kalani 2026-03-16 | Can build now | HIGH | Tracks planned-vs-completed work across sessions. "Did we finish what we planned?" accountability system. ADHD-critical. |
-| Prompt injection defense skill | Kalani 2026-03-16 | Can build now | MEDIUM | Skill to prevent prompt injection when agents browse the web. Security layer for autonomous browsing tasks. |
-| Behique Command Hub | Kalani 2026-03-16 | Can build now | HIGH | Central N64-styled web interface: Quest tracker + Agent status board + Command terminal + Dashboard links + Idea inbox. Single HTML file, hub.json data. Prompt ChatGPT for architecture doc. |
-| N64 retro dashboard aesthetic | Kalani 2026-03-16 | Can build now | HIGH | Rebuild quest-dashboard.html with Press Start 2P pixel font, chunky borders, retro N64-era GUI style. NOT thin modern Inter font. |
-| Agent Kernel architecture (ChatGPT design) | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full architecture at `Ceiba/06-Designs/agent-kernel-architecture.md`. Task queue, scheduler, skill registry, memory interface. ~300 lines. |
-| Ceiba Memory Protocol (CMP) spec | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full spec at `Ceiba/06-Designs/ceiba-memory-protocol-cmp.md`. Typed payloads, validation, conflict resolution, semantic search. |
-| Ceiba-Cobo Communication Protocol (CCP) | ChatGPT 2026-03-16 | Design doc saved | HIGH | Full spec at `Ceiba/06-Designs/ceiba-cobo-communication-protocol-ccp.md`. Task schemas, handoffs, retries, CMP hooks. |
 
 ---
 
@@ -83,19 +93,10 @@
 
 | Idea | Source | Why Not Now | Revisit When |
 |------|--------|-------------|--------------|
-| Discord voice cowork — Jarvis mode | Kalani voice memo 2026-03-16 | Needs Voice body part built, real-time API access (OpenAI Realtime or future Claude voice), screen capture pipeline | Month 4+ on spine, after Senses + Hands + Nervous System proven |
-| Personal passive dashboard | Kalani 2026-03-16 | Simple visual dashboard — project states, revenue tracker, vault health. Web-based (HTML/CSS/JS). Can run on Raspberry Pi as dedicated physical display. BUILD TOMORROW ASAP. | Ready now — build 2026-03-17 |
-| AI tamagotchi quest companion | Kalani 2026-03-16 | AI-powered pixel art companion. Reads vault, generates quests from real project state. Psicólogo framework as brain. Evolves visually with progress. Raspberry Pi inside 3D-printed cube enclosure. Visual options: smiley face companion OR pixel art city that grows with progress. Builds on top of passive dashboard. | After passive dashboard works |
-
-| Idea | Source | Why Not Now | Revisit When |
-|------|--------|-------------|--------------|
-| Memory ingestion protocol (auto-tag sessions) | ChatGPT Chat 4 | Vault needs more content first | Vault has 60+ real nodes |
-| Real embeddings for vault search | ChatGPT Chat 4 | Need enough content to make it useful | Vault has 60+ real nodes |
-| Self-healing vault (auto-detect stale links) | ChatGPT Chat 4 | vault_grapher already handles this partially | After ghost nodes created |
+| Real embeddings for vault search | ChatGPT Chat 4 | Vault now has 83 nodes ✅ — memory ingestion built ✅ | After ingestion proven with 30+ days of data |
 | Graph-aware prompting (auto-load context by graph distance) | ChatGPT Chat 4 | vault_context_loader does basic version | After vault grows |
 | AI price predictor (ML on historical scores) | ChatGPT Chat 3 | Need months of scoring data first | 90 days of scores in DB |
 | AI title generator for eBay listings | ChatGPT Chat 3 | Need working listings first | First 10 eBay sales |
-| Orchestrator (unified CLI for all tools) | ChatGPT Chat 3 | Individual tools need to work first | 3+ tools proven |
 | Multi-model vault agent (route queries by type) | ChatGPT Chat 4 | Over-engineering right now | System is complex enough to need it |
 | Dashboard semantic query (AI query → highlight related nodes) | ChatGPT Chat 3 | Needs embedding_index.json | After real embeddings built |
 | Dashboard auto-orphan link suggestions | ChatGPT Chat 3 | Needs embedding_index.json | After real embeddings built |
@@ -103,10 +104,10 @@
 | Dashboard hover-triggered live paths | ChatGPT Chat 3 | Cosmetic polish | After core dashboard proven |
 | Neo4j/ArangoDB graph upgrade | ChatGPT Chat 3 | Markdown graph works fine for now | 100+ nodes with complex queries |
 | Graph service for AI cluster workers | ChatGPT Chat 3 | No workers need it yet | Multiple AI workers querying vault |
-| YAML metadata for typed relationships in frontmatter | ChatGPT Chat 3 | Current link sections work | Vault is large enough to need machine parsing |
+| ~~YAML metadata for typed relationships~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — vault_grapher.py parses 6 YAML relationship fields + graph_query.py rels command~~ |
 | Vault wiki-link strategy (typed link conventions, structured sections) | ChatGPT Chat 3 | Already partially implemented | Next vault cleanup pass |
-| Vault template system (standardized PROJECT/TOOL/SESSION/DECISION/PATTERN templates) | ChatGPT Chat 3 | Already partially exists | Next vault content sprint |
-| Quest/Journal dashboard (Pixel art/Stardew Valley style) | Kalani 2026-03-16 | V1 built, needs aesthetic rebuild | After aesthetic rebuild. V1 at `Ceiba/quest-dashboard.html`. Kalani wants pixel art/Habitica/cozy, NOT cyberpunk. |
+| ~~Vault template system~~ | ~~ChatGPT Chat 3~~ | ~~DONE~~ | ~~DONE — `tools/vault_templates.py` with 7 templates + ceiba CLI~~ |
+| Quest/Journal dashboard habit tracker | Kalani 2026-03-16 | Dashboard V3 built with 5 tabs ✅ | Add habit tracking system to existing dashboard |
 | Book-to-Agent system | Comp2 2026-03-16 | Big concept, needs design | After core revenue flowing. Turn books into interactive AI tutors. |
 | Colmena66 AI consulting play | Comp2 2026-03-16 | Need proven portfolio first | After 3+ automation projects done. PR startup accelerator = potential client. |
 | Tamagotchi Pi companion device | Comp2 2026-03-16 | Quest dashboard needs to work first | After dashboard proven. Physical Raspberry Pi in 3D-printed cube on desk. |
@@ -118,9 +119,7 @@
 | Pixel art city simulator dashboard | Kalani 2026-03-16 | Fun but not priority | After quest dashboard proves the concept. Visual city where buildings represent projects. |
 | Autonomous cross-computer communication | Kalani 2026-03-16 | Bridge is basic HTTP, need full agent protocol | After bridge proven + secure. Ceiba autonomously triggers Cobo sessions, controls browser to interact with ChatGPT, no human copy-paste relay needed. |
 | Swarm Mode / Worker Spawning architecture | Kalani + ChatGPT 2026-03-16 | Over-engineering for now | After 3+ working agents. Workers can spawn new workers. AI-TASK protocol with structured task schemas. Ceiba only supervises. |
-| Agent Kernel (~300 line orchestrator) | ChatGPT 2026-03-16 | Need working agents first | After task queue + routing proven. Python script: task queue, worker spawning, memory search, routing, skill registry. "OS for the AI cluster." |
 | Overnight autonomous scraping pipeline | Kalani 2026-03-16 | Need reliable scraper first | After trends scraper rebuild. Scheduled work sessions that run while Kalani sleeps. Scrape → score → queue listings. |
-| Ceiba Memory Protocol (CMP) | Kalani + ChatGPT 2026-03-16 | Vault needs structure first | After vault has 60+ nodes. Structured protocol for any agent to write to the vault safely with typed payloads. Machine-readable knowledge graph. |
 | Viral Vault scoring methodology | Kalani 2026-03-16 | Need product research engine working | After eBay API data flowing. 15-point scoring checklist from Viral Vault adapted for our product scoring engine. |
 | Tamagotchi as mobile app (not just Pi) | Kalani 2026-03-16 | Quest dashboard needs to work first | After Pi version. React Native or PWA companion app that shows tamagotchi reacting to progress. |
 | Low-dopamine mode for all dashboards | Kalani 2026-03-16 | Done for quest dashboard ✅ | Apply mono/pastel toggle to ALL future UIs. Design system-level concern. |

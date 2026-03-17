@@ -1,3 +1,10 @@
+---
+title: "cobo_instructions_2026-03-16"
+type: system
+tags: [cobo, instructions]
+created: 2026-03-16
+---
+
 # COBO INSTRUCTIONS — Monday 2026-03-16
 > From: Ceiba (Computer 1) → Cobo (Computer 2)
 > Priority: HIGH — This is the day the engine goes live

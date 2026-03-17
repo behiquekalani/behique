@@ -1,3 +1,15 @@
+---
+title: "agent-kernel-architecture"
+type: design
+tags: [distributed, agent]
+
+projects:
+  - Spine-Architecture
+systems:
+  - SYS_AI_Cluster
+created: 2026-03-16
+---
+
 # Distributed AI Agent Kernel Architecture
 **Source:** ChatGPT (2026-03-16)
 **Status:** DESIGN — needs implementation

@@ -1,3 +1,10 @@
+---
+title: "Kalani"
+type: identity
+tags: [kalani, andré, gómez]
+created: 2026-03-16
+---
+
 # Kalani André Gómez Padín
 
 ## Core Identity

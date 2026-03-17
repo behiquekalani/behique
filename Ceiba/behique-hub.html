@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behique Command Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+/* ============ N64 RETRO BASE ============ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #1a1a2e;
+  --bg2: #16213e;
+  --card: #0f3460;
+  --border: #e94560;
+  --border2: #533483;
+  --text: #eee;
+  --text-dim: #8899aa;
+  --gold: #ffd700;
+  --green: #00ff88;
+  --red: #ff3366;
+  --cyan: #00d4ff;
+  --purple: #b388ff;
+  --orange: #ff9f43;
+  --pixel: 'Press Start 2P', monospace;
+  --chunk: 4px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--pixel);
+  font-size: 10px;
+  line-height: 1.6;
+  min-height: 100vh;
+  image-rendering: pixelated;
+}
+
+/* Scanline overlay */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,0.08) 2px 4px);
+}
+
+/* ============ LAYOUT ============ */
+.hub { max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+.header {
+  text-align: center;
+  padding: 20px 0;
+  border: var(--chunk) solid var(--border);
+  background: var(--bg2);
+  margin-bottom: 0;
+  position: relative;
+}
+.header::before, .header::after {
+  content: "\2605";
+  position: absolute;
+  top: 8px;
+  color: var(--gold);
+  font-size: 14px;
+  animation: spin 3s linear infinite;
+}
+.header::before { left: 12px; }
+.header::after { right: 12px; animation-direction: reverse; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.header h1 {
+  font-size: 16px;
+  color: var(--gold);
+  text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5);
+  letter-spacing: 2px;
+}
+.header .subtitle { font-size: 8px; color: var(--text-dim); margin-top: 6px; }
+.header .timestamp { font-size: 7px; color: var(--cyan); margin-top: 4px; }
+
+/* ============ TABS ============ */
+.tab-bar {
+  display: flex;
+  border-left: var(--chunk) solid var(--border);
+  border-right: var(--chunk) solid var(--border);
+  background: var(--card);
+}
+.tab {
+  flex: 1;
+  padding: 10px 8px;
+  text-align: center;
+  font-family: var(--pixel);
+  font-size: 8px;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  background: transparent;
+  border-top: none;
+  border-left: none;
+  border-right: 1px solid var(--border2);
+}
+.tab:last-child { border-right: none; }
+.tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+.tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  background: var(--bg2);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/* ============ PANELS ============ */
+.panel {
+  border: var(--chunk) solid var(--border2);
+  background: var(--bg2);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.panel:hover { border-color: var(--border); }
+
+.panel-header {
+  background: var(--card);
+  padding: 10px 12px;
+  border-bottom: 3px solid var(--border2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-header .icon { font-size: 14px; }
+.panel-header h2 {
+  font-size: 9px;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.panel-body { padding: 12px; }
+
+/* ============ STAT ROWS ============ */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.08);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--text-dim); font-size: 8px; }
+.stat-value { color: var(--text); font-size: 9px; font-weight: bold; }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+.stat-value.gold { color: var(--gold); }
+.stat-value.cyan { color: var(--cyan); }
+.stat-value.orange { color: var(--orange); }
+
+/* ============ HEALTH BAR ============ */
+.health-bar {
+  height: 14px;
+  background: #1a1a1a;
+  border: 2px solid var(--border2);
+  margin: 6px 0;
+  position: relative;
+  overflow: hidden;
+}
+.health-fill { height: 100%; transition: width 0.5s; position: relative; }
+.health-fill.high { background: var(--green); }
+.health-fill.mid { background: var(--orange); }
+.health-fill.low { background: var(--red); }
+.health-fill::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 50%;
+  background: rgba(255,255,255,0.2);
+}
+.health-label {
+  position: absolute;
+  top: 0; right: 6px;
+  font-size: 7px;
+  line-height: 14px;
+  color: #000;
+  font-weight: bold;
+  z-index: 1;
+}
+
+/* ============ COMMIT LOG ============ */
+.commit-list { list-style: none; padding: 0; }
+.commit-item {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 7px;
+  display: flex;
+  gap: 6px;
+}
+.commit-hash { color: var(--cyan); flex-shrink: 0; }
+.commit-msg { color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ============ TASK LIST ============ */
+.task-item {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.task-icon { flex-shrink: 0; font-size: 10px; }
+.task-name { color: var(--text); }
+.task-item.completed .task-name { color: var(--text-dim); text-decoration: line-through; }
+
+/* ============ BACKLOG BARS ============ */
+.backlog-bar-row { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.backlog-label { width: 60px; font-size: 7px; color: var(--text-dim); text-align: right; }
+.backlog-bar { flex: 1; height: 12px; background: #1a1a1a; border: 2px solid var(--border2); overflow: hidden; }
+.backlog-bar-fill { height: 100%; position: relative; }
+.backlog-bar-fill::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 50%; background: rgba(255,255,255,0.15); }
+.backlog-count { width: 30px; font-size: 8px; color: var(--text); font-weight: bold; }
+
+/* ============ CLUSTER STATUS ============ */
+.cluster-node { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+.cluster-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; animation: pulse 2s infinite; }
+.cluster-dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.cluster-dot.offline { background: var(--red); box-shadow: 0 0 8px var(--red); animation: none; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+.cluster-name { font-size: 9px; font-weight: bold; }
+.cluster-detail { font-size: 7px; color: var(--text-dim); }
+
+/* ============ REVENUE BANNER ============ */
+.revenue-banner {
+  border: var(--chunk) solid var(--gold);
+  background: rgba(255,215,0,0.05);
+  padding: 12px;
+  margin-top: 16px;
+  text-align: center;
+}
+.revenue-amount { font-size: 24px; color: var(--gold); text-shadow: 2px 2px 0 #000; }
+.revenue-label { font-size: 7px; color: var(--text-dim); margin-top: 4px; }
+.revenue-note { font-size: 7px; color: var(--orange); margin-top: 6px; }
+
+/* ============ QUEST STYLES ============ */
+.quest-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px;
+  background: var(--card);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 16px;
+}
+.filter-btn {
+  font-family: var(--pixel);
+  font-size: 7px;
+  padding: 6px 10px;
+  background: var(--bg);
+  color: var(--text-dim);
+  border: 2px solid var(--border2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-btn:hover { border-color: var(--border); color: var(--text); }
+.filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(255,215,0,0.08); }
+.filter-group { display: flex; align-items: center; gap: 4px; }
+.filter-label { font-size: 6px; color: var(--text-dim); margin-right: 4px; text-transform: uppercase; }
+
+.quest-list { margin-top: 12px; }
+
+.quest-card {
+  border: var(--chunk) solid var(--border2);
+  background: var(--bg2);
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.quest-card:hover { border-color: var(--border); }
+.quest-card.locked { opacity: 0.4; filter: grayscale(0.3); }
+
+.quest-card-head {
+  background: var(--card);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid var(--border2);
+  cursor: pointer;
+}
+.quest-card-head h3 { font-size: 9px; color: var(--gold); }
+.quest-type-badge {
+  font-size: 6px;
+  padding: 3px 6px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+.quest-type-badge.MAIN { color: var(--red); border-color: var(--red); }
+.quest-type-badge.SIDE { color: var(--cyan); border-color: var(--cyan); }
+.quest-type-badge.FUTURE { color: var(--purple); border-color: var(--purple); }
+
+.quest-progress {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quest-progress .health-bar { flex: 1; margin: 0; }
+.quest-pct { font-size: 8px; font-weight: bold; width: 40px; text-align: right; }
+
+.quest-objectives {
+  padding: 0 12px 12px;
+  display: none;
+}
+.quest-card.expanded .quest-objectives { display: block; }
+
+.obj-item {
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 7px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.obj-item.done { opacity: 0.5; }
+.obj-item.done .obj-text { text-decoration: line-through; }
+.obj-text { flex: 1; }
+.obj-diff {
+  font-size: 6px;
+  padding: 2px 5px;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+.obj-diff.very_easy { color: var(--green); border-color: var(--green); }
+.obj-diff.easy { color: #66ffaa; border-color: #66ffaa; }
+.obj-diff.medium { color: var(--cyan); border-color: var(--cyan); }
+.obj-diff.hard { color: var(--orange); border-color: var(--orange); }
+.obj-diff.very_hard { color: var(--red); border-color: var(--red); }
+.obj-time { font-size: 6px; color: var(--text-dim); flex-shrink: 0; }
+
+/* ============ BROWSE TAB STYLES ============ */
+.browse-search {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: var(--card);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 16px;
+  align-items: center;
+}
+.browse-search input {
+  flex: 1;
+  font-family: var(--pixel);
+  font-size: 8px;
+  padding: 8px 12px;
+  background: var(--bg);
+  color: var(--cyan);
+  border: 2px solid var(--border2);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.browse-search input:focus { border-color: var(--cyan); }
+.browse-search input::placeholder { color: var(--text-dim); }
+
+.browse-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--card);
+  border-left: var(--chunk) solid var(--border2);
+  border-right: var(--chunk) solid var(--border2);
+  border-bottom: var(--chunk) solid var(--border2);
+}
+
+.browse-stats {
+  display: flex;
+  gap: 16px;
+  padding: 10px 12px;
+  background: rgba(0,212,255,0.03);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.browse-stat { text-align: center; }
+.browse-stat-num { font-size: 12px; font-weight: bold; }
+.browse-stat-label { font-size: 6px; color: var(--text-dim); margin-top: 2px; }
+
+.obj-quest-tag {
+  font-size: 5px;
+  padding: 2px 4px;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  flex-shrink: 0;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.obj-reward { font-size: 6px; color: var(--gold); flex-shrink: 0; }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toggle-label { font-size: 6px; color: var(--text-dim); }
+.toggle-switch {
+  width: 28px; height: 14px;
+  background: var(--bg);
+  border: 2px solid var(--border2);
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+}
+.toggle-switch.on { border-color: var(--green); }
+.toggle-switch.on::after { left: 14px; background: var(--green); }
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px;
+  top: 1px; left: 2px;
+  background: var(--text-dim);
+  transition: all 0.2s;
+}
+
+/* Completed quest */
+.completed-card {
+  border: var(--chunk) solid rgba(255,215,0,0.3);
+  background: rgba(255,215,0,0.03);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.completed-card h3 { font-size: 8px; color: var(--gold); }
+.completed-card .reward { font-size: 7px; color: var(--text-dim); }
+.completed-card .date { font-size: 6px; color: var(--cyan); }
+
+/* Sort indicator */
+.sort-label { font-size: 6px; color: var(--gold); margin-left: auto; }
+
+/* ============ REFRESH & FOOTER ============ */
+.refresh-bar { text-align: center; padding: 12px; font-size: 7px; color: var(--text-dim); }
+.refresh-bar button {
+  font-family: var(--pixel);
+  font-size: 8px;
+  background: var(--card);
+  color: var(--cyan);
+  border: 2px solid var(--border2);
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.refresh-bar button:hover { border-color: var(--border); color: var(--gold); }
+.focus-box { background: rgba(0,212,255,0.05); border: 2px solid var(--cyan); padding: 8px; font-size: 8px; color: var(--cyan); line-height: 1.8; word-break: break-word; }
+.loading { text-align: center; padding: 40px; font-size: 10px; color: var(--cyan); animation: blink 1s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.footer { text-align: center; padding: 16px; font-size: 6px; color: var(--text-dim); border-top: 2px solid var(--border2); margin-top: 16px; }
+
+/* ============ MAP TAB ============ */
+#quest-graph {
+  width: 100%;
+  height: 520px;
+  border: var(--chunk) solid var(--border2);
+  background: var(--bg2);
+  margin-top: 16px;
+}
+.map-legend {
+  display: flex;
+  gap: 16px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 6px;
+  color: var(--text-dim);
+}
+.map-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.map-info {
+  padding: 12px;
+  background: var(--card);
+  border: var(--chunk) solid var(--border2);
+  margin-top: 8px;
+  display: none;
+}
+.map-info.visible { display: block; }
+.map-info h3 { font-size: 10px; color: var(--gold); margin-bottom: 8px; }
+.map-info .map-info-meta { font-size: 7px; color: var(--text-dim); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<div class="hub" id="app"><div class="loading">LOADING HUB DATA...</div></div>
+
+<script>
+/* ============ QUEST DATA ============ */
+const QUEST_DATA = {
+  missions: [
+    { id: "ebay-empire", name: "eBay Empire", type: "MAIN", status: "active", description: "From $0 to revenue.", reward: "First revenue stream", reward_tier: 5, objectives: [
+      { text: "Build listing agent V1", done: true, difficulty: "hard", time_est: "6h", reward_tier: 3 },
+      { text: "Get eBay API keys", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Build V2 auto-publisher", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Build quick_list.py", done: true, difficulty: "medium", time_est: "1h", reward_tier: 2 },
+      { text: "Generate Funko Pop listing", done: true, difficulty: "very_easy", time_est: "5m", reward_tier: 1 },
+      { text: "Build Telegram bot /ebay", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Post Funko Pops on eBay", done: false, difficulty: "very_easy", time_est: "10m", reward_tier: 3 },
+      { text: "Run OAuth consent flow", done: false, difficulty: "easy", time_est: "15m", reward_tier: 2 },
+      { text: "First eBay sale", done: false, difficulty: "medium", time_est: "1-7d", reward_tier: 5 },
+      { text: "Activate V2 API auto-publish", done: false, difficulty: "medium", time_est: "2h", reward_tier: 4 },
+      { text: "10 listings live on eBay", done: false, difficulty: "medium", time_est: "3h", reward_tier: 4 },
+      { text: "List Hello Kitty cups", done: false, difficulty: "easy", time_est: "15m", reward_tier: 1 },
+      { text: "eBay cross-reference engine", done: false, difficulty: "hard", time_est: "6h", reward_tier: 4 },
+      { text: "Multi-model A/B testing", done: false, difficulty: "hard", time_est: "8h", reward_tier: 3 },
+      { text: "AI title generator", done: false, difficulty: "very_hard", time_est: "2d", reward_tier: 4 },
+      { text: "Dropship auto-lister 24/7", done: false, difficulty: "very_hard", time_est: "1w", reward_tier: 5 }
+    ]},
+    { id: "product-research", name: "Product Research Engine", type: "MAIN", status: "active", reward: "Automated discovery", reward_tier: 4, objectives: [
+      { text: "Research engine core", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Scoring engine (5 signals)", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Product normalizer", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Trends adapter", done: true, difficulty: "easy", time_est: "1h", reward_tier: 1 },
+      { text: "Seed from trends", done: true, difficulty: "easy", time_est: "30m", reward_tier: 1 },
+      { text: "Trends Intelligence dashboard", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Real scoring with margins", done: false, difficulty: "hard", time_est: "6h", reward_tier: 4 },
+      { text: "Amazon scraper + proxies", done: false, difficulty: "hard", time_est: "8h", reward_tier: 3 },
+      { text: "Viral Vault 15pt scoring", done: false, difficulty: "medium", time_est: "3h", reward_tier: 3 },
+      { text: "Product clustering", done: false, difficulty: "medium", time_est: "4h", reward_tier: 2 },
+      { text: "Walmart scraper", done: false, difficulty: "hard", time_est: "6h", reward_tier: 2 },
+      { text: "AI price predictor (ML)", done: false, difficulty: "very_hard", time_est: "1w", reward_tier: 4 },
+      { text: "Overnight auto-scraping", done: false, difficulty: "very_hard", time_est: "2d", reward_tier: 5 }
+    ]},
+    { id: "the-bridge", name: "The Bridge", type: "MAIN", status: "active", reward: "AI cluster operational", reward_tier: 5, objectives: [
+      { text: "Set up Cobo as AI worker", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Build bridge server", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Wire Syncthing", done: true, difficulty: "medium", time_est: "1h", reward_tier: 2 },
+      { text: "wake.sh / sleep.sh", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Jarvis morning briefing", done: true, difficulty: "medium", time_est: "3h", reward_tier: 4 },
+      { text: "Agent Kernel orchestrator", done: true, difficulty: "very_hard", time_est: "3d", reward_tier: 5 },
+      { text: "Secure bridge (HTTPS)", done: false, difficulty: "easy", time_est: "15m", reward_tier: 2 },
+      { text: "Autonomous cross-computer", done: false, difficulty: "very_hard", time_est: "2d", reward_tier: 5 },
+      { text: "Swarm Mode / Workers", done: false, difficulty: "very_hard", time_est: "1w", reward_tier: 5 }
+    ]},
+    { id: "ceiba-vault", name: "Ceiba Memory Vault", type: "SIDE", status: "active", reward: "Persistent AI memory", reward_tier: 4, objectives: [
+      { text: "Obsidian vault + wiki links", done: true, difficulty: "medium", time_est: "3h", reward_tier: 2 },
+      { text: "Vault graph scanner", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "vis.js dashboard", done: true, difficulty: "medium", time_est: "3h", reward_tier: 3 },
+      { text: "Session stop hooks", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Security scan hook", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "vault-architect skill", done: true, difficulty: "medium", time_est: "2h", reward_tier: 3 },
+      { text: "Session transcript persist", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Ghost node vault files (27)", done: true, difficulty: "easy", time_est: "1h", reward_tier: 1 },
+      { text: "Graph query layer", done: true, difficulty: "medium", time_est: "3h", reward_tier: 3 },
+      { text: "Session auto-generator", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "ceiba_run.py orchestrator", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "CMP (Ceiba Memory Protocol)", done: true, difficulty: "hard", time_est: "6h", reward_tier: 4 },
+      { text: "Self-healing vault", done: true, difficulty: "medium", time_est: "3h", reward_tier: 2 },
+      { text: "Memory ingestion protocol", done: false, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Real embeddings search", done: false, difficulty: "hard", time_est: "6h", reward_tier: 4 },
+      { text: "Graph-aware prompting", done: false, difficulty: "hard", time_est: "4h", reward_tier: 4 },
+      { text: "YAML typed relationships", done: false, difficulty: "easy", time_est: "2h", reward_tier: 1 },
+      { text: "Vault template system", done: false, difficulty: "easy", time_est: "1h", reward_tier: 1 }
+    ]},
+    { id: "behiquebot", name: "BehiqueBot", type: "SIDE", status: "active", reward: "24/7 accountability AI", reward_tier: 4, objectives: [
+      { text: "Deploy on Railway", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Telegram + classification", done: true, difficulty: "medium", time_est: "3h", reward_tier: 2 },
+      { text: "Notion persistence", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Ollama-first classification", done: true, difficulty: "medium", time_est: "2h", reward_tier: 3 },
+      { text: "Session finish-tracker", done: true, difficulty: "medium", time_est: "3h", reward_tier: 3 },
+      { text: "eBay /ebay command", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Memory system (cross-session)", done: false, difficulty: "hard", time_est: "6h", reward_tier: 4 },
+      { text: "Claude-powered check-ins", done: false, difficulty: "hard", time_est: "4h", reward_tier: 4 },
+      { text: "Redeploy to Railway with /ebay", done: false, difficulty: "easy", time_est: "15m", reward_tier: 2 }
+    ]},
+    { id: "ai-skills", name: "AI Skills & Tooling", type: "SIDE", status: "active", reward: "Expanded AI capabilities", reward_tier: 3, objectives: [
+      { text: "vault-architect skill", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Prompt quality comparator", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Prompt injection defense", done: true, difficulty: "medium", time_est: "3h", reward_tier: 3 },
+      { text: "Unified CLI orchestrator", done: true, difficulty: "hard", time_est: "6h", reward_tier: 3 },
+      { text: "hub.json export pipeline", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Ralph Loop autonomous", done: false, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Multi-model vault agent", done: false, difficulty: "very_hard", time_est: "1w", reward_tier: 4 }
+    ]},
+    { id: "quest-dashboard", name: "Quest Dashboard", type: "SIDE", status: "active", reward: "Motivation system", reward_tier: 3, objectives: [
+      { text: "Dashboard V1", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "3 themes (Neon/Mono/Pastel)", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Low-dopamine mode", done: true, difficulty: "easy", time_est: "30m", reward_tier: 2 },
+      { text: "Behique Command Hub (N64)", done: true, difficulty: "hard", time_est: "4h", reward_tier: 3 },
+      { text: "Quest filters + sort", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Browse tab (search+sort all)", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Load from quests.json", done: false, difficulty: "easy", time_est: "30m", reward_tier: 1 },
+      { text: "Habit tracker", done: false, difficulty: "medium", time_est: "3h", reward_tier: 2 }
+    ]},
+    { id: "revenue-diversification", name: "Revenue Diversification", type: "FUTURE", status: "locked", reward: "Multiple income streams", reward_tier: 5, objectives: [
+      { text: "Shopify store + logo", done: true, difficulty: "medium", time_est: "2h", reward_tier: 2 },
+      { text: "Feed eBay winners to Shopify", done: false, difficulty: "medium", time_est: "4h", reward_tier: 3 },
+      { text: "First Shopify sale", done: false, difficulty: "medium", time_est: "2w", reward_tier: 5 },
+      { text: "n8n Agency first client", done: false, difficulty: "hard", time_est: "4w", reward_tier: 5 },
+      { text: "AI ebook", done: false, difficulty: "hard", time_est: "1w", reward_tier: 3 },
+      { text: "AI video content", done: false, difficulty: "medium", time_est: "3d", reward_tier: 3 }
+    ]}
+  ],
+  completed_missions: [
+    { name: "Ceiba Memory Stack", reward: "Persistent AI memory", completed: "2026-03-15", reward_tier: 3 },
+    { name: "Product Research V1", reward: "61 products scored", completed: "2026-03-15", reward_tier: 3 },
+    { name: "Trends Scraper", reward: "35 categories tracked", completed: "2026-03-14", reward_tier: 2 },
+    { name: "OpenClaw Migration", reward: "3 bots, 5 skills", completed: "2026-03-15", reward_tier: 3 }
+  ]
+};
+
+/* ============ CONSTANTS ============ */
+const DIFF_ORDER = { very_easy: 1, easy: 2, medium: 3, hard: 4, very_hard: 5 };
+const DIFF_LABELS = { very_easy: 'VERY EASY', easy: 'EASY', medium: 'MEDIUM', hard: 'HARD', very_hard: 'VERY HARD' };
+const TAB_LIST = ['hub','quests','browse','map','completed'];
+
+function parseTimeToMinutes(t) {
+  if (!t) return 999;
+  const s = t.toLowerCase().trim();
+  const val = parseFloat(s);
+  const unit = s.replace(/[\d.\-\s]/g, '');
+  if (unit.startsWith('m')) return val;
+  if (unit.startsWith('h')) return val * 60;
+  if (unit.startsWith('d')) return val * 60 * 24;
+  if (unit.startsWith('w')) return val * 60 * 24 * 7;
+  return val * 60;
+}
+
+/* ============ QUEST DEPENDENCIES ============ */
+const QUEST_DEPS = [
+  // [from, to, label] — "from" feeds into / unlocks "to"
+  ["ebay-empire", "product-research", "product data"],
+  ["ebay-empire", "revenue-diversification", "winners feed"],
+  ["product-research", "ebay-empire", "discovery"],
+  ["the-bridge", "ceiba-vault", "cross-machine sync"],
+  ["ceiba-vault", "ai-skills", "context + memory"],
+  ["ceiba-vault", "the-bridge", "vault data"],
+  ["behiquebot", "ebay-empire", "/ebay command"],
+  ["ai-skills", "ceiba-vault", "tools + prompts"],
+  ["ai-skills", "the-bridge", "orchestration"],
+  ["quest-dashboard", "ceiba-vault", "hub.json data"],
+  ["ebay-empire", "behiquebot", "listing pipeline"],
+  ["the-bridge", "ai-skills", "agent kernel"],
+];
+
+/* ============ STATE ============ */
+let activeTab = 'hub';
+let questSort = 'easy_first';
+let questTypeFilter = 'all';
+let questStatusFilter = 'all';
+let browseSort = 'easy_first';
+let browseSearch = '';
+let browseHideDone = false;
+let hubData = null;
+let questNetwork = null;
+
+/* ============ DATA LOADING ============ */
+async function loadHubData() {
+  try {
+    const resp = await fetch('./hub.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('not found');
+    return await resp.json();
+  } catch(e) { return null; }
+}
+
+function healthClass(pct) {
+  if (pct >= 70) return 'high';
+  if (pct >= 40) return 'mid';
+  return 'low';
+}
+
+/* ============ RENDER ============ */
+function renderApp() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="header">
+      <h1>BEHIQUE COMMAND HUB</h1>
+      <div class="subtitle">CEIBA + COBO AI CLUSTER</div>
+      <div class="timestamp">${hubData ? 'DATA: ' + hubData.generated_local : ''} | AUTO-REFRESH: 30s</div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab ${activeTab==='hub'?'active':''}" onclick="switchTab('hub')">\uD83D\uDDA5\uFE0F HUB</button>
+      <button class="tab ${activeTab==='quests'?'active':''}" onclick="switchTab('quests')">\u2694\uFE0F QUESTS</button>
+      <button class="tab ${activeTab==='browse'?'active':''}" onclick="switchTab('browse')">\uD83D\uDD0D BROWSE</button>
+      <button class="tab ${activeTab==='map'?'active':''}" onclick="switchTab('map')">\uD83D\uDDFA\uFE0F MAP</button>
+      <button class="tab ${activeTab==='completed'?'active':''}" onclick="switchTab('completed')">\uD83C\uDFC6 COMPLETED</button>
+    </div>
+    <div id="tab-hub" class="tab-content ${activeTab==='hub'?'active':''}"></div>
+    <div id="tab-quests" class="tab-content ${activeTab==='quests'?'active':''}"></div>
+    <div id="tab-browse" class="tab-content ${activeTab==='browse'?'active':''}"></div>
+    <div id="tab-map" class="tab-content ${activeTab==='map'?'active':''}"></div>
+    <div id="tab-completed" class="tab-content ${activeTab==='completed'?'active':''}"></div>
+    <div class="refresh-bar">
+      <button onclick="doRefresh()">\u21BB REFRESH</button>
+    </div>
+    <div class="footer">BEHIQUE COMMAND HUB v3.0 \u2022 CEIBA + COBO \u2022 ${new Date().getFullYear()}</div>
+  `;
+  renderHubTab();
+  renderQuestsTab();
+  renderBrowseTab();
+  renderMapTab();
+  renderCompletedTab();
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', TAB_LIST[i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  // Focus search box when switching to browse
+  if (tab === 'browse') {
+    const input = document.getElementById('browse-search-input');
+    if (input) setTimeout(() => input.focus(), 50);
+  }
+  // Refit graph when switching to map (vis.js needs visible container)
+  if (tab === 'map') {
+    setTimeout(() => {
+      if (questNetwork) questNetwork.fit();
+      else renderMapTab();
+    }, 100);
+  }
+}
+
+/* ============ HUB TAB (unchanged) ============ */
+function renderHubTab() {
+  if (!hubData) {
+    document.getElementById('tab-hub').innerHTML = '<div style="text-align:center;padding:30px;color:var(--red);font-size:8px">Could not load hub.json \u2014 run python3 tools/export_hub_data.py</div>';
+    return;
+  }
+  const d = hubData;
+  const git = d.git||{}, cmp = d.cmp||{}, vault = d.vault||{}, session = d.session||{},
+        backlog = d.backlog||{}, bridge = d.bridge||{}, primer = d.primer||{},
+        cobo = d.cobo||{}, revenue = d.revenue||{};
+  const pct = session.completion_pct||0;
+  const bt = (backlog.done||0)+(backlog.ready||0)+(backlog.blocked||0)+(backlog.future||0)+(backlog.killed||0);
+
+  document.getElementById('tab-hub').innerHTML = `
+    <div class="revenue-banner">
+      <div class="revenue-amount">${revenue.current||'$0'}</div>
+      <div class="revenue-label">LIFETIME REVENUE</div>
+      ${revenue.note?`<div class="revenue-note">${revenue.note}</div>`:''}
+    </div>
+    <div class="grid">
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDDA5\uFE0F</span><h2>Cluster</h2></div><div class="panel-body">
+        <div class="cluster-node"><div class="cluster-dot online"></div><div><div class="cluster-name">CEIBA (Mac)</div><div class="cluster-detail">HQ \u2022 Claude Code \u2022 Vault</div></div></div>
+        <div class="cluster-node"><div class="cluster-dot ${cobo.online?'online':'offline'}"></div><div><div class="cluster-name">COBO (Win)</div><div class="cluster-detail">${cobo.online?'Ollama \u2022 n8n':'OFFLINE'}</div></div></div>
+        <div class="stat-row"><span class="stat-label">CMP</span><span class="stat-value cyan">${cmp.total||0}</span></div>
+        <div class="stat-row"><span class="stat-label">Vault</span><span class="stat-value green">${vault.nodes||0} nodes</span></div>
+      </div></div>
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDCCB</span><h2>Session</h2></div><div class="panel-body">
+        <div class="stat-row"><span class="stat-label">Status</span><span class="stat-value ${session.active?'green':'red'}">${session.active?'ACTIVE':'NONE'}</span></div>
+        <div class="health-bar"><div class="health-fill ${healthClass(pct)}" style="width:${pct}%"></div><span class="health-label">${session.completed||0}/${session.planned||0}</span></div>
+        ${(session.tasks||[]).map(t=>`<div class="task-item ${t.status==='completed'?'completed':''}"><span class="task-icon">${t.status==='completed'?'\u2705':'\u2B1C'}</span><span class="task-name">${t.task}</span></div>`).join('')}
+      </div></div>
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDD00</span><h2>Git</h2></div><div class="panel-body">
+        <div class="stat-row"><span class="stat-label">Branch</span><span class="stat-value cyan">${git.branch||'?'}</span></div>
+        <div class="stat-row"><span class="stat-label">Commits</span><span class="stat-value gold">${git.commits_today||0}</span></div>
+        <div class="stat-row"><span class="stat-label">Dirty</span><span class="stat-value">${git.uncommitted||0}</span></div>
+        <ul class="commit-list">${(git.recent_commits||[]).slice(0,5).map(c=>`<li class="commit-item"><span class="commit-hash">${(c.hash||'').slice(0,7)}</span><span class="commit-msg">${c.message||''}</span></li>`).join('')}</ul>
+      </div></div>
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDCA1</span><h2>Backlog</h2></div><div class="panel-body">
+        ${['done','ready','blocked','future','killed'].map(k=>{
+          const colors = {done:'var(--green)',ready:'var(--cyan)',blocked:'var(--orange)',future:'var(--purple)',killed:'var(--red)'};
+          return `<div class="backlog-bar-row"><span class="backlog-label">${k.toUpperCase()}</span><div class="backlog-bar"><div class="backlog-bar-fill" style="width:${bt?(backlog[k]||0)/bt*100:0}%;background:${colors[k]}"></div></div><span class="backlog-count" style="color:${colors[k]}">${backlog[k]||0}</span></div>`;
+        }).join('')}
+      </div></div>
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83C\uDFAF</span><h2>Focus</h2></div><div class="panel-body">
+        <div class="focus-box">${primer.focus||'No focus set'}</div>
+        <div class="stat-row" style="margin-top:8px"><span class="stat-label">Age</span><span class="stat-value ${(primer.age_minutes||999)>120?'orange':'green'}">${primer.age_minutes?Math.round(primer.age_minutes)+'m':'?'}</span></div>
+      </div></div>
+      <div class="panel"><div class="panel-header"><span class="icon">\uD83D\uDD78\uFE0F</span><h2>Vault</h2></div><div class="panel-body">
+        <div class="stat-row"><span class="stat-label">Nodes</span><span class="stat-value green">${vault.nodes||0}</span></div>
+        <div class="stat-row"><span class="stat-label">Edges</span><span class="stat-value">${vault.edges||0}</span></div>
+        <div class="stat-row"><span class="stat-label">Missing</span><span class="stat-value ${(vault.missing||0)>0?'orange':'green'}">${vault.missing||0}</span></div>
+        ${(vault.hubs||[]).slice(0,4).map(h=>`<div style="font-size:6px;color:var(--text-dim);padding:1px 0">${h[0]} <span style="color:var(--cyan)">(${h[1]})</span></div>`).join('')}
+      </div></div>
+    </div>
+  `;
+}
+
+/* ============ QUESTS TAB (original quest card system) ============ */
+function renderQuestsTab() {
+  const missions = QUEST_DATA.missions;
+
+  // Global stats
+  let allObjs = [];
+  missions.forEach(m => { m.objectives.forEach(o => allObjs.push(o)); });
+  const totalObj = allObjs.length;
+  const doneObj = allObjs.filter(o => o.done).length;
+  const globalPct = Math.round(doneObj / totalObj * 100);
+
+  // Filter
+  let filtered = [...missions];
+  if (questTypeFilter !== 'all') filtered = filtered.filter(m => m.type === questTypeFilter);
+  if (questStatusFilter !== 'all') filtered = filtered.filter(m => m.status === questStatusFilter);
+
+  // Sort quests
+  if (questSort === 'easy_first') {
+    filtered.sort((a,b) => {
+      const aMin = Math.min(...a.objectives.filter(o=>!o.done).map(o=>DIFF_ORDER[o.difficulty]||3));
+      const bMin = Math.min(...b.objectives.filter(o=>!o.done).map(o=>DIFF_ORDER[o.difficulty]||3));
+      return aMin - bMin;
+    });
+  } else if (questSort === 'hard_first') {
+    filtered.sort((a,b) => {
+      const aMax = Math.max(...a.objectives.filter(o=>!o.done).map(o=>DIFF_ORDER[o.difficulty]||3));
+      const bMax = Math.max(...b.objectives.filter(o=>!o.done).map(o=>DIFF_ORDER[o.difficulty]||3));
+      return bMax - aMax;
+    });
+  } else if (questSort === 'progress') {
+    filtered.sort((a,b) => {
+      const aPct = a.objectives.filter(o=>o.done).length / a.objectives.length;
+      const bPct = b.objectives.filter(o=>o.done).length / b.objectives.length;
+      return bPct - aPct;
+    });
+  }
+
+  document.getElementById('tab-quests').innerHTML = `
+    <div style="padding:12px 0;text-align:center">
+      <div style="font-size:9px;color:var(--gold);margin-bottom:6px">GLOBAL PROGRESS</div>
+      <div class="health-bar" style="max-width:500px;margin:0 auto">
+        <div class="health-fill ${healthClass(globalPct)}" style="width:${globalPct}%"></div>
+        <span class="health-label">${doneObj}/${totalObj}</span>
+      </div>
+      <div style="font-size:7px;color:var(--text-dim);margin-top:4px">${globalPct}% complete across all quests</div>
+    </div>
+    <div class="quest-filters">
+      <div class="filter-group">
+        <span class="filter-label">Sort:</span>
+        <button class="filter-btn ${questSort==='easy_first'?'active':''}" onclick="setQuestSort('easy_first')">EASY\u2192HARD</button>
+        <button class="filter-btn ${questSort==='hard_first'?'active':''}" onclick="setQuestSort('hard_first')">HARD\u2192EASY</button>
+        <button class="filter-btn ${questSort==='progress'?'active':''}" onclick="setQuestSort('progress')">BY PROGRESS</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Type:</span>
+        <button class="filter-btn ${questTypeFilter==='all'?'active':''}" onclick="setTypeFilter('all')">ALL</button>
+        <button class="filter-btn ${questTypeFilter==='MAIN'?'active':''}" onclick="setTypeFilter('MAIN')">MAIN</button>
+        <button class="filter-btn ${questTypeFilter==='SIDE'?'active':''}" onclick="setTypeFilter('SIDE')">SIDE</button>
+        <button class="filter-btn ${questTypeFilter==='FUTURE'?'active':''}" onclick="setTypeFilter('FUTURE')">FUTURE</button>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Status:</span>
+        <button class="filter-btn ${questStatusFilter==='all'?'active':''}" onclick="setStatusFilter('all')">ALL</button>
+        <button class="filter-btn ${questStatusFilter==='active'?'active':''}" onclick="setStatusFilter('active')">ACTIVE</button>
+        <button class="filter-btn ${questStatusFilter==='locked'?'active':''}" onclick="setStatusFilter('locked')">LOCKED</button>
+      </div>
+    </div>
+    <div class="quest-list">
+      ${filtered.map(m => {
+        const done = m.objectives.filter(o=>o.done).length;
+        const total = m.objectives.length;
+        const pct = Math.round(done/total*100);
+        const objs = [...m.objectives];
+        if (questSort === 'easy_first') objs.sort((a,b) => (DIFF_ORDER[a.difficulty]||3)-(DIFF_ORDER[b.difficulty]||3));
+        if (questSort === 'hard_first') objs.sort((a,b) => (DIFF_ORDER[b.difficulty]||3)-(DIFF_ORDER[a.difficulty]||3));
+        return `
+          <div class="quest-card ${m.status==='locked'?'locked':''}" id="quest-${m.id}">
+            <div class="quest-card-head" onclick="toggleQuest('${m.id}')">
+              <h3>${m.name}</h3>
+              <div style="display:flex;gap:8px;align-items:center">
+                <span style="font-size:8px;color:${pct>=80?'var(--green)':pct>=50?'var(--orange)':'var(--red)'}">${pct}%</span>
+                <span class="quest-type-badge ${m.type}">${m.type}</span>
+              </div>
+            </div>
+            <div class="quest-progress">
+              <div class="health-bar"><div class="health-fill ${healthClass(pct)}" style="width:${pct}%"></div></div>
+              <span class="quest-pct">${done}/${total}</span>
+            </div>
+            <div class="quest-objectives">
+              ${objs.map(o => `
+                <div class="obj-item ${o.done?'done':''}">
+                  <span style="font-size:9px">${o.done?'\u2705':'\u2B1C'}</span>
+                  <span class="obj-text">${o.text}</span>
+                  <span class="obj-diff ${o.difficulty}">${DIFF_LABELS[o.difficulty]||o.difficulty}</span>
+                  <span class="obj-time">${o.time_est||''}</span>
+                </div>
+              `).join('')}
+              <div style="padding:6px 0;font-size:7px;color:var(--gold)">\uD83C\uDF81 ${m.reward} ${'★'.repeat(m.reward_tier)}</div>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function toggleQuest(id) { document.getElementById('quest-' + id).classList.toggle('expanded'); }
+function setQuestSort(s) { questSort = s; renderQuestsTab(); }
+function setTypeFilter(f) { questTypeFilter = f; renderQuestsTab(); }
+function setStatusFilter(f) { questStatusFilter = f; renderQuestsTab(); }
+
+/* ============ BROWSE TAB (flat objectives search/sort) ============ */
+function renderBrowseTab() {
+  // Flatten all objectives
+  let allObjs = [];
+  QUEST_DATA.missions.forEach(m => {
+    m.objectives.forEach(o => {
+      allObjs.push({ ...o, questName: m.name, questType: m.type, questStatus: m.status, questId: m.id });
+    });
+  });
+
+  // Filter by search
+  let objs = [...allObjs];
+  if (browseSearch) {
+    const q = browseSearch.toLowerCase();
+    objs = objs.filter(o => o.text.toLowerCase().includes(q) || o.questName.toLowerCase().includes(q));
+  }
+  if (browseHideDone) objs = objs.filter(o => !o.done);
+
+  // Sort
+  switch(browseSort) {
+    case 'easy_first': objs.sort((a,b) => (DIFF_ORDER[a.difficulty]||3)-(DIFF_ORDER[b.difficulty]||3)); break;
+    case 'hard_first': objs.sort((a,b) => (DIFF_ORDER[b.difficulty]||3)-(DIFF_ORDER[a.difficulty]||3)); break;
+    case 'reward': objs.sort((a,b) => (b.reward_tier||0)-(a.reward_tier||0)); break;
+    case 'time_fast': objs.sort((a,b) => parseTimeToMinutes(a.time_est)-parseTimeToMinutes(b.time_est)); break;
+    case 'time_slow': objs.sort((a,b) => parseTimeToMinutes(b.time_est)-parseTimeToMinutes(a.time_est)); break;
+    case 'name': objs.sort((a,b) => a.text.localeCompare(b.text)); break;
+  }
+
+  // Stats
+  const remaining = objs.filter(o => !o.done).length;
+  const quickWins = objs.filter(o => !o.done && parseTimeToMinutes(o.time_est) <= 60).length;
+  const highReward = objs.filter(o => !o.done && (o.reward_tier||0) >= 4).length;
+
+  document.getElementById('tab-browse').innerHTML = `
+    <div class="browse-search">
+      <input id="browse-search-input" type="text" placeholder="SEARCH OBJECTIVES..." value="${browseSearch}" oninput="onBrowseSearch(this.value)">
+      <div class="toggle-row">
+        <div class="toggle-switch ${browseHideDone?'on':''}" onclick="toggleBrowseHideDone()"></div>
+        <span class="toggle-label">HIDE DONE</span>
+      </div>
+    </div>
+    <div class="browse-filters">
+      <div class="filter-group">
+        <span class="filter-label">Sort:</span>
+        <button class="filter-btn ${browseSort==='easy_first'?'active':''}" onclick="setBrowseSort('easy_first')">EASY\u2192HARD</button>
+        <button class="filter-btn ${browseSort==='hard_first'?'active':''}" onclick="setBrowseSort('hard_first')">HARD\u2192EASY</button>
+        <button class="filter-btn ${browseSort==='reward'?'active':''}" onclick="setBrowseSort('reward')">\u2B50 REWARD</button>
+        <button class="filter-btn ${browseSort==='time_fast'?'active':''}" onclick="setBrowseSort('time_fast')">\u23F1 QUICK WINS</button>
+        <button class="filter-btn ${browseSort==='time_slow'?'active':''}" onclick="setBrowseSort('time_slow')">\uD83D\uDC22 BIG</button>
+        <button class="filter-btn ${browseSort==='name'?'active':''}" onclick="setBrowseSort('name')">A\u2192Z</button>
+      </div>
+    </div>
+    <div class="browse-stats">
+      <div class="browse-stat"><div class="browse-stat-num" style="color:var(--cyan)">${objs.length}</div><div class="browse-stat-label">SHOWING</div></div>
+      <div class="browse-stat"><div class="browse-stat-num" style="color:var(--orange)">${remaining}</div><div class="browse-stat-label">REMAINING</div></div>
+      <div class="browse-stat"><div class="browse-stat-num" style="color:var(--green)">${quickWins}</div><div class="browse-stat-label">QUICK WINS (&lt;1h)</div></div>
+      <div class="browse-stat"><div class="browse-stat-num" style="color:var(--gold)">${highReward}</div><div class="browse-stat-label">HIGH REWARD (4-5\u2B50)</div></div>
+    </div>
+    <div style="margin-top:8px">
+      ${objs.map(o => `
+        <div class="obj-item ${o.done?'done':''}">
+          <span style="font-size:9px">${o.done?'\u2705':'\u2B1C'}</span>
+          <span class="obj-text">${o.text}</span>
+          <span class="obj-quest-tag">${o.questName}</span>
+          <span class="obj-reward">${'\u2B50'.repeat(o.reward_tier||0)}</span>
+          <span class="obj-diff ${o.difficulty}">${DIFF_LABELS[o.difficulty]||o.difficulty}</span>
+          <span class="obj-time">${o.time_est||''}</span>
+        </div>
+      `).join('')}
+      ${objs.length === 0 ? '<div style="text-align:center;padding:30px;color:var(--text-dim);font-size:8px">No objectives match your search</div>' : ''}
+    </div>
+  `;
+}
+
+function onBrowseSearch(val) { browseSearch = val; renderBrowseTab(); }
+function setBrowseSort(s) { browseSort = s; renderBrowseTab(); }
+function toggleBrowseHideDone() { browseHideDone = !browseHideDone; renderBrowseTab(); }
+
+/* ============ MAP TAB (vis.js quest graph) ============ */
+function renderMapTab() {
+  const missions = QUEST_DATA.missions;
+
+  document.getElementById('tab-map').innerHTML = `
+    <div class="map-legend">
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#ff3366"></div>MAIN QUEST</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#00d4ff"></div>SIDE QUEST</div>
+      <div class="map-legend-item"><div class="map-legend-dot" style="background:#b388ff"></div>FUTURE</div>
+      <div class="map-legend-item" style="font-size:5px;color:var(--text-dim)">NODE SIZE = PROGRESS | CLICK TO INSPECT</div>
+    </div>
+    <div id="quest-graph"></div>
+    <div class="map-info" id="map-info"></div>
+  `;
+
+  // Build vis.js nodes
+  const typeColors = { MAIN: '#ff3366', SIDE: '#00d4ff', FUTURE: '#b388ff' };
+  const typeColorBorder = { MAIN: '#cc2952', SIDE: '#009ec2', FUTURE: '#8a5fcc' };
+
+  const nodes = missions.map(m => {
+    const done = m.objectives.filter(o => o.done).length;
+    const total = m.objectives.length;
+    const pct = done / total;
+    const baseSize = 25;
+    const size = baseSize + pct * 30; // 25-55 based on progress
+    const color = typeColors[m.type] || '#888';
+    const borderColor = typeColorBorder[m.type] || '#666';
+    const opacity = m.status === 'locked' ? 0.3 : 1;
+
+    return {
+      id: m.id,
+      label: m.name.replace(/ /g, '\n'),
+      size: size,
+      color: {
+        background: color + (m.status === 'locked' ? '44' : 'cc'),
+        border: borderColor,
+        highlight: { background: '#ffd700', border: '#ffd700' },
+        hover: { background: color, border: '#ffd700' }
+      },
+      font: {
+        color: m.status === 'locked' ? '#555' : '#eee',
+        face: "'Press Start 2P', monospace",
+        size: 8,
+        strokeWidth: 2,
+        strokeColor: '#000'
+      },
+      borderWidth: 3,
+      shadow: { enabled: true, color: color + '44', size: 15, x: 0, y: 0 },
+      title: `${m.name} — ${Math.round(pct*100)}% (${done}/${total})`,
+      _quest: m
+    };
+  });
+
+  // Build vis.js edges
+  const edges = QUEST_DEPS.map((dep, i) => ({
+    id: 'e' + i,
+    from: dep[0],
+    to: dep[1],
+    label: dep[2],
+    arrows: { to: { enabled: true, scaleFactor: 0.6 } },
+    color: { color: '#533483', highlight: '#ffd700', hover: '#e94560' },
+    font: { color: '#556', size: 6, face: "'Press Start 2P', monospace", strokeWidth: 1, strokeColor: '#000' },
+    width: 1.5,
+    smooth: { type: 'curvedCW', roundness: 0.15 },
+    hoverWidth: 0.5
+  }));
+
+  // Create network
+  const container = document.getElementById('quest-graph');
+  if (!container) return;
+
+  const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+  const options = {
+    physics: {
+      solver: 'forceAtlas2Based',
+      forceAtlas2Based: {
+        gravitationalConstant: -80,
+        centralGravity: 0.01,
+        springLength: 180,
+        springConstant: 0.04,
+        damping: 0.4
+      },
+      stabilization: { iterations: 150, fit: true }
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 200,
+      zoomView: true,
+      dragView: true
+    },
+    layout: { randomSeed: 42 }
+  };
+
+  questNetwork = new vis.Network(container, data, options);
+
+  // Click handler — show quest details
+  questNetwork.on('click', function(params) {
+    const infoEl = document.getElementById('map-info');
+    if (params.nodes.length > 0) {
+      const nodeId = params.nodes[0];
+      const node = nodes.find(n => n.id === nodeId);
+      if (!node || !node._quest) return;
+
+      const m = node._quest;
+      const done = m.objectives.filter(o => o.done).length;
+      const total = m.objectives.length;
+      const pct = Math.round(done / total * 100);
+
+      // Find connected quests
+      const connections = QUEST_DEPS
+        .filter(d => d[0] === m.id || d[1] === m.id)
+        .map(d => {
+          const otherId = d[0] === m.id ? d[1] : d[0];
+          const other = missions.find(mm => mm.id === otherId);
+          const dir = d[0] === m.id ? '\u2192' : '\u2190';
+          return `<span style="color:var(--cyan)">${dir} ${other ? other.name : otherId}</span> <span style="color:var(--text-dim);font-size:5px">(${d[2]})</span>`;
+        });
+
+      infoEl.innerHTML = `
+        <h3>${m.name} <span class="quest-type-badge ${m.type}" style="font-size:6px;vertical-align:middle">${m.type}</span></h3>
+        <div class="map-info-meta">${pct}% complete \u2022 ${done}/${total} objectives \u2022 ${'★'.repeat(m.reward_tier)} \u2022 ${m.reward}</div>
+        <div class="health-bar" style="max-width:400px"><div class="health-fill ${healthClass(pct)}" style="width:${pct}%"></div></div>
+        <div style="margin-top:8px">
+          ${m.objectives.map(o => `
+            <div class="obj-item ${o.done?'done':''}" style="padding:3px 0">
+              <span style="font-size:8px">${o.done?'\u2705':'\u2B1C'}</span>
+              <span class="obj-text">${o.text}</span>
+              <span class="obj-diff ${o.difficulty}">${DIFF_LABELS[o.difficulty]}</span>
+              <span class="obj-time">${o.time_est||''}</span>
+            </div>
+          `).join('')}
+        </div>
+        ${connections.length > 0 ? `
+          <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border2)">
+            <div style="font-size:7px;color:var(--gold);margin-bottom:4px">CONNECTIONS</div>
+            ${connections.map(c => `<div style="font-size:7px;padding:2px 0">${c}</div>`).join('')}
+          </div>
+        ` : ''}
+      `;
+      infoEl.classList.add('visible');
+    } else {
+      infoEl.classList.remove('visible');
+    }
+  });
+}
+
+/* ============ COMPLETED TAB ============ */
+function renderCompletedTab() {
+  const completed = QUEST_DATA.completed_missions || [];
+
+  const doneObjs = [];
+  QUEST_DATA.missions.forEach(m => {
+    m.objectives.filter(o => o.done).forEach(o => {
+      doneObjs.push({ text: o.text, difficulty: o.difficulty, time_est: o.time_est, quest: m.name, reward_tier: o.reward_tier||0 });
+    });
+  });
+
+  // Sort hardest first
+  doneObjs.sort((a,b) => (DIFF_ORDER[b.difficulty]||3) - (DIFF_ORDER[a.difficulty]||3));
+
+  const totalTime = doneObjs.reduce((s,o) => s + parseTimeToMinutes(o.time_est), 0);
+  const totalHours = Math.round(totalTime / 60);
+  const totalReward = doneObjs.reduce((s,o) => s + (o.reward_tier||0), 0);
+
+  document.getElementById('tab-completed').innerHTML = `
+    <div style="padding:16px 0">
+      <div style="font-size:10px;color:var(--gold);text-align:center;margin-bottom:12px">
+        \uD83C\uDFC6 ${completed.length} QUESTS COMPLETED \u2022 ${doneObjs.length} OBJECTIVES DONE
+      </div>
+
+      <div class="browse-stats" style="margin-bottom:16px">
+        <div class="browse-stat"><div class="browse-stat-num" style="color:var(--green)">${doneObjs.length}</div><div class="browse-stat-label">OBJECTIVES</div></div>
+        <div class="browse-stat"><div class="browse-stat-num" style="color:var(--cyan)">${totalHours}h</div><div class="browse-stat-label">EST. TIME</div></div>
+        <div class="browse-stat"><div class="browse-stat-num" style="color:var(--gold)">${totalReward}\u2B50</div><div class="browse-stat-label">TOTAL REWARD</div></div>
+        <div class="browse-stat"><div class="browse-stat-num" style="color:var(--orange)">${doneObjs.filter(o=>DIFF_ORDER[o.difficulty]>=4).length}</div><div class="browse-stat-label">HARD+ DONE</div></div>
+      </div>
+
+      ${completed.length > 0 ? `
+        <div style="margin-bottom:20px">
+          <div style="font-size:8px;color:var(--gold);padding:8px 0;border-bottom:2px solid var(--border2)">COMPLETED QUESTS</div>
+          ${completed.map(c => `
+            <div class="completed-card">
+              <div>
+                <h3>${c.name}</h3>
+                <div class="reward">\uD83C\uDF81 ${c.reward} ${'★'.repeat(c.reward_tier||1)}</div>
+              </div>
+              <div class="date">${c.completed||''}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+
+      <div style="font-size:8px;color:var(--gold);padding:8px 0;border-bottom:2px solid var(--border2)">
+        ALL COMPLETED OBJECTIVES (${doneObjs.length}) \u2014 hardest first
+      </div>
+      ${doneObjs.map(o => `
+        <div class="obj-item done" style="opacity:0.8">
+          <span style="font-size:9px">\u2705</span>
+          <span class="obj-text" style="text-decoration:none">${o.text}</span>
+          <span class="obj-quest-tag">${o.quest}</span>
+          <span class="obj-reward">${'\u2B50'.repeat(o.reward_tier)}</span>
+          <span class="obj-diff ${o.difficulty}">${DIFF_LABELS[o.difficulty]||o.difficulty}</span>
+          <span class="obj-time">${o.time_est}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ============ INIT ============ */
+async function doRefresh() {
+  hubData = await loadHubData();
+  renderApp();
+}
+
+doRefresh();
+setInterval(async () => { hubData = await loadHubData(); renderHubTab(); }, 30000);
+</script>
+</body>
+</html>

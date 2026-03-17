@@ -1,0 +1,161 @@
+{
+  "name": "Spec Prompt Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "spec-prompt-trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-spec",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/spec",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-spec",
+      "name": "Filter /spec",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.message.text;\nconst description = text.replace(/^\\/spec\\s*/, '').trim();\n\nif (!description) {\n  throw new Error('No description provided after /spec');\n}\n\nreturn [{ json: { description, chatId: $input.first().json.message.chat.id } }];"
+      },
+      "id": "extract-description",
+      "name": "Extract Description",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\Kalani\\behique\\CLAUDE.md",
+        "options": {}
+      },
+      "id": "read-claude-md",
+      "name": "Read CLAUDE.md",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileData = $input.first().json.data;\nconst claudeMd = Buffer.from(fileData, 'base64').toString('utf-8');\nconst description = $('Extract Description').first().json.description;\nconst chatId = $('Extract Description').first().json.chatId;\n\nreturn [{ json: { claudeMd, description, chatId } }];"
+      },
+      "id": "prepare-prompt",
+      "name": "Prepare Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o-mini', messages: [ { role: 'system', content: $json.claudeMd }, { role: 'user', content: 'Draft a detailed Claude Code prompt for: ' + $json.description } ], temperature: 0.7, max_tokens: 2048 }) }}",
+        "options": {}
+      },
+      "id": "openai-call",
+      "name": "Call OpenAI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst result = response.choices[0].message.content;\nconst chatId = $('Prepare Prompt').first().json.chatId;\n\n// Telegram has a 4096 char limit — truncate if needed\nconst maxLen = 4000;\nconst text = result.length > maxLen\n  ? result.substring(0, maxLen) + '\\n\\n... (truncated)'\n  : result;\n\nreturn [{ json: { chatId, text } }];"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "telegram-send",
+      "name": "Send to Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1780, 300]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [{ "node": "Filter /spec", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filter /spec": {
+      "main": [
+        [{ "node": "Extract Description", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Description": {
+      "main": [
+        [{ "node": "Read CLAUDE.md", "type": "main", "index": 0 }]
+      ]
+    },
+    "Read CLAUDE.md": {
+      "main": [
+        [{ "node": "Prepare Prompt", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [{ "node": "Call OpenAI", "type": "main", "index": 0 }]
+      ]
+    },
+    "Call OpenAI": {
+      "main": [
+        [{ "node": "Format Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [{ "node": "Send to Telegram", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1
+}

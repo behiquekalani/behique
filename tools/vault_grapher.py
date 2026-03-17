@@ -88,10 +88,64 @@ ENTITY_MAP = {
 
 WIKI_LINK_RE = re.compile(r'\[\[([^\]|]+)(?:\|[^\]]+)?\]\]')
 
+# YAML frontmatter relationship fields → edge type
+RELATIONSHIP_FIELDS = {
+    "tools": "uses_tool",
+    "systems": "uses_system",
+    "projects": "relates_to_project",
+    "patterns": "follows_pattern",
+    "decisions": "implements_decision",
+    "sessions": "logged_in_session",
+}
+
+
+def parse_yaml_frontmatter(content):
+    """Extract YAML frontmatter as a dict. Handles arrays and scalars."""
+    fm = {}
+    if not content.startswith("---"):
+        return fm
+    end = content.find("---", 3)
+    if end == -1:
+        return fm
+    yaml_block = content[3:end].strip()
+
+    current_key = None
+    for line in yaml_block.split("\n"):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        # Array item under current key
+        if stripped.startswith("- ") and current_key:
+            val = stripped[2:].strip().strip('"').strip("'")
+            if isinstance(fm.get(current_key), list):
+                fm[current_key].append(val)
+            continue
+
+        # Key: value pair
+        if ":" in stripped:
+            key, _, val = stripped.partition(":")
+            key = key.strip()
+            val = val.strip()
+            current_key = key
+
+            # Inline array: [a, b, c]
+            if val.startswith("[") and val.endswith("]"):
+                items = val[1:-1]
+                fm[key] = [v.strip().strip('"').strip("'") for v in items.split(",") if v.strip()]
+            elif val == "" or val == "[]":
+                fm[key] = []
+            else:
+                fm[key] = val.strip('"').strip("'")
+        else:
+            current_key = None
+
+    return fm
+
 
 def scan_vault():
-    """Scan all markdown files and extract wiki links."""
-    files = {}  # filename (no ext) → {path, links_out, links_in, tags, type}
+    """Scan all markdown files and extract wiki links + YAML relationships."""
+    files = {}  # filename (no ext) → {path, links_out, links_in, tags, type, yaml_rels, ...}
 
     # Collect all .md files
     all_paths = []
@@ -112,24 +166,39 @@ def scan_vault():
         except Exception:
             continue
 
-        # Extract wiki links
+        # Parse YAML frontmatter
+        fm = parse_yaml_frontmatter(content)
+
+        # Extract wiki links from body
         links = WIKI_LINK_RE.findall(content)
 
-        # Extract tags from YAML frontmatter or inline
+        # Extract typed relationships from YAML
+        yaml_rels = {}  # {edge_type: [target_names]}
+        for field, edge_type in RELATIONSHIP_FIELDS.items():
+            if field in fm and isinstance(fm[field], list) and fm[field]:
+                yaml_rels[edge_type] = fm[field]
+
+        # Extract tags from YAML or inline
         tags = []
-        tag_matches = re.findall(r'tags:\s*\[([^\]]+)\]', content)
-        if tag_matches:
-            for match in tag_matches:
-                tags.extend([t.strip() for t in match.split(",")])
-        inline_tags = re.findall(r'#(\w+)', content)
+        if "tags" in fm and isinstance(fm["tags"], list):
+            tags.extend(fm["tags"])
+        else:
+            # Fallback regex for non-standard tag formats
+            tag_matches = re.findall(r'tags:\s*\[([^\]]+)\]', content)
+            if tag_matches:
+                for match in tag_matches:
+                    tags.extend([t.strip() for t in match.split(",")])
+        inline_tags = re.findall(r'(?:^|\s)#(\w+)', content)
         tags.extend(inline_tags)
 
-        # Detect node type from prefix or folder
-        node_type = "unknown"
-        for prefix, ntype in PREFIXES.items():
-            if name.startswith(prefix):
-                node_type = ntype
-                break
+        # Get type from YAML first, then prefix, then folder
+        node_type = fm.get("type", "").strip()
+        if not node_type or node_type == "unknown":
+            node_type = "unknown"
+            for prefix, ntype in PREFIXES.items():
+                if name.startswith(prefix):
+                    node_type = ntype
+                    break
         if node_type == "unknown":
             # Infer from folder
             if "01-Projects" in rel_path or "Projects" in rel_path:
@@ -153,21 +222,28 @@ def scan_vault():
             elif "ai_cluster" in rel_path:
                 node_type = "system"
 
+        # Additional YAML metadata
+        status = fm.get("status", "")
+        created = fm.get("created", "")
+
         files[name] = {
             "path": rel_path,
             "links_out": links,
             "links_in": [],  # populated below
             "tags": list(set(tags)),
             "type": node_type,
+            "status": status,
+            "created": created,
             "word_count": len(content.split()),
+            "yaml_rels": yaml_rels,
+            "frontmatter": fm,
         }
 
-    # Build backlinks
+    # Build backlinks (from wiki links)
     for name, data in files.items():
         for link in data["links_out"]:
-            # Normalize link target
-            target = link.split("/")[-1]  # handle path-based links
-            target = target.split("#")[0]  # handle section links
+            target = link.split("/")[-1]
+            target = target.split("#")[0]
             if target in files:
                 files[target]["links_in"].append(name)
 
@@ -281,6 +357,67 @@ def generate_graph_index(files):
 
     return "\n".join(lines)
 
+def build_graph_json(files):
+    """Build JSON graph with typed edges from both wiki links and YAML relationships."""
+    nodes = {}
+    edges = []         # Legacy format: [source, target]
+    typed_edges = []   # New format: {source, target, type, label}
+
+    for name, data in files.items():
+        nodes[name] = {
+            "type": data["type"],
+            "path": data["path"],
+            "links": data["links_out"],
+            "tags": data["tags"],
+            "word_count": data["word_count"],
+            "status": data.get("status", ""),
+            "created": data.get("created", ""),
+            "yaml_rels": {k: v for k, v in data.get("yaml_rels", {}).items()},
+        }
+
+        # Wiki link edges (type = "wiki_link")
+        for link in data["links_out"]:
+            target = link.split("/")[-1].split("#")[0]
+            edges.append([name, target])
+            typed_edges.append({
+                "source": name,
+                "target": target,
+                "type": "wiki_link",
+            })
+
+        # YAML relationship edges (typed)
+        for edge_type, targets in data.get("yaml_rels", {}).items():
+            for target in targets:
+                typed_edges.append({
+                    "source": name,
+                    "target": target,
+                    "type": edge_type,
+                })
+
+    # Count typed relationship stats
+    rel_counts = defaultdict(int)
+    for e in typed_edges:
+        rel_counts[e["type"]] += 1
+
+    return {
+        "generated": datetime.now().isoformat(),
+        "nodes": nodes,
+        "edges": edges,  # Legacy: [[source, target], ...]
+        "typed_edges": typed_edges,  # New: [{source, target, type}, ...]
+        "stats": {
+            "total_files": len(files),
+            "total_links": sum(len(d["links_out"]) for d in files.values()),
+            "typed_relationships": sum(
+                sum(len(v) for v in d.get("yaml_rels", {}).values())
+                for d in files.values()
+            ),
+            "orphans": len(find_orphans(files)),
+            "missing_targets": len(find_missing_targets(files)),
+            "relationship_types": dict(rel_counts),
+        }
+    }
+
+
 # ── CLI ────────────────────────────────────────────────────────────────────────
 
 
@@ -312,30 +449,7 @@ def main():
 
     if "--json" in sys.argv:
         # Output graph as JSON for dashboards and other consumers
-        nodes = {}
-        edges = []
-        for name, data in files.items():
-            nodes[name] = {
-                "type": data["type"],
-                "path": data["path"],
-                "links": data["links_out"],
-                "tags": data["tags"],
-                "word_count": data["word_count"],
-            }
-            for link in data["links_out"]:
-                target = link.split("/")[-1].split("#")[0]
-                edges.append([name, target])
-        graph_json = {
-            "generated": datetime.now().isoformat(),
-            "nodes": nodes,
-            "edges": edges,
-            "stats": {
-                "total_files": len(files),
-                "total_links": sum(len(d["links_out"]) for d in files.values()),
-                "orphans": len(find_orphans(files)),
-                "missing_targets": len(find_missing_targets(files)),
-            }
-        }
+        graph_json = build_graph_json(files)
         json_path = CEIBA_DIR / "vault_graph.json"
         json_path.write_text(json.dumps(graph_json, indent=2))
         print(f"JSON graph written to {json_path}")
@@ -350,30 +464,7 @@ def main():
     print(f"Graph index written to {OUTPUT_FILE}")
 
     # Always output JSON alongside markdown on full runs
-    nodes = {}
-    edges = []
-    for name, data in files.items():
-        nodes[name] = {
-            "type": data["type"],
-            "path": data["path"],
-            "links": data["links_out"],
-            "tags": data["tags"],
-            "word_count": data["word_count"],
-        }
-        for link in data["links_out"]:
-            target = link.split("/")[-1].split("#")[0]
-            edges.append([name, target])
-    graph_json = {
-        "generated": datetime.now().isoformat(),
-        "nodes": nodes,
-        "edges": edges,
-        "stats": {
-            "total_files": len(files),
-            "total_links": sum(len(d["links_out"]) for d in files.values()),
-            "orphans": len(find_orphans(files)),
-            "missing_targets": len(find_missing_targets(files)),
-        }
-    }
+    graph_json = build_graph_json(files)
     json_path = CEIBA_DIR / "vault_graph.json"
     json_path.write_text(json.dumps(graph_json, indent=2))
     print(f"JSON graph written to {json_path}")
