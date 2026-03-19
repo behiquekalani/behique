@@ -183,3 +183,12 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com> (files: Ceiba/command-hu
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com> (files: Ceiba/command-hub.html,Ceiba/quest-dashboard.html,)
 - [2026-03-16 20:27] [main] cd78cf9: auto: session checkpoint 2026-03-16 20:27:49 (files: primer.md,)
 - [2026-03-16 20:50] [main] 6b96cb3: auto: session checkpoint 2026-03-16 20:50:36 (files: primer.md,)
+- [2026-03-18 12:52] [claude/blissful-ptolemy] 3d4abaa: feat: agent face gallery — particle, wireframe, command center + hooks
+
+Three face variants for agent dashboard:
+- Particle face (scattered dots, breathing, glitch)
+- Wireframe face (3D grid, expressions, scanlines)
+- Command center (4 agents with task feeds + activity)
+Gallery index at Ceiba/faces/ for preview server.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com> (files: .claude/hooks/pre_push_security.sh,.claude/hooks/stop_live_state.py,.claude/hooks/stop_session_summary.py,.claude/hooks/vault_context_loader.py,Ceiba/agent_faces.html,Ceiba/ceiba_face.html,Ceiba/faces/command-center.html,Ceiba/faces/index.html,Ceiba/faces/particle-face.html,Ceiba/faces/wireframe-face.html,)
