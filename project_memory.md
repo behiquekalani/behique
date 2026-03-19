@@ -183,3 +183,23 @@ Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com> (files: Ceiba/command-hu
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com> (files: Ceiba/command-hub.html,Ceiba/quest-dashboard.html,)
 - [2026-03-16 20:27] [main] cd78cf9: auto: session checkpoint 2026-03-16 20:27:49 (files: primer.md,)
 - [2026-03-16 20:50] [main] 6b96cb3: auto: session checkpoint 2026-03-16 20:50:36 (files: primer.md,)
+- [2026-03-18 12:52] [claude/blissful-ptolemy] 3d4abaa: feat: agent face gallery — particle, wireframe, command center + hooks
+
+Three face variants for agent dashboard:
+- Particle face (scattered dots, breathing, glitch)
+- Wireframe face (3D grid, expressions, scanlines)
+- Command center (4 agents with task feeds + activity)
+Gallery index at Ceiba/faces/ for preview server.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com> (files: .claude/hooks/pre_push_security.sh,.claude/hooks/stop_live_state.py,.claude/hooks/stop_session_summary.py,.claude/hooks/vault_context_loader.py,Ceiba/agent_faces.html,Ceiba/ceiba_face.html,Ceiba/faces/command-center.html,Ceiba/faces/index.html,Ceiba/faces/particle-face.html,Ceiba/faces/wireframe-face.html,)
+- [2026-03-19 11:05] [claude/blissful-ptolemy] 8ace3e9: feat: meditation interface, ASCII face, eBay listing, SSH remote guide
+
+- meditation.html: box breathing with bell frequencies, 30sec-15min timers,
+  inhale/exhale audio, secret mode easter egg
+- ascii-face.html: retro terminal face with PxPlus pixel font, CRT scanlines
+- EBAY_LISTING_READY.md: Funko Pop 3-pack listing ready to paste ($27.99, 40% margin)
+- SSH_REMOTE_SETUP.md: Cloudflare tunnel + Termius phone access guide
+- Gallery index updated with all new face variants
+- Audio assets: inhale.m4a, exhale.m4a, bitch.m4a
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com> (files: Ceiba/EBAY_LISTING_READY.md,Ceiba/SSH_REMOTE_SETUP.md,Ceiba/faces/ascii-face.html,Ceiba/faces/assets/PxPlus_HP_100LX_8x8.ttf,Ceiba/faces/assets/bitch.m4a,Ceiba/faces/assets/exhale.m4a,Ceiba/faces/assets/inhale.m4a,Ceiba/faces/index.html,Ceiba/faces/meditation.html,project_memory.md,)

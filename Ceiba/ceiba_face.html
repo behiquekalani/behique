@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEIBA // Face</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0e17;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: crosshair;
+  }
+  canvas {
+    display: block;
+  }
+  #status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: #00f0ff44;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<canvas id="face"></canvas>
+<div id="status">CEIBA ONLINE</div>
+<script>
+const canvas = document.getElementById('face');
+const ctx = canvas.getContext('2d');
+
+let W, H, cx, cy, faceRadius;
+let particles = [];
+let mouse = { x: -9999, y: -9999 };
+let state = 'idle'; // idle, listening, thinking, speaking
+let stateTimer = 0;
+let breathPhase = 0;
+let glitchTimer = 0;
+let nextGlitch = Math.random() * 300 + 100;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+  faceRadius = Math.min(W, H) * 0.3;
+  initParticles();
+}
+
+// Face geometry — define key points of a skull/face shape
+function getFacePoints() {
+  const pts = [];
+  const r = faceRadius;
+
+  // Skull outline — oval
+  for (let a = 0; a < Math.PI * 2; a += 0.08) {
+    const rx = r * 0.7;
+    const ry = r * 0.9;
+    const x = cx + Math.cos(a) * rx;
+    const y = cy + Math.sin(a) * ry - r * 0.05;
+    pts.push({ x, y, type: 'outline', size: Math.random() * 1.5 + 0.5 });
+  }
+
+  // Left eye socket
+  for (let a = 0; a < Math.PI * 2; a += 0.12) {
+    const ex = cx - r * 0.22;
+    const ey = cy - r * 0.15;
+    const erx = r * 0.14;
+    const ery = r * 0.12;
+    const x = ex + Math.cos(a) * erx;
+    const y = ey + Math.sin(a) * ery;
+    pts.push({ x, y, type: 'eye', size: Math.random() * 2 + 1 });
+  }
+  // Left eye fill (sparse dots inside)
+  for (let i = 0; i < 15; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * r * 0.08;
+    pts.push({ x: cx - r * 0.22 + Math.cos(a) * d, y: cy - r * 0.15 + Math.sin(a) * d, type: 'eye-fill', size: Math.random() * 1.5 + 0.5 });
+  }
+
+  // Right eye socket
+  for (let a = 0; a < Math.PI * 2; a += 0.12) {
+    const ex = cx + r * 0.22;
+    const ey = cy - r * 0.15;
+    const erx = r * 0.14;
+    const ery = r * 0.12;
+    const x = ex + Math.cos(a) * erx;
+    const y = ey + Math.sin(a) * ery;
+    pts.push({ x, y, type: 'eye', size: Math.random() * 2 + 1 });
+  }
+  // Right eye fill
+  for (let i = 0; i < 15; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * r * 0.08;
+    pts.push({ x: cx + r * 0.22 + Math.cos(a) * d, y: cy - r * 0.15 + Math.sin(a) * d, type: 'eye-fill', size: Math.random() * 1.5 + 0.5 });
+  }
+
+  // Nose — simple triangle hint
+  const ny = cy + r * 0.08;
+  for (let i = 0; i < 8; i++) {
+    const t = i / 7;
+    pts.push({ x: cx - r * 0.04 + t * r * 0.08, y: ny + r * 0.12, type: 'nose', size: Math.random() + 0.8 });
+  }
+  // Nose bridge
+  for (let i = 0; i < 5; i++) {
+    const t = i / 4;
+    pts.push({ x: cx, y: cy - r * 0.02 + t * r * 0.2, type: 'nose', size: Math.random() + 0.5 });
+  }
+
+  // Mouth — subtle line
+  for (let a = -0.8; a <= 0.8; a += 0.06) {
+    const mx = cx + Math.sin(a) * r * 0.2;
+    const my = cy + r * 0.38 + Math.cos(a * 2) * r * 0.01;
+    pts.push({ x: mx, y: my, type: 'mouth', size: Math.random() * 1.5 + 0.5 });
+  }
+
+  // Cheekbones — scattered dots
+  for (let i = 0; i < 20; i++) {
+    const side = i < 10 ? -1 : 1;
+    const x = cx + side * (r * 0.4 + Math.random() * r * 0.15);
+    const y = cy + r * 0.05 + Math.random() * r * 0.2;
+    pts.push({ x, y, type: 'cheek', size: Math.random() * 1.2 + 0.3 });
+  }
+
+  // Jaw line
+  for (let a = 0.3; a < Math.PI - 0.3; a += 0.1) {
+    const x = cx + Math.cos(a - Math.PI / 2) * r * 0.55;
+    const y = cy + r * 0.35 + Math.sin(a) * r * 0.25;
+    pts.push({ x, y, type: 'jaw', size: Math.random() + 0.5 });
+  }
+
+  // Ambient floating particles around face
+  for (let i = 0; i < 120; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = r * 0.3 + Math.random() * r * 0.8;
+    pts.push({
+      x: cx + Math.cos(a) * d,
+      y: cy + Math.sin(a) * d,
+      type: 'ambient',
+      size: Math.random() * 1.2 + 0.2
+    });
+  }
+
+  // Forehead scatter
+  for (let i = 0; i < 25; i++) {
+    const x = cx + (Math.random() - 0.5) * r * 1.0;
+    const y = cy - r * 0.4 - Math.random() * r * 0.35;
+    pts.push({ x, y, type: 'forehead', size: Math.random() + 0.3 });
+  }
+
+  return pts;
+}
+
+function initParticles() {
+  const facePoints = getFacePoints();
+  particles = facePoints.map(fp => ({
+    // Target position (where the particle wants to be)
+    tx: fp.x,
+    ty: fp.y,
+    // Current position (start scattered)
+    x: cx + (Math.random() - 0.5) * W,
+    y: cy + (Math.random() - 0.5) * H,
+    // Velocity
+    vx: 0,
+    vy: 0,
+    // Properties
+    type: fp.type,
+    baseSize: fp.size,
+    size: fp.size,
+    alpha: 0,
+    targetAlpha: fp.type === 'ambient' ? 0.2 + Math.random() * 0.3 : 0.6 + Math.random() * 0.4,
+    // Drift — organic movement
+    driftAngle: Math.random() * Math.PI * 2,
+    driftSpeed: 0.002 + Math.random() * 0.005,
+    driftRadius: 1 + Math.random() * 3,
+    // Phase offset for breathing
+    phase: Math.random() * Math.PI * 2,
+    // Flicker
+    flickerSpeed: 0.02 + Math.random() * 0.04,
+    flickerPhase: Math.random() * Math.PI * 2,
+  }));
+}
+
+function update() {
+  breathPhase += 0.008;
+  stateTimer++;
+  glitchTimer++;
+
+  const breathScale = 1 + Math.sin(breathPhase) * 0.008;
+  const isGlitching = glitchTimer > nextGlitch && glitchTimer < nextGlitch + 8;
+
+  if (glitchTimer > nextGlitch + 8) {
+    glitchTimer = 0;
+    nextGlitch = Math.random() * 400 + 150;
+  }
+
+  for (const p of particles) {
+    // Target with breathing
+    const dx = p.tx - cx;
+    const dy = p.ty - cy;
+    const targetX = cx + dx * breathScale;
+    const targetY = cy + dy * breathScale;
+
+    // Drift
+    p.driftAngle += p.driftSpeed;
+    const driftX = Math.cos(p.driftAngle) * p.driftRadius;
+    const driftY = Math.sin(p.driftAngle * 0.7) * p.driftRadius;
+
+    // Mouse repulsion
+    const mdx = p.x - mouse.x;
+    const mdy = p.y - mouse.y;
+    const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+    let repelX = 0, repelY = 0;
+    if (mDist < 120) {
+      const force = (120 - mDist) / 120 * 8;
+      repelX = (mdx / mDist) * force;
+      repelY = (mdy / mDist) * force;
+    }
+
+    // Spring physics toward target
+    const sx = targetX + driftX - p.x;
+    const sy = targetY + driftY - p.y;
+    p.vx += sx * 0.03 + repelX;
+    p.vy += sy * 0.03 + repelY;
+    p.vx *= 0.88;
+    p.vy *= 0.88;
+
+    // Glitch displacement
+    if (isGlitching && Math.random() < 0.15) {
+      p.vx += (Math.random() - 0.5) * 20;
+      p.vy += (Math.random() - 0.5) * 20;
+    }
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // Alpha fade in
+    p.alpha += (p.targetAlpha - p.alpha) * 0.02;
+
+    // Flicker
+    p.flickerPhase += p.flickerSpeed;
+    const flicker = 0.7 + Math.sin(p.flickerPhase) * 0.3;
+    p.size = p.baseSize * flicker;
+  }
+}
+
+function draw() {
+  ctx.fillStyle = 'rgba(10, 14, 23, 0.15)';
+  ctx.fillRect(0, 0, W, H);
+
+  for (const p of particles) {
+    const alpha = p.alpha * (0.7 + Math.sin(p.flickerPhase) * 0.3);
+
+    if (p.type === 'eye' || p.type === 'eye-fill') {
+      ctx.fillStyle = `rgba(0, 240, 255, ${alpha})`;
+      // Subtle glow for eyes
+      if (p.type === 'eye' && alpha > 0.4) {
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 6;
+      }
+    } else if (p.type === 'mouth') {
+      ctx.fillStyle = `rgba(0, 240, 255, ${alpha * 0.7})`;
+      ctx.shadowColor = '';
+      ctx.shadowBlur = 0;
+    } else if (p.type === 'ambient') {
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.4})`;
+      ctx.shadowColor = '';
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.85})`;
+      ctx.shadowColor = '';
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Reset shadow
+  ctx.shadowColor = '';
+  ctx.shadowBlur = 0;
+
+  // Subtle scan line effect
+  if (Math.random() < 0.03) {
+    const sy = Math.random() * H;
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.02)';
+    ctx.fillRect(0, sy, W, 1);
+  }
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Events
+window.addEventListener('resize', resize);
+canvas.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+canvas.addEventListener('mouseleave', () => {
+  mouse.x = -9999;
+  mouse.y = -9999;
+});
+
+// Click to trigger glitch
+canvas.addEventListener('click', () => {
+  glitchTimer = nextGlitch;
+});
+
+// Cycle states with keyboard
+document.addEventListener('keydown', e => {
+  const states = ['idle', 'listening', 'thinking', 'speaking'];
+  if (e.key === ' ') {
+    e.preventDefault();
+    const idx = (states.indexOf(state) + 1) % states.length;
+    state = states[idx];
+    document.getElementById('status').textContent = `CEIBA ${state.toUpperCase()}`;
+  }
+});
+
+// Status text pulse
+setInterval(() => {
+  const el = document.getElementById('status');
+  el.style.color = `rgba(0, 240, 255, ${0.15 + Math.sin(Date.now() / 1000) * 0.1})`;
+}, 50);
+
+resize();
+loop();
+</script>
+</body>
+</html>

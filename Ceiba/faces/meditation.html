@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba — Breathe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #060a10;
+    color: #c0c8d8;
+    font-family: 'Courier New', monospace;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* --- SETUP SCREEN --- */
+  #setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    transition: opacity 0.8s;
+  }
+  #setup.hidden { opacity: 0; pointer-events: none; position: absolute; }
+
+  #setup h1 {
+    font-size: 14px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #00f0ff;
+    opacity: 0.6;
+  }
+
+  .time-grid {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .time-btn {
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    color: #00f0ff;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    padding: 20px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 90px;
+  }
+  .time-btn:hover {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+  }
+  .time-btn span { font-size: 12px; opacity: 0.5; display: block; margin-top: 4px; }
+
+  /* Custom time input */
+  .custom-time {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .custom-time input {
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    color: #00f0ff;
+    font-family: 'Courier New', monospace;
+    font-size: 18px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    width: 80px;
+    text-align: center;
+    outline: none;
+  }
+  .custom-time input:focus {
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+  }
+  .custom-time label {
+    font-size: 12px;
+    color: rgba(0, 240, 255, 0.4);
+    letter-spacing: 2px;
+  }
+  .custom-time button {
+    background: rgba(0, 240, 255, 0.05);
+    border: 1px solid rgba(0, 240, 255, 0.15);
+    color: #00f0ff;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .custom-time button:hover {
+    background: rgba(0, 240, 255, 0.12);
+    border-color: rgba(0, 240, 255, 0.4);
+  }
+
+  /* Secret ? button */
+  .secret-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: none;
+    border: 1px solid rgba(255, 107, 157, 0.2);
+    color: rgba(255, 107, 157, 0.4);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+    z-index: 10;
+  }
+  .secret-btn:hover {
+    border-color: rgba(255, 107, 157, 0.5);
+    color: rgba(255, 107, 157, 0.7);
+    box-shadow: 0 0 15px rgba(255, 107, 157, 0.15);
+  }
+  .secret-btn.active {
+    border-color: #ff6b9d;
+    color: #ff6b9d;
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+  }
+
+  /* --- MEDITATION SCREEN --- */
+  #meditation {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  #meditation.active { display: flex; }
+
+  /* Breathing circle */
+  .breath-ring {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 240, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 4s ease-in-out, border-color 0.5s, box-shadow 0.5s;
+  }
+  .breath-ring.inhale {
+    transform: scale(1.6);
+    border-color: rgba(0, 240, 255, 0.6);
+    box-shadow: 0 0 60px rgba(0, 240, 255, 0.15), inset 0 0 40px rgba(0, 240, 255, 0.05);
+  }
+  .breath-ring.hold-in {
+    transform: scale(1.6);
+    border-color: rgba(180, 77, 255, 0.6);
+    box-shadow: 0 0 60px rgba(180, 77, 255, 0.15), inset 0 0 40px rgba(180, 77, 255, 0.05);
+  }
+  .breath-ring.exhale {
+    transform: scale(1.0);
+    border-color: rgba(0, 255, 136, 0.5);
+    box-shadow: 0 0 40px rgba(0, 255, 136, 0.1), inset 0 0 30px rgba(0, 255, 136, 0.03);
+  }
+  .breath-ring.hold-out {
+    transform: scale(1.0);
+    border-color: rgba(255, 200, 50, 0.4);
+    box-shadow: 0 0 30px rgba(255, 200, 50, 0.08);
+  }
+
+  .breath-label {
+    font-size: 16px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #00f0ff;
+    transition: color 0.5s;
+  }
+  .hold-in .breath-label { color: #b44dff; }
+  .exhale .breath-label { color: #00ff88; }
+  .hold-out .breath-label { color: #ffc832; }
+
+  .phase-timer {
+    font-size: 48px;
+    color: rgba(255,255,255,0.15);
+    position: absolute;
+    bottom: -70px;
+  }
+
+  /* Timer + controls */
+  .top-bar {
+    position: absolute;
+    top: 30px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+  }
+  .total-timer {
+    font-size: 24px;
+    color: rgba(0, 240, 255, 0.4);
+    letter-spacing: 3px;
+  }
+
+  .stop-btn {
+    position: absolute;
+    bottom: 50px;
+    background: none;
+    border: 1px solid rgba(255, 100, 100, 0.3);
+    color: rgba(255, 100, 100, 0.5);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .stop-btn:hover {
+    border-color: rgba(255, 100, 100, 0.6);
+    color: rgba(255, 100, 100, 0.8);
+  }
+
+  /* Cycle counter */
+  .cycle-count {
+    position: absolute;
+    bottom: 110px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  /* Completion */
+  #complete {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  #complete.active { display: flex; }
+  #complete h2 {
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: #00ff88;
+    opacity: 0.7;
+  }
+  .stats {
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
+    line-height: 2;
+  }
+  .restart-btn {
+    background: none;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    color: rgba(0, 240, 255, 0.5);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 12px 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .restart-btn:hover {
+    border-color: rgba(0, 240, 255, 0.5);
+    color: #00f0ff;
+  }
+
+  /* Background particles */
+  canvas#bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- SETUP -->
+<div id="setup">
+  <h1>Ceiba // Breathe</h1>
+  <div class="time-grid">
+    <button class="time-btn" data-seconds="30">30<span>sec</span></button>
+    <button class="time-btn" data-minutes="1">1<span>min</span></button>
+    <button class="time-btn" data-minutes="2">2<span>min</span></button>
+    <button class="time-btn" data-minutes="5">5<span>min</span></button>
+    <button class="time-btn" data-minutes="10">10<span>min</span></button>
+    <button class="time-btn" data-minutes="15">15<span>min</span></button>
+  </div>
+  <div class="custom-time">
+    <input type="number" id="customMin" min="1" max="120" placeholder="—">
+    <label>MIN</label>
+    <button id="customGo">GO</button>
+  </div>
+</div>
+
+<button class="secret-btn" id="secretBtn">?</button>
+
+<!-- MEDITATION -->
+<div id="meditation">
+  <div class="top-bar">
+    <div class="total-timer" id="totalTimer">05:00</div>
+  </div>
+  <div class="breath-ring" id="ring">
+    <span class="breath-label" id="phaseLabel">READY</span>
+    <span class="phase-timer" id="phaseTimer"></span>
+  </div>
+  <div class="cycle-count" id="cycleCount"></div>
+  <button class="stop-btn" id="stopBtn">STOP</button>
+</div>
+
+<!-- COMPLETE -->
+<div id="complete">
+  <h2>Session Complete</h2>
+  <div class="stats" id="stats"></div>
+  <button class="restart-btn" id="restartBtn">AGAIN</button>
+</div>
+
+<script>
+// --- AUDIO ENGINE (Web Audio API bell tones) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playBell(freq, duration, volume = 0.3) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+
+  filter.type = 'lowpass';
+  filter.frequency.value = freq * 2;
+  filter.Q.value = 1;
+
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, audioCtx.currentTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+// Preload voice clips
+const inhaleAudio = new Audio('assets/inhale.m4a');
+const exhaleAudio = new Audio('assets/exhale.m4a');
+const bitchAudio = new Audio('assets/bitch.m4a');
+bitchAudio.volume = 1.0;
+let secretMode = false;
+inhaleAudio.volume = 0.8;
+exhaleAudio.volume = 0.8;
+
+function bellInhale() {
+  inhaleAudio.currentTime = 0;
+  inhaleAudio.play();
+  // Subtle harmonic underneath
+  playBell(528, 1.5, 0.08);
+}
+
+function bellExhale() {
+  exhaleAudio.currentTime = 0;
+  exhaleAudio.play();
+  // Subtle harmonic underneath
+  playBell(432, 1.5, 0.08);
+}
+
+function bellComplete() {
+  // Three ascending bells
+  playBell(528, 2.0, 0.3);
+  setTimeout(() => playBell(660, 2.0, 0.25), 400);
+  setTimeout(() => playBell(792, 3.0, 0.3), 800);
+}
+
+// --- BREATHING PATTERN (box breathing 4-4-4-4, can adjust) ---
+const PHASES = [
+  { name: 'BREATHE IN',  key: 'inhale',   duration: 4, bell: bellInhale },
+  { name: 'HOLD',        key: 'hold-in',  duration: 4, bell: null },
+  { name: 'BREATHE OUT', key: 'exhale',   duration: 4, bell: bellExhale },
+  { name: 'HOLD',        key: 'hold-out', duration: 4, bell: null },
+];
+
+// --- STATE ---
+let totalSeconds = 0;
+let remainingSeconds = 0;
+let currentPhase = 0;
+let phaseRemaining = 0;
+let cycles = 0;
+let running = false;
+let intervalId = null;
+
+// --- ELEMENTS ---
+const setupEl = document.getElementById('setup');
+const medEl = document.getElementById('meditation');
+const completeEl = document.getElementById('complete');
+const ring = document.getElementById('ring');
+const phaseLabel = document.getElementById('phaseLabel');
+const phaseTimer = document.getElementById('phaseTimer');
+const totalTimerEl = document.getElementById('totalTimer');
+const cycleCountEl = document.getElementById('cycleCount');
+const statsEl = document.getElementById('stats');
+
+// --- TIME BUTTONS ---
+document.querySelectorAll('.time-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    if (btn.dataset.seconds) {
+      startMeditationSeconds(parseInt(btn.dataset.seconds));
+    } else {
+      startMeditation(parseInt(btn.dataset.minutes));
+    }
+  });
+});
+
+// Custom time input
+document.getElementById('customGo').addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const val = parseInt(document.getElementById('customMin').value);
+  if (val && val > 0) startMeditation(val);
+});
+document.getElementById('customMin').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('customGo').click();
+});
+
+// Secret ? button
+document.getElementById('secretBtn').addEventListener('click', () => {
+  secretMode = !secretMode;
+  document.getElementById('secretBtn').classList.toggle('active', secretMode);
+});
+
+document.getElementById('stopBtn').addEventListener('click', endSession);
+document.getElementById('restartBtn').addEventListener('click', () => {
+  completeEl.classList.remove('active');
+  completeEl.style.display = 'none';
+  setupEl.classList.remove('hidden');
+  setupEl.style.display = 'flex';
+});
+
+function startMeditationSeconds(secs) {
+  totalSeconds = secs;
+  remainingSeconds = totalSeconds;
+  currentPhase = 0;
+  phaseRemaining = PHASES[0].duration;
+  cycles = 0;
+  running = true;
+
+  setupEl.classList.add('hidden');
+  setTimeout(() => { setupEl.style.display = 'none'; }, 800);
+  medEl.classList.add('active');
+
+  enterPhase(0);
+  intervalId = setInterval(tick, 1000);
+}
+
+function startMeditation(minutes) {
+  totalSeconds = minutes * 60;
+  remainingSeconds = totalSeconds;
+  currentPhase = 0;
+  phaseRemaining = PHASES[0].duration;
+  cycles = 0;
+  running = true;
+
+  setupEl.classList.add('hidden');
+  setTimeout(() => { setupEl.style.display = 'none'; }, 800);
+  medEl.classList.add('active');
+
+  // Start first phase
+  enterPhase(0);
+
+  intervalId = setInterval(tick, 1000);
+}
+
+function enterPhase(idx) {
+  const phase = PHASES[idx];
+  phaseRemaining = phase.duration;
+
+  // Update ring class
+  ring.className = 'breath-ring ' + phase.key;
+  phaseLabel.textContent = phase.name;
+
+  // Set transition duration to match phase
+  ring.style.transitionDuration = phase.duration + 's';
+
+  // Play bell (silent on hold phases)
+  if (phase.bell) phase.bell();
+
+  // Track cycles
+  if (idx === 0) cycles++;
+  cycleCountEl.textContent = 'CYCLE ' + cycles;
+}
+
+function tick() {
+  if (!running) return;
+
+  remainingSeconds--;
+  phaseRemaining--;
+
+  // Update total timer
+  const m = Math.floor(remainingSeconds / 60);
+  const s = remainingSeconds % 60;
+  totalTimerEl.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+
+  // Update phase countdown
+  phaseTimer.textContent = phaseRemaining > 0 ? phaseRemaining : '';
+
+  // Time's up
+  if (remainingSeconds <= 0) {
+    endSession();
+    return;
+  }
+
+  // Next phase
+  if (phaseRemaining <= 0) {
+    currentPhase = (currentPhase + 1) % PHASES.length;
+    enterPhase(currentPhase);
+  }
+}
+
+function endSession() {
+  running = false;
+  clearInterval(intervalId);
+
+  if (secretMode) {
+    bitchAudio.currentTime = 0;
+    bitchAudio.play();
+  }
+  bellComplete();
+
+  medEl.classList.remove('active');
+  completeEl.classList.add('active');
+  completeEl.style.display = 'flex';
+
+  const elapsed = totalSeconds - remainingSeconds;
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  statsEl.innerHTML =
+    mins + ' min ' + secs + ' sec<br>' +
+    cycles + ' breath cycles<br>' +
+    (cycles * 4) + ' breaths';
+}
+
+// --- BACKGROUND PARTICLES ---
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.5 + 0.5,
+    dx: (Math.random() - 0.5) * 0.3,
+    dy: (Math.random() - 0.5) * 0.3,
+    phase: Math.random() * Math.PI * 2,
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const t = Date.now() * 0.001;
+
+  particles.forEach(p => {
+    p.x += p.dx;
+    p.y += p.dy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+
+    const alpha = 0.3 + 0.3 * Math.sin(t + p.phase);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 240, 255, ${alpha})`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+</body>
+</html>
