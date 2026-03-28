@@ -6440,3 +6440,22 @@ All have .md + .pdf + landing page:
 - Gumroad listing docs: 4 (V3, V4, Apps, Quick List)
 - Store: v2 rebuilt (850+ lines)
 - Sprint audits: 8 (all clean)
+
+## Session: 2026-03-28 (Product Audit + Git Reset)
+
+### Fixed:
+- ALL 16 blueprint PDFs: removed @media print white override, removed page-break-inside:avoid (blank pages), removed duplicate footers, reduced footer padding
+- Starter Blueprint + Voice Bible: same print override fix
+- Behike OS bundle: duplicate behike.co in 3 variants, footer padding, IDE code syntax, all 5 PDFs regenerated, zip rebuilt
+- All 21 covers: prices removed, regenerated
+- All 19 thumbnails: regenerated
+- Git repo: reset from 11GB to 1.1GB (fresh history, large files gitignored)
+- SSH key set up for GitHub, remote switched to SSH
+- products-organized/: 18 folders rebuilt with fixed files
+
+### Gumroad:
+- 3 products listed: starter (free), ecommerce ($19.99), behike-os ($97)
+- BEHIKE10 discount code created
+- 15 more products ready to list in products-organized/
+
+### Sprint audits: 10 total this session (final: 5 security fixed, PII false positives, copyright data feeds)
