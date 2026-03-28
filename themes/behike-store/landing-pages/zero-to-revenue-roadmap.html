@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Zero-to-Revenue Roadmap — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1c1c1e;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: #F5F5F7;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .nav-cta {
+      background: #30D158;
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: #30D15820;
+      color: #30D158;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+      border: 1px solid #30D15830;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: #30D158;
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: #98989d;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+    .hero-price-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 36px;
+    }
+    .price-label {
+      font-size: 13px;
+      color: #636366;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .price-value {
+      font-size: 48px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -0.02em;
+    }
+    .price-note {
+      font-size: 13px;
+      color: #48484a;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 48px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .cta-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+    .hero-detail {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #48484a;
+    }
+
+    /* PROBLEM SECTION */
+    .section {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0A84FF;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 24px;
+    }
+    .section p {
+      color: #98989d;
+      font-size: 18px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+    .divider {
+      height: 1px;
+      background: #1c1c1e;
+    }
+
+    /* 90 DAY TIMELINE */
+    .timeline {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: #1c1c1e;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .timeline-phase {
+      background: #0a0a0a;
+      padding: 32px;
+    }
+    .phase-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #30D158;
+      margin-bottom: 8px;
+    }
+    .phase-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .phase-list {
+      list-style: none;
+    }
+    .phase-list li {
+      font-size: 14px;
+      color: #636366;
+      padding: 6px 0;
+      border-bottom: 1px solid #141414;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .phase-list li:last-child { border-bottom: none; }
+    .phase-list li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #30D158;
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    /* WHAT YOU LEARN */
+    .learn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      background: #1c1c1e;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+    .learn-item {
+      background: #0a0a0a;
+      padding: 32px;
+    }
+    .learn-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0A84FF;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .learn-item h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .learn-item p {
+      font-size: 15px;
+      color: #636366;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* FOR LIST */
+    .for-list {
+      list-style: none;
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 24px;
+      background: #0a0a0a;
+      border: 1px solid #1c1c1e;
+      border-radius: 12px;
+      font-size: 16px;
+      color: #ebebeb;
+      line-height: 1.5;
+    }
+    .for-list li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #30D158;
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    /* TOC */
+    .toc {
+      margin-top: 48px;
+      border: 1px solid #1c1c1e;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 22px 28px;
+      border-bottom: 1px solid #1c1c1e;
+    }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0A84FF;
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .toc-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .toc-content p {
+      font-size: 14px;
+      color: #636366;
+      margin: 0;
+    }
+
+    /* QUOTE */
+    .quote-block {
+      margin: 64px 0;
+      padding: 48px;
+      background: #0a0a0a;
+      border: 1px solid #1c1c1e;
+      border-left: 4px solid #30D158;
+      border-radius: 16px;
+    }
+    .quote-text {
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: #F5F5F7;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .quote-source {
+      font-size: 14px;
+      color: #48484a;
+    }
+
+    /* DETAILS */
+    .details-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .detail-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #0a0a0a;
+      border: 1px solid #1c1c1e;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #98989d;
+    }
+    .detail-pill .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #30D158;
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .bottom-cta h2 {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      line-height: 1.15;
+    }
+    .bottom-cta p {
+      font-size: 18px;
+      color: #636366;
+      margin-bottom: 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid #1c1c1e;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #3a3a3c;
+    }
+
+    @media (max-width: 768px) {
+      .timeline { grid-template-columns: 1fr; }
+      .hero { padding: 64px 0 56px; }
+      .quote-block { padding: 28px; }
+      .quote-text { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-logo">Behike</a>
+      <a href="https://behike.gumroad.com" class="nav-cta">Get It Now</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="fade-up">
+        <div class="hero-tag">90-Day Roadmap</div>
+        <h1>The <em>Zero-to-Revenue</em> Roadmap</h1>
+        <p class="hero-sub">You are not failing because you lack skill. You are failing because you are doing the right things in the wrong order. This roadmap fixes the sequence.</p>
+      </div>
+      <div class="fade-up" style="transition-delay: 0.1s">
+        <div class="hero-price-block">
+          <span class="price-label">One-time purchase</span>
+          <span class="price-value">$21.99</span>
+          <span class="price-note">Instant download. Keep forever.</span>
+        </div>
+        <br>
+        <a href="https://behike.gumroad.com/l/zero-to-revenue-roadmap" class="cta-btn">Get Instant Access</a>
+        <p class="hero-detail">PDF format. 5,000+ words. No recurring fees.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">The Problem</p>
+        <h2>The gap between zero and your first dollar is a sequencing problem.</h2>
+        <p>Most people build products before they understand what people want to buy. They grow audiences before they have something to sell. They optimize systems before they have proven the offer works.</p>
+        <p>The knowledge is not missing. The order is wrong.</p>
+        <p>This roadmap is built around a 90-day arc from absolute zero to your first $1,000 in online revenue. Not because $1,000 is the destination, but because the mechanics of the first dollar are the exact mechanics that scale.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">The 90-Day Sequence</p>
+        <h2>Three phases. One outcome.</h2>
+      </div>
+      <div class="timeline fade-up">
+        <div class="timeline-phase">
+          <div class="phase-num">Days 1 to 30</div>
+          <div class="phase-title">Foundation</div>
+          <ul class="phase-list">
+            <li>Choose your income vehicle</li>
+            <li>Define the minimum viable offer</li>
+            <li>Build the offer</li>
+            <li>Set up payment and delivery infrastructure</li>
+          </ul>
+        </div>
+        <div class="timeline-phase">
+          <div class="phase-num">Days 31 to 60</div>
+          <div class="phase-title">First Buyers</div>
+          <ul class="phase-list">
+            <li>Find where buyers already gather</li>
+            <li>Contribute without selling first</li>
+            <li>Direct outreach to warm prospects</li>
+            <li>Soft launch to trusted contacts</li>
+          </ul>
+        </div>
+        <div class="timeline-phase">
+          <div class="phase-num">Days 61 to 90</div>
+          <div class="phase-title">First $1,000</div>
+          <ul class="phase-list">
+            <li>Publish social proof</li>
+            <li>Expand to content distribution</li>
+            <li>Address objections directly</li>
+            <li>Close the gap with a specific plan</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">What You Will Learn</p>
+        <h2>Eight chapters. Every phase covered.</h2>
+      </div>
+      <div class="learn-grid fade-up">
+        <div class="learn-item">
+          <div class="learn-num">01</div>
+          <h3>The 90-Day Sequence</h3>
+          <p>The exact week-by-week actions from zero to $1,000. No ambiguity, no "it depends." A specific sequence.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">02</div>
+          <h3>Choosing Your Income Vehicle</h3>
+          <p>Products vs. services vs. both. How to choose based on your timeline, existing audience, and long-term vision.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">03</div>
+          <h3>Minimum Viable Offer</h3>
+          <p>What minimum viable actually means. The one-problem rule. How to price for speed, not optimization.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">04</div>
+          <h3>The First 10 Customers</h3>
+          <p>The 10-customer sequence. What to do with every buyer. How to handle rejection without losing momentum.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">05</div>
+          <h3>From $1K to Recurring Revenue</h3>
+          <p>The four recurring models. Converting one-time buyers into subscribers. Building the upgrade path.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">06</div>
+          <h3>The Scaling Trap</h3>
+          <p>What premature scaling looks like and why it kills early-stage businesses. The anti-scaling principles.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">07</div>
+          <h3>Building Systems While Selling</h3>
+          <p>The system-building protocol. The four systems every revenue business needs. Selling and building in parallel.</p>
+        </div>
+        <div class="learn-item">
+          <div class="learn-num">08</div>
+          <h3>From $1K to $5K</h3>
+          <p>What changes at $5,000. The compounding distribution strategy. Raising prices with data, not guessing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="quote-block fade-up">
+        <p class="quote-text">"The first dollar is the hardest. Not because of the amount, but because it requires you to build something, offer it to strangers, and see whether they find it valuable enough to exchange money for it."</p>
+        <p class="quote-source">From The Zero-to-Revenue Roadmap</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">Who This Is For</p>
+        <h2>This is for people starting from zero.</h2>
+      </div>
+      <ul class="for-list fade-up">
+        <li>You have been meaning to start an online business for months but keep getting stuck on where to begin</li>
+        <li>You have tried before and did not make any sales, and you want to understand what went wrong in the sequence</li>
+        <li>You have skills and knowledge but no clear path to turning them into money</li>
+        <li>You have built a product that nobody bought and you need to understand the distribution problem</li>
+        <li>You want your first $1,000 in the next 90 days, not a long-term strategy that starts paying off in year two</li>
+        <li>You are ready to do the uncomfortable work of direct outreach and real customer conversations</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">Inside the Roadmap</p>
+        <h2>What is covered, chapter by chapter.</h2>
+      </div>
+      <div class="toc fade-up">
+        <div class="toc-item">
+          <span class="toc-num">01</span>
+          <div class="toc-content">
+            <h4>The 90-Day Sequence to Your First $1,000</h4>
+            <p>The week-by-week breakdown. Foundation, first buyers, and closing the gap.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">02</span>
+          <div class="toc-content">
+            <h4>Choosing Your Income Vehicle</h4>
+            <p>Products, services, and the hybrid path. Decision framework based on urgency, audience, and vision.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">03</span>
+          <div class="toc-content">
+            <h4>Building the Minimum Viable Offer</h4>
+            <p>The one-problem rule. What minimum viable actually means. Writing the offer description that converts.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">04</span>
+          <div class="toc-content">
+            <h4>The First 10 Customers Playbook</h4>
+            <p>Why 10 is the inflection point. The network, outreach, and content sequence for the first ten buyers.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">05</span>
+          <div class="toc-content">
+            <h4>Turning $1,000 Into Recurring Revenue</h4>
+            <p>The four recurring models. Converting one-time buyers. Building the upgrade path before you need it.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">06</span>
+          <div class="toc-content">
+            <h4>The Scaling Trap</h4>
+            <p>Why early traction leads to premature scaling and how to stay disciplined. The anti-scaling principles.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">07</span>
+          <div class="toc-content">
+            <h4>Building Systems While Still Selling</h4>
+            <p>The 10-repetition rule. The four systems every revenue business needs. The 80/20 time allocation.</p>
+          </div>
+        </div>
+        <div class="toc-item">
+          <span class="toc-num">08</span>
+          <div class="toc-content">
+            <h4>From $1,000 to $5,000</h4>
+            <p>The shift from proving the offer to proving distribution. Compounding architecture. Strategic price increases.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">Product Details</p>
+        <h2>Everything you get.</h2>
+        <div class="details-row">
+          <div class="detail-pill"><span class="dot"></span> PDF format</div>
+          <div class="detail-pill"><span class="dot"></span> 5,000+ words</div>
+          <div class="detail-pill"><span class="dot"></span> 8 complete chapters</div>
+          <div class="detail-pill"><span class="dot"></span> 90-day action sequence</div>
+          <div class="detail-pill"><span class="dot"></span> Instant download</div>
+          <div class="detail-pill"><span class="dot"></span> No DRM restrictions</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="bottom-cta">
+    <div class="container">
+      <div class="fade-up">
+        <h2>The sequence exists.<br>Now follow it.</h2>
+        <p>Your first $1,000 online is not a knowledge gap. It is a sequencing gap. This roadmap closes it.</p>
+        <a href="https://behike.gumroad.com/l/zero-to-revenue-roadmap" class="cta-btn">Get The Roadmap — $21.99</a>
+        <p style="margin-top: 16px; font-size: 13px; color: #3a3a3c;">Instant PDF download. One-time payment. No subscription.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

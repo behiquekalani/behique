@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One-Person Business Handbook — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1C1C1E;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #F5F5F7;
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 16px;
+      color: #86868B;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #F5F5F7 0%, #86868B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: 20px;
+      color: #86868B;
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-price {
+      font-size: 36px;
+      font-weight: 700;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .hero-price-note {
+      font-size: 14px;
+      color: #48484A;
+      margin-bottom: 32px;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid #1C1C1E;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section-tag {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: #86868B;
+      max-width: 680px;
+      line-height: 1.65;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .problem-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #F5F5F7;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    /* PILLARS */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .pillar-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      transition: border-color 0.2s ease;
+    }
+    .pillar-card:hover { border-color: #0A84FF; }
+    .pillar-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(10, 132, 255, 0.1);
+      border-radius: 12px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .pillar-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 10px;
+    }
+    .pillar-card p {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    /* CHAPTERS */
+    .chapters-list {
+      margin-top: 40px;
+      display: grid;
+      gap: 12px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px;
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      transition: border-color 0.2s ease;
+    }
+    .chapter-item:hover { border-color: #0A84FF; }
+    .chapter-number {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #0A84FF;
+      min-width: 32px;
+      padding-top: 2px;
+    }
+    .chapter-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+    }
+    .chapter-content p {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.55;
+    }
+
+    /* WHO IT'S FOR */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .audience-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .audience-card .check {
+      width: 32px;
+      height: 32px;
+      background: rgba(48, 209, 88, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .audience-card .check::after {
+      content: '';
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid #30D158;
+      border-bottom: 2px solid #30D158;
+      transform: rotate(-45deg) translateY(-1px);
+    }
+    .audience-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+    }
+    .audience-card p {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .cta-section .section-title { margin-bottom: 16px; }
+    .cta-section .section-body { margin: 0 auto 40px; }
+    .cta-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    .cta-note {
+      font-size: 13px;
+      color: #48484A;
+      margin-bottom: 32px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1C1C1E;
+      text-align: center;
+    }
+    footer p { font-size: 13px; color: #48484A; }
+    footer a { color: #636366; text-decoration: none; }
+    footer a:hover { color: #F5F5F7; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 80px 0 60px; }
+      section { padding: 60px 0; }
+      .cta-section { padding: 70px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <span class="nav-price">$26.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <span class="hero-tag">Digital Product</span>
+      <h1>One-Person Business<br>Handbook</h1>
+      <p class="hero-subtitle">The complete operating system for building a business that generates freedom, not just revenue. Content, products, services, and systems, built in the right order.</p>
+      <div class="hero-price">$26.99</div>
+      <p class="hero-price-note">Instant PDF download. 9 chapters. 5000+ words.</p>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-tag">The Problem</p>
+      <h2 class="section-title">Most solopreneurs build a job, not a business.</h2>
+      <p class="section-body">The default path for a one-person business looks like success from the outside: busy calendar, paying clients, decent income. Underneath, there's no leverage. Every dollar requires proportional hours. The ceiling is always visible.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>The freelancer trap</h3>
+          <p>Revenue grows linearly with hours worked. You cannot take two weeks off without income stopping. You gave yourself a job with a different title.</p>
+        </div>
+        <div class="problem-card">
+          <h3>No product leverage</h3>
+          <p>All income comes from services. There's nothing that sells while you sleep. The business exists only when you are actively working.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Wrong sequencing</h3>
+          <p>Building products before doing service work means building for a problem you think people have rather than the problem they actually have.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Optimizing revenue, not freedom</h3>
+          <p>Hitting income targets but still feeling trapped. Freedom requires intentional business design, not just more revenue.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUR PILLARS PREVIEW -->
+  <section id="pillars">
+    <div class="container">
+      <p class="section-tag">The Framework</p>
+      <h2 class="section-title">Four pillars. Remove one and the business breaks.</h2>
+      <p class="section-body">A one-person business that runs well is built on content, products, services, and systems working together. Each pillar serves a distinct function. Together they create the leverage that separates a real business from a hustle.</p>
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">C</div>
+          <h3>Content</h3>
+          <p>Long-term audience acquisition. Builds trust alongside awareness. Compounds in value over time.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">P</div>
+          <h3>Products</h3>
+          <p>Scalable income that doesn't require your active time per dollar generated.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">S</div>
+          <h3>Services</h3>
+          <p>Highest revenue per transaction. Primary source of market intelligence for products.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">Sy</div>
+          <h3>Systems</h3>
+          <p>Makes everything else run without constant manual intervention. The foundation of sustainability.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="inside">
+    <div class="container">
+      <p class="section-tag">What's Inside</p>
+      <h2 class="section-title">Nine chapters on building a business that actually works.</h2>
+      <p class="section-body">Not motivational frameworks. The actual operating system: mindset, structure, execution, and design for the life you want.</p>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <span class="chapter-number">01</span>
+          <div class="chapter-content">
+            <h3>The Founder's Mindset Shift</h3>
+            <p>The three liability patterns that employment builds into you, and how to replace them with patterns suited to building something of your own.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">02</span>
+          <div class="chapter-content">
+            <h3>The Four Pillars of a One-Person Business</h3>
+            <p>Content, products, services, systems. What each one does, how they reinforce each other, and the right sequence for building them.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">03</span>
+          <div class="chapter-content">
+            <h3>Building for Freedom, Not Just Revenue</h3>
+            <p>Time freedom, location freedom, creative freedom, and freedom from things you do not want to do. How to design each into the business structure.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">04</span>
+          <div class="chapter-content">
+            <h3>Avoiding the Freelancer Trap</h3>
+            <p>The specific patterns that indicate you are in the trap, and the concrete tactics for breaking out without catastrophic short-term revenue loss.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">05</span>
+          <div class="chapter-content">
+            <h3>The Content Engine</h3>
+            <p>Input system, production system, distribution system. How to build a content practice that sustains itself rather than burning out after two months.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">06</span>
+          <div class="chapter-content">
+            <h3>Products That Sell While You Sleep</h3>
+            <p>How to identify your first product, which product types to build first, and why most first-time creators underprice by a factor of three or more.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">07</span>
+          <div class="chapter-content">
+            <h3>Services as Market Research</h3>
+            <p>Why services should not be eliminated but refined. How to use client work to generate the product roadmap that actually works.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">08</span>
+          <div class="chapter-content">
+            <h3>Systems That Run the Business</h3>
+            <p>The four system categories every one-person business needs: content production, email sequences, revenue tracking, and time allocation.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">09</span>
+          <div class="chapter-content">
+            <h3>Designing the Business Around Your Life</h3>
+            <p>Starting from what you want your life to look like and working backward. Why treating freedom as a future reward keeps you trapped indefinitely.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="audience">
+    <div class="container">
+      <p class="section-tag">Who It's For</p>
+      <h2 class="section-title">For people building something that is actually theirs.</h2>
+      <p class="section-body">This is for builders at every stage who want a real operating system, not motivation and tactics that don't connect to each other.</p>
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Freelancers who want out</h3>
+          <p>You have client income but no leverage. You want to understand the path from trading time to building assets.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Creators building products</h3>
+          <p>You have an audience but your product revenue doesn't reflect the size of it. The business design needs work.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>People starting from scratch</h3>
+          <p>You want to build correctly from the beginning, in the right sequence, without developing structural problems you have to fix later.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Employees planning an exit</h3>
+          <p>You are building toward leaving employment and want a clear model for what comes next, not just inspiration to make the leap.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <p class="section-tag">Get the Handbook</p>
+      <h2 class="section-title">Build the business that is actually yours.</h2>
+      <p class="section-body">A one-time purchase. Instant PDF download. The complete operating system for a one-person business built around your life, not the other way around.</p>
+      <div class="cta-price">$26.99</div>
+      <p class="cta-note">Instant access. No subscription.</p>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        <a href="/index.html">Behike</a> &nbsp;&middot;&nbsp;
+        <a href="/privacy.html">Privacy</a> &nbsp;&middot;&nbsp;
+        <a href="/refund.html">Refund Policy</a>
+      </p>
+      <p style="margin-top:12px;">All products are digital downloads. No physical goods.</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('section').forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>

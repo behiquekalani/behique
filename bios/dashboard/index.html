@@ -1,0 +1,381 @@
+<!--
+# Serve: cd ~/behique/bios && python3 -m http.server 8093 --bind 0.0.0.0
+# Open:  http://localhost:8093/dashboard/index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOS</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #000; --fg: #e0e0e0; --dim: #555; --border: #1a1a1a;
+  --green: #00c853; --red: #ff1744; --yellow: #ffd600; --blue: #448aff;
+  --gold: #ffd600; --panel-bg: #0a0a0a; --bar-bg: #151515;
+}
+body { background: var(--bg); color: var(--fg); font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; font-size: 13px; line-height: 1.5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+a { color: var(--dim); text-decoration: none; } a:hover { color: var(--gold); }
+.navbar { display: flex; align-items: center; gap: 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.nav-brand { padding: 10px 20px; font-size: 18px; font-weight: 700; letter-spacing: 6px; color: #fff; border-right: 1px solid var(--border); }
+.nav-links { display: flex; gap: 0; flex: 1; }
+.nav-links a { padding: 10px 18px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); border-right: 1px solid var(--border); transition: color 0.2s, background 0.2s; }
+.nav-links a:hover, .nav-links a.active { color: var(--gold); background: #0d0d0d; }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; padding: 0 20px; }
+.fleet { display: flex; gap: 16px; align-items: center; }
+.fleet-node { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+.fleet-dot { width: 8px; height: 8px; border-radius: 50%; }
+.fleet-dot.online { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.fleet-dot.offline { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.timestamp { font-size: 10px; color: var(--dim); white-space: nowrap; }
+.main { display: flex; flex: 1; overflow: hidden; }
+.panel { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+.panel:last-child { border-right: none; }
+.panel-1 { width: 30%; } .panel-2 { width: 25%; } .panel-3 { width: 25%; } .panel-4 { width: 20%; }
+.panel-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-weight: 600; flex-shrink: 0; display: flex; justify-content: space-between; }
+.panel-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+.panel-body::-webkit-scrollbar { width: 4px; } .panel-body::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; } .panel-body::-webkit-scrollbar-track { background: transparent; }
+.conviction { padding: 10px 16px; border-bottom: 1px solid var(--border); } .conviction:hover { background: #0d0d0d; }
+.conv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.conv-topic { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+.conv-score { font-size: 14px; font-weight: 700; }
+.conv-bar { height: 3px; background: var(--bar-bg); border-radius: 2px; overflow: hidden; }
+.conv-bar-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.conv-meta { display: flex; gap: 12px; margin-top: 6px; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
+.signal { padding: 10px 16px; border-bottom: 1px solid var(--border); cursor: pointer; } .signal:hover { background: #0d0d0d; }
+.signal-top { display: flex; gap: 8px; align-items: flex-start; }
+.signal-source { font-size: 10px; padding: 2px 6px; border-radius: 2px; background: var(--bar-bg); color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; white-space: nowrap; margin-top: 1px; }
+.signal-title { font-size: 12px; color: var(--fg); line-height: 1.4; flex: 1; }
+.signal-time { font-size: 10px; color: var(--dim); margin-top: 4px; text-align: right; }
+.signal.bullish .signal-title { color: var(--green); } .signal.bearish .signal-title { color: var(--red); }
+.signal-detail { display: none; padding: 8px 16px 4px; font-size: 11px; color: var(--dim); border-bottom: 1px solid var(--border); background: #050505; }
+.signal-detail.open { display: block; } .signal-detail a { color: var(--blue); word-break: break-all; } .signal-detail a:hover { text-decoration: underline; }
+.signal-full-title { color: var(--fg); margin-bottom: 4px; }
+.market-section { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.market-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 10px; font-weight: 600; }
+.market-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.market-name { font-size: 12px; color: var(--fg); font-weight: 500; } .market-price { font-size: 12px; color: #fff; font-weight: 600; }
+.market-change { font-size: 11px; font-weight: 600; } .market-change.up { color: var(--green); } .market-change.down { color: var(--red); }
+.gauge-container { padding: 16px 0; text-align: center; }
+.gauge-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 8px; }
+.gauge-value { font-size: 36px; font-weight: 700; } .gauge-text { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.gauge-bar { height: 4px; background: linear-gradient(to right, var(--red), var(--yellow), var(--green)); border-radius: 2px; margin: 8px 0 4px; position: relative; }
+.gauge-marker { position: absolute; top: -4px; width: 3px; height: 12px; background: #fff; border-radius: 1px; transform: translateX(-50%); }
+.mover { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.mover-name { font-size: 11px; color: var(--fg); } .mover-price { font-size: 11px; color: var(--dim); } .mover-change { font-size: 11px; font-weight: 600; }
+.sales-stat { padding: 16px; border-bottom: 1px solid var(--border); text-align: center; }
+.sales-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--dim); margin-bottom: 6px; }
+.sales-value { font-size: 28px; font-weight: 700; color: var(--gold); } .sales-value.zero { color: var(--dim); font-size: 18px; }
+.sales-empty { padding: 24px 16px; text-align: center; color: var(--dim); font-size: 12px; line-height: 1.6; }
+.sales-empty strong { color: var(--gold); display: block; font-size: 22px; margin-bottom: 8px; }
+.bottombar { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; border-top: 1px solid var(--border); flex-shrink: 0; font-size: 11px; color: var(--dim); }
+.pipeline { display: flex; gap: 16px; }
+.pipe-status { display: flex; align-items: center; gap: 4px; }
+.pipe-dot { width: 6px; height: 6px; border-radius: 50%; } .pipe-dot.ok { background: var(--green); } .pipe-dot.stale { background: var(--red); }
+.pipe-label.stale { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="nav-brand">BIOS</div>
+  <div class="nav-links">
+    <a href="index.html" class="active">Hub</a>
+    <a href="../trading/index.html">Trading</a>
+    <a href="../reports/puerto-rico.html">Puerto Rico</a>
+    <a href="../control/war-room.html">VR War Room</a>
+  </div>
+  <div class="nav-right">
+    <div class="fleet" id="fleet"></div>
+    <div class="timestamp" id="lastUpdate"></div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="panel panel-1">
+    <div class="panel-header"><span>Convictions</span><span id="topicCount"></span></div>
+    <div class="panel-body" id="convictions"></div>
+  </div>
+  <div class="panel panel-2">
+    <div class="panel-header"><span>Signal Feed</span><span id="signalCount"></span></div>
+    <div class="panel-body" id="signals"></div>
+  </div>
+  <div class="panel panel-3">
+    <div class="panel-header"><span>Markets</span><span id="marketTime"></span></div>
+    <div class="panel-body" id="markets"></div>
+  </div>
+  <div class="panel panel-4">
+    <div class="panel-header"><span>Sales</span><span id="salesUpdated"></span></div>
+    <div class="panel-body" id="sales"></div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <div class="pipeline" id="pipeline"></div>
+  <div id="totalSignals"></div>
+</div>
+
+<script>
+const BASE = '../storage';
+const FLEET_URL = '../fleet/fleet.json';
+const SALES_URL = '../analytics/data/sales.json';
+const REFRESH = 60000;
+const STALE_MS = 2 * 60 * 60 * 1000;
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h / 24) + 'd ago';
+}
+
+function trunc(s, n) { return s && s.length > n ? s.slice(0, n) + '...' : s || ''; }
+
+function scoreColor(v) {
+  if (v >= 75) return 'var(--green)';
+  if (v >= 50) return 'var(--yellow)';
+  return 'var(--dim)';
+}
+
+function sentClass(hint) {
+  if (!hint) return '';
+  if (hint.includes('bullish')) return 'bullish';
+  if (hint.includes('bearish')) return 'bearish';
+  return '';
+}
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url, { cache: 'no-cache' });
+    if (!r.ok) return null;
+    const lm = r.headers.get('Last-Modified');
+    return { data: await r.json(), lastMod: lm ? new Date(lm) : new Date() };
+  } catch { return null; }
+}
+
+function renderFleet(fleet) {
+  const el = document.getElementById('fleet');
+  if (!fleet || !fleet.fleet) {
+    el.innerHTML = '<span style="color:var(--red)">FLEET OFFLINE</span>';
+    return;
+  }
+  el.innerHTML = Object.values(fleet.fleet).map(n => {
+    const on = n.status === 'active';
+    return '<div class="fleet-node"><div class="fleet-dot ' +
+      (on ? 'online' : 'offline') + '"></div>' + n.name + '</div>';
+  }).join('');
+}
+
+function renderConvictions(data) {
+  const el = document.getElementById('convictions');
+  const ct = document.getElementById('topicCount');
+  if (!data || !data.convictions) {
+    el.innerHTML = '<div style="padding:16px;color:var(--dim)">No data</div>';
+    return;
+  }
+  const sorted = data.convictions.sort((a, b) => b.score - a.score);
+  ct.textContent = sorted.length + ' topics';
+  el.innerHTML = sorted.map(c => {
+    const col = scoreColor(c.score);
+    return '<div class="conviction">' +
+      '<div class="conv-top">' +
+        '<span class="conv-topic">' + c.topic + '</span>' +
+        '<span class="conv-score" style="color:' + col + '">' + c.score.toFixed(1) + '</span>' +
+      '</div>' +
+      '<div class="conv-bar"><div class="conv-bar-fill" data-width="' + c.score + '" style="background:' + col + '"></div></div>' +
+      '<div class="conv-meta">' +
+        '<span>' + (c.sources ? c.sources.length : 0) + ' sources</span>' +
+        '<span>' + (c.signal_count || 0) + ' signals</span>' +
+        '<span>' + c.level + '</span>' +
+        '<span>vel ' + (c.velocity || 0).toFixed(0) + '</span>' +
+      '</div></div>';
+  }).join('');
+  requestAnimationFrame(() => {
+    el.querySelectorAll('.conv-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width + '%';
+    });
+  });
+}
+
+function toggleSignal(id) {
+  const detail = document.getElementById('detail-' + id);
+  if (detail) detail.classList.toggle('open');
+}
+
+function renderSignals(social, news) {
+  const el = document.getElementById('signals');
+  const ct = document.getElementById('signalCount');
+  let all = [];
+  if (social) {
+    social.filter(s => s.source !== 'coingecko' && s.source !== 'fear_greed_index')
+      .forEach(s => all.push({
+        source: s.source, title: s.title, time: s.timestamp,
+        sent: sentClass(s.sentiment_hint), url: s.url || ''
+      }));
+  }
+  if (news) {
+    news.slice(0, 40).forEach(s => all.push({
+      source: s.source, title: s.title, time: s.timestamp,
+      sent: s.sentiment > 0.3 ? 'bullish' : s.sentiment < -0.3 ? 'bearish' : '',
+      url: s.url || ''
+    }));
+  }
+  all.sort((a, b) => new Date(b.time) - new Date(a.time));
+  const show = all.slice(0, 25);
+  ct.textContent = all.length + ' total';
+  el.innerHTML = show.map((s, i) => {
+    const esc = (s.url || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return '<div class="signal ' + s.sent + '" onclick="toggleSignal(' + i + ')">' +
+      '<div class="signal-top">' +
+        '<span class="signal-source">' + trunc(s.source, 16) + '</span>' +
+        '<span class="signal-title">' + trunc(s.title, 80) + '</span>' +
+      '</div>' +
+      '<div class="signal-time">' + timeAgo(s.time) + '</div></div>' +
+      '<div class="signal-detail" id="detail-' + i + '">' +
+        '<div class="signal-full-title">' + (s.title || '') + '</div>' +
+        (esc ? '<a href="' + esc + '" target="_blank">' + esc + '</a>' : '<span>No source URL</span>') +
+      '</div>';
+  }).join('');
+}
+
+function renderMarkets(social) {
+  const el = document.getElementById('markets');
+  const tmEl = document.getElementById('marketTime');
+  if (!social) { el.innerHTML = '<div style="padding:16px;color:var(--dim)">No data</div>'; return; }
+  const coins = social.filter(s => s.source === 'coingecko');
+  const fearItem = social.find(s => s.source === 'fear_greed_index');
+  const parsed = coins.map(c => {
+    const m = c.title.match(/^(.+?)\s*\((\w+)\)\s*([+-]?\d+\.?\d*)%\s*\|\s*\$(.+)$/);
+    if (!m) return null;
+    return { name: m[1].trim(), ticker: m[2], change: parseFloat(m[3]), price: m[4] };
+  }).filter(Boolean);
+  const eth = parsed.find(p => p.ticker === 'ETH');
+  const sol = parsed.find(p => p.ticker === 'SOL');
+  const btc = parsed.find(p => p.ticker === 'BTC');
+  const keys = [btc, eth, sol].filter(Boolean);
+  const movers = [...parsed].sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 5);
+  let fearVal = null, fearText = '';
+  if (fearItem) {
+    const fm = fearItem.title.match(/(\d+)\s*\((.+?)\)/);
+    if (fm) { fearVal = parseInt(fm[1]); fearText = fm[2]; }
+  }
+  let html = '';
+  if (keys.length) {
+    html += '<div class="market-section"><div class="market-section-title">Key Assets</div>';
+    keys.forEach(a => {
+      const cls = a.change >= 0 ? 'up' : 'down';
+      const sign = a.change >= 0 ? '+' : '';
+      html += '<div class="market-row"><span class="market-name">' + a.ticker +
+        '</span><span class="market-price">$' + a.price +
+        '</span><span class="market-change ' + cls + '">' + sign + a.change.toFixed(1) + '%</span></div>';
+    });
+    html += '</div>';
+  }
+  if (fearVal !== null) {
+    const fc = fearVal <= 25 ? 'var(--red)' : fearVal <= 50 ? 'var(--yellow)' : 'var(--green)';
+    html += '<div class="market-section"><div class="gauge-container">' +
+      '<div class="gauge-label">Fear & Greed Index</div>' +
+      '<div class="gauge-value" style="color:' + fc + '">' + fearVal + '</div>' +
+      '<div class="gauge-text" style="color:' + fc + '">' + fearText + '</div>' +
+      '<div class="gauge-bar"><div class="gauge-marker" style="left:' + fearVal + '%"></div></div>' +
+      '</div></div>';
+  }
+  if (movers.length) {
+    html += '<div class="market-section"><div class="market-section-title">Top Movers (24h)</div>';
+    movers.forEach(m => {
+      const cls = m.change >= 0 ? 'up' : 'down';
+      const sign = m.change >= 0 ? '+' : '';
+      html += '<div class="mover"><span class="mover-name">' + m.name + ' (' + m.ticker + ')</span>' +
+        '<span class="mover-price">$' + m.price + '</span>' +
+        '<span class="mover-change ' + cls + '">' + sign + m.change.toFixed(1) + '%</span></div>';
+    });
+    html += '</div>';
+  }
+  if (coins.length) tmEl.textContent = timeAgo(coins[0].timestamp);
+  el.innerHTML = html || '<div style="padding:16px;color:var(--dim)">No market data</div>';
+}
+
+function renderSales(salesData, lastMod) {
+  const el = document.getElementById('sales');
+  const updEl = document.getElementById('salesUpdated');
+  if (lastMod) updEl.textContent = timeAgo(lastMod.toISOString());
+  if (!salesData || !Array.isArray(salesData) || salesData.length === 0) {
+    el.innerHTML = '<div class="sales-empty"><strong>$0</strong>List your products on Gumroad today</div>';
+    return;
+  }
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const weekAgo = new Date(now.getTime() - 7 * 86400000);
+  let todayRev = 0, weekRev = 0, totalRev = 0;
+  salesData.forEach(s => {
+    const amt = parseFloat(s.amount || s.revenue || s.price || 0);
+    const d = new Date(s.date || s.timestamp || s.created_at || 0);
+    totalRev += amt;
+    if (d.toISOString().slice(0, 10) === todayStr) todayRev += amt;
+    if (d >= weekAgo) weekRev += amt;
+  });
+  el.innerHTML =
+    '<div class="sales-stat"><div class="sales-label">Today</div>' +
+      '<div class="sales-value' + (todayRev === 0 ? ' zero' : '') + '">$' + todayRev.toFixed(2) + '</div></div>' +
+    '<div class="sales-stat"><div class="sales-label">This Week</div>' +
+      '<div class="sales-value' + (weekRev === 0 ? ' zero' : '') + '">$' + weekRev.toFixed(2) + '</div></div>' +
+    '<div class="sales-stat"><div class="sales-label">Total</div>' +
+      '<div class="sales-value">$' + totalRev.toFixed(2) + '</div></div>' +
+    '<div class="sales-stat"><div class="sales-label">Transactions</div>' +
+      '<div class="sales-value">' + salesData.length + '</div></div>';
+}
+
+function renderPipeline(ft) {
+  const el = document.getElementById('pipeline');
+  const now = Date.now();
+  const pipes = [
+    { label: 'Signals', key: 'signals' },
+    { label: 'Social', key: 'social' },
+    { label: 'Conviction', key: 'conviction' }
+  ];
+  el.innerHTML = pipes.map(p => {
+    const t = ft[p.key];
+    const stale = !t || (now - t.getTime()) > STALE_MS;
+    return '<div class="pipe-status"><div class="pipe-dot ' + (stale ? 'stale' : 'ok') +
+      '"></div><span class="pipe-label ' + (stale ? 'stale' : '') + '">' +
+      p.label + ': ' + (stale ? 'STALE' : 'OK') + '</span></div>';
+  }).join('');
+  document.getElementById('totalSignals').textContent =
+    (ft.total || 0) + ' signals ingested | signals.json ' + (ft.signalsLastMod || 'unknown');
+}
+
+async function refresh() {
+  const [conv, social, sigs, fleet, sales] = await Promise.all([
+    fetchJSON(BASE + '/convictions.json'),
+    fetchJSON(BASE + '/social_signals.json'),
+    fetchJSON(BASE + '/signals.json'),
+    fetchJSON(FLEET_URL),
+    fetchJSON(SALES_URL)
+  ]);
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+  renderFleet(fleet ? fleet.data : null);
+  renderConvictions(conv ? conv.data : null);
+  renderSignals(social ? social.data : null, sigs ? sigs.data : null);
+  renderMarkets(social ? social.data : null);
+  renderSales(sales ? sales.data : null, sales ? sales.lastMod : null);
+  const ft = {
+    signals: sigs ? sigs.lastMod : null,
+    social: social ? social.lastMod : null,
+    conviction: conv ? conv.lastMod : null,
+    signalsLastMod: sigs && sigs.lastMod ? sigs.lastMod.toLocaleString() : 'N/A',
+    total: 0
+  };
+  if (sigs && Array.isArray(sigs.data)) ft.total += sigs.data.length;
+  if (social && Array.isArray(social.data)) ft.total += social.data.length;
+  renderPipeline(ft);
+}
+
+refresh();
+setInterval(refresh, REFRESH);
+</script>
+</body>
+</html>

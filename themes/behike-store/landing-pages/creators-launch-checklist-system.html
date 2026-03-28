@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Launch Checklist System — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #888899;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #28b84e;
+      --border: rgba(255,255,255,0.08);
+      --card-bg: rgba(255,255,255,0.04);
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(10,132,255,0.12);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(17px, 2.2vw, 21px);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 44px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 16px 36px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .hero-guarantee {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION SHARED */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .body-text {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+      max-width: 640px;
+    }
+    .body-text + .body-text { margin-top: 16px; }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card .icon {
+      font-size: 24px;
+      margin-bottom: 14px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* WHAT'S INSIDE */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .chapter-card.visible { opacity: 1; transform: translateY(0); }
+    .chapter-num {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .chapter-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .chapter-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      list-style: none;
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .for-list li.visible { opacity: 1; transform: translateX(0); }
+    .for-list li .check {
+      color: var(--cta);
+      font-size: 18px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* NOT FOR */
+    .not-for-list {
+      list-style: none;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .not-for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    .not-for-list li .x { color: #FF453A; }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+    }
+    .cta-section h2 {
+      max-width: 640px;
+      margin: 0 auto 20px;
+    }
+    .cta-section p {
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+    .price-display {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .price-display span { color: var(--accent); }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ANIMATE UTIL */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 70px 0 60px; }
+      .btn-primary { width: 100%; justify-content: center; }
+      section { padding: 60px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">Behike</a>
+      <span class="nav-price">$19.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" style="border-top: none; padding-top: 100px;">
+    <div class="container">
+      <div class="hero-tag">Digital Product</div>
+      <h1>The <span>Creator's Launch</span> Checklist System</h1>
+      <p class="hero-sub">The complete digital product launch framework. From 8 weeks out to post-launch follow-up. 8 phases, embedded checklists, nothing left to guesswork.</p>
+      <div class="hero-cta-group">
+        <a href="#buy" class="btn-primary">Get Instant Access — $19.99</a>
+        <span class="hero-guarantee">PDF download. Yours to keep. No subscription.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Good products fail because of bad launches</h2>
+      <p class="body-text">The product was not the issue. The launch process was. Most creators build something real, then spend two days "launching" it. They post once, get twelve sales, and call it a flop. The product had nothing to do with it.</p>
+      <p class="body-text" style="margin-top: 16px;">A launch is a system. It has a before, a during, and an after. Each phase has specific work. Skip the before and the during feels like shouting into a void. Skip the after and you leave 30-60% of your revenue behind.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">&#9888;</div>
+          <h3>No pre-launch phase</h3>
+          <p>They announce a product their audience has never heard them talk about. Cold traffic to a cold offer.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9888;</div>
+          <h3>One-day launch</h3>
+          <p>Post on Day 1, go quiet, close on Day 2. Most buyers decide on Day 7. They were never given the chance.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9888;</div>
+          <h3>No post-launch system</h3>
+          <p>The cart closes and the creator moves on. The 40% of buyers who needed a nudge never got one.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9888;</div>
+          <h3>Unaddressed objections</h3>
+          <p>Objections in DMs and comments go unanswered. Every unanswered objection is a sale that did not happen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>8 phases. Every checklist you need.</h2>
+      <p class="body-text">Each chapter covers one phase of the launch arc. Each chapter ends with a concrete checklist. Not aspirational. Executable.</p>
+
+      <div class="chapters-grid">
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 1</div>
+          <h3>The Pre-Launch Window</h3>
+          <p>8-4 weeks out. Build the context your launch needs before you announce anything.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 2</div>
+          <h3>The Warm-Up Phase</h3>
+          <p>4-2 weeks out. Tease the solution, finalize price, build your launch notification list.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 3</div>
+          <h3>Building Anticipation</h3>
+          <p>72 hours before. The three content pillars that shape how people think about the product before they see the price.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 4</div>
+          <h3>The Launch Week Sequence</h3>
+          <p>Day-by-day breakdown of what to post, when to email, and how to keep momentum alive for all seven days.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 5</div>
+          <h3>Handling Objections in Real Time</h3>
+          <p>The 5 universal objections and the exact framing that addresses each one without being defensive.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 6</div>
+          <h3>Amplifying Social Proof</h3>
+          <p>How to collect it fast, the credibility ladder, and how to share it in ways that actually move buyers.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 7</div>
+          <h3>Post-Launch Follow-Up</h3>
+          <p>The three revenue streams that open after your cart closes. Most creators skip all three.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 8</div>
+          <h3>Lessons From Failed Launches</h3>
+          <p>The six patterns that cause launches to underperform. Understand them before your next launch, not after.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <div class="section-label">Who It's For</div>
+      <h2>Built for one type of creator</h2>
+      <p class="body-text">You make real things. You want to sell them. You want a system that works without a team.</p>
+
+      <ul class="for-list">
+        <li><span class="check">&#10003;</span> Solo creators launching their first or second digital product and want to do it right the first time</li>
+        <li><span class="check">&#10003;</span> Creators who have launched before and underwhelmed themselves. You know the product was good. The launch was not.</li>
+        <li><span class="check">&#10003;</span> Builders who are tired of improvising launch strategy at the last minute and want a repeatable framework</li>
+        <li><span class="check">&#10003;</span> Anyone who has left a cart open for two days, gotten discouraged, and closed it early</li>
+      </ul>
+
+      <p style="margin-top: 32px; font-size: 15px; color: var(--muted); font-weight: 600;">Not for:</p>
+      <ul class="not-for-list">
+        <li><span class="x">&#215;</span> Teams running high-production launches with dedicated marketers</li>
+        <li><span class="x">&#215;</span> Physical product businesses with different distribution mechanics</li>
+        <li><span class="x">&#215;</span> People who want theory without execution steps</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="buy">
+    <div class="container">
+      <div class="section-label">Get Access</div>
+      <h2>Stop leaving revenue on the table</h2>
+      <p>Every failed launch is expensive. In time, in motivation, in lost revenue. This system pays for itself the first time you use it.</p>
+      <div class="price-display"><span>$19</span>.99</div>
+      <p class="price-note">One-time payment. Instant PDF download.</p>
+      <a href="https://behike.gumroad.com/l/creators-launch-checklist-system" class="btn-primary">Get the Creator's Launch Checklist System</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p><a href="/">Behike</a> &nbsp;|&nbsp; Digital products for independent builders &nbsp;|&nbsp; <a href="mailto:hello@behike.com">hello@behike.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.problem-card, .chapter-card, .for-list li, .fade-up').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

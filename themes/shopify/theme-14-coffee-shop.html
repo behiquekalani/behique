@@ -1,0 +1,485 @@
+<!--
+  SHOPIFY THEME: Coffee Shop / Cafe
+  ==================================
+  Shopify Liquid Conversion Notes:
+  - Replace logo placeholder with: {{ shop.name }} or {{ 'logo.png' | asset_url | img_tag }}
+  - Replace hero image placeholder with: {{ section.settings.hero_image | img_url: '1920x' | img_tag }}
+  - Replace product cards with: {% for product in collections['featured'].products limit:4 %}
+  - Replace prices with: {{ product.price | money }}
+  - Replace cart icon count with: {{ cart.item_count }}
+  - Replace newsletter form action with: {% form 'customer' %}...{% endform %}
+  - Extract CSS custom properties into theme settings via settings_schema.json
+  - Move sections into /sections/*.liquid files for drag-and-drop customization
+  - Replace testimonials with metafield content or section blocks
+  - Add {{ content_for_header }} to <head> and {{ content_for_layout }} to body
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molido - Artisan Coffee Roasters</title>
+  <style>
+    :root {
+      --color-bg: #1a1209;
+      --color-bg-card: #241a10;
+      --color-bg-light: #2e2216;
+      --color-cream: #f5e6c8;
+      --color-cream-dark: #d4c4a0;
+      --color-brown: #6f4e37;
+      --color-brown-light: #8b6b4a;
+      --color-brown-dark: #4a3425;
+      --color-accent: #c8956c;
+      --color-text: #f5e6c8;
+      --color-text-muted: #9a8a72;
+      --color-border: #3a2e20;
+      --font-heading: Georgia, 'Times New Roman', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    /* BEAN DECORATION */
+    .bean-divider {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin: 0 auto;
+    }
+    .bean-dot {
+      width: 6px; height: 6px; background: var(--color-brown);
+      border-radius: 50%;
+    }
+    .bean-line { width: 40px; height: 1px; background: var(--color-border); }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(26, 18, 9, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .nav-inner {
+      max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center; height: 68px;
+    }
+    .nav-logo {
+      font-family: var(--font-heading); font-size: 1.4rem;
+      color: var(--color-cream); text-decoration: none;
+      letter-spacing: 2px;
+    }
+    .nav-logo span { color: var(--color-accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--color-text-muted); text-decoration: none; font-size: 0.85rem;
+      letter-spacing: 1px; transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--color-cream); }
+    .nav-cart {
+      color: var(--color-cream); text-decoration: none; font-size: 0.85rem;
+      background: var(--color-brown); padding: 8px 20px;
+      border-radius: 4px; transition: background var(--transition);
+    }
+    .nav-cart:hover { background: var(--color-brown-light); }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 80px; text-align: center;
+      position: relative;
+      background: radial-gradient(ellipse at 50% 80%, rgba(111, 78, 55, 0.15) 0%, transparent 60%);
+    }
+    .hero-label {
+      font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--color-accent); margin-bottom: 20px; display: block;
+    }
+    .hero h1 {
+      font-family: var(--font-heading); font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 400; line-height: 1.2; margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .hero p {
+      font-size: 1.05rem; color: var(--color-text-muted);
+      max-width: 500px; margin: 0 auto 24px;
+    }
+    .hero .bean-divider { margin-bottom: 32px; }
+    .hero-btn {
+      display: inline-block; padding: 16px 40px;
+      background: var(--color-brown); color: var(--color-cream);
+      text-decoration: none; font-size: 0.85rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      border-radius: 4px; transition: all var(--transition);
+    }
+    .hero-btn:hover {
+      background: var(--color-brown-light);
+      box-shadow: 0 4px 24px rgba(111, 78, 55, 0.4);
+    }
+    .hero-image {
+      max-width: 700px; margin: 56px auto 0; aspect-ratio: 16/9;
+      background: var(--color-bg-card); border-radius: 8px;
+      border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-image span { color: var(--color-text-muted); font-size: 0.85rem; }
+
+    /* PRODUCTS (MENU STYLE) */
+    .products { padding: 100px 0; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-label {
+      font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--color-accent); margin-bottom: 8px; display: block;
+    }
+    .section-title {
+      font-family: var(--font-heading); font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 400; letter-spacing: 1px;
+    }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .product-card {
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      border-radius: 8px; overflow: hidden;
+      transition: all var(--transition);
+    }
+    .product-card:hover {
+      border-color: var(--color-brown);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .product-image {
+      aspect-ratio: 1; background: var(--color-bg-light);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .product-image span { color: var(--color-text-muted); font-size: 0.8rem; opacity: 0.5; }
+    .product-info { padding: 24px; }
+    .product-origin {
+      font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--color-accent); margin-bottom: 6px;
+    }
+    .product-name {
+      font-family: var(--font-heading); font-size: 1.05rem;
+      font-weight: 400; margin-bottom: 6px;
+    }
+    .product-notes {
+      font-size: 0.8rem; color: var(--color-text-muted);
+      margin-bottom: 16px; font-style: italic;
+    }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .product-price { font-size: 1.1rem; color: var(--color-accent); font-weight: 600; }
+    .product-btn {
+      background: var(--color-brown); color: var(--color-cream);
+      border: none; padding: 8px 18px; border-radius: 4px;
+      font-size: 0.8rem; cursor: pointer; transition: background var(--transition);
+    }
+    .product-btn:hover { background: var(--color-brown-light); }
+
+    /* ABOUT */
+    .about {
+      padding: 100px 0; border-top: 1px solid var(--color-border);
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .about-image {
+      aspect-ratio: 4/3; background: var(--color-bg-card);
+      border: 1px solid var(--color-border); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-image span { color: var(--color-text-muted); font-size: 0.85rem; opacity: 0.5; }
+    .about h2 {
+      font-family: var(--font-heading); font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 400; margin-bottom: 20px; letter-spacing: 1px;
+    }
+    .about p { color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 16px; line-height: 1.8; }
+    .about-features {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;
+    }
+    .about-feature {
+      padding: 16px; background: var(--color-bg-card);
+      border: 1px solid var(--color-border); border-radius: 6px;
+    }
+    .about-feature strong {
+      display: block; font-size: 0.8rem; color: var(--color-accent);
+      margin-bottom: 4px; letter-spacing: 1px;
+    }
+    .about-feature span { font-size: 0.8rem; color: var(--color-text-muted); }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 100px 0; border-top: 1px solid var(--color-border); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial {
+      background: var(--color-bg-card); border: 1px solid var(--color-border);
+      border-radius: 8px; padding: 32px; position: relative;
+    }
+    .testimonial-quote {
+      font-family: var(--font-heading); font-size: 3rem;
+      color: var(--color-brown); line-height: 1; margin-bottom: 12px;
+    }
+    .testimonial-text {
+      font-size: 0.95rem; color: var(--color-text-muted);
+      line-height: 1.8; margin-bottom: 20px;
+    }
+    .testimonial-author { font-size: 0.85rem; color: var(--color-accent); font-weight: 500; }
+    .testimonial-detail { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 2px; }
+
+    /* FOOTER */
+    footer {
+      padding: 64px 0 32px;
+      border-top: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px;
+    }
+    .footer-col h4 {
+      font-family: var(--font-heading); font-size: 0.9rem;
+      margin-bottom: 16px; font-weight: 400;
+      color: var(--color-cream); letter-spacing: 1px;
+    }
+    .footer-col p { color: var(--color-text-muted); font-size: 0.85rem; line-height: 1.7; }
+    .footer-col a {
+      display: block; color: var(--color-text-muted); text-decoration: none;
+      font-size: 0.85rem; margin-bottom: 8px; transition: color var(--transition);
+    }
+    .footer-col a:hover { color: var(--color-cream); }
+    .newsletter-form { display: flex; gap: 0; margin-top: 12px; }
+    .newsletter-form input {
+      flex: 1; padding: 12px 16px; background: var(--color-bg);
+      border: 1px solid var(--color-border); color: var(--color-text);
+      font-size: 0.85rem; border-radius: 4px 0 0 4px;
+    }
+    .newsletter-form input::placeholder { color: var(--color-text-muted); }
+    .newsletter-form button {
+      padding: 12px 20px; background: var(--color-brown);
+      color: var(--color-cream); border: none; border-radius: 0 4px 4px 0;
+      font-size: 0.85rem; cursor: pointer; font-weight: 600;
+      transition: background var(--transition);
+    }
+    .newsletter-form button:hover { background: var(--color-brown-light); }
+    .footer-bottom {
+      text-align: center; color: var(--color-text-muted); font-size: 0.75rem;
+      padding-top: 32px; border-top: 1px solid var(--color-border);
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .about-features { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">Mol<span>ido</span></a>
+      <ul class="nav-links">
+        <li><a href="#menu">Coffee</a></li>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+      </ul>
+      <a href="#" class="nav-cart">Cart (0)</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-label">Small Batch, Single Origin</span>
+      <h1>Coffee Worth<br>Waking Up For</h1>
+      <p>Ethically sourced, hand-roasted in small batches. From the farm to your cup in under two weeks.</p>
+      <div class="bean-divider">
+        <span class="bean-line"></span>
+        <span class="bean-dot"></span>
+        <span class="bean-dot"></span>
+        <span class="bean-dot"></span>
+        <span class="bean-line"></span>
+      </div>
+      <a href="#menu" class="hero-btn">Browse the Menu</a>
+      <div class="hero-image"><span>Hero image 700 x 394</span></div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products" id="menu">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">The Menu</span>
+        <h2 class="section-title">Current Roasts</h2>
+      </div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-origin">Ethiopia, Yirgacheffe</p>
+            <h3 class="product-name">Morning Light</h3>
+            <p class="product-notes">Blueberry, jasmine, honey</p>
+            <div class="product-bottom">
+              <span class="product-price">$19.00</span>
+              <button class="product-btn">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-origin">Colombia, Huila</p>
+            <h3 class="product-name">Velvet Dark</h3>
+            <p class="product-notes">Chocolate, caramel, walnut</p>
+            <div class="product-bottom">
+              <span class="product-price">$21.00</span>
+              <button class="product-btn">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-origin">Guatemala, Antigua</p>
+            <h3 class="product-name">Sunstone</h3>
+            <p class="product-notes">Citrus, brown sugar, spice</p>
+            <div class="product-bottom">
+              <span class="product-price">$18.50</span>
+              <button class="product-btn">Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-origin">Brazil, Cerrado</p>
+            <h3 class="product-name">Night Owl Espresso</h3>
+            <p class="product-notes">Dark chocolate, hazelnut, smoke</p>
+            <div class="product-bottom">
+              <span class="product-price">$22.00</span>
+              <button class="product-btn">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <span class="section-label">Our Story</span>
+          <h2>From Soil to Soul</h2>
+          <p>Molido was born from a simple frustration: why does most coffee taste the same? We travel to the farms, meet the growers, and roast every batch by hand in our workshop in San Juan.</p>
+          <p>Every bag ships within 48 hours of roasting. You will never drink stale coffee again.</p>
+          <div class="about-features">
+            <div class="about-feature">
+              <strong>Direct Trade</strong>
+              <span>Farm-to-roaster relationships</span>
+            </div>
+            <div class="about-feature">
+              <strong>48-Hour Fresh</strong>
+              <span>Roasted and shipped same week</span>
+            </div>
+            <div class="about-feature">
+              <strong>Small Batch</strong>
+              <span>15 lb roasts, max flavor</span>
+            </div>
+            <div class="about-feature">
+              <strong>Free Shipping</strong>
+              <span>On all subscription orders</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-image"><span>Roastery image 500 x 375</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Reviews</span>
+        <h2 class="section-title">What Our Drinkers Say</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">I canceled my subscription to the big guys after my first bag of Morning Light. There is no going back from this kind of quality.</p>
+          <p class="testimonial-author">Carlos D.</p>
+          <p class="testimonial-detail">Subscriber since 2024</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">The freshness is real. You can smell it when you open the bag. My pour-over game has never been better.</p>
+          <p class="testimonial-author">Ana M.</p>
+          <p class="testimonial-detail">Bayamon, PR</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Ordered the Velvet Dark for my office. Now everyone asks where the coffee comes from. Best marketing I never planned.</p>
+          <p class="testimonial-author">Roberto J.</p>
+          <p class="testimonial-detail">Wholesale customer</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Molido</h4>
+          <p>Artisan coffee roasters based in San Juan, Puerto Rico. Small batch, single origin, shipped fresh.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Your email">
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <a href="#">All Coffee</a>
+          <a href="#">Subscriptions</a>
+          <a href="#">Brewing Gear</a>
+          <a href="#">Gift Sets</a>
+        </div>
+        <div class="footer-col">
+          <h4>Learn</h4>
+          <a href="#">Brew Guides</a>
+          <a href="#">Our Process</a>
+          <a href="#">Farm Partners</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Contact</a>
+          <a href="#">Shipping</a>
+          <a href="#">FAQ</a>
+          <a href="#">Wholesale</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Molido Coffee. Roasted with care in San Juan, PR.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Track income, expenses, cash position, and 12-month projections across 8 interconnected tabs. All formulas pre-built. $14.99 one-time.">
+<title>Cash Flow Dashboard. Your Entire Financial Picture | Behike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060609;
+  --surface: #0f0f18;
+  --surface2: #181824;
+  --border: rgba(255,255,255,0.07);
+  --text: #e8e8f2;
+  --muted: rgba(232,232,242,0.5);
+  --accent: #34C759;
+  --accent2: #30d158;
+  --success: #34C759;
+  --radius: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* NAV */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,9,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-cta {
+  background: var(--accent);
+  color: #000;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.nav-cta:hover { opacity: 0.85; }
+
+/* HERO */
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 100px 40px 80px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 62px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, #a8ff78 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 540px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); }
+
+.price-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+/* MOCKUP */
+.mockup-wrap {
+  max-width: 900px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.mockup {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+}
+
+.mockup-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot-red   { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.dot-yellow{ width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; }
+.dot-green { width: 12px; height: 12px; border-radius: 50%; background: #28c840; }
+
+.mockup-title { font-size: 12px; color: var(--muted); margin-left: 8px; font-weight: 500; }
+
+/* Spreadsheet mockup layout */
+.mockup-sheet {
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+  overflow: hidden;
+}
+
+.sheet-tabs {
+  display: flex;
+  background: #0c0c15;
+  border-bottom: 1px solid var(--border);
+  padding: 0 12px;
+  gap: 2px;
+  overflow-x: auto;
+}
+
+.sheet-tab {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 8px 14px;
+  color: var(--muted);
+  border-radius: 4px 4px 0 0;
+  white-space: nowrap;
+  cursor: default;
+  border-top: 2px solid transparent;
+}
+
+.sheet-tab.active {
+  color: var(--text);
+  background: var(--surface2);
+  border-top-color: var(--accent);
+}
+
+.sheet-grid {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-header-row {
+  display: grid;
+  grid-template-columns: 120px repeat(5, 1fr);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.sheet-cell {
+  padding: 6px 10px;
+  font-size: 11px;
+  border-right: 1px solid var(--border);
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sheet-row {
+  display: grid;
+  grid-template-columns: 120px repeat(5, 1fr);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.sheet-row:hover { background: rgba(255,255,255,0.02); }
+
+.sheet-data {
+  padding: 6px 10px;
+  font-size: 11px;
+  border-right: 1px solid rgba(255,255,255,0.03);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sheet-data.label { color: var(--muted); }
+
+.sheet-data.income { color: var(--accent); font-weight: 600; }
+.sheet-data.expense { color: #ff453a; font-weight: 600; }
+.sheet-data.neutral { color: var(--text); }
+
+.sheet-summary {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  background: var(--surface2);
+  margin-top: auto;
+}
+
+.summary-stat {
+  flex: 1;
+  padding: 12px 16px;
+  border-right: 1px solid var(--border);
+  text-align: center;
+}
+
+.summary-stat:last-child { border-right: none; }
+
+.summary-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.summary-value.pos { color: var(--accent); }
+.summary-value.neg { color: #ff453a; }
+.summary-value.neutral { color: var(--text); }
+
+/* PAS SECTION */
+.pas-section {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.pas-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.pas-block.pain { border-left: 3px solid #ff453a; }
+.pas-block.agitate { border-left: 3px solid #ff9f0a; }
+.pas-block.solve { border-left: 3px solid var(--accent); }
+
+.pas-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+.pas-block.pain .pas-tag { color: #ff453a; }
+.pas-block.agitate .pas-tag { color: #ff9f0a; }
+.pas-block.solve .pas-tag { color: var(--accent); }
+
+.pas-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+/* FEATURES */
+.features {
+  max-width: 900px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: border-color 0.2s;
+  position: relative;
+}
+
+.feature-card:hover { border-color: rgba(52,199,89,0.3); }
+
+.tab-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(52,199,89,0.1);
+  border: 1px solid rgba(52,199,89,0.2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* WHO IT'S FOR */
+.audience {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.audience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.audience-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.audience-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.audience-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* VALUE STACK */
+.value-stack {
+  max-width: 520px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.value-table {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+.value-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.value-row:last-child { border-bottom: none; }
+
+.value-row.total {
+  background: rgba(52,199,89,0.06);
+  border-top: 1px solid rgba(52,199,89,0.2);
+}
+
+.value-label { color: var(--muted); }
+.value-amount { font-weight: 600; color: var(--muted); text-decoration: line-through; font-size: 13px; }
+.value-row.total .value-label { font-weight: 700; color: var(--text); font-size: 15px; }
+.value-row.total .value-amount { text-decoration: none; color: var(--accent); font-size: 18px; font-weight: 800; }
+
+/* PRICING */
+.pricing {
+  max-width: 520px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+  text-align: center;
+}
+
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid rgba(52,199,89,0.3);
+  border-radius: 20px;
+  padding: 48px;
+  margin-top: 40px;
+}
+
+.price-amount {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  margin-bottom: 4px;
+  color: var(--accent);
+}
+
+.price-period {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.price-includes {
+  text-align: left;
+  margin-bottom: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.check { color: var(--success); font-size: 16px; }
+
+/* FAQ */
+.faq {
+  max-width: 640px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.faq-q {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.faq-a {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* FINAL CTA */
+.final-cta {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+  text-align: center;
+}
+
+.final-cta-card {
+  background: var(--surface);
+  border: 1px solid rgba(52,199,89,0.2);
+  border-radius: 20px;
+  padding: 56px 48px;
+}
+
+.final-cta h2 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.final-cta p {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+
+/* FOOTER */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+footer a { color: var(--muted); }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero { animation: fadeUp 0.5s ease both; }
+.hero-eyebrow { animation: fadeUp 0.5s 0.05s ease both; }
+.hero h1 { animation: fadeUp 0.5s 0.1s ease both; }
+.hero-sub { animation: fadeUp 0.5s 0.15s ease both; }
+.hero-actions { animation: fadeUp 0.5s 0.2s ease both; }
+.price-note { animation: fadeUp 0.5s 0.25s ease both; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 64px 24px 60px; }
+  .mockup-wrap, .features, .pricing, .faq, .pas-section, .audience, .value-stack, .final-cta { padding-left: 24px; padding-right: 24px; }
+  .pricing-card, .final-cta-card { padding: 32px 24px; }
+  .sheet-tabs { display: none; }
+  .summary-label { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Behike</a>
+  <a href="https://behikeai.gumroad.com/l/cash-flow-dashboard" class="nav-cta" target="_blank">
+    Get Dashboard. $14.99
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Excel and Google Sheets. 8 Tabs. All Formulas Built.</div>
+  <h1>Your entire<br><span>financial picture.</span></h1>
+  <p class="hero-sub">
+    You know the money is coming in. You just never know where it goes. This dashboard tracks income, expenses, cash position, and projections. Open it. Enter your numbers. Done.
+  </p>
+  <div class="hero-actions">
+    <a href="https://behikeai.gumroad.com/l/cash-flow-dashboard" class="btn-primary" target="_blank">
+      Get Cash Flow Dashboard. $14.99
+    </a>
+    <a href="#pricing" class="btn-secondary">See what's included</a>
+  </div>
+  <p class="price-note">One-time payment. No subscription. No data sent anywhere. Yours forever.</p>
+</section>
+
+<!-- MOCKUP: Spreadsheet Preview -->
+<div class="mockup-wrap">
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="dot-red"></div>
+      <div class="dot-yellow"></div>
+      <div class="dot-green"></div>
+      <div class="mockup-title">Cash Flow Dashboard.xlsx</div>
+    </div>
+    <div class="mockup-sheet">
+      <div class="sheet-tabs">
+        <div class="sheet-tab active">Dashboard</div>
+        <div class="sheet-tab">Income</div>
+        <div class="sheet-tab">Expenses</div>
+        <div class="sheet-tab">Cash Position</div>
+        <div class="sheet-tab">Projections</div>
+        <div class="sheet-tab">Savings Goals</div>
+        <div class="sheet-tab">Debt Tracker</div>
+        <div class="sheet-tab">Annual Summary</div>
+      </div>
+      <div class="sheet-grid">
+        <div class="sheet-header-row">
+          <div class="sheet-cell">Category</div>
+          <div class="sheet-cell">Jan</div>
+          <div class="sheet-cell">Feb</div>
+          <div class="sheet-cell">Mar</div>
+          <div class="sheet-cell">Apr</div>
+          <div class="sheet-cell">YTD</div>
+        </div>
+        <div class="sheet-row">
+          <div class="sheet-data label">Total Income</div>
+          <div class="sheet-data income">$4,200</div>
+          <div class="sheet-data income">$3,850</div>
+          <div class="sheet-data income">$5,100</div>
+          <div class="sheet-data income">$4,750</div>
+          <div class="sheet-data income">$17,900</div>
+        </div>
+        <div class="sheet-row">
+          <div class="sheet-data label">Fixed Expenses</div>
+          <div class="sheet-data expense">$1,640</div>
+          <div class="sheet-data expense">$1,640</div>
+          <div class="sheet-data expense">$1,640</div>
+          <div class="sheet-data expense">$1,640</div>
+          <div class="sheet-data expense">$6,560</div>
+        </div>
+        <div class="sheet-row">
+          <div class="sheet-data label">Variable Expenses</div>
+          <div class="sheet-data expense">$980</div>
+          <div class="sheet-data expense">$1,120</div>
+          <div class="sheet-data expense">$870</div>
+          <div class="sheet-data expense">$1,040</div>
+          <div class="sheet-data expense">$4,010</div>
+        </div>
+        <div class="sheet-row">
+          <div class="sheet-data label">Net Cash Flow</div>
+          <div class="sheet-data income">$1,580</div>
+          <div class="sheet-data income">$1,090</div>
+          <div class="sheet-data income">$2,590</div>
+          <div class="sheet-data income">$2,070</div>
+          <div class="sheet-data income">$7,330</div>
+        </div>
+        <div class="sheet-row">
+          <div class="sheet-data label">Savings Rate</div>
+          <div class="sheet-data neutral">37.6%</div>
+          <div class="sheet-data neutral">28.3%</div>
+          <div class="sheet-data neutral">50.8%</div>
+          <div class="sheet-data neutral">43.6%</div>
+          <div class="sheet-data income">40.9%</div>
+        </div>
+        <div class="sheet-summary">
+          <div class="summary-stat">
+            <div class="summary-label">Cash on Hand</div>
+            <div class="summary-value pos">$11,840</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">Monthly Burn</div>
+            <div class="summary-value neg">$2,660</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">Runway</div>
+            <div class="summary-value neutral">4.4 mo</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">12-Mo Projection</div>
+            <div class="summary-value pos">+$26,040</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAS -->
+<section class="pas-section">
+  <div class="section-label">Why this exists</div>
+  <div class="section-title" style="margin-bottom: 40px;">The problem with your money.</div>
+
+  <div class="pas-block pain">
+    <div class="pas-tag">Pain</div>
+    <div class="pas-text">You make decent money. But every month the number in your account surprises you. Always lower than expected.</div>
+  </div>
+
+  <div class="pas-block agitate">
+    <div class="pas-tag">The alternative</div>
+    <div class="pas-text">YNAB is $14/month. Monarch is $14/month. Both want recurring fees to tell you you're overspending. And neither shows you the full business picture.</div>
+  </div>
+
+  <div class="pas-block solve">
+    <div class="pas-tag">The fix</div>
+    <div class="pas-text">One spreadsheet. 8 tabs. All formulas already built. $14.99 once. No subscriptions, no accounts, no data sent anywhere.</div>
+  </div>
+</section>
+
+<!-- 8 TABS AS FEATURE CARDS -->
+<section class="features">
+  <div class="section-label">What's Inside</div>
+  <div class="section-title">8 tabs. Every angle covered.</div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="tab-number">1</div>
+      <div class="feature-title">Dashboard Overview</div>
+      <div class="feature-desc">Income vs. expenses at a glance. Monthly snapshot, key ratios, and your full financial health on one screen.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">2</div>
+      <div class="feature-title">Income Tracker</div>
+      <div class="feature-desc">All revenue streams, categorized with monthly trends. See exactly which sources are growing and which are flat.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">3</div>
+      <div class="feature-title">Expense Tracker</div>
+      <div class="feature-desc">Fixed vs. variable costs, category breakdowns. Know where every dollar goes without building the formulas yourself.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">4</div>
+      <div class="feature-title">Cash Position</div>
+      <div class="feature-desc">Running balance with daily, weekly, and monthly views. Always know exactly how much runway you have.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">5</div>
+      <div class="feature-title">Projections</div>
+      <div class="feature-desc">12-month forecast built from your current trends. Adjust assumptions and watch the numbers update instantly.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">6</div>
+      <div class="feature-title">Savings Goals</div>
+      <div class="feature-desc">Set targets, track progress automatically. The dashboard shows you what you need to hit each month to get there.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">7</div>
+      <div class="feature-title">Debt Tracker</div>
+      <div class="feature-desc">Outstanding balances, minimum payments, and payoff timeline. See the full picture of what you owe and when it clears.</div>
+    </div>
+    <div class="feature-card">
+      <div class="tab-number">8</div>
+      <div class="feature-title">Annual Summary</div>
+      <div class="feature-desc">Year in review with tax-ready categories. Export it, hand it to your accountant, or use it to plan next year.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="audience">
+  <div class="section-label">Who it's for</div>
+  <div class="section-title" style="margin-bottom: 0;">Built for people who<br>actually need this.</div>
+  <div class="audience-list">
+    <div class="audience-item">
+      <div class="audience-icon">💼</div>
+      <div class="audience-text">Freelancers and solopreneurs tracking irregular income across multiple clients and projects.</div>
+    </div>
+    <div class="audience-item">
+      <div class="audience-icon">📊</div>
+      <div class="audience-text">Small business owners who need more than a basic budget spreadsheet but less than accounting software.</div>
+    </div>
+    <div class="audience-item">
+      <div class="audience-icon">📱</div>
+      <div class="audience-text">Anyone who's tried budgeting apps and still doesn't know where their money goes at the end of the month.</div>
+    </div>
+    <div class="audience-item">
+      <div class="audience-icon">🔒</div>
+      <div class="audience-text">People who want a one-time tool with no monthly subscription fees and no data leaving their machine.</div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE STACK -->
+<section class="value-stack">
+  <div class="section-label">Value</div>
+  <div class="section-title" style="margin-bottom: 0;">What you're actually getting.</div>
+  <div class="value-table">
+    <div class="value-row">
+      <div class="value-label">8-tab integrated dashboard</div>
+      <div class="value-amount">$197 value</div>
+    </div>
+    <div class="value-row">
+      <div class="value-label">Pre-built formulas and projections</div>
+      <div class="value-amount">$97 value</div>
+    </div>
+    <div class="value-row">
+      <div class="value-label">Annual summary for tax season</div>
+      <div class="value-amount">$47 value</div>
+    </div>
+    <div class="value-row">
+      <div class="value-label">Lifetime access, all future updates</div>
+      <div class="value-amount">$47 value</div>
+    </div>
+    <div class="value-row total">
+      <div class="value-label">Total value: $388. Your price:</div>
+      <div class="value-amount">$14.99</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Pricing</div>
+  <div class="section-title">One price.<br>Forever yours.</div>
+
+  <div class="pricing-card">
+    <div class="price-amount">$14.99</div>
+    <div class="price-period">One-time. No subscription. All future updates included.</div>
+
+    <div class="price-includes">
+      <div class="price-item"><span class="check">✓</span> Dashboard Overview tab</div>
+      <div class="price-item"><span class="check">✓</span> Income Tracker tab</div>
+      <div class="price-item"><span class="check">✓</span> Expense Tracker tab</div>
+      <div class="price-item"><span class="check">✓</span> Cash Position tab</div>
+      <div class="price-item"><span class="check">✓</span> 12-Month Projections tab</div>
+      <div class="price-item"><span class="check">✓</span> Savings Goals tab</div>
+      <div class="price-item"><span class="check">✓</span> Debt Tracker tab</div>
+      <div class="price-item"><span class="check">✓</span> Annual Summary tab</div>
+      <div class="price-item"><span class="check">✓</span> Works in Excel and Google Sheets</div>
+      <div class="price-item"><span class="check">✓</span> All future updates included</div>
+    </div>
+
+    <a class="btn-primary" href="https://behikeai.gumroad.com/l/cash-flow-dashboard" target="_blank"
+       style="display:block; text-align:center; font-size:16px; padding:16px 32px;">
+      Get Cash Flow Dashboard
+    </a>
+    <div style="font-size:12px; color:var(--muted); margin-top:12px; text-align:center;">
+      Instant download after purchase. Works in Excel 2016+ and Google Sheets.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label">FAQ</div>
+  <div class="section-title" style="margin-bottom:40px;">Common questions.</div>
+
+  <div class="faq-item">
+    <div class="faq-q">Does this work in Google Sheets?</div>
+    <div class="faq-a">Yes. Upload the .xlsx to Google Drive and open with Sheets. All formulas transfer. A few conditional formatting styles may need minor adjustments, but every calculation works as-is.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Do I need to know Excel to use this?</div>
+    <div class="faq-a">No. Enter your numbers in the highlighted input cells. Everything else calculates automatically. You don't need to touch a single formula.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Is my financial data sent anywhere?</div>
+    <div class="faq-a">No. It's a local file. It never touches a server. Your data stays on your machine. This is the entire point of building it as a spreadsheet instead of an app.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">What version of Excel does it require?</div>
+    <div class="faq-a">Excel 2016 or newer on Mac or Windows. All formulas use standard Excel functions with no add-ins or macros required.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Is there a refund policy?</div>
+    <div class="faq-a">Yes. Gumroad's 30-day refund policy applies. If it doesn't work for your setup, email me and I'll refund you immediately, no questions asked.</div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="final-cta-card">
+    <h2>Stop guessing where<br>your money went.</h2>
+    <p>One spreadsheet. Eight tabs. All the formulas done. $14.99 once and you'll know exactly where you stand every month, for the rest of the year.</p>
+    <a href="https://behikeai.gumroad.com/l/cash-flow-dashboard" class="btn-primary" target="_blank"
+       style="font-size: 16px; padding: 16px 40px;">
+      Get Cash Flow Dashboard. $14.99
+    </a>
+    <div style="font-size: 13px; color: var(--muted); margin-top: 14px;">
+      Instant download. Works in Excel and Google Sheets.
+    </div>
+  </div>
+</section>
+
+<!-- Cross-sell -->
+<section style="padding: 80px 24px; max-width: 900px; margin: 0 auto;">
+  <p style="text-align:center; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#8e8e93; margin-bottom:12px;">Pair it with</p>
+  <h2 style="text-align:center; font-size:28px; font-weight:700; letter-spacing:-0.03em; color:#e8e8e8; margin-bottom:48px;">Build the full money system</h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;">
+    <a href="budget-template.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#34C759'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Template</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Personal Budget Template</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">The income/expense tracking layer. Use with the Dashboard for complete financial visibility.</p>
+      <p style="font-size:15px; font-weight:600; color:#34C759;">$9.99</p>
+    </a>
+    <a href="solopreneur-os.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#34C759'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Workbook</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Solopreneur OS</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">5-module business system. The financial runway module plugs directly into this dashboard.</p>
+      <p style="font-size:15px; font-weight:600; color:#34C759;">$12.99</p>
+    </a>
+    <a href="ecommerce-playbook.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#34C759'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Playbook</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Ecommerce Playbook</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">The income engine. 10-chapter dropshipping system that feeds the numbers in this dashboard.</p>
+      <p style="font-size:15px; font-weight:600; color:#34C759;">$14.99</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="index.html">Behike</a> .
+    <a href="index.html">All Products</a>
+  </p>
+  <p style="margin-top:8px;">2026 Behike</p>
+</footer>
+
+</body>
+</html>

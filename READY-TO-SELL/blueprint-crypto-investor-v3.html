@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Investor Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+  .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .stacked-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Crypto Investor Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">Research deeply. Allocate wisely. Manage risk. Take profits.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and build your entire crypto investment strategy on paper before deploying capital.</p>
+  </div>
+
+  <!-- MODULE 01: RESEARCH FRAMEWORK -->
+  <div class="module">
+    <div class="module-number">01 -- Research Framework</div>
+    <h2 class="module-title">Research Framework</h2>
+
+    <div class="label">Due Diligence Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Discover</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Read Whitepaper</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Evaluate Team</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Check Tokenomics</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">On-Chain Data</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Invest or Pass</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Project Scorecard</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Criteria</th><th>Project 1</th><th>Project 2</th><th>Project 3</th></tr>
+      <tr><td>Team credibility (1-5)</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Real-world utility (1-5)</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Tokenomics (1-5)</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Community strength (1-5)</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>On-chain activity (1-5)</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td><strong>Total Score</strong></td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+
+    <div class="label">Research Tools</div>
+    <div class="pills">
+      <span class="pill">CoinGecko</span>
+      <span class="pill">Messari</span>
+      <span class="pill">Dune Analytics</span>
+      <span class="pill">DefiLlama</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+
+  <!-- MODULE 02: PORTFOLIO ALLOCATION -->
+  <div class="module">
+    <div class="module-number">02 -- Portfolio Allocation</div>
+    <h2 class="module-title">Portfolio Allocation</h2>
+
+    <div class="label">Allocation Strategy</div>
+    <div class="stacked-bar" style="margin-bottom: 32px;">
+      <div class="segment" style="flex: 5; background: var(--cyan);">50% Blue Chips</div>
+      <div class="segment" style="flex: 3; background: rgba(0,212,255,0.5);">30% Mid Caps</div>
+      <div class="segment" style="flex: 2; background: rgba(0,212,255,0.3);">20% High Risk</div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Blue Chips (50%)</div>
+        <h4>BTC, ETH, SOL</h4>
+        <hr class="section-divider">
+        <div class="label">Holdings</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Mid Caps (30%)</div>
+        <h4>Top 50 Projects</h4>
+        <hr class="section-divider">
+        <div class="label">Holdings</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">High Risk (20%)</div>
+        <h4>Small Caps / New</h4>
+        <hr class="section-divider">
+        <div class="label">Holdings</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Total Portfolio Value</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Stablecoin Reserve %</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 03: RISK MANAGEMENT -->
+  <div class="module">
+    <div class="module-number">03 -- Risk Management</div>
+    <h2 class="module-title">Risk Management</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Position Sizing Rules</div>
+        <ul class="checklist">
+          <li>Never risk more than 5% on one position</li>
+          <li>Set stop-loss before entering</li>
+          <li>Use dollar-cost averaging for entries</li>
+          <li>Keep 10-20% in stablecoins</li>
+          <li>No leverage above 3x</li>
+          <li>Never invest money you need short-term</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Red Flags Checklist</div>
+        <ul class="checklist">
+          <li>Anonymous team with no track record</li>
+          <li>Guaranteed returns promised</li>
+          <li>Token unlock cliff approaching</li>
+          <li>Declining on-chain activity</li>
+          <li>Single exchange liquidity</li>
+          <li>No working product, only hype</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Risk per Position</div>
+    <table class="clean">
+      <tr><th>Asset</th><th>Entry Price</th><th>Stop-Loss</th><th>Max Loss $</th><th>% of Portfolio</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 04: PROFIT-TAKING STRATEGY -->
+  <div class="module">
+    <div class="module-number">04 -- Profit-Taking Strategy</div>
+    <h2 class="module-title">Profit-Taking Strategy</h2>
+
+    <div class="label">Exit Plan Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Set Targets</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Scale Out 25%</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Scale Out 25%</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Scale Out 25%</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Let 25% Ride</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Take-Profit Grid</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Asset</th><th>Target 1 (25%)</th><th>Target 2 (50%)</th><th>Target 3 (75%)</th><th>Moon Bag (25%)</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+
+    <div class="grid-3">
+      <div>
+        <div class="label">Rebalance Frequency</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Rebalance Trigger (%)</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Next Review Date</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 05: DEFI STRATEGY -->
+  <div class="module">
+    <div class="module-number">05 -- DeFi Strategy</div>
+    <h2 class="module-title">DeFi Strategy</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Staking</div>
+        <h4>Passive Yield</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>ETH staking (Lido, Rocket Pool)</li>
+          <li>SOL staking (native)</li>
+          <li>Validator selection</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Risk: Low-Medium</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Liquidity Pools</div>
+        <h4>Active Yield</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Stable-stable pairs</li>
+          <li>Blue chip pairs</li>
+          <li>Impermanent loss tracking</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Risk: Medium-High</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Lending</div>
+        <h4>Stablecoin Yield</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Aave, Compound</li>
+          <li>Collateralized borrowing</li>
+          <li>Health factor monitoring</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Risk: Low (stables only)</p>
+      </div>
+    </div>
+
+    <div class="label">DeFi Position Tracker</div>
+    <table class="clean">
+      <tr><th>Protocol</th><th>Type</th><th>Amount</th><th>APY</th><th>Chain</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 06: TAX PLANNING -->
+  <div class="module">
+    <div class="module-number">06 -- Tax Planning</div>
+    <h2 class="module-title">Tax Planning</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Taxable Events</div>
+        <ul class="checklist">
+          <li>Selling crypto for fiat</li>
+          <li>Trading one crypto for another</li>
+          <li>Spending crypto on purchases</li>
+          <li>Receiving mining / staking rewards</li>
+          <li>Airdrops received</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Non-Taxable Events</div>
+        <ul class="checklist">
+          <li>Buying crypto with fiat</li>
+          <li>Transferring between wallets</li>
+          <li>Gifting (under annual limit)</li>
+          <li>Holding (unrealized gains)</li>
+          <li>Donating to charity</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-3">
+      <div>
+        <div class="label">Tax Tracking Software</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">CPA / Tax Professional</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Tax Jurisdiction</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Tax Tools</div>
+    <div class="pills">
+      <span class="pill">Koinly</span>
+      <span class="pill">CoinTracker</span>
+      <span class="pill">TokenTax</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+
+  <!-- MODULE 07: SECURITY -->
+  <div class="module">
+    <div class="module-number">07 -- Security</div>
+    <h2 class="module-title">Security</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Wallet Security Checklist</div>
+        <ul class="checklist">
+          <li>Hardware wallet for long-term holds</li>
+          <li>Seed phrase stored offline (metal backup)</li>
+          <li>Never share seed phrase with anyone</li>
+          <li>Use separate wallets for DeFi vs. holding</li>
+          <li>Enable 2FA on all exchanges</li>
+          <li>Use unique email for crypto accounts</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Scam Prevention</div>
+        <ul class="checklist">
+          <li>Verify URLs before connecting wallet</li>
+          <li>Never click links from DMs</li>
+          <li>Revoke unused token approvals</li>
+          <li>Use a burner wallet for minting</li>
+          <li>Bookmark exchange and DeFi sites</li>
+          <li>Check contract addresses on Etherscan</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Wallet Inventory</div>
+    <table class="clean">
+      <tr><th>Wallet</th><th>Type</th><th>Chain</th><th>Purpose</th><th>Backup Location</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 08: PORTFOLIO TRACKER -->
+  <div class="module">
+    <div class="module-number">08 -- Portfolio Tracker</div>
+    <h2 class="module-title">Portfolio Tracker</h2>
+
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Invested</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Total fiat deployed into crypto</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Current Value</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Live portfolio value</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total P&L</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Unrealized + realized gains</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">DeFi Yield / Mo</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Monthly passive income from DeFi</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Monthly Review</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">What Worked This Month</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Lessons Learned</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>CRYPTO INVESTOR BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+
+</div>
+
+</body>
+</html>

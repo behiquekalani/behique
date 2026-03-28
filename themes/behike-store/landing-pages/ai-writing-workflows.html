@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Writing Workflows — Behike</title>
+  <meta name="description" content="How to use Claude, ChatGPT, and local AI to write faster without losing your voice. A practical system for writers, content creators, and solopreneurs." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --text-dim: #3A3A3C;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --surface-2: #1A1A1A;
+      --border: #2A2A2A;
+      --code-bg: #0D0D0D;
+      --radius: 12px;
+      --max-w: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.12s ease;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .hero-price-block {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      margin-bottom: 36px;
+    }
+
+    .hero-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .hero-price-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+      box-shadow: 0 0 0 0 rgba(48,209,88,0);
+    }
+
+    .hero-cta:hover {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(48,209,88,0.25);
+    }
+
+    .hero-note {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 14px;
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .lead {
+      font-size: 19px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    /* PROBLEM SECTION */
+    .problem { border-top: 1px solid var(--border); }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 640px) {
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .problem-card.bad { border-color: #3A1A1A; }
+    .problem-card.bad h3 { color: #FF453A; }
+    .problem-card.good { border-color: #1A3A24; }
+    .problem-card.good h3 { color: var(--cta); }
+
+    /* CHAPTERS */
+    .chapters { border-top: 1px solid var(--border); }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 48px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    @media (max-width: 640px) {
+      .chapters-grid { grid-template-columns: 1fr; }
+    }
+
+    .chapter-item {
+      background: var(--surface);
+      padding: 24px 28px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .chapter-item:nth-child(even) {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+
+    .chapter-item.visible { opacity: 1; transform: translateX(0); }
+
+    .chapter-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 3px;
+    }
+
+    .chapter-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .chapter-content p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .chapter-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--cta);
+      background: rgba(48,209,88,0.1);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+
+    /* PROMPT PREVIEW */
+    .prompts { border-top: 1px solid var(--border); background: var(--surface); }
+
+    .prompts-inner { padding: 80px 0; }
+
+    .prompt-showcase {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .prompt-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .prompt-card.visible { opacity: 1; transform: translateY(0); }
+
+    .prompt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .prompt-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .prompt-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      background: rgba(10,132,255,0.15);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+
+    .prompt-body {
+      padding: 20px;
+      font-family: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #A0A0A0;
+      background: var(--code-bg);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .prompt-body .ph { color: var(--accent); }
+    .prompt-body .kw { color: var(--cta); }
+    .prompt-body .cm { color: #555; }
+
+    /* PLATFORMS */
+    .platforms { border-top: 1px solid var(--border); }
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 720px) {
+      .platforms-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 480px) {
+      .platforms-grid { grid-template-columns: 1fr; }
+    }
+
+    .platform-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .platform-card.visible { opacity: 1; transform: scale(1); }
+
+    .platform-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .platform-card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .platform-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .platform-time {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cta);
+      letter-spacing: 0.06em;
+    }
+
+    /* FOR / NOT FOR */
+    .fornotfor { border-top: 1px solid var(--border); }
+
+    .fornotfor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 48px;
+    }
+
+    @media (max-width: 600px) {
+      .fornotfor-grid { grid-template-columns: 1fr; }
+    }
+
+    .for-list, .notfor-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .for-list { border-color: #1A3A24; }
+    .notfor-list { border-color: #3A1A1A; }
+
+    .list-header {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .for-list .list-header { color: var(--cta); }
+    .notfor-list .list-header { color: #FF453A; }
+
+    .check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .check-list li .icon {
+      font-size: 16px;
+      min-width: 20px;
+      padding-top: 1px;
+    }
+
+    /* FAQ */
+    .faq { border-top: 1px solid var(--border); }
+
+    .faq-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .faq-item.visible { opacity: 1; transform: translateY(0); }
+
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 22px 24px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: inherit;
+    }
+
+    .faq-q .faq-arrow {
+      color: var(--text-muted);
+      font-size: 20px;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-arrow { transform: rotate(45deg); }
+
+    .faq-a {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      padding: 0 24px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 400px;
+      padding: 0 24px 22px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(28px, 5vw, 52px);
+      margin-bottom: 16px;
+    }
+
+    .final-cta .lead {
+      margin: 0 auto 40px;
+    }
+
+    .cta-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .final-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cta);
+      color: #000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 48px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.18s ease, transform 0.14s ease, box-shadow 0.18s ease;
+      box-shadow: 0 0 0 0 rgba(48,209,88,0);
+    }
+
+    .final-cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(48,209,88,0.3);
+    }
+
+    .final-cta-note {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .final-cta-price {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .final-cta-price strong {
+      color: var(--text);
+      font-size: 20px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* DIVIDER */
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      margin: 24px 0;
+    }
+
+    /* ANIMATION */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="https://behikeai.gumroad.com" class="nav-brand">Behike</a>
+      <a href="https://behikeai.gumroad.com/l/ai-writing-workflows" class="nav-cta">Get it — $19.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-eyebrow">New from Behike</span>
+      <h1>Write more.<br><span>Sound more like you.</span></h1>
+      <p class="hero-sub">How to use Claude, ChatGPT, and local AI to produce more content, faster, without losing your voice in the process.</p>
+      <div class="hero-price-block">
+        <span class="hero-price">$19.99</span>
+        <span class="hero-price-label">One-time purchase.<br>Instant PDF download.</span>
+      </div>
+      <br>
+      <a href="https://behikeai.gumroad.com/l/ai-writing-workflows" class="hero-cta">Get AI Writing Workflows</a>
+      <p class="hero-note">10 chapters. Full prompt library. Real time estimates.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>AI content has a smell to it.<br>You already know what it is.</h2>
+      <p class="lead">Too smooth. Too structured. Technically correct and completely hollow. The people using AI well are not outsourcing their voice. They have a system.</p>
+      <div class="divider"></div>
+      <div class="problem-grid">
+        <div class="problem-card bad">
+          <h3>Without a system</h3>
+          <p>You paste a vague prompt. You get a vague draft. You edit for an hour. You post something that sounds like it could be anyone. Engagement is flat. You blame AI.</p>
+        </div>
+        <div class="problem-card good">
+          <h3>With this system</h3>
+          <p>You show up with your angle and your voice brief. AI handles structure and grunt work. You edit for tone, not content. You publish something that sounds like you.</p>
+        </div>
+        <div class="problem-card bad">
+          <h3>What most guides teach</h3>
+          <p>100 prompts to copy-paste. Generic instructions. Tips that work for no one in particular. Content that proves you used AI, not that you are good at writing.</p>
+        </div>
+        <div class="problem-card good">
+          <h3>What this guide teaches</h3>
+          <p>How to extract your voice before prompting. How to structure every piece of content. How to edit AI output until it sounds like you wrote it from scratch.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section class="chapters">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>10 chapters. No filler.</h2>
+      <p class="lead">Every section has a clear purpose. Every template is tested. Every time estimate is real.</p>
+      <div class="chapters-grid">
+        <div class="chapter-item">
+          <span class="chapter-num">01</span>
+          <div class="chapter-content">
+            <h4>The AI Writing Paradox</h4>
+            <p>Why AI is great at writing and why that produces bad content. The mindset shift that changes everything.</p>
+            <span class="chapter-tag">10 min read</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">02</span>
+          <div class="chapter-content">
+            <h4>Your Voice First</h4>
+            <p>Extract your writing DNA before touching a prompt. The Voice Brief exercise. Answers 8 questions in 15 minutes.</p>
+            <span class="chapter-tag">15 min exercise</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">03</span>
+          <div class="chapter-content">
+            <h4>The Workflow Map</h4>
+            <p>Ideation to publish. 6 stages. What AI does at each one. What you do. Time estimates per format.</p>
+            <span class="chapter-tag">Reference chart</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">04</span>
+          <div class="chapter-content">
+            <h4>Claude vs. ChatGPT vs. Local</h4>
+            <p>Honest comparison. No affiliation. Decision matrix for every task. When to use each tool and why.</p>
+            <span class="chapter-tag">Decision matrix</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">05</span>
+          <div class="chapter-content">
+            <h4>Prompt Engineering for Writers</h4>
+            <p>Templates for every format: thread, newsletter, blog, YouTube script, Reel. Fill-in-the-bracket structure.</p>
+            <span class="chapter-tag">6 templates</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">06</span>
+          <div class="chapter-content">
+            <h4>The Edit Loop</h4>
+            <p>Three-pass editing system. Specific prompts to fix AI output. What to never delegate. The read-aloud test.</p>
+            <span class="chapter-tag">5 edit prompts</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">07</span>
+          <div class="chapter-content">
+            <h4>Speed Runs</h4>
+            <p>Newsletter in 45 min. Thread in 15 min. Blog in 2 hours. Minute-by-minute walkthroughs for each.</p>
+            <span class="chapter-tag">3 walkthroughs</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">08</span>
+          <div class="chapter-content">
+            <h4>Building a Prompt Library</h4>
+            <p>File structure, naming system, annotation protocol. How to turn one good prompt session into months of leverage.</p>
+            <span class="chapter-tag">File templates</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">09</span>
+          <div class="chapter-content">
+            <h4>Repurposing Workflows</h4>
+            <p>One long-form piece into 10 platform-specific pieces. The chain. The prompt. What changes, what stays.</p>
+            <span class="chapter-tag">Saves 3+ hours/week</span>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">10</span>
+          <div class="chapter-content">
+            <h4>The Long Game</h4>
+            <p>How AI compresses year 1 content volume. What still takes time. How to build a content moat that is actually yours.</p>
+            <span class="chapter-tag">Strategy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMPT PREVIEW -->
+  <section class="prompts">
+    <div class="prompts-inner">
+      <div class="container">
+        <div class="section-label">Prompt Library Preview</div>
+        <h2>Templates that actually work.</h2>
+        <p class="lead">These are not examples. They are the actual prompts from the guide, ready to copy, fill in, and use.</p>
+        <div class="prompt-showcase">
+
+          <div class="prompt-card">
+            <div class="prompt-header">
+              <span class="prompt-title">THREAD PROMPT</span>
+              <span class="prompt-badge">Twitter / X</span>
+            </div>
+            <pre class="prompt-body"><span class="cm">You are writing as</span> <span class="ph">[your name/persona]</span><span class="cm">, a</span> <span class="ph">[brief description]</span><span class="cm"> who writes about</span> <span class="ph">[topics]</span><span class="cm">.</span>
+
+<span class="cm">Voice brief:</span> <span class="ph">[paste your voice brief]</span>
+
+<span class="kw">Task:</span> Write a Twitter/X thread about <span class="ph">[topic]</span>.
+
+<span class="kw">Angle:</span> <span class="ph">[your specific take, the thing you believe that most people don't say]</span>
+
+<span class="kw">Format:</span>
+<span class="cm">- 8-10 tweets
+- First tweet is the hook (bold claim, no questions)
+- Each tweet stands alone but builds toward the conclusion
+- Final tweet is a direct call to action
+- No hashtags. No emojis. Short sentences.</span>
+
+<span class="kw">Key points:</span> <span class="ph">[your specific points]</span>
+<span class="kw">Do not include:</span> hype language, generic advice, filler phrases</pre>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-header">
+              <span class="prompt-title">EDIT LOOP PROMPT</span>
+              <span class="prompt-badge">Any format</span>
+            </div>
+            <pre class="prompt-body"><span class="cm">Remove all hedging language from this paragraph. Be direct.</span>
+<span class="cm">Do not use phrases like</span> <span class="ph">"it's worth noting," "it's important to remember,"</span>
+<span class="cm">or</span> <span class="ph">"some might argue."</span>
+
+<span class="cm">---</span>
+
+<span class="cm">This section sounds too formal. Rewrite it in a more direct,
+conversational tone. Keep all the same information.</span>
+
+<span class="cm">---</span>
+
+<span class="cm">This is too long. Cut it by 30% without losing the main point.
+Remove filler. Keep specifics.</span></pre>
+          </div>
+
+          <div class="prompt-card">
+            <div class="prompt-header">
+              <span class="prompt-title">REPURPOSING PROMPT</span>
+              <span class="prompt-badge">One piece, 10 outputs</span>
+            </div>
+            <pre class="prompt-body"><span class="cm">Here is a</span> <span class="ph">[blog post / newsletter]</span><span class="cm">. I want to repurpose it for multiple platforms.</span>
+<span class="cm">The core idea is:</span> <span class="ph">[state it in one sentence]</span><span class="cm">.</span>
+
+<span class="cm">My voice brief:</span> <span class="ph">[paste it]</span>
+
+<span class="kw">Create the following:</span>
+<span class="cm">1. Twitter thread (8 tweets, start with the strongest hook)
+2. LinkedIn post (300-500 words, professional tone)
+3. Instagram caption (hook in first line)
+4. TikTok/Reel script (60-75 seconds, one takeaway)
+5. Pinterest pin headline + description</span>
+
+<span class="cm">Keep the core argument consistent. Rewrite for each platform.
+Do not copy-paste sections.</span>
+
+<span class="kw">Source content:</span> <span class="ph">[paste here]</span></pre>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section class="platforms">
+    <div class="container">
+      <div class="section-label">Platform Coverage</div>
+      <h2>Every platform you publish on.</h2>
+      <p class="lead">Workflows and prompt templates built for each format, with real time estimates per piece.</p>
+      <div class="platforms-grid">
+        <div class="platform-card">
+          <span class="platform-icon">𝕏</span>
+          <h4>Twitter / X</h4>
+          <p>Thread structure, hook formula, engagement-first format</p>
+          <span class="platform-time">15 MIN PER THREAD</span>
+        </div>
+        <div class="platform-card">
+          <span class="platform-icon">✉</span>
+          <h4>Newsletter</h4>
+          <p>Hook, context, insight, action. Full structure with subject line system</p>
+          <span class="platform-time">45 MIN PER ISSUE</span>
+        </div>
+        <div class="platform-card">
+          <span class="platform-icon">✍</span>
+          <h4>Blog / Long-form</h4>
+          <p>Research, outline, draft, edit workflow. SEO without stuffing.</p>
+          <span class="platform-time">2 HRS PER POST</span>
+        </div>
+        <div class="platform-card">
+          <span class="platform-icon">▶</span>
+          <h4>YouTube</h4>
+          <p>Script structure for 8-12 min videos. Hook, content, close. Delivery notes.</p>
+          <span class="platform-time">65 MIN PER SCRIPT</span>
+        </div>
+        <div class="platform-card">
+          <span class="platform-icon">♦</span>
+          <h4>TikTok / Reels</h4>
+          <p>60-90 second spoken scripts. Pattern interrupt hook. Single takeaway.</p>
+          <span class="platform-time">15 MIN PER SCRIPT</span>
+        </div>
+        <div class="platform-card">
+          <span class="platform-icon">in</span>
+          <h4>LinkedIn</h4>
+          <p>Professional tone, same voice. Format that works with the algorithm.</p>
+          <span class="platform-time">20 MIN PER POST</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR / NOT FOR -->
+  <section class="fornotfor">
+    <div class="container">
+      <div class="section-label">Fit Check</div>
+      <h2>Who this is for.<br>Who it is not for.</h2>
+      <div class="fornotfor-grid">
+        <div class="for-list fade-up">
+          <div class="list-header">This is for you if</div>
+          <ul class="check-list">
+            <li><span class="icon">+</span> You already write and want to produce more without burning out</li>
+            <li><span class="icon">+</span> You have tried AI writing and the output always sounds wrong</li>
+            <li><span class="icon">+</span> You write threads, newsletters, blogs, scripts, or captions for an audience</li>
+            <li><span class="icon">+</span> You want a system, not a list of prompts to copy</li>
+            <li><span class="icon">+</span> You are building a content-driven business or personal brand</li>
+            <li><span class="icon">+</span> You are willing to spend 15 minutes extracting your voice before anything else</li>
+          </ul>
+        </div>
+        <div class="notfor-list fade-up">
+          <div class="list-header">This is not for you if</div>
+          <ul class="check-list">
+            <li><span class="icon">-</span> You want AI to write everything for you with zero involvement</li>
+            <li><span class="icon">-</span> You do not have a point of view yet and expect AI to supply one</li>
+            <li><span class="icon">-</span> You are looking for a get-rich-quick content farm strategy</li>
+            <li><span class="icon">-</span> You have never written anything for a real audience</li>
+            <li><span class="icon">-</span> You want a magic prompt that does it all in one click</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container">
+      <div class="section-label">FAQ</div>
+      <h2>Questions.</h2>
+      <div class="faq-list">
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Do I need a paid AI subscription to use this?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">No. The guide covers free tiers and local AI options. Claude and ChatGPT both have free tiers that work for testing the workflows. Section 4 includes a dedicated section on local AI (Ollama, LM Studio) that runs at zero cost on most modern computers. You can run the full system without paying for API access.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Will this work for my niche or industry?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">Yes. The system is built around your voice, your angle, and your audience, not a specific topic category. The Voice Brief exercise in Section 2 works for any niche. The prompt templates are format-specific, not topic-specific. Writers in tech, finance, wellness, creative industries, education, and business have all used these workflows. If you write for an audience, it applies.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How is this different from a prompt list PDF?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">A prompt list gives you templates to copy. This guide gives you a system for why those templates work and how to customize them for your voice, your audience, and your specific format. The prompts in this guide will need your voice brief and your angle to work well. Without those inputs, any prompt is generic. This guide starts by building those inputs first.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How long does it take to implement?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">The Voice Brief exercise takes 15 minutes. Building your first prompt file from the templates takes about 30 minutes. The first time you run a full workflow (choosing a topic, prompting, editing, publishing) takes slightly longer than normal as you calibrate. By the second or third piece, the time estimates in Section 3 become accurate for most people.</div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Is this a course or a guide?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">It is a guide. No videos, no live sessions, no community upsell. You get a PDF you can read in two hours and reference any time you sit down to write. The prompt templates are copy-paste ready. The workflows are step-by-step. If you prefer learning by reading and then doing, this is the format for you.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <div class="section-label">Get the Guide</div>
+      <h2>Stop sounding like everyone else.</h2>
+      <p class="lead">10 chapters. 6 prompt templates. 3 speed run walkthroughs. A system you will use every time you sit down to write.</p>
+      <div class="cta-block">
+        <p class="final-cta-price"><strong>$19.99</strong> one-time. Instant download.</p>
+        <a href="https://behikeai.gumroad.com/l/ai-writing-workflows" class="final-cta-btn">Get AI Writing Workflows</a>
+        <p class="final-cta-note">PDF format. Works on any device. No subscription.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 <a href="https://behikeai.gumroad.com">Behike</a>. Built by Kalani Andre.</p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll(
+      '.problem-card, .chapter-item, .platform-card, .prompt-card, .faq-item, .fade-up'
+    ).forEach(el => observer.observe(el));
+
+    // Stagger chapter items
+    document.querySelectorAll('.chapter-item').forEach((el, i) => {
+      el.style.transitionDelay = `${(i % 2) * 80}ms`;
+    });
+
+    // Stagger platform cards
+    document.querySelectorAll('.platform-card').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 60}ms`;
+    });
+
+    // Stagger problem cards
+    document.querySelectorAll('.problem-card').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 80}ms`;
+    });
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+
+</body>
+</html>

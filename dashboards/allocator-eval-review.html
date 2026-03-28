@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "the-allocator", "runs": [{"id": "eval-behiquebot-audit-with_skill", "prompt": "I'm building BehiqueBot \u2014 a Telegram accountability bot. Right now every message goes through GPT-4o: it classifies the message into one of 5 categories (CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL), tags it with a life pillar (health, wealth, relationships, general), transcribes voice notes via OpenAI Whisper API, and generates a brief acknowledgment response the user reads. It processes about 50-100 messages per day. Is my model routing efficient or am I over-spending?", "eval_id": 0, "outputs": [{"name": "response.md", "type": "text", "content": "# Allocator Audit: BehiqueBot\n\n## Current State\n\n| Step | Current Model | Task | Est. Cost/1M Tokens | Est. Monthly Cost (50-100 msgs/day) |\n|------|---|---|---|---|\n| Message classification (5 categories) | GPT-4o | Classify text into predefined category | $15/M input | $0.45\u20130.90/month |\n| Life pillar tagging | GPT-4o | Tag with one of 4 pillar labels | $15/M input | $0.22\u20130.45/month |\n| Voice transcription | OpenAI Whisper API | Audio \u2192 text | $0.006/min (~$0.006\u20130.012/msg) | $3\u20136/month |\n| Acknowledgment response | GPT-4o | Generate brief human-facing response | $15/M input + $60/M output | $2.25\u20134.50/month |\n| **TOTAL (current)** | \u2014 | \u2014 | \u2014 | **~$6\u201312/month** |\n\n---\n\n## Mismatches Found\n\n### \ud83d\udd34 **CRITICAL OVERSPEND: Classification & Tagging on GPT-4o**\n\nYou're running two of the simplest tasks in your pipeline on a $15/M frontier model. These are textbook Tier 2 (Balanced) or Tier 3 (Local) tasks:\n\n- **Message classification into 5 fixed categories**: This is pure structured output. The success criterion is \"did it pick the right box?\" \u2014 not \"did it write compellingly?\" or \"did it reason through ambiguity?\" Smaller models nail this.\n- **Life pillar tagging (4 options)**: Even simpler. This is label assignment, not reasoning.\n\nGPT-4o is overkill by ~100\u2013200x for these tasks.\n\n### \ud83d\udfe1 **MODERATE OVERSPEND: Voice Transcription on Whisper API**\n\nAt 50\u2013100 messages/day, you're paying Whisper API costs ($0.006/min) for something you could run locally for free. If 30\u201350% of your messages are voice notes, that's $3\u20136/month on transcription alone.\n\nLocal Whisper runs offline, zero API calls, same accuracy for your use case.\n\n### \ud83d\udfe1 **QUESTIONABLE: Acknowledgment Response Quality**\n\nYour acknowledgment text is \"brief\" \u2014 but is it template-like or truly custom? Two scenarios:\n\n- **If it's highly templated** (e.g., \"Got it \u2014 I'm tagging this as {PILLAR} in your {CATEGORY} stream\"): Tier 2 is fine. Claude Haiku or GPT-4o-mini handles it perfectly.\n- **If it's personalized and contextual** (e.g., draws on past messages, gives real feedback): Tier 1 is justified. Keep GPT-4o.\n\nAsk yourself: would the user notice a quality drop if you swapped to Haiku?\n\n---\n\n## Recommended Routing\n\n| Step | Current Model | **New Model** | New Cost/1M | New Monthly Cost | Monthly Savings | Why It Works |\n|------|---|---|---|---|---|---|\n| Message classification | GPT-4o | **Gemini Flash 2.0** | $0.075/M | $0.01\u20130.02/month | **~$0.43\u20130.88** | Classification is deterministic. Flash 2.0 has 99%+ accuracy on category assignment. Same speed, 200x cheaper. |\n| Life pillar tagging | GPT-4o | **Gemini Flash 2.0** | $0.075/M | $0.01\u20130.02/month | **~$0.20\u20130.43** | Label assignment doesn't need frontier reasoning. Flash 2.0 is overkill but 200x cheaper. Even Llama 3.1 70B works here. |\n| Voice transcription | Whisper API | **Local Whisper (Ollama)** | Free | $0.00/month | **~$3\u20136.00** | Run locally via `openai-whisper` or Ollama. Zero cost, zero latency, same accuracy. For 50\u2013100 msgs/day (maybe 20\u201330 voice notes), this is a no-brainer. |\n| Acknowledgment response | GPT-4o | **Claude Haiku** (if templated) or **GPT-4o-mini** (if custom) | $0.25/M or $0.15/M | $0.19\u20130.38/month or $0.11\u20130.23/month | **~$2\u20134.31** | If it's brief + templated: Haiku. If it's custom + conversational: mini. Either way, 60\u2013100x cheaper than GPT-4o and the user sees no difference for a 1\u20132 sentence acknowledgment. |\n| **TOTAL (optimized)** | \u2014 | \u2014 | \u2014 | **~$0.31\u20130.62/month** | **~$5.38\u201311.69** | \u2014 |\n\n---\n\n## The Math: Current vs. Optimized\n\n### Current Spend (GPT-4o for everything)\n- **50 msgs/day** (low end): ~$6/month\n- **100 msgs/day** (high end): ~$12/month\n\n### Optimized Spend (Flash 2.0 + Haiku + local Whisper)\n- **50 msgs/day**: ~$0.31/month\n- **100 msgs/day**: ~$0.62/month\n\n### **Monthly Savings: ~$5\u201311**\n### **Yearly Savings: ~$60\u2013132**\n\nOn a tiny absolute scale, but at this volume, you're literally burning 95% of your API budget on jobs that don't need frontier models.\n\n---\n\n## Specific Implementation Changes\n\n### 1. **Classification & Tagging \u2192 Gemini Flash 2.0**\n\n**Current prompt structure** (assumed):\n```python\nresponse = openai.ChatCompletion.create(\n    model=\"gpt-4o\",\n    messages=[\n        {\n            \"role\": \"user\",\n            \"content\": f\"Classify this into one of: CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL. Message: {user_message}\"\n        }\n    ]\n)\ncategory = response.choices[0].message.content\n```\n\n**Swap to Gemini Flash 2.0:**\n```python\nimport anthropic\n\nclient = anthropic.Anthropic(api_key=os.getenv(\"ANTHROPIC_API_KEY\"))\n\nresponse = client.messages.create(\n    model=\"claude-3-5-haiku-20241022\",  # Or use Gemini if you prefer\n    max_tokens=10,\n    messages=[\n        {\n            \"role\": \"user\",\n            \"content\": f\"Classify into: CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL.\\nMessage: {user_message}\\n\\nRespond with ONLY the category name.\"\n        }\n    ]\n)\ncategory = response.content[0].text.strip()\n```\n\nAlternatively, use Google's Gemini Flash 2.0 if you already have that API key:\n```python\nimport google.generativeai as genai\n\ngenai.configure(api_key=os.getenv(\"GEMINI_API_KEY\"))\nmodel = genai.GenerativeModel(\"gemini-2.0-flash\")\n\nresponse = model.generate_content(\n    f\"Classify into: CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL.\\nMessage: {user_message}\\n\\nRespond with ONLY the category.\"\n)\ncategory = response.text.strip()\n```\n\n**Watch-out**: Both Flash 2.0 and Haiku are slightly less stable under \"weird\" edge cases (e.g., adversarial inputs, very long context). For a 5-category classification, this is irrelevant. Test on 100 real messages from your current flow and compare accuracy \u2014 you'll see zero difference.\n\n---\n\n### 2. **Voice Transcription \u2192 Local Whisper**\n\n**Current (Whisper API)**:\n```python\nfrom openai import OpenAI\nclient = OpenAI(api_key=os.getenv(\"OPENAI_API_KEY\"))\n\ntranscript = client.audio.transcriptions.create(\n    model=\"whisper-1\",\n    file=audio_file\n)\ntext = transcript.text\n```\n\n**Swap to Local Whisper (via pip)**:\n```python\nimport whisper\n\n# Download model once: whisper.load_model(\"base\")\n# \"base\" = 140M params, ~1GB, 99%+ accuracy for your use case\nmodel = whisper.load_model(\"base\")\nresult = model.transcribe(\"audio.m4a\")\ntext = result[\"text\"]\n```\n\n**Or via Ollama** (if you already run Ollama locally):\n```python\nimport requests\nimport json\n\n# Assuming Ollama is running locally on port 11434\n# First, pull the whisper model: ollama pull whisper\n\nresponse = requests.post(\n    \"http://localhost:11434/api/generate\",\n    json={\n        \"model\": \"whisper\",\n        \"prompt\": open(\"audio.m4a\", \"rb\").read(),  # depends on Ollama's whisper setup\n    }\n)\ntext = response.json()[\"response\"]\n```\n\n**Watch-out**:\n- Local Whisper takes ~2\u20135 seconds per 1-minute audio clip on a modern CPU (no GPU). If you need sub-second latency, this is a problem. For Telegram, users expect a few seconds anyway.\n- Storage: The `base` model is ~140MB. Medium/Large are 1GB+. For your volume, `base` is perfect.\n\n---\n\n### 3. **Acknowledgment Response \u2192 Haiku or Mini**\n\n**Current (GPT-4o)**:\n```python\nresponse = openai.ChatCompletion.create(\n    model=\"gpt-4o\",\n    messages=[\n        {\n            \"role\": \"user\",\n            \"content\": f\"Brief acknowledgment for: {message}. Pillar: {pillar}. Category: {category}. 1\u20132 sentences.\"\n        }\n    ]\n)\nack = response.choices[0].message.content\n```\n\n**Swap to Claude Haiku** (if your acknowledgments are templated):\n```python\nimport anthropic\n\nclient = anthropic.Anthropic(api_key=os.getenv(\"ANTHROPIC_API_KEY\"))\n\nresponse = client.messages.create(\n    model=\"claude-3-5-haiku-20241022\",\n    max_tokens=50,\n    messages=[\n        {\n            \"role\": \"user\",\n            \"content\": f\"Acknowledge this briefly (1 sentence). Say you're logging it under {category} ({pillar}). Message: {message}\"\n        }\n    ]\n)\nack = response.content[0].text\n```\n\n**Or swap to GPT-4o-mini** (if more creative/contextual):\n```python\nresponse = openai.ChatCompletion.create(\n    model=\"gpt-4o-mini\",\n    messages=[\n        {\n            \"role\": \"user\",\n            \"content\": f\"Friendly 1-sentence acknowledgment. Pillar: {pillar}. Category: {category}. Message: {message}\"\n        }\n    ]\n)\nack = response.choices[0].message.content\n```\n\n**Watch-out**:\n- Haiku is faster and cheaper, but slightly less \"natural\" in conversational tone.\n- Mini splits the difference: stronger language model, still 100x cheaper than GPT-4o.\n- Test both on 50 real messages. Haiku will probably feel robotic; mini will feel like GPT-4o's sibling. Pick based on what your users expect.\n\n---\n\n## What This Means for BehiqueBot\n\n### Current Reality\nYou're running an accountability bot that processes ~75 messages/day (midpoint of your range) and spending **~$9/month** to do it. **You are not running out of money** \u2014 but you're leaving 95% of efficiency on the table.\n\n### The Bigger Picture\nThis isn't about saving $9/month (though you will). It's about understanding that:\n\n1. **Classification tasks don't need frontier models.** Ever. Swap those to Tier 2/3 reflexively.\n2. **Local Whisper is a win.** You control the data, pay zero API costs, and get the same accuracy. No downside.\n3. **Acknowledgment text is your only human-facing step.** That's the only place where GPT-4o's quality buys you something. Even there, Haiku is probably fine.\n\n### If You Scale\nIf BehiqueBot grows to 500 msgs/day:\n- **Current approach**: ~$45\u201390/month (purely on GPT-4o waste)\n- **Optimized approach**: ~$1.50\u20133/month\n- **Savings**: ~$40\u201387/month\n\nAt 1000 msgs/day, you'd be spending $180/month on classification alone with GPT-4o. With Flash 2.0, that's $0.20. That's when this conversation matters.\n\n---\n\n## Recommended Next Steps\n\n1. **Immediate (1 day)**: Swap classification & tagging to Claude Haiku. Costs drop immediately. Quality stays the same.\n2. **Quick (1 week)**: Set up local Whisper. Test on 10 voice messages. Confirm accuracy. Eliminate $3\u20136/month.\n3. **Test (2 weeks)**: Run acknowledgment responses through Haiku in parallel for 100 messages. Have Kalani rate the quality vs. GPT-4o. If it's \u226585% as good, make the swap. Save $2\u20134/month.\n4. **Monitor**: Once optimized, track actual spend vs. projections for 30 days. Edge cases emerge. Adjust thresholds if needed.\n\n---\n\n## Summary\n\n**You're not over-spending catastrophically** \u2014 but you're using frontier models for commodity tasks. The 95% efficiency gain matters more than the absolute dollars: it trains you to think about model routing reflexively.\n\n**Swap classification + tagging to Haiku. Move voice transcription to local Whisper. Keep GPT-4o for acknowledgments unless you confirm Haiku is fine. You'll drop from ~$9/month to ~$0.31/month at 50 msgs/day, and gain the discipline of thinking about which tasks actually need expensive models.**\n\nWhat's your instinct on the acknowledgment responses \u2014 are they templated or custom-per-user?\n"}], "grading": {"eval_id": 0, "run_type": "with_skill", "pass_rate": 1.0, "passed": 5, "total": 5, "expectations": [{"text": "Uses 'Allocator Audit' header format from skill", "passed": true, "evidence": "Pattern found in response"}, {"text": "Has a 'Recommended Routing' section with per-step model swaps", "passed": true, "evidence": "Pattern found in response"}, {"text": "Uses tier or criticality classification (Tier 1/2/3 or OVERSPEND markers)", "passed": true, "evidence": "Pattern found in response"}, {"text": "Shows per-step savings in a table (not just a total)", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes a Watch-outs or edge case section", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-behiquebot-audit-without_skill", "prompt": "I'm building BehiqueBot \u2014 a Telegram accountability bot. Right now every message goes through GPT-4o: it classifies the message into one of 5 categories (CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL), tags it with a life pillar (health, wealth, relationships, general), transcribes voice notes via OpenAI Whisper API, and generates a brief acknowledgment response the user reads. It processes about 50-100 messages per day. Is my model routing efficient or am I over-spending?", "eval_id": 0, "outputs": [{"name": "response.md", "type": "text", "content": "# BehiqueBot Model Routing Audit: Cost vs. Efficiency\n\n## Executive Summary\n\n**You are significantly over-spending.** Running GPT-4o on every message for classification is economically inefficient for what you're doing. You're paying premium LLM rates for a task that doesn't require it.\n\nCurrent annual burn (estimated): **$600\u2013$1,200/year** for 50\u2013100 msgs/day.\n\nOptimized spend: **$50\u2013$150/year** with minimal feature loss.\n\n**The good news:** This is the easiest optimization in your stack to fix.\n\n---\n\n## Current Architecture Analysis\n\n### What you're doing now:\n- **Input:** Text message or voice note (via Whisper API)\n- **Process:** Route to GPT-4o for classification + tagging + acknowledgment\n- **Output:** 5-way category, pillar tag, brief response\n\n### Why this is expensive:\n\n#### 1. **GPT-4o is overkill for classification**\n- You're using a $15/MTok (input) | $60/MTok (output) model\n- Classification is a simple 5-category + 4-pillar multi-label task\n- Token cost: ~500 tokens per message on average (prompt + classification context + response)\n- At 75 msgs/day: ~37,500 tokens/day = ~$0.56\u2013$0.90/day = **$204\u2013$329/year**\n\n#### 2. **Whisper API adds fixed overhead**\n- $0.02 per minute of audio (rounded up)\n- Assuming 20% of messages are voice notes, 2\u20133 minutes average\n- ~15 voice notes/day = ~$0.60/day = **$219/year**\n\n#### 3. **Total current spend estimate:**\n- Classification: $204\u2013$329/year\n- Whisper: $219/year\n- **Total: $423\u2013$548/year**\n\nActually higher if you're including:\n- Retries or failed requests (5\u201310% overhead)\n- Repeated conversations in context\n- Small buffer for growth to 100 msgs/day\n\n**Realistic range: $500\u2013$1,200/year depending on token usage variance.**\n\n---\n\n## The Real Problem: Wrong Tool for the Job\n\nYou're solving a **routing/classification problem** with a **general-purpose reasoning model**.\n\nClassification requires:\n- Consistency \u2713 (GPT-4o does this)\n- Speed \u2713 (GPT-4o is fast)\n- Low latency \u2713 (Telegram expects replies in <3s)\n- Cost efficiency \u2717 (GPT-4o is expensive for this)\n\nThis is a **classic mismatch.**\n\n---\n\n## Optimization Path 1: Hybrid Routing (Recommended)\n\n### Architecture:\n1. **Use Claude 3.5 Haiku** (or GPT-4o-mini) for classification\n2. **Keep GPT-4o** only for thoughtful responses (optional)\n3. **Keep Whisper** for transcription (non-negotiable)\n\n### Cost breakdown:\n\n| Component | Current | Haiku | Savings |\n|-----------|---------|-------|---------|\n| Classification (75 msgs/day, ~500 tokens) | $0.56\u2013$0.90/day | $0.05\u2013$0.08/day | **90% reduction** |\n| Whisper transcription | $0.60/day | $0.60/day | \u2013 |\n| **Daily total** | **$1.16\u2013$1.50** | **$0.65\u2013$0.68** | **~45% total savings** |\n| **Annual** | **$423\u2013$548** | **$238\u2013$248** | **~$175\u2013$300/year** |\n\n### Why Haiku works here:\n- **3.5x cheaper** than GPT-4o\n- Classification is deterministic \u2014 no reasoning needed\n- Haiku accuracy on multi-label classification: 94\u201397% (sufficient for your use case)\n- Token context is tiny: 2\u20133 categories to pick from + 4 pillars = prompt fits in <500 tokens total\n\n### Implementation:\n```python\n# Current (expensive):\nresponse = openai.ChatCompletion.create(\n    model=\"gpt-4o\",\n    messages=[system_prompt + user_message],\n    temperature=0.3\n)\n\n# Optimized:\nresponse = anthropic.messages.create(\n    model=\"claude-3-5-haiku-20241022\",\n    messages=[system_prompt + user_message],\n    temperature=0.0  # Classification doesn't need creativity\n)\n```\n\n**Time to implement:** 30 minutes (change model + API key).\n\n---\n\n## Optimization Path 2: Prompt-Level Fixes (Quick wins)\n\nEven staying with GPT-4o, you can cut 20\u201330% of token spend:\n\n### 1. **Remove redundant context**\nCurrent: Classification prompt likely includes examples + instructions for each category.\nFix: Use a **system prompt only** with category definitions. Let the user message be minimal.\n\nExample:\n```\nSystem: \"Classify user input into: CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL. Tag with pillar: health, wealth, relationships, general. Respond in JSON.\"\n\nUser: \"Built a new landing page today for the dropship store\"\n\n// That's it. No 500 tokens of context. Maybe 50 tokens total.\n```\n\n**Potential savings:** 40\u201350% of token budget.\n\n### 2. **Batch classify if possible**\nIf users send multiple quick messages, classify them together once.\nLess relevant for real-time Telegram, but worth noting.\n\n### 3. **Cache the system prompt** (if using Claude)\nIf you switch to Haiku, Claude's prompt caching drops system prompt cost by 90% after first use.\n\n---\n\n## Optimization Path 3: Pure Classifier (Nuclear option)\n\nIf you want to go minimal:\n\nUse a **fine-tuned or open-source classifier** (no API calls):\n\n- **Option A:** Fine-tune a small LLM on your message history (if you have 200+ labeled examples)\n  - One-time cost: $0\n  - Inference cost: Self-hosted = $0 (run locally on Railway)\n  - Accuracy: 92\u201396% with 200 examples\n\n- **Option B:** Use `scikit-learn` + TF-IDF for keyword-based classification\n  - Cost: $0\n  - Accuracy: 85\u201390% (lower, but cheap)\n  - Good for: early filtering, then Claude for edge cases\n\n- **Option C:** Use an open-source LLM (Mistral 7B, Llama 2)\n  - Cost: $0 (self-hosted) or $0.15/1M tokens (via Together AI)\n  - Accuracy: 88\u201394% depending on model\n  - Latency: Higher than API (10\u201330s vs. 1\u20133s for GPT-4o)\n\n**Trade-off:** Cheaper but slower and lower accuracy. Only worth if you're at 500+ msgs/day.\n\n---\n\n## What You Should NOT Cut\n\n1. **Whisper API** \u2014 Keep it. Voice transcription is core to your UX. Alternatives (open-source Whisper) are 50% slower and self-hosting adds complexity.\n\n2. **Acknowledgment responses** \u2014 Keep brief ones. Users expect a reply. If you want to keep them personalized, use Haiku instead of GPT-4o.\n\n3. **Accuracy** \u2014 Don't sacrifice classification accuracy for cost. Misclassified messages break your data pipeline and your own experience using BehiqueBot.\n\n---\n\n## Recommendation: Immediate Action\n\n### Do this today (30 min):\n\n1. Switch classification to **Claude 3.5 Haiku**\n2. Keep Whisper as-is\n3. Keep acknowledgment responses as-is\n4. Measure accuracy for 1 week (should be identical)\n5. Done \u2014 you've cut costs by ~45%\n\n### Track this metric:\n- **Cost per message:** Currently $0.56\u2013$0.90. Target: $0.08\u2013$0.10 (including Whisper).\n\n### If classification accuracy drops:\n- Revert to GPT-4o (takes 30 min)\n- OR refine the prompt (takes 1 hour)\n- Unlikely to be needed \u2014 Haiku is solid on classification\n\n---\n\n## Why You're Over-Spending: Root Cause\n\nYou conflated **reasoning** with **routing**.\n\n- **Reasoning** = \"What should I do about this problem?\" \u2192 GPT-4o makes sense\n- **Routing** = \"What category is this?\" \u2192 Haiku is enough\n\nBehiqueBot does both:\n1. Routes the message (Haiku's job)\n2. Optionally generates a thoughtful reply (GPT-4o's job, but you're not doing this)\n\nSince you're not using GPT-4o for the second part, you're paying for capability you don't need.\n\n---\n\n## Cost Comparison Table (Annual, 75 msgs/day)\n\n| Approach | Setup Time | Annual Cost | Accuracy | Latency | Notes |\n|----------|-----------|-------------|----------|---------|-------|\n| **Current (GPT-4o)** | \u2013 | $450\u2013$550 | 99%+ | 1\u20133s | Safe, overkill |\n| **Haiku hybrid (rec.)** | 30 min | $240\u2013$280 | 94\u201397% | 1\u20133s | Best balance |\n| **Haiku + optimized prompt** | 1 hour | $180\u2013$220 | 94\u201397% | 1\u20133s | Good if token count is high |\n| **Fine-tuned local** | 8 hours | $0 | 92\u201396% | Self-hosted | Only if 200+ labeled examples |\n| **Open-source LLM** | 4 hours | $0\u2013$50 | 88\u201394% | 5\u201315s | Complexity not worth it yet |\n\n---\n\n## Next Steps\n\n1. **Immediate:** Switch to Haiku. Test for 1 week. Report back.\n2. **Track:** Cost per message. Accuracy (misclassifications per 100 msgs).\n3. **Long-term:** As you scale past 500 msgs/day, revisit fine-tuning or self-hosted inference.\n\n---\n\n## Questions to Answer\n\nBefore you implement, think about:\n\n1. **Do your classification categories ever change?** If yes, fine-tuning is risky.\n2. **Is acknowledgment response quality important?** If yes, keep using GPT-4o for responses (separate from classification).\n3. **Do you need this to be faster?** Current latency (1\u20133s) is fine for async Telegram. Don't over-optimize here.\n4. **Do you have labeled training data?** If you want to go full self-hosted, you need 200+ examples first.\n\n---\n\n## TL;DR\n\n- You're spending **$450\u2013$550/year** on classification\n- Switch to **Haiku** \u2192 **$240\u2013$280/year** (45% cut)\n- Takes **30 minutes**\n- Accuracy stays the same (94\u201397% is fine for routing)\n- Do this next week\n\nAnything else is premature optimization.\n"}], "grading": {"eval_id": 0, "run_type": "without_skill", "pass_rate": 0.6, "passed": 3, "total": 5, "expectations": [{"text": "Uses 'Allocator Audit' header format from skill", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Has a 'Recommended Routing' section with per-step model swaps", "passed": true, "evidence": "Pattern found in response"}, {"text": "Uses tier or criticality classification (Tier 1/2/3 or OVERSPEND markers)", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Shows per-step savings in a table (not just a total)", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes a Watch-outs or edge case section", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-ebay-pipeline-with_skill", "prompt": "I want to build an eBay Listing Assistant that takes a product name + image and automatically generates a title, description, item specifics, and suggested price. The pipeline is: (1) analyze the image to identify the product, (2) call eBay's Finding API to get sold listing data, (3) generate the listing title (max 80 chars, keyword-stuffed for SEO), (4) write the listing description (buyer-facing, persuasive), (5) extract item specifics from the research data, (6) suggest a price based on the sold data. Which steps need Claude Sonnet and which can run on something cheaper?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# The Allocator: eBay Listing Assistant Pipeline\n\n## Executive Summary\n\nYour eBay pipeline has **6 steps, 3 of which are currently over-engineered**. Running everything on Claude Sonnet burns ~$0.40\u20130.60 per listing. With smart routing, you drop to ~$0.08\u20130.12 per listing: **80% cost savings**. At 100 listings/day, that's **$3,200/month saved**.\n\n---\n\n## Step-by-Step Model Routing\n\n### Step 1: Analyze Product Image \u2192 Identify Product\n**What it does:** Vision call on product image to extract: brand, product name, condition, color, material, key features.\n\n**Current assumption:** Claude Sonnet (multimodal)\n\n**Classification:** \ud83d\udfe8 **Balanced is Fine**\n\n**Recommended Model:** **GPT-4o-mini**\n- GPT-4o-mini has excellent vision at $0.15/M tokens (input) vs Sonnet $3\u20135/M\n- Product identification is a straightforward extraction task \u2014 classify the item, extract basic specs\n- No nuanced judgment needed; the output is structured (JSON with fields)\n- The human doesn't read this directly; it feeds into step 2\n\n**Cost:** ~$0.008\u20130.012 per image (assuming ~800 tokens per image analysis)\n\n**Watch-outs:**\n- \u2705 GPT-4o-mini vision is production-ready\n- \u2705 Edge case: damaged/blurry images \u2014 GPT-4o-mini handles these fine, just set a fallback prompt if confidence is low\n- \u26a0\ufe0f If you're selling luxury items where authenticity verification matters, you'd escalate to Sonnet, but for general eBay reselling this is overkill\n\n---\n\n### Step 2: Query eBay Finding API for Sold Listing Data\n**What it does:** Call eBay API with product name + specs, get back 50\u2013200 sold listings with prices, condition, shipping cost, sale date.\n\n**Current assumption:** N/A (this is deterministic API call)\n\n**Classification:** \ud83d\udfe9 **Local/Free Sufficient**\n\n**Recommended Model:** **No LLM call needed**\n- This is a data fetch + JSON parsing step\n- Use Python + requests library to hit eBay API\n- Parse the response into structured fields (price range, median, condition distribution, etc.)\n- If you need to do any \"fuzzy matching\" of your product to eBay categories, that's a quick Haiku/Flash call (see below)\n\n**Cost:** ~$0.001 or free (eBay API call, no LLM)\n\n**Watch-outs:**\n- \u2705 Rate limiting: eBay has a call limit. Cache results by product fingerprint (brand + model + condition) for 24 hours\n- \u2705 Category mapping: If your product doesn't match an eBay category perfectly, use a **Haiku** call to map it (e.g., \"Is this a 'Vintage Clothing / Dress' or 'Vintage Clothing / Coat'?\"). That's ~$0.0002 per call.\n\n---\n\n### Step 3: Generate Listing Title (Max 80 Chars, SEO-Optimized)\n**What it does:** Take product name + specs + eBay sold data and generate a keyword-stuffed title that:\n- Fits exactly 80 characters (hard constraint)\n- Includes searchable keywords from the eBay data (e.g., brand, condition, size)\n- Follows eBay best practices (no special characters, no ALL CAPS, no guarantee claims)\n\n**Current assumption:** Claude Sonnet\n\n**Classification:** \ud83d\udfe8 **Balanced is Fine**\n\n**Recommended Model:** **Claude Haiku** or **Gemini Flash 2.0**\n- Title generation is rule-based + constrained output\n- The prompt is short: \"Here are the product specs, here's the max 80 characters, here are trending keywords from sold data, generate 3 title options\"\n- Smaller models excel at constrained tasks (JSON output, word limits, template filling)\n- Claude Haiku at $0.25/M is literally 12\u201320x cheaper than Sonnet and handles this perfectly\n- Gemini Flash 2.0 at $0.075/M is even cheaper (~35x) and equally good\n\n**Cost:**\n- Haiku: ~$0.0003\u20130.0005 per title (assuming 200 tokens)\n- Gemini Flash 2.0: ~$0.00015\u20130.0002 per title\n\n**Watch-outs:**\n- \u2705 Haiku is fast and reliable for constrained generation\n- \u2705 Test on 10 titles to verify character count compliance (smaller models sometimes miss hard constraints, but you can loop once if needed)\n- \u2705 If character count is critical, add a validation step: \"If title > 80 chars, regenerate shorter\"\n\n---\n\n### Step 4: Write Listing Description (Buyer-Facing, Persuasive)\n**What it does:** Generate a compelling, persuasive description that:\n- Highlights condition, features, and selling points\n- Answers FAQ (shipping, returns, authenticity)\n- Uses casual, friendly tone (not robotic)\n- Organizes information for scannability (bullet points, line breaks)\n\n**Current assumption:** Claude Sonnet\n\n**Classification:** \ud83d\udfe5 **Frontier Required**\n\n**Recommended Model:** **Claude Sonnet 4** (don't downgrade)\n- This is **the** step where quality is the constraint, not cost\n- The description is read directly by potential buyers\n- A weak description = fewer clicks = fewer sales = lost revenue\n- Nuance matters: tone, persuasiveness, addressing objections, creating urgency without being pushy\n- Sonnet's ability to balance formality, personality, and conversion intent is worth the cost here\n\n**Cost:** ~$0.12\u20130.20 per description (assuming 800\u20131200 tokens output)\n\n**Watch-outs:**\n- \u2705 This is worth paying for. A 2% difference in conversion rate = 2\u20135x the cost of the API call\n- \u26a0\ufe0f If you're batch-generating 1000+ descriptions/day and don't have time to review, consider GPT-4o-mini with a tighter prompt template and do spot-checks. But for your volume (100 listings/day reselling), Sonnet is the right call\n- \u2705 Cache the eBay research data with Claude's cache API (cheaper reruns if you iterate on description prompts)\n\n---\n\n### Step 5: Extract Item Specifics (Category-Specific Fields)\n**What it does:** Map product specs to eBay-category-specific item specifics:\n- For clothing: size, material, color, brand, condition\n- For electronics: brand, model, working condition, features\n- For vintage/collectibles: era, material, condition, authenticity\n- etc.\n\n**Current assumption:** Claude Sonnet\n\n**Classification:** \ud83d\udfe8 **Balanced is Fine**\n\n**Recommended Model:** **GPT-4o-mini** or **Gemini Flash 2.0**\n- This is structured extraction from product data + eBay research\n- No nuance; just \"map these fields to eBay's schema\"\n- Output is JSON with predefined keys (no creative writing)\n- Smaller models excel at schema mapping and extraction\n\n**Cost:**\n- GPT-4o-mini: ~$0.002\u20130.004 per call\n- Gemini Flash 2.0: ~$0.001\u20130.002 per call\n\n**Watch-outs:**\n- \u2705 Keep a mapping template for each eBay category (e.g., \"For clothing, extract: brand, size, color, material, condition\")\n- \u2705 Validate output against eBay's allowed values for each field (e.g., size must be one of [\"S\", \"M\", \"L\", \"XL\"] for your category)\n- \u2705 If a field is missing or invalid, fallback to GPT-4o-mini with explicit instruction: \"Fill in missing field: {field}. Here are valid options: [list]\"\n\n---\n\n### Step 6: Suggest Price (Based on Sold Data)\n**What it does:** Analyze eBay's sold listing data and suggest a price:\n- Calculate median price for exact condition match\n- Apply adjustments for rarity, seasonality, trending keywords\n- Factor in shipping cost (free shipping = higher price)\n- Give a range (min, recommended, max)\n\n**Current assumption:** Claude Sonnet\n\n**Classification:** \ud83d\udfe9 **Local/Free Sufficient** or **\ud83d\udfe8 Balanced**\n\n**Recommended Model:**\n- **If deterministic:** No LLM \u2014 pure Python/SQL\n- **If you want nuance:** **Haiku** or **GPT-4o-mini**\n\n**Details:**\n1. **Start with pure math** (no LLM):\n   - Median of condition-matched sold listings\n   - 10th percentile (undercut), 50th (sweet spot), 90th (aspirational)\n   - Shipping adjustment rule: \"If avg shipping cost is $5, subtract $5 from your price\"\n   - Result: a data-driven price range with no AI call\n\n2. **If you want LLM-powered nuance** (optional):\n   - Pass structured data to Haiku: \"Median: $45, trend: +12% (last 7 days), rarity score: 7/10, similar high-priced comps: [list]\"\n   - Haiku returns: \"I recommend $38\u201348, with $45 as the sweet spot. Reason: [short reasoning]\"\n   - Cost: ~$0.0003 per call\n\n**Cost:**\n- Pure math: $0.00 (free)\n- Haiku-powered: ~$0.0003 per listing\n\n**Watch-outs:**\n- \u2705 **Pure math is better for pricing.** You want consistency, not AI whimsy. Price too high = no sales; too low = left money on table\n- \u2705 If you do use Haiku, sanity-check output: reject if suggested price is more than 2x median or less than 50% of median\n- \u2705 Don't overthink this step. A simple rule (\"list at 95% of recent median for same condition\") outperforms an LLM 95% of the time\n\n---\n\n## Complete Recommended Pipeline\n\n| Step | Task | Recommended Model | Cost Per Call | Why |\n|------|------|---|---|---|\n| 1 | Analyze product image | GPT-4o-mini (vision) | $0.008\u20130.012 | Extraction, not reasoning |\n| 2 | Query eBay API | Python + requests (no LLM) | ~$0.00 | Deterministic API call |\n| 3 | Generate title | Claude Haiku | $0.0003\u20130.0005 | Constrained output, rule-based |\n| 4 | Write description | Claude Sonnet 4 | $0.12\u20130.20 | **Buyer-facing, needs quality** |\n| 5 | Extract item specifics | GPT-4o-mini | $0.002\u20130.004 | Schema mapping, extraction |\n| 6 | Suggest price | Python (no LLM) | ~$0.00 | Math beats AI for pricing |\n\n---\n\n## Cost Comparison\n\n### Current Approach (All Claude Sonnet)\n```\nPer listing:\n  Step 1 (image): $0.12\u20130.20\n  Step 2 (eBay API): $0.00 (assumed no LLM call)\n  Step 3 (title): $0.12\u20130.20\n  Step 4 (description): $0.12\u20130.20\n  Step 5 (item specifics): $0.12\u20130.20\n  Step 6 (price): $0.12\u20130.20 (or simple math)\n\n  TOTAL: $0.60\u20131.00 per listing\n\nAt 100 listings/day:\n  Monthly: $1,800\u20133,000\n```\n\n### Recommended Approach (Smart Routing)\n```\nPer listing:\n  Step 1 (image): $0.008\u20130.012 (GPT-4o-mini)\n  Step 2 (eBay API): ~$0.00 (Python, no LLM)\n  Step 3 (title): $0.0003\u20130.0005 (Haiku)\n  Step 4 (description): $0.12\u20130.20 (Sonnet 4) \u2705 keep here\n  Step 5 (item specifics): $0.002\u20130.004 (GPT-4o-mini)\n  Step 6 (price): ~$0.00 (Python)\n\n  TOTAL: $0.13\u20130.22 per listing\n\nAt 100 listings/day:\n  Monthly: $390\u2013660\n\nSAVINGS: $1,140\u20132,340 per month (60\u201380% reduction)\n```\n\n---\n\n## Implementation Priority\n\n### Phase 1 (Immediate \u2014 High Impact, Low Risk)\n1. **Step 6 (Pricing):** Switch from any LLM to pure Python math. No quality loss. Saves ~$0.12 per listing.\n2. **Step 3 (Title):** Swap Sonnet \u2192 Haiku. Test 10 titles for compliance. Saves ~$0.12 per listing.\n3. **Step 5 (Item Specifics):** Swap Sonnet \u2192 GPT-4o-mini. Validate against eBay schema. Saves ~$0.11 per listing.\n\n**Phase 1 Savings:** ~$0.35 per listing = $1,050/month at 100/day\n\n### Phase 2 (Next \u2014 Medium Impact, Requires Testing)\n4. **Step 1 (Image Analysis):** Swap Sonnet \u2192 GPT-4o-mini vision. Run A/B test on 50 images to verify no quality drop. Saves ~$0.11 per listing.\n\n**Phase 2 Savings:** ~$0.11 per listing = $330/month at 100/day\n\n### Phase 3 (Long-term \u2014 Optimization)\n5. **Step 4 (Description):** Keep on Sonnet 4, but add prompt caching to reduce re-runs if you iterate. Also consider batching descriptions (cheaper by 5\u201310% with volume discounts).\n\n---\n\n## Watch-outs & Edge Cases\n\n### Image Analysis (Step 1)\n- **Blurry/damaged images:** GPT-4o-mini may struggle. Add a fallback: if confidence < 0.7, manually review or escalate to Sonnet.\n- **Ambiguous products:** If you can't tell if it's a \"vintage dress\" or \"costumer,\" have a human-in-the-loop step or escalate.\n\n### Title Generation (Step 3)\n- **Character count:** Haiku sometimes generates titles > 80 chars. Add a validation step: \"If title > 80 chars, shorten it.\"\n- **Keyword stuffing:** Test that keywords are relevant (not spammy). Check 10 titles for naturalness.\n\n### Pricing (Step 6)\n- **New/rare products:** If eBay sold data is sparse (<5 listings in last 30 days), use a rule like \"start at 2x best offer from similar items or 10% above cost.\" Don't let an LLM guess.\n- **Seasonal items:** eBay data shows prices for current season only. If listing in off-season, apply a discount (e.g., -15% for summer clothing in December).\n\n### eBay API (Step 2)\n- **Rate limiting:** Cache results for 24 hours by product fingerprint (brand + model + condition).\n- **Category mapping:** If product doesn't fit neatly, use a tiny Haiku call: \"Is this Vintage Clothing / Dress or Vintage Clothing / Coat?\" (~$0.0002).\n\n---\n\n## Quality Guardrails\n\n### Before Going Live\n1. **Image \u2192 Product (Step 1):** Test GPT-4o-mini on 50 images. Pass if >95% match human label.\n2. **Title (Step 3):** Generate 100 titles on Haiku. Check that 99% are \u226480 chars and keywords are natural.\n3. **Specifics (Step 5):** Validate 50 outputs against eBay's allowed values. Pass if 100% valid.\n4. **Descriptions (Step 4):** Keep on Sonnet; no test needed. This is where quality matters.\n\n### Monitoring\n- **Title compliance:** Track % of titles > 80 chars. Alert if > 1%.\n- **Specifics validity:** Track % of fields that fail eBay schema validation. Alert if > 2%.\n- **Description feedback:** Ask buyers if descriptions answered their questions. Flag any mentions of \"unclear\" or \"missing info.\"\n\n---\n\n## Upgrade Triggers\n\nIf you notice problems, upgrade the model:\n\n| Metric | Threshold | Action |\n|--------|-----------|--------|\n| Image analysis errors | >5% | Upgrade Step 1 to Claude Sonnet |\n| Title character overage | >2% | Tighten validation prompt (not model) |\n| Specifics validation failures | >2% | Upgrade Step 5 to Sonnet; likely a category-specific edge case |\n| Description feedback: \"unclear\" mentions | >10 per 100 listings | Upgrade Step 4 to GPT-4o (not needed; Sonnet is already strong) |\n| Pricing complaints: \"priced too high\" | >20% of feedback | Review pricing math (not LLM quality) |\n\n---\n\n## FAQ\n\n**Q: Why not just use GPT-4o-mini for everything?**\nA: Descriptions are read by humans and directly impact your conversion rate. The 2\u20133x cost of Sonnet is trivial compared to a 2% loss in conversion rate. For the other steps, mini is perfect.\n\n**Q: Can I use local Ollama to save even more?**\nA: Yes, for Steps 3, 5, 6. Run Llama 2 70B locally for title + specifics + pricing. Free tier saves you another $0.013 per listing. But you lose speed (latency) and need server resources. Not worth it unless you're doing 1000+ listings/day and have local infrastructure.\n\n**Q: What if I'm selling luxury items where authenticity matters?**\nA: Keep image analysis on Sonnet for Step 1. Authenticity detection is where frontier reasoning matters. Everything else stays cheap.\n\n**Q: How do I test these swaps without breaking production?**\nA: Create a test variant:\n1. Run both old (Sonnet) and new (cheap) pipelines on 50 listings\n2. Have a human spot-check 20 outputs from each\n3. Measure: title compliance, description engagement (if live), specifics errors\n4. If new pipeline passes, roll out to 10% of traffic, monitor, then 100%\n\n**Q: What about eBay API limits?**\nA: eBay's Finding API has a call limit (typically 5000 calls/day for tier 1). At 100 listings/day, you're at ~100 calls/day (one search + pagination). You're well under. Cache aggressively anyway (24-hour TTL per product fingerprint).\n\n---\n\n## Summary\n\n**Bottom line:** Run the description through Claude Sonnet 4. Everything else is commodity work. Your pipeline will cost 80% less and perform just as well.\n\n- Estimated savings: **$1,140\u20132,340/month** at 100 listings/day\n- Quality impact: **Zero** (you're actually improving cost/quality ratio)\n- Implementation time: **2\u20134 hours** to refactor and test\n- Risk level: **Low** (each step is independent; you can swap one at a time)\n\nStart with Phase 1 (pricing + title + specifics). That buys you $1,050/month. Phase 2 (image) gets you another $330. Done.\n"}], "grading": {"eval_id": 1, "run_type": "with_skill", "pass_rate": 0.8, "passed": 4, "total": 5, "expectations": [{"text": "Uses 'Allocator Plan' or 'Allocator Audit' header from skill", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Has a step-by-step routing table or structured per-step breakdown", "passed": true, "evidence": "Pattern found in response"}, {"text": "Explicitly states price step does not need an LLM", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes upgrade triggers or quality thresholds for when to use a better model", "passed": true, "evidence": "Pattern found in response"}, {"text": "Shows cost per listing (not just monthly)", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-ebay-pipeline-without_skill", "prompt": "I want to build an eBay Listing Assistant that takes a product name + image and automatically generates a title, description, item specifics, and suggested price. The pipeline is: (1) analyze the image to identify the product, (2) call eBay's Finding API to get sold listing data, (3) generate the listing title (max 80 chars, keyword-stuffed for SEO), (4) write the listing description (buyer-facing, persuasive), (5) extract item specifics from the research data, (6) suggest a price based on the sold data. Which steps need Claude Sonnet and which can run on something cheaper?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# eBay Listing Assistant \u2014 Model Allocation Strategy\n\n## Executive Summary\n\nThis pipeline can be built cost-effectively by using **Claude Sonnet for steps 3 & 4** (the high-leverage writing tasks) and **cheaper models/APIs for steps 1, 2, 5 & 6** (data retrieval and structured extraction).\n\n**Estimated cost per listing:** ~$0.08\u2013$0.15 (vs. $0.35\u2013$0.50 if everything used Sonnet)\n\n---\n\n## Pipeline Breakdown & Model Recommendations\n\n### Step 1: Image Analysis to Identify Product\n**Task:** Look at product image, extract basic info (category, brand, condition, key features)\n\n**Recommended:** Claude Haiku or Vision API\n- **Why Haiku:** Fast, cheap ($0.80/M input), excellent at image classification and basic feature extraction\n- **Why not Sonnet:** Overkill for pattern recognition; Haiku is 80% as capable at 1/4 the cost\n- **Alternative:** Use a dedicated vision model (OpenAI's Vision API is similar cost)\n\n**Estimated cost:** $0.003\u2013$0.008 per image\n\n**Output format needed:**\n```json\n{\n  \"category\": \"Electronics > Smartphones\",\n  \"brand\": \"Apple\",\n  \"model\": \"iPhone 13\",\n  \"condition\": \"Used\",\n  \"key_features\": [\"64GB\", \"Black\", \"Screen Protector\"],\n  \"detected_issues\": [\"Slight scratches on back\"]\n}\n```\n\n---\n\n### Step 2: eBay Finding API to Get Sold Listing Data\n**Task:** Query eBay API for recently sold similar products, extract sold prices + market data\n\n**Recommended:** Direct API call (no LLM needed)\n- **Why:** Deterministic, no interpretation needed \u2014 just data retrieval\n- Use eBay's official Finding API or Shopping API\n- Parse response directly into structured format\n- No model cost; only API call cost (~$0.001\u2013$0.005 per query)\n\n**Output format needed:**\n```json\n{\n  \"sold_listings\": [\n    {\n      \"title\": \"iPhone 13 64GB Black - Excellent Condition\",\n      \"sold_price\": 599.99,\n      \"condition\": \"Used\",\n      \"shipping\": 9.99,\n      \"sold_date\": \"2026-03-10\",\n      \"feedback\": 98\n    }\n  ],\n  \"avg_sold_price\": 585.50,\n  \"price_range\": [475, 650],\n  \"market_momentum\": \"stable\"\n}\n```\n\n---\n\n### Step 3: Generate Listing Title (max 80 chars, SEO-optimized)\n**Task:** Craft eBay title with keyword stuffing while staying under 80 chars\n\n**Recommended:** Claude Sonnet\n- **Why Sonnet:** Title needs semantic optimization (high search relevance + readability balance). Cheap models struggle with:\n  - Knowing which keywords eBay buyers actually search for\n  - Balancing keyword density without sounding spammy\n  - Understanding brand/model/condition combinations for best placement\n- **Why not Haiku:** Can write titles, but weaker at keyword strategy and market awareness\n- **Prompt strategy:** Feed it the category, brand, model, condition, AND the sold listing titles as examples of what works\n\n**Estimated cost:** $0.01\u2013$0.02 per title\n\n**Prompt template:**\n```\nYou are an eBay SEO expert. Generate a listing title (max 80 chars) that maximizes search visibility.\n\nProduct: {brand} {model}, {condition}\nCategory: {category}\nKey features: {features}\n\nExample successful titles from sold listings:\n- {example_1}\n- {example_2}\n- {example_3}\n\nGenerate ONE title. Return ONLY the title, no explanation.\n```\n\n**Output:** `iPhone 13 64GB Black Used Excellent Condition Smartphone Mobile`\n\n---\n\n### Step 4: Write Listing Description (Persuasive, buyer-facing)\n**Task:** Create engaging, conversion-focused product description\n\n**Recommended:** Claude Sonnet\n- **Why Sonnet:** Description needs:\n  - Persuasive copywriting skill (building desire)\n  - Product knowledge integration (combining research data + features)\n  - Tone calibration (trustworthy for used goods, urgency without aggression)\n  - Structure (benefits \u2192 specs \u2192 condition \u2192 shipping \u2192 urgency)\n- **Why not Haiku:** Weaker at persuasive writing and emotional resonance\n- **Prompt strategy:** Feed it the product data + sold listing descriptions as examples + known buyer pain points for the category\n\n**Estimated cost:** $0.03\u2013$0.06 per description\n\n**Prompt template:**\n```\nYou are an expert eBay copywriter. Write a compelling product description for a used item.\n\nProduct: {brand} {model}\nCondition: {condition}\nDetected issues: {issues}\nKey features: {features}\nTypical price range: ${min}\u2013${max}\n\nExample descriptions that sold well:\n{example_1}\n{example_2}\n\nWrite a 150\u2013250 word description that:\n1. Opens with a hook (why this is a good deal)\n2. Lists key specs and features\n3. Honestly addresses condition/wear\n4. Highlights shipping speed\n5. Closes with urgency/scarcity\n```\n\n**Output:**\n```\n\ud83c\udfa7 iPhone 13 64GB Black - Like New Condition!\n\nYou're looking at a beautiful iPhone 13 in excellent condition \u2014 minimal signs of use.\nPerfect for anyone upgrading without the flagship price tag.\n\n\u2713 64GB Storage | A15 Bionic Chip | 5G Ready\n\u2713 6.1\" Super Retina XDR Display (pristine, no cracks)\n\u2713 Advanced Dual Camera System\n\u2713 All original accessories included\n\nCONDITION: Excellent used. Light scratches on back casing (barely visible).\nScreen is flawless. Battery health: 89% (shown in iOS).\n\n\u2705 Ships SAME DAY\n\u2705 Money-back guarantee\n\u2705 100% authentic Apple device\n\nThis exact model typically sells $585\u2013$650. This is a great value for a quality device.\n```\n\n---\n\n### Step 5: Extract Item Specifics from Research Data\n**Task:** Parse sold listings + product data to populate eBay's structured fields (Brand, Model, Capacity, Color, Condition, etc.)\n\n**Recommended:** Claude Haiku or lightweight structured extraction\n- **Why Haiku:** Item specifics are structured, rule-based data extraction \u2014 high volume, low creativity\n- **Why not Sonnet:** You're just mapping data from Step 1 & 2 into predefined eBay fields\n- **Alternative:** Use a cheaper structured extraction model or even rule-based parsing if the fields are consistent\n\n**Estimated cost:** $0.001\u2013$0.003 per listing\n\n**Prompt template (Haiku):**\n```json\nExtract item specifics from this product data. Return ONLY valid JSON.\n\nProduct data: {step_1_output}\n\neBay Item Specifics (use ONLY if data supports it):\n{\n  \"Brand\": \"\",\n  \"Model\": \"\",\n  \"Storage Capacity\": \"\",\n  \"Color\": \"\",\n  \"Condition\": \"\",\n  \"Network\": \"\",\n  \"Features\": []\n}\n```\n\n**Output:**\n```json\n{\n  \"Brand\": \"Apple\",\n  \"Model\": \"iPhone 13\",\n  \"Storage Capacity\": \"64GB\",\n  \"Color\": \"Black\",\n  \"Condition\": \"Used\",\n  \"Network\": \"5G\",\n  \"Features\": [\"Unlocked\", \"Face ID\", \"Wireless Charging\"]\n}\n```\n\n---\n\n### Step 6: Suggest Price Based on Sold Data\n**Task:** Analyze sold prices + market momentum to recommend listing price\n\n**Recommended:** Claude Haiku or pure statistical calculation\n- **Why Haiku:** Price recommendation is mostly data-driven (median, percentiles, momentum) with light strategic interpretation\n- **Why not Sonnet:** Overkill; you can also do this with basic statistics\n- **Prompt template (if using Haiku):**\n```\nAnalyze sold data and suggest a starting bid price.\n\nSold price range: ${min}\u2013${max}\nAverage: ${avg}\nMarket momentum: {stable|rising|declining}\nSeller feedback: {percentage}\nShipping cost: ${shipping}\nCondition: {condition}\n\nSuggest: (1) Starting bid, (2) Buy It Now price, (3) Reserve (if needed)\nReturn ONLY JSON.\n```\n\n**Estimated cost:** $0.001\u2013$0.003 per recommendation\n\n**Output:**\n```json\n{\n  \"starting_bid\": 525.00,\n  \"buy_it_now\": 599.99,\n  \"reserve\": null,\n  \"reasoning\": \"Positioned at 90th percentile of recent sales given excellent condition. Faster sale vs. higher margin.\"\n}\n```\n\n---\n\n## Full Cost Analysis\n\n### Per-Listing Breakdown\n| Step | Model | Cost | Notes |\n|------|-------|------|-------|\n| 1. Image Analysis | Haiku | $0.005 | 1K input tokens |\n| 2. eBay API Query | API only | $0.003 | No model cost |\n| 3. Title Generation | **Sonnet** | **$0.015** | 800 input, 80 output tokens |\n| 4. Description | **Sonnet** | **$0.045** | 1.5K input, 250 output tokens |\n| 5. Item Specifics | Haiku | $0.002 | Structured extraction |\n| 6. Price Suggestion | Haiku | $0.002 | Statistical + light interpretation |\n| **Total** | | **~$0.08** | Per listing |\n\n### If you used Claude Sonnet for everything:\n- Sonnet would cost ~$0.12\u2013$0.18 per listing (2\u20133x more)\n- No quality improvement for Steps 1, 2, 5, 6\n- Slower execution (Haiku is faster for simple tasks)\n\n### Annual Volume Example\n- **100 listings/month \u00d7 12 months = 1,200 listings/year**\n- **Optimized strategy:** 1,200 \u00d7 $0.08 = **$96/year in API costs**\n- **All-Sonnet strategy:** 1,200 \u00d7 $0.15 = **$180/year** (87% more expensive)\n\n---\n\n## Implementation Roadmap\n\n### Phase 1: MVP (Use this allocation)\n1. Image analysis \u2192 Haiku\n2. eBay API query \u2192 Direct API call\n3. Title generation \u2192 **Sonnet**\n4. Description \u2192 **Sonnet**\n5. Item specifics \u2192 Haiku\n6. Price suggestion \u2192 Haiku\n\n**Why start here:** Minimal cost, maximum quality on the revenue-critical pieces (title + description).\n\n### Phase 2: Optimization (Optional)\n- Cache sold listing examples to reduce input tokens in Sonnet calls\n- Batch API calls to eBay to reduce latency\n- Fine-tune Haiku for category-specific extraction if you hit edge cases\n\n### Phase 3: Scaling (Long-term)\n- Consider running Steps 1, 5, 6 on-device or via open-source models (Llama 2/3) if volume justifies it\n- Keep Steps 3 & 4 on Sonnet (proprietary data and quality matter)\n\n---\n\n## Strategic Insight for Kalani\n\nThis is a **high-margin automation pipeline** because:\n- **Input:** One product image + name\n- **Output:** Complete, listing-ready content in <30 seconds\n- **Value:** Eliminates 15\u201320 minutes of manual copywriting per listing\n- **Leverage:** At 100 listings/month, you're saving ~30\u201340 hours of writing time\n- **Unit economics:** Even at $0.10 per listing, you break even if you sell just 1\u20132 items per month\n\n**Allocation logic:** Spend on Sonnet where the LLM makes the sale (title + description). Automate the rest.\n\n---\n\n## API & Library Recommendations\n\n### Required:\n```python\n# For eBay API\nfrom ebaysdk.finding import Connection  # Official eBay SDK\n# or requests + ebay-api for simpler setup\n\n# For Claude Sonnet\nfrom anthropic import Anthropic\n\n# For image processing (Step 1)\nimport anthropic  # Claude Haiku with vision\n```\n\n### Configuration:\n```python\n# Claude API clients\nsonnet_client = Anthropic(api_key=os.environ[\"ANTHROPIC_API_KEY\"])\nhaiku_client = Anthropic(api_key=os.environ[\"ANTHROPIC_API_KEY\"])\n\n# eBay credentials\nEBAY_API_KEY = os.environ[\"EBAY_FINDING_API_KEY\"]\nEBAY_APP_ID = os.environ[\"EBAY_APP_ID\"]\n```\n\n---\n\n## Next Steps for Implementation\n\n1. **Get eBay API credentials** (if you don't have them)\n   - Register at eBay Developer Program\n   - Get Finding API key (free, rate-limited)\n   - Authenticate with your seller account\n\n2. **Build Step 1 first** (image analysis)\n   - Test with 10 product photos\n   - Validate Haiku extracts correct features\n\n3. **Integrate Step 2 next** (eBay API)\n   - Query for recently sold listings in your categories\n   - Parse price data consistently\n\n4. **Then add Sonnet** (Steps 3 & 4)\n   - Start with templates, iterate on prompts\n   - A/B test titles/descriptions against actual sold listings\n\n5. **Wire it together** (Steps 5 & 6)\n   - Full end-to-end pipeline: image \u2192 API \u2192 Sonnet \u2192 structured output\n\n---\n\n## Risk & Mitigation\n\n| Risk | Mitigation |\n|------|-----------|\n| eBay API rate limits | Batch queries, cache results, use exponential backoff |\n| Sonnet latency for bulk requests | Queue-based async processing, batch generations |\n| Haiku hallucinating features | Add validation step: cross-check extracted features against image |\n| Price suggestions too aggressive | Use 75th percentile instead of average, build in margin safety |\n| Image analysis fails on unclear photos | Flag for manual review, implement confidence scoring |\n\n---\n\n## Summary Table: Model Selection\n\n| Step | Task | Model | Cost | Speed | Why |\n|------|------|-------|------|-------|-----|\n| 1 | Image ID | Haiku | $$ | Fast | Classification, not creativity |\n| 2 | Market data | API | $ | Instant | Pure data retrieval |\n| 3 | Title (SEO) | **Sonnet** | $$$ | Medium | Keyword strategy matters |\n| 4 | Description | **Sonnet** | $$$ | Medium | Persuasion + copywriting |\n| 5 | Specifics | Haiku | $$ | Fast | Structured extraction |\n| 6 | Price | Haiku | $$ | Instant | Statistical + light reasoning |\n\n**Only steps marked Sonnet directly impact sales. Optimize those. Automate the rest.**\n"}], "grading": {"eval_id": 1, "run_type": "without_skill", "pass_rate": 0.6, "passed": 3, "total": 5, "expectations": [{"text": "Uses 'Allocator Plan' or 'Allocator Audit' header from skill", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Has a step-by-step routing table or structured per-step breakdown", "passed": true, "evidence": "Pattern found in response"}, {"text": "Explicitly states price step does not need an LLM", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes upgrade triggers or quality thresholds for when to use a better model", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Shows cost per listing (not just monthly)", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-n8n-briefing-with_skill", "prompt": "I'm building an n8n workflow that runs every morning and: fetches my eBay sold listings from the past 24h, pulls my Shopify orders, checks Google Trends for rising keywords in my categories, summarizes everything into a daily briefing, and sends it to me on Telegram. I'm using Claude Sonnet for every single LLM step right now. Which steps actually need Sonnet and which don't?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# The Allocator: n8n Daily Briefing Workflow Audit\n\n## Current State\n\nYou're running Claude Sonnet on **five separate steps** in your daily briefing pipeline. Let me be direct: you're burning credits on three steps that don't need a frontier model at all, and one step that barely needs an LLM.\n\n| Step | Current Model | Actual LLM Calls? | Est. Cost/Call | Est. Monthly (1 call/day) |\n|------|---------------|-------------------|---|---|\n| 1. Fetch eBay sold listings (24h) | Claude Sonnet | No \u2014 API call | \u2014 | $0 |\n| 2. Pull Shopify orders | Claude Sonnet | No \u2014 API call | \u2014 | $0 |\n| 3. Google Trends keyword check | Claude Sonnet | Maybe | $0.015\u20130.03 | $0.45\u20130.90 |\n| 4. Summarize into briefing | Claude Sonnet | Yes | $0.015\u20130.03 | $0.45\u20130.90 |\n| 5. Format & send to Telegram | Claude Sonnet | No \u2014 formatting | \u2014 | $0 |\n\n**Current monthly spend estimate (Sonnet on synthesis only):** ~$1\u20132/month\n**Current monthly spend if you're actually calling Sonnet 5x/day:** ~$5\u201310/month\n\nBut here's the thing: steps 1, 2, and 5 shouldn't be LLM calls at all. And step 3 doesn't need Sonnet.\n\n---\n\n## The Mismatches\n\n### \ud83d\udd34 Step 1: Fetch eBay Sold Listings\n**Current:** Claude Sonnet\n**Reality:** This is a pure API call to eBay's REST API. There's no reasoning, no synthesis, no judgment call. You're:\n- Setting a time filter (last 24 hours)\n- Calling the endpoint\n- Parsing JSON\n\n**Verdict:** No LLM needed. Remove this entirely. Use n8n's built-in HTTP request node with eBay's API credentials.\n\n**Savings:** $0/month, but you're saving latency and API overhead by cutting unnecessary hops.\n\n---\n\n### \ud83d\udd34 Step 2: Pull Shopify Orders\n**Current:** Claude Sonnet\n**Reality:** Same as eBay. This is a Shopify API call with optional filters (orders from past 24h, status=fulfilled, etc.).\n\n**Verdict:** No LLM needed. Use n8n's Shopify connector node directly.\n\n**Savings:** $0/month, plus removing another unnecessary model hop.\n\n---\n\n### \ud83d\udfe1 Step 3: Google Trends Keyword Check\n**Current:** Claude Sonnet\n**Reality:** Here's where it gets interesting. What are you actually asking Claude to do?\n\n**If you're just:**\n- Fetching trending keywords from Google Trends API\n- Filtering by your category\n- Ranking them by volume\n\nThen this is pure API + filtering. No LLM.\n\n**If you're asking Claude to:**\n- \"Analyze these 50 trending terms and tell me which 5 are most relevant to my product categories\"\n- \"Which of these trends could turn into products I can resell?\"\n- \"Is there a pattern here? Are these related?\"\n\nThen you *do* need an LLM. But **not Sonnet**. This is classification/extraction work.\n\n**My guess:** You're probably doing the second one \u2014 asking Claude for judgment on which trends matter.\n\n**Verdict:** If you need LLM assistance here, swap to **Claude Haiku** ($0.25/M) or **Gemini Flash 2.0** ($0.075/M).\n\n**Why it works:** You're asking for relevance ranking and pattern spotting, not nuanced reasoning. Haiku and Flash are both solid at \"given this list, pick the top N and explain why.\" The difference in quality between Sonnet and Haiku on this task is negligible. You're not writing a thesis; you're filtering a ranking.\n\n**Current cost (Sonnet):** ~$0.45\u20130.90/month\n**With Haiku:** ~$0.09/month\n**With Flash 2.0:** ~$0.02/month\n\n**Savings:** $0.40\u20130.88/month (small, but proves the point)\n\n---\n\n### \ud83d\udfe2 Step 4: Summarize Into Daily Briefing\n**Current:** Claude Sonnet\n**Reality:** This is the *only* step that genuinely needs a frontier model.\n\nYou're taking:\n- eBay sold items (titles, prices, dates)\n- Shopify orders (product names, customer locations, order totals)\n- Google Trends insights (rising keywords, categories)\n\nAnd synthesizing them into a **human-readable daily briefing** that you're going to read and act on.\n\nThis touches on:\n- Nuanced writing (making dry data feel narrative)\n- Context weaving (connecting eBay sales to Trends to Shopify orders)\n- Decision-relevant summaries (what actually matters for your business today?)\n\n**Verdict:** Sonnet is justified here. This is exactly what Sonnet is designed for \u2014 strong general reasoning, good prose, context synthesis.\n\nYou *could* use Haiku for pure structured output (JSON with sections), but if you want readable prose that connects the dots, Sonnet is worth it.\n\n**Cost:** ~$0.45\u20130.90/month (acceptable for the one step that matters)\n\n---\n\n### \ud83d\udd34 Step 5: Format & Send to Telegram\n**Current:** Claude Sonnet\n**Reality:** You're formatting the briefing (maybe into a Telegram message template) and sending it.\n\nThis is:\n- Wrapping text in Telegram markdown\n- Maybe adding emoji or section breaks\n- Calling Telegram's send_message API\n\n**Verdict:** No LLM needed. Use n8n's built-in Telegram node to format and send.\n\n**Savings:** $0/month\n\n---\n\n## Recommended Routing\n\n| Step | New Model | Why | Cost | Monthly Savings |\n|------|-----------|-----|------|-----------------|\n| 1. Fetch eBay | n8n HTTP node (no LLM) | Pure API call | $0 | $0.45\u20130.90 |\n| 2. Fetch Shopify | n8n Shopify node (no LLM) | Pure API call | $0 | $0.45\u20130.90 |\n| 3. Google Trends analysis | Claude Haiku or Gemini Flash 2.0 | Classification/ranking, not reasoning | $0.09\u20130.02 | $0.36\u20130.88 |\n| 4. Summarize briefing | Claude Sonnet | Synthesis, prose, context weaving | $0.45\u20130.90 | $0 |\n| 5. Format & send | n8n Telegram node (no LLM) | Pure formatting + API call | $0 | $0.45\u20130.90 |\n\n---\n\n## The Real Numbers\n\n**Current approach (Sonnet on all steps):**\n- If you're actually calling Sonnet 5 times per day: ~$5\u201310/month\n- If Sonnet is only on the summary step (my guess): ~$1\u20132/month\n\n**Recommended approach:**\n- eBay API: $0\n- Shopify API: $0\n- Trends analysis (Haiku): ~$0.09/month\n- Summary (Sonnet): ~$0.45\u20130.90/month\n- Telegram formatting: $0\n\n**Total:** ~$0.54\u20131.00/month\n\n**Potential monthly savings:** $0\u20139/month (depending on whether you're really calling Sonnet 5x per day or just once)\n\n---\n\n## More Importantly: Architecture Clarity\n\nThe bigger win here isn't the $5\u201310/month savings. It's **thinking through what each step actually needs.**\n\nYour workflow is:\n1. **Data gathering** (eBay, Shopify, Trends) \u2014 pure APIs, no reasoning\n2. **Synthesis** (turn scattered data into a coherent briefing) \u2014 this needs Claude\n3. **Delivery** (send it to you) \u2014 pure formatting\n\nThat's a good mental model. Separate the commodity work from the thinking work. Make Claude do only the thinking.\n\n**This pattern scales.** When you add more data sources (email, Discord, Reddit mentions of your products), keep pulling data with APIs. Claude only sees the aggregated, structured data. Claude's job: make it readable.\n\n---\n\n## Watch-outs & Upgrade Triggers\n\n### If using Haiku or Flash for Trends Analysis:\n- **Quality cliff:** These models can miss nuanced pattern connections. If you're getting trends that don't connect to your business, upgrade back to Sonnet and ask it to also explain *why* a trend matters to your categories.\n- **Latency:** Flash 2.0 is faster than Haiku. If your workflow needs to run in <5 seconds, prefer Flash.\n\n### If you add more data sources:\n- **Don't upgrade the synthesis step to Opus.** Sonnet is good enough. Opus is overkill for a daily briefing.\n- **Do consider caching.** If your eBay/Shopify/Trends retrieval is identical every run, use prompt caching on the Sonnet call to save 90% on re-runs.\n\n### If this workflow becomes your sole n8n job:\n- **Watch monthly spend.** If you're running this daily (365 calls/year), Sonnet at ~$0.015/call = ~$5.48/year. Still cheap. But at scale (multiple workflows), it adds up.\n- **Consider local summarization.** For a daily briefing that doesn't go to clients, Ollama (Mistral, Llama 3.1) running locally could handle the summary for zero cost. Tradeoff: prose quality vs. latency.\n\n---\n\n## Final Answer\n\n**Which steps actually need Sonnet?**\n\u2192 Only **step 4 (summarize into briefing).**\n\n**Which ones don't?**\n\u2192 Steps 1, 2, 5 are pure API/formatting. Don't use an LLM.\n\u2192 Step 3 (Trends) can use Haiku or Flash if you're asking for pattern analysis.\n\n**What should you do right now?**\n1. Remove Claude from steps 1, 2, 5. Use n8n's native connectors (HTTP, Shopify, Telegram).\n2. Test step 3 with Haiku. If the insights are still useful, keep it. If they're vague, add more context or swap back to Sonnet.\n3. Keep Sonnet on the summary step. This is where quality matters.\n\n**Cost today:** ~$1\u20132/month (probably already optimized if you're only calling Sonnet on the summary).\n**Cost after this audit:** ~$0.54\u20131.00/month (if you fix steps 1\u20133).\n**Real value:** You understand the pipeline now. When you add more workflows, you'll route them right the first time.\n"}], "grading": {"eval_id": 2, "run_type": "with_skill", "pass_rate": 0.8, "passed": 4, "total": 5, "expectations": [{"text": "Uses 'Allocator Audit' or 'Allocator Plan' header from skill", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Explicitly labels API fetch steps as requiring NO LLM call at all", "passed": true, "evidence": "Pattern found in response"}, {"text": "Uses tier or classification language from the skill framework", "passed": true, "evidence": "Pattern found in response"}, {"text": "Shows monthly cost before AND after optimization", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes Watch-outs or quality caveat section", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-n8n-briefing-without_skill", "prompt": "I'm building an n8n workflow that runs every morning and: fetches my eBay sold listings from the past 24h, pulls my Shopify orders, checks Google Trends for rising keywords in my categories, summarizes everything into a daily briefing, and sends it to me on Telegram. I'm using Claude Sonnet for every single LLM step right now. Which steps actually need Sonnet and which don't?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# n8n eBay/Shopify/Trends Daily Briefing \u2014 LLM Model Allocation Analysis\n\n## Executive Summary\n\nYou're currently using Claude Sonnet for **every** LLM step. You should keep it for 2-3 of them. For the rest, you can drop down to Claude Haiku or even structured extraction tools, cutting costs by 80%+ while keeping quality high.\n\n---\n\n## Workflow Steps Analyzed\n\n### 1. **Fetch eBay Sold Listings (past 24h)**\n**Current:** Could be using an LLM\n**Recommendation:** \u274c **Don't use any LLM here**\n\n**Why:** This is a pure API call. eBay API returns structured JSON. Just parse it directly.\n- No reasoning needed\n- No summarization needed\n- Cost savings: $0 \u2192 $0 (eliminate the LLM entirely)\n\n**Implementation:**\n```javascript\n// In n8n, use the native eBay connector or HTTP Request node\n// Parse response directly, no LLM wrapper needed\n```\n\n---\n\n### 2. **Pull Shopify Orders**\n**Current:** Could be using an LLM\n**Recommendation:** \u274c **Don't use any LLM here**\n\n**Why:** Same as eBay \u2014 structured data from API.\n- Extract order IDs, amounts, customer names, dates\n- No reasoning or summarization needed\n- Use Shopify API directly\n\n**Cost savings:** Eliminate entirely\n\n---\n\n### 3. **Check Google Trends for Rising Keywords**\n**Current:** Sonnet (if you're using it)\n**Recommendation:** \u26a0\ufe0f **Use Haiku or structured extraction, not Sonnet**\n\n**What's happening:** You're scraping/fetching trending keywords in your categories (e.g., \"electronics reselling,\" \"home goods,\" etc.), then... what? Ranking them? Filtering for relevance?\n\n**If you're just** listing trending keywords:\n- **Use:** Haiku or no LLM (just structure the data)\n- **Cost:** Haiku is ~10x cheaper than Sonnet\n- **Why:** No creative reasoning needed; pattern matching is light\n\n**If you're analyzing why they're trending or predicting demand:**\n- **Use:** Haiku still works (it's good at quick analysis)\n- **Cost:** Still ~10x cheaper\n- **Note:** Only escalate to Sonnet if you're doing comparative forecasting across multiple trend signals\n\n---\n\n### 4. **Summarize Everything into Daily Briefing**\n**Current:** Sonnet\n**Recommendation:** \u2705 **KEEP Sonnet here**\n\n**Why:** This is where you need reasoning and judgment:\n- Cross-referencing eBay sales with Shopify inventory\n- Highlighting anomalies (\"sold 3x normal volume of X today\")\n- Connecting trends to your actual sales (\"Y is trending and we sold it\")\n- Prioritizing what matters for tomorrow's strategy\n- Writing it coherently for human consumption\n\nThis requires:\n- Multi-source reasoning\n- Context synthesis\n- Business judgment\n- Natural language quality\n\n**Sonnet is justified.** Haiku might miss subtle connections.\n\n---\n\n### 5. **Send to Telegram**\n**Current:** Likely no LLM\n**Recommendation:** \u274c **No LLM needed**\n\nThis is just message formatting + Telegram API call.\n\n---\n\n## Cost Impact Analysis\n\n### Current Setup (estimated)\nAssuming daily run, average input ~1500 tokens, output ~500 tokens:\n\n| Step | Model | Calls/day | Cost/call | Daily | Monthly |\n|------|-------|-----------|-----------|-------|---------|\n| Fetch eBay | Sonnet | 1 | $0.003 | $0.003 | $0.09 |\n| Fetch Shopify | Sonnet | 1 | $0.003 | $0.003 | $0.09 |\n| Google Trends | Sonnet | 1 | $0.003 | $0.003 | $0.09 |\n| Summarize | Sonnet | 1 | $0.015 | $0.015 | $0.45 |\n| **TOTAL (all Sonnet)** | | | | **$0.024** | **$0.72** |\n\n### Optimized Setup\n\n| Step | Model | Calls/day | Cost/call | Daily | Monthly |\n|------|-------|-----------|-----------|-------|---------|\n| Fetch eBay | None | \u2014 | \u2014 | \u2014 | \u2014 |\n| Fetch Shopify | None | \u2014 | \u2014 | \u2014 | \u2014 |\n| Google Trends | Haiku | 1 | $0.0004 | $0.0004 | $0.012 |\n| Summarize | Sonnet | 1 | $0.015 | $0.015 | $0.45 |\n| **TOTAL (optimized)** | | | | **$0.0154** | **$0.462** |\n\n**Monthly savings: $0.26** \u2190 sounds small, but it's 36% cheaper and scales with volume.\n\nMore importantly: **you're not overthinking the cheap steps, so you move faster.**\n\n---\n\n## Recommended Architecture\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 n8n Workflow: Daily Briefing (7am UTC)  \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n         \u2193\n    [1. Fetch eBay API]\n         \u2193\n    [2. Fetch Shopify API]\n         \u2193\n    [3. Fetch Google Trends via scraper/API]\n         \u2193\n    [4. Haiku: Quick keyword analysis & filtering]\n         \u2193\n    [5. Sonnet: Cross-source synthesis + briefing]\n         \u2193\n    [6. Format + send to Telegram]\n```\n\n---\n\n## When to Escalate Each Step to Sonnet\n\n### Google Trends (Step 3) \u2192 upgrade to Sonnet if:\n- You're doing predictive demand forecasting (\"these 3 trends are converging, expect demand spike\")\n- You're comparing cross-category trends and making inventory allocation decisions\n- You need nuanced competitive analysis\n\n### Summary (Step 4) \u2192 keep as Sonnet (already optimal)\n\n---\n\n## Alternative: Structured Output + No LLM\n\nFor steps 1-3, consider whether you even need language generation:\n\n```json\n{\n  \"ebay_24h\": {\n    \"total_sold\": 5,\n    \"total_revenue\": 250,\n    \"items\": [\n      {\"title\": \"...\", \"sku\": \"...\", \"price\": 50}\n    ]\n  },\n  \"shopify_pending\": {\n    \"count\": 2,\n    \"orders\": [...]\n  },\n  \"trending_keywords\": [\n    {\"keyword\": \"...\", \"search_volume\": 15000, \"trend\": \"up\"}\n  ]\n}\n```\n\nThen **just feed this structured JSON to Sonnet for the summary**. No intermediate LLM calls. Clean, fast, cheap.\n\n---\n\n## My Honest Take\n\nYou're doing what a lot of builders do: defaulting to the most powerful tool for every step. It works, but you're paying 5-10x more than you need to for basic data retrieval and filtering.\n\nThe real value of Sonnet in this workflow is **the summary step** \u2014 where you synthesize signals and make recommendations. That's where reasoning matters.\n\nUse Sonnet there. Let APIs handle the rest.\n\n---\n\n## Implementation Priority\n\n1. **Immediate:** Remove LLM calls from eBay and Shopify fetch steps (highest ROI)\n2. **Next:** Structure trending keywords output, route to Haiku instead of Sonnet\n3. **Refinement:** If Haiku summaries start missing context, escalate just the summary step to Sonnet\n\n---\n\n## Questions to Ask Yourself\n\n- Are you using the LLM output in a meaningful way at each step, or just passing data through?\n- What decision would change if the LLM got that step slightly wrong?\n- If the answer is \"nothing would change,\" you don't need it there.\n\nApply that filter ruthlessly. It saves money and makes the workflow faster.\n"}], "grading": {"eval_id": 2, "run_type": "without_skill", "pass_rate": 0.2, "passed": 1, "total": 5, "expectations": [{"text": "Uses 'Allocator Audit' or 'Allocator Plan' header from skill", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Explicitly labels API fetch steps as requiring NO LLM call at all", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Uses tier or classification language from the skill framework", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Shows monthly cost before AND after optimization", "passed": true, "evidence": "Pattern found in response"}, {"text": "Includes Watch-outs or quality caveat section", "passed": false, "evidence": "Pattern NOT found in response"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"skill_name": "the-allocator", "iteration": 1, "configurations": [{"name": "with_skill", "label": "The Allocator Skill", "evals": [{"eval_id": 0, "eval_name": "behiquebot-audit", "pass_rate": 1.0, "passed": 5, "total": 5}, {"eval_id": 1, "eval_name": "ebay-pipeline", "pass_rate": 0.8, "passed": 4, "total": 5}, {"eval_id": 2, "eval_name": "n8n-briefing", "pass_rate": 0.8, "passed": 4, "total": 5}], "aggregate": {"pass_rate": 0.87, "pass_rate_pct": "87%", "total_passed": 13, "total_assertions": 15}}, {"name": "without_skill", "label": "Baseline (No Skill)", "evals": [{"eval_id": 0, "eval_name": "behiquebot-audit", "pass_rate": 0.6, "passed": 3, "total": 5}, {"eval_id": 1, "eval_name": "ebay-pipeline", "pass_rate": 0.6, "passed": 3, "total": 5}, {"eval_id": 2, "eval_name": "n8n-briefing", "pass_rate": 0.2, "passed": 1, "total": 5}], "aggregate": {"pass_rate": 0.47, "pass_rate_pct": "47%", "total_passed": 7, "total_assertions": 15}}], "delta": {"pass_rate": 0.4, "pass_rate_pct": "+40%", "summary": "The Allocator skill passes 87% vs 47% baseline \u2014 +40pp. Key gains: structured Allocator format, tier language, per-step savings tables, watch-outs."}}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!--
+  THEME 08: FITNESS BOLD
+  High-energy dark theme for athletic and supplement stores.
+  Bold sans-serif typography, electric orange accent, large imagery.
+
+  SHOPIFY LIQUID CONVERSION NOTES:
+  - Replace product cards with {% for product in collections.featured.products %}
+  - Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  - Replace prices with {{ product.price | money }}
+  - Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  - Replace nav links with {{ shop.name }}, {{ linklists.main-menu.links }}
+  - Replace newsletter form action with Shopify customer signup or Klaviyo endpoint
+  - Replace testimonials with metafield content or a dedicated section schema
+  - Wrap sections in {% schema %} blocks for Shopify theme editor customization
+  - Move CSS to assets/theme.css and reference with {{ 'theme.css' | asset_url | stylesheet_tag }}
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Bold Store</title>
+  <style>
+    :root {
+      --color-bg: #1a1a1a;
+      --color-surface: #222222;
+      --color-text: #f0f0f0;
+      --color-text-muted: #999999;
+      --color-accent: #ff6b00;
+      --color-accent-hover: #ff8533;
+      --color-border: #333333;
+      --color-card-bg: #252525;
+      --font-heading: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+      --font-body: 'Helvetica Neue', Arial, sans-serif;
+      --radius: 6px;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--color-accent); text-decoration: none; transition: color var(--transition); }
+    a:hover { color: var(--color-accent-hover); }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(26, 26, 26, 0.97);
+      border-bottom: 2px solid var(--color-accent);
+      padding: 14px 0;
+    }
+    .nav .container {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-logo {
+      font-family: var(--font-heading); font-size: 1.5rem;
+      color: #fff; text-transform: uppercase; letter-spacing: 2px;
+    }
+    .nav-logo span { color: var(--color-accent); }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--color-text-muted); font-size: 0.85rem;
+      text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
+    }
+    .nav-links a:hover { color: var(--color-accent); }
+    .nav-cart {
+      color: #fff; font-size: 0.85rem; font-weight: bold;
+      background: var(--color-accent); padding: 8px 18px;
+      border-radius: var(--radius); border: none;
+      text-transform: uppercase; letter-spacing: 1px;
+      transition: all var(--transition);
+    }
+    .nav-cart:hover { background: var(--color-accent-hover); }
+    .mobile-toggle { display: none; background: none; border: none; color: var(--color-accent); font-size: 1.5rem; cursor: pointer; font-weight: bold; }
+
+    /* HERO */
+    .hero {
+      padding: 160px 0 100px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a1a0a 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; right: -100px; top: -100px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 107, 0, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 650px; }
+    .hero-tag {
+      display: inline-block; padding: 6px 16px; background: var(--color-accent);
+      color: #fff; font-size: 0.75rem; font-weight: bold;
+      text-transform: uppercase; letter-spacing: 2px;
+      border-radius: var(--radius); margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-family: var(--font-heading); font-size: 3.5rem;
+      text-transform: uppercase; line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--color-accent); }
+    .hero p {
+      font-size: 1.05rem; color: var(--color-text-muted);
+      margin-bottom: 36px; max-width: 500px;
+    }
+    .btn-primary {
+      display: inline-block; padding: 16px 44px; font-family: var(--font-body);
+      font-size: 0.9rem; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 2px; background: var(--color-accent); color: #fff;
+      border: none; cursor: pointer; border-radius: var(--radius);
+      transition: all var(--transition);
+    }
+    .btn-primary:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 0, 0.3);
+    }
+
+    /* PRODUCTS */
+    .products { padding: 80px 0; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 50px;
+    }
+    .section-title {
+      font-family: var(--font-heading); font-size: 2rem;
+      text-transform: uppercase; letter-spacing: 2px;
+    }
+    .section-title span { color: var(--color-accent); }
+    .section-link {
+      font-size: 0.85rem; font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--color-accent);
+    }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .product-card {
+      background: var(--color-card-bg); border-radius: var(--radius);
+      overflow: hidden; transition: all var(--transition);
+      border: 1px solid var(--color-border);
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-color: var(--color-accent);
+    }
+    .product-image {
+      width: 100%; height: 260px;
+      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted); font-size: 0.85rem;
+      position: relative;
+    }
+    .product-badge {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--color-accent); color: #fff;
+      font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+      padding: 4px 10px; border-radius: var(--radius); letter-spacing: 1px;
+    }
+    .product-info { padding: 20px; }
+    .product-name {
+      font-family: var(--font-heading); font-size: 0.9rem;
+      text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;
+    }
+    .product-price { color: var(--color-accent); font-size: 1.2rem; font-weight: bold; margin-bottom: 16px; }
+    .btn-cart {
+      width: 100%; padding: 12px; background: var(--color-accent);
+      border: none; color: #fff; font-family: var(--font-body);
+      font-size: 0.8rem; font-weight: bold; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 2px;
+      border-radius: var(--radius); transition: all var(--transition);
+    }
+    .btn-cart:hover { background: var(--color-accent-hover); }
+
+    /* ABOUT */
+    .about {
+      padding: 80px 0;
+      background: var(--color-surface);
+    }
+    .about-content {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .about-image {
+      height: 380px; background: linear-gradient(135deg, #2a1a0a, #1a1a1a);
+      border-radius: var(--radius); display: flex; align-items: center;
+      justify-content: center; color: var(--color-text-muted); font-size: 0.85rem;
+    }
+    .about-text h2 {
+      font-family: var(--font-heading); font-size: 2rem;
+      text-transform: uppercase; margin-bottom: 20px; line-height: 1.2;
+    }
+    .about-text h2 span { color: var(--color-accent); }
+    .about-text p { color: var(--color-text-muted); margin-bottom: 16px; font-size: 0.95rem; }
+    .about-stats {
+      display: flex; gap: 30px; margin-top: 24px;
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-family: var(--font-heading); font-size: 2rem;
+      color: var(--color-accent); display: block;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 80px 0; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: var(--color-card-bg); border: 1px solid var(--color-border);
+      border-radius: var(--radius); padding: 30px;
+      transition: all var(--transition); position: relative;
+    }
+    .testimonial-card:hover {
+      border-color: var(--color-accent);
+      box-shadow: 0 5px 20px rgba(255, 107, 0, 0.1);
+    }
+    .testimonial-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; background: var(--color-accent); border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .testimonial-stars { color: var(--color-accent); margin-bottom: 14px; font-size: 1rem; letter-spacing: 2px; }
+    .testimonial-text {
+      color: var(--color-text-muted); font-size: 0.9rem;
+      margin-bottom: 20px; line-height: 1.7;
+    }
+    .testimonial-author { font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+    .testimonial-role { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* FOOTER */
+    .footer {
+      padding: 60px 0 30px;
+      border-top: 2px solid var(--color-accent);
+      background: var(--color-surface);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer h4 {
+      font-family: var(--font-heading); font-size: 0.85rem;
+      text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 16px; color: #fff;
+    }
+    .footer p { color: var(--color-text-muted); font-size: 0.85rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a { color: var(--color-text-muted); font-size: 0.85rem; }
+    .footer-links a:hover { color: var(--color-accent); }
+    .social-links { display: flex; gap: 12px; margin-top: 12px; }
+    .social-links a {
+      width: 38px; height: 38px; background: var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius); color: #fff;
+      font-size: 0.7rem; font-weight: bold; text-transform: uppercase;
+      transition: all var(--transition);
+    }
+    .social-links a:hover { background: var(--color-accent); }
+    .newsletter-form { display: flex; gap: 8px; margin-top: 10px; }
+    .newsletter-form input {
+      flex: 1; padding: 12px 14px; background: var(--color-bg);
+      border: 1px solid var(--color-border); color: var(--color-text);
+      font-family: var(--font-body); font-size: 0.85rem; border-radius: var(--radius);
+    }
+    .newsletter-form input:focus { outline: none; border-color: var(--color-accent); }
+    .newsletter-form button {
+      padding: 12px 24px; background: var(--color-accent); color: #fff;
+      border: none; font-family: var(--font-body); font-size: 0.85rem;
+      font-weight: bold; cursor: pointer; text-transform: uppercase;
+      letter-spacing: 1px; border-radius: var(--radius);
+      transition: all var(--transition);
+    }
+    .newsletter-form button:hover { background: var(--color-accent-hover); }
+    .footer-bottom {
+      text-align: center; padding-top: 30px;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-muted); font-size: 0.75rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: block; }
+      .hero h1 { font-size: 2.2rem; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-content { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .about-stats { justify-content: flex-start; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .newsletter-form { flex-direction: column; }
+      .about-stats { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav-logo">IRON<span>FORGE</span></a>
+      <ul class="nav-links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#" class="nav-cart">Cart (0)</a>
+      <button class="mobile-toggle">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-tag">New Arrivals</span>
+        <h1>Train Harder. <span>Recover Faster.</span></h1>
+        <p>Premium supplements, gear, and accessories designed for athletes who take their training seriously. No fillers, no compromises.</p>
+        <button class="btn-primary">Shop Now</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Best <span>Sellers</span></h2>
+        <a href="#" class="section-link">View All Products &rarr;</a>
+      </div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">
+            <span class="product-badge">Best Seller</span>
+            [PRODUCT IMAGE]
+          </div>
+          <div class="product-info">
+            <div class="product-name">Whey Protein Isolate</div>
+            <div class="product-price">$54.99</div>
+            <button class="btn-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">[PRODUCT IMAGE]</div>
+          <div class="product-info">
+            <div class="product-name">Pre-Workout Formula</div>
+            <div class="product-price">$39.99</div>
+            <button class="btn-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <span class="product-badge">New</span>
+            [PRODUCT IMAGE]
+          </div>
+          <div class="product-info">
+            <div class="product-name">Lifting Straps Pro</div>
+            <div class="product-price">$24.99</div>
+            <button class="btn-cart">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">[PRODUCT IMAGE]</div>
+          <div class="product-info">
+            <div class="product-name">Creatine Monohydrate</div>
+            <div class="product-price">$29.99</div>
+            <button class="btn-cart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-text">
+          <h2>Built by Athletes, <span>for Athletes</span></h2>
+          <p>We started IronForge because we were tired of supplements full of fillers and gear that falls apart after a month. Every product we sell is something we use ourselves, tested in real training environments.</p>
+          <p>Our formulas are transparent. Every ingredient, every dosage, right on the label. We do not hide behind proprietary blends because we have nothing to hide.</p>
+          <div class="about-stats">
+            <div class="stat">
+              <span class="stat-number">50K+</span>
+              <span class="stat-label">Athletes</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">98%</span>
+              <span class="stat-label">Satisfaction</span>
+            </div>
+            <div class="stat">
+              <span class="stat-number">0</span>
+              <span class="stat-label">Fillers</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-image">[BRAND IMAGE]</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <h2 class="section-title" style="text-align:center; margin-bottom:50px;">What Athletes <span>Say</span></h2>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+          <p class="testimonial-text">"The protein isolate mixes clean and tastes great. No bloating, no stomach issues. I have tried over a dozen brands and this one finally sticks."</p>
+          <div class="testimonial-author">Marcus D.</div>
+          <div class="testimonial-role">Powerlifter, 3 years</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+          <p class="testimonial-text">"The pre-workout hits different. Clean energy, no crash, and the focus is insane. I hit a new PR on deadlift the first week I used it."</p>
+          <div class="testimonial-author">Jessica K.</div>
+          <div class="testimonial-role">CrossFit Competitor</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733; &#9733; &#9733; &#9733; &#9733;</div>
+          <p class="testimonial-text">"Finally, a brand that actually puts the dosages on the label. Transparent, effective, and the shipping is fast. Became a subscriber after my first order."</p>
+          <div class="testimonial-author">Tyler W.</div>
+          <div class="testimonial-role">Bodybuilder</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>IronForge</h4>
+          <p>Premium supplements and gear for serious athletes. No fillers, no shortcuts, no excuses.</p>
+          <div class="social-links">
+            <a href="#">IG</a>
+            <a href="#">TW</a>
+            <a href="#">YT</a>
+            <a href="#">TK</a>
+          </div>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul class="footer-links">
+            <li><a href="#">Supplements</a></li>
+            <li><a href="#">Gear</a></li>
+            <li><a href="#">Apparel</a></li>
+            <li><a href="#">Bundles</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul class="footer-links">
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Join the Team</h4>
+          <p>Get 10% off your first order plus exclusive training tips.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="your@email.com">
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 IronForge Athletics. All rights reserved. Train hard, recover harder.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

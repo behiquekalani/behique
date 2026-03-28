@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADHD Productivity Suite</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #1a1714; --surface: #242019; --border: #3a3428; --amber: #d4a056; --amber-dim: #8a6a3a; --text: #e8dcc8; --muted: #8a7e6e; --done: #5a7a5a; --radius: 14px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 24px; line-height: 1.5; }
+  h1 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 6px; color: var(--amber); }
+  .subtitle { text-align: center; color: var(--muted); margin-bottom: 32px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .card h2 { font-size: 16px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--amber); margin-bottom: 16px; font-weight: 600; }
+  button { font-family: inherit; cursor: pointer; border: none; border-radius: 8px; font-size: 14px; padding: 10px 18px; transition: all .15s; }
+  .btn { background: var(--amber-dim); color: var(--text); }
+  .btn:hover { background: var(--amber); color: var(--bg); }
+  .btn.active { background: var(--amber); color: var(--bg); font-weight: 600; }
+  input[type="text"] { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; outline: none; }
+  input[type="text"]:focus { border-color: var(--amber); }
+  footer { text-align: center; color: var(--muted); margin-top: 40px; font-size: 13px; padding-bottom: 20px; }
+
+  /* Pomodoro */
+  .timer-circle { width: 200px; height: 200px; border-radius: 50%; border: 4px solid var(--border); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; position: relative; }
+  .timer-circle.running { border-color: var(--amber); }
+  .timer-circle.on-break { border-color: var(--done); }
+  .timer-time { font-size: 48px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .timer-label { text-align: center; color: var(--muted); margin-bottom: 12px; font-size: 14px; }
+  .timer-controls { display: flex; gap: 10px; justify-content: center; }
+  .session-count { text-align: center; color: var(--muted); margin-top: 12px; font-size: 13px; }
+
+  /* Task Dumper */
+  .task-list { list-style: none; margin-top: 12px; max-height: 260px; overflow-y: auto; }
+  .task-list li { padding: 10px 12px; background: var(--bg); border-radius: 8px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 15px; border: 1px solid transparent; user-select: none; }
+  .task-list li:hover { border-color: var(--border); }
+  .task-list li.done { text-decoration: line-through; color: var(--muted); }
+  .task-list li .drag-handle { color: var(--muted); cursor: grab; font-size: 12px; }
+  .task-list li .dot { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--amber-dim); flex-shrink: 0; }
+  .task-list li.done .dot { background: var(--done); border-color: var(--done); }
+
+  /* Focus Mode */
+  .focus-overlay { position: fixed; inset: 0; background: rgba(10,8,6,.92); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 40px; }
+  .focus-overlay .focus-task { font-size: 32px; font-weight: 700; color: var(--amber); text-align: center; max-width: 600px; line-height: 1.4; }
+  .focus-overlay .focus-sub { color: var(--muted); margin-top: 16px; font-size: 15px; }
+  .focus-overlay .btn { margin-top: 32px; }
+  .focus-current { color: var(--muted); font-size: 14px; margin-bottom: 12px; min-height: 20px; }
+  .hidden { display: none !important; }
+
+  /* Body Double */
+  .body-double-area { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg); border-radius: 10px; min-height: 80px; }
+  .pulse-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+  .pulse-dot.active { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: .4; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.15); } }
+  .bd-text { color: var(--muted); font-size: 15px; }
+  .bd-text.active { color: var(--text); }
+  .bd-timer { font-variant-numeric: tabular-nums; color: var(--amber-dim); font-size: 13px; margin-top: 4px; }
+
+  /* Energy Tracker */
+  .energy-buttons { display: flex; gap: 8px; margin-bottom: 16px; }
+  .energy-buttons button { flex: 1; padding: 12px; font-size: 15px; }
+  .energy-buttons .high { background: #5a7a3a; color: var(--text); }
+  .energy-buttons .med { background: #7a6a2a; color: var(--text); }
+  .energy-buttons .low { background: #7a3a3a; color: var(--text); }
+  .energy-timeline { display: flex; gap: 2px; align-items: flex-end; height: 60px; }
+  .energy-bar { flex: 1; border-radius: 3px 3px 0 0; min-width: 4px; transition: height .2s; }
+  .energy-bar.high { background: #5a7a3a; }
+  .energy-bar.med { background: #7a6a2a; }
+  .energy-bar.low { background: #7a3a3a; }
+  .energy-insight { color: var(--muted); font-size: 13px; margin-top: 10px; }
+
+  /* Quick Wins */
+  .qw-list { list-style: none; }
+  .qw-list li { padding: 10px 12px; background: var(--bg); border-radius: 8px; margin-bottom: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .qw-list li.checked { color: var(--muted); text-decoration: line-through; }
+  .qw-list li .check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--amber-dim); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .qw-list li.checked .check { background: var(--done); border-color: var(--done); }
+  .confetti { position: fixed; pointer-events: none; z-index: 2000; font-size: 24px; animation: confettiFall 1s ease-out forwards; }
+  @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(120px) rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<h1>ADHD Productivity Suite</h1>
+<p class="subtitle">Tools for minds that move fast</p>
+
+<div class="grid">
+
+  <!-- POMODORO -->
+  <div class="card">
+    <h2>Pomodoro Timer</h2>
+    <div class="timer-circle" id="timerCircle">
+      <span class="timer-time" id="timerDisplay">25:00</span>
+    </div>
+    <div class="timer-label" id="timerLabel">Ready to focus</div>
+    <div class="timer-controls">
+      <button class="btn" id="timerStart" onclick="toggleTimer()">Start</button>
+      <button class="btn" onclick="resetTimer()">Reset</button>
+    </div>
+    <div class="session-count" id="sessionCount">Sessions today: 0</div>
+  </div>
+
+  <!-- TASK DUMPER -->
+  <div class="card">
+    <h2>Task Dumper</h2>
+    <input type="text" id="taskInput" placeholder="Dump a thought, hit enter..." onkeydown="if(event.key==='Enter')addTask()">
+    <ul class="task-list" id="taskList"></ul>
+  </div>
+
+  <!-- FOCUS MODE -->
+  <div class="card">
+    <h2>Focus Mode</h2>
+    <div class="focus-current" id="focusCurrent">No task selected</div>
+    <button class="btn" onclick="enterFocus()">Enter Focus Mode</button>
+    <div id="focusOverlay" class="focus-overlay hidden">
+      <div class="focus-task" id="focusTask">Pick a task first</div>
+      <div class="focus-sub">This is the only thing that matters right now.</div>
+      <button class="btn" onclick="exitFocus()">Exit Focus Mode</button>
+    </div>
+  </div>
+
+  <!-- BODY DOUBLE -->
+  <div class="card">
+    <h2>Body Double</h2>
+    <div class="body-double-area">
+      <div class="pulse-dot" id="bdDot"></div>
+      <div>
+        <div class="bd-text" id="bdText">Press start to begin a session</div>
+        <div class="bd-timer" id="bdTimer"></div>
+      </div>
+    </div>
+    <div style="margin-top: 12px;">
+      <button class="btn" id="bdBtn" onclick="toggleBodyDouble()">Start Session</button>
+    </div>
+  </div>
+
+  <!-- ENERGY TRACKER -->
+  <div class="card">
+    <h2>Energy Tracker</h2>
+    <div class="energy-buttons">
+      <button class="high" onclick="logEnergy('high')">High</button>
+      <button class="med" onclick="logEnergy('med')">Medium</button>
+      <button class="low" onclick="logEnergy('low')">Low</button>
+    </div>
+    <div class="energy-timeline" id="energyTimeline"></div>
+    <div class="energy-insight" id="energyInsight"></div>
+  </div>
+
+  <!-- QUICK WINS -->
+  <div class="card">
+    <h2>Quick Wins</h2>
+    <ul class="qw-list" id="qwList"></ul>
+    <button class="btn" style="margin-top: 10px; font-size: 13px;" onclick="resetQuickWins()">Reset Wins</button>
+  </div>
+
+</div>
+
+<footer>behike.co | Built for minds that move fast</footer>
+
+<script>
+// ---- POMODORO ----
+let pomState = { running: false, seconds: 25*60, isBreak: false, sessions: +(localStorage.getItem('pom_sessions')||0), interval: null };
+const timerDisplay = document.getElementById('timerDisplay');
+const timerCircle = document.getElementById('timerCircle');
+const timerLabel = document.getElementById('timerLabel');
+const timerStartBtn = document.getElementById('timerStart');
+const sessionCountEl = document.getElementById('sessionCount');
+
+function renderTimer() {
+  const m = Math.floor(pomState.seconds/60), s = pomState.seconds%60;
+  timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  timerCircle.className = 'timer-circle' + (pomState.running ? (pomState.isBreak ? ' on-break' : ' running') : '');
+  timerLabel.textContent = pomState.isBreak ? 'Break time' : (pomState.running ? 'Focus...' : 'Ready to focus');
+  sessionCountEl.textContent = `Sessions today: ${pomState.sessions}`;
+}
+
+function toggleTimer() {
+  if (pomState.running) { clearInterval(pomState.interval); pomState.running = false; timerStartBtn.textContent = 'Start'; }
+  else { pomState.running = true; timerStartBtn.textContent = 'Pause'; pomState.interval = setInterval(tick, 1000); }
+  renderTimer();
+}
+
+function tick() {
+  pomState.seconds--;
+  if (pomState.seconds < 0) {
+    clearInterval(pomState.interval); pomState.running = false; timerStartBtn.textContent = 'Start';
+    playAlert();
+    if (!pomState.isBreak) { pomState.sessions++; localStorage.setItem('pom_sessions', pomState.sessions); pomState.isBreak = true; pomState.seconds = 5*60; }
+    else { pomState.isBreak = false; pomState.seconds = 25*60; }
+  }
+  renderTimer();
+}
+
+function resetTimer() {
+  clearInterval(pomState.interval); pomState.running = false; pomState.isBreak = false; pomState.seconds = 25*60;
+  timerStartBtn.textContent = 'Start'; renderTimer();
+}
+
+function playAlert() {
+  try {
+    const ac = new AudioContext(), o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination); o.frequency.value = 528; o.type = 'sine';
+    g.gain.setValueAtTime(0.3, ac.currentTime); g.gain.exponentialRampToValueAtTime(0.01, ac.currentTime + 1.5);
+    o.start(); o.stop(ac.currentTime + 1.5);
+  } catch(e) {}
+}
+
+// Reset session count if new day
+const today = new Date().toDateString();
+if (localStorage.getItem('pom_date') !== today) { pomState.sessions = 0; localStorage.setItem('pom_sessions', 0); localStorage.setItem('pom_date', today); }
+renderTimer();
+
+// ---- TASK DUMPER ----
+let tasks = JSON.parse(localStorage.getItem('adhd_tasks') || '[]');
+const taskList = document.getElementById('taskList');
+const taskInput = document.getElementById('taskInput');
+let dragIdx = null;
+
+function saveTasks() { localStorage.setItem('adhd_tasks', JSON.stringify(tasks)); }
+
+function renderTasks() {
+  taskList.innerHTML = '';
+  tasks.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.className = t.done ? 'done' : '';
+    li.draggable = true;
+    li.innerHTML = `<span class="drag-handle">::</span><span class="dot"></span><span>${esc(t.text)}</span>`;
+    li.addEventListener('click', () => { tasks[i].done = !tasks[i].done; saveTasks(); renderTasks(); updateFocusCurrent(); });
+    li.addEventListener('dragstart', () => { dragIdx = i; });
+    li.addEventListener('dragover', e => e.preventDefault());
+    li.addEventListener('drop', () => { if (dragIdx !== null && dragIdx !== i) { const item = tasks.splice(dragIdx, 1)[0]; tasks.splice(i, 0, item); saveTasks(); renderTasks(); } dragIdx = null; });
+    taskList.appendChild(li);
+  });
+  updateFocusCurrent();
+}
+
+function addTask() {
+  const v = taskInput.value.trim();
+  if (!v) return;
+  tasks.unshift({ text: v, done: false });
+  taskInput.value = '';
+  saveTasks(); renderTasks();
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+renderTasks();
+
+// ---- FOCUS MODE ----
+function getFirstUndone() { return tasks.find(t => !t.done); }
+
+function updateFocusCurrent() {
+  const t = getFirstUndone();
+  document.getElementById('focusCurrent').textContent = t ? `Next: ${t.text}` : 'No task selected';
+}
+
+function enterFocus() {
+  const t = getFirstUndone();
+  document.getElementById('focusTask').textContent = t ? t.text : 'Add a task first, then try again.';
+  document.getElementById('focusOverlay').classList.remove('hidden');
+}
+
+function exitFocus() { document.getElementById('focusOverlay').classList.add('hidden'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') exitFocus(); });
+
+// ---- BODY DOUBLE ----
+let bdState = { active: false, start: null, interval: null };
+
+function toggleBodyDouble() {
+  const dot = document.getElementById('bdDot'), text = document.getElementById('bdText'), btn = document.getElementById('bdBtn'), timer = document.getElementById('bdTimer');
+  if (bdState.active) {
+    bdState.active = false; clearInterval(bdState.interval);
+    dot.classList.remove('active'); text.classList.remove('active');
+    text.textContent = 'Press start to begin a session'; timer.textContent = ''; btn.textContent = 'Start Session';
+  } else {
+    bdState.active = true; bdState.start = Date.now();
+    dot.classList.add('active'); text.classList.add('active');
+    text.textContent = 'Working alongside you...'; btn.textContent = 'End Session';
+    bdState.interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - bdState.start) / 1000);
+      const m = Math.floor(elapsed / 60), s = elapsed % 60;
+      timer.textContent = `${m}m ${String(s).padStart(2,'0')}s together`;
+    }, 1000);
+  }
+}
+
+// ---- ENERGY TRACKER ----
+let energyLog = JSON.parse(localStorage.getItem('adhd_energy') || '[]');
+if (energyLog.length && new Date(energyLog[0].ts).toDateString() !== today) { energyLog = []; localStorage.setItem('adhd_energy', '[]'); }
+
+function logEnergy(level) {
+  energyLog.push({ level, ts: Date.now(), hour: new Date().getHours() });
+  localStorage.setItem('adhd_energy', JSON.stringify(energyLog));
+  renderEnergy();
+}
+
+function renderEnergy() {
+  const tl = document.getElementById('energyTimeline');
+  const ins = document.getElementById('energyInsight');
+  tl.innerHTML = '';
+  const heights = { high: '100%', med: '55%', low: '25%' };
+  energyLog.forEach(e => {
+    const bar = document.createElement('div');
+    bar.className = `energy-bar ${e.level}`;
+    bar.style.height = heights[e.level];
+    bar.title = `${new Date(e.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} - ${e.level}`;
+    tl.appendChild(bar);
+  });
+  // Find peak hours
+  const hourMap = {};
+  energyLog.filter(e => e.level === 'high').forEach(e => { hourMap[e.hour] = (hourMap[e.hour]||0) + 1; });
+  const peak = Object.entries(hourMap).sort((a,b) => b[1]-a[1])[0];
+  if (peak) { ins.textContent = `Peak energy around ${peak[0]}:00. Schedule deep work here.`; }
+  else if (energyLog.length) { ins.textContent = 'Keep logging to find your peak hours.'; }
+  else { ins.textContent = 'Log your energy throughout the day to find patterns.'; }
+}
+renderEnergy();
+
+// ---- QUICK WINS ----
+const defaultWins = ['Drink a glass of water', 'Stand up and stretch for 60 seconds', 'Clear 1 email from your inbox', 'Organize one thing on your desktop', 'Reply to 1 message you have been putting off'];
+let qwState = JSON.parse(localStorage.getItem('adhd_qw') || 'null');
+if (!qwState || new Date(qwState.date).toDateString() !== today) { qwState = { date: today, items: defaultWins.map(t => ({text: t, done: false})) }; }
+
+function saveQW() { localStorage.setItem('adhd_qw', JSON.stringify(qwState)); }
+
+function renderQW() {
+  const list = document.getElementById('qwList');
+  list.innerHTML = '';
+  qwState.items.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.className = item.done ? 'checked' : '';
+    li.innerHTML = `<span class="check">${item.done ? '&#10003;' : ''}</span><span>${esc(item.text)}</span>`;
+    li.addEventListener('click', () => {
+      if (!item.done) { qwState.items[i].done = true; saveQW(); renderQW(); celebrate(li); }
+    });
+    list.appendChild(li);
+  });
+}
+
+function celebrate(el) {
+  const rect = el.getBoundingClientRect();
+  const emojis = ['&#127881;', '&#11088;', '&#128293;', '&#128170;', '&#10024;'];
+  for (let i = 0; i < 5; i++) {
+    const span = document.createElement('span');
+    span.className = 'confetti';
+    span.innerHTML = emojis[i % emojis.length];
+    span.style.left = (rect.left + Math.random() * rect.width) + 'px';
+    span.style.top = (rect.top - 10) + 'px';
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), 1100);
+  }
+}
+
+function resetQuickWins() {
+  qwState.items = defaultWins.map(t => ({text: t, done: false}));
+  saveQW(); renderQW();
+}
+renderQW();
+</script>
+</body>
+</html>

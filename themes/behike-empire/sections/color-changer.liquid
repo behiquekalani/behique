@@ -1,0 +1,80 @@
+<section class="color-changer section-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="color-changer__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="color-changer__swatches">
+      {%- for block in section.blocks -%}
+        <button
+          class="color-changer__swatch {% if forloop.first %}active{% endif %}"
+          style="background-color: {{ block.settings.color }};"
+          data-color="{{ block.settings.color }}"
+          aria-label="{{ block.settings.label }}"
+          {{ block.shopify_attributes }}
+        ></button>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var swatches = document.querySelectorAll('.color-changer__swatch');
+    swatches.forEach(function(swatch) {
+      swatch.addEventListener('click', function() {
+        swatches.forEach(function(s) { s.classList.remove('active'); });
+        swatch.classList.add('active');
+        document.documentElement.style.setProperty('--color-accent', swatch.dataset.color);
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Color Changer",
+  "tag": "section",
+  "class": "section-color-changer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Choose Your Accent"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "color_swatch",
+      "name": "Color swatch",
+      "settings": [
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color",
+          "default": "#D4AF37"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Color name",
+          "default": "Gold"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Color Changer",
+      "blocks": [
+        { "type": "color_swatch", "settings": { "color": "#D4AF37", "label": "Gold" } },
+        { "type": "color_swatch", "settings": { "color": "#C0C0C0", "label": "Silver" } },
+        { "type": "color_swatch", "settings": { "color": "#B76E79", "label": "Rose Gold" } },
+        { "type": "color_swatch", "settings": { "color": "#E5E4E2", "label": "Platinum" } },
+        { "type": "color_swatch", "settings": { "color": "#0F0F0F", "label": "Onyx" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

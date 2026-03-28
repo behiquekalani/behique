@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Post Mockup Generator</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#141414;--border:#222;--text:#fff;--muted:#888;--accent:#0066ff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:20px 0}
+header h1{font-size:1.6em;font-weight:700}
+header h1 span{color:var(--accent)}
+header p{color:var(--muted);font-size:.9em;margin-top:4px}
+
+.layout{display:grid;grid-template-columns:1fr 380px;gap:24px;margin-top:20px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+
+.editor{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+.editor label{display:block;font-size:.8em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:14px}
+.editor label:first-child{margin-top:0}
+.editor input,.editor textarea,.editor select{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9em;font-family:inherit}
+.editor textarea{min-height:80px;resize:vertical}
+.editor input:focus,.editor textarea:focus,.editor select:focus{outline:none;border-color:var(--accent)}
+
+.color-row{display:flex;gap:8px}
+.color-row input[type="color"]{width:50px;height:36px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;background:var(--bg)}
+
+.template-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tmpl-btn{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.75em;cursor:pointer;font-family:inherit;transition:all .15s}
+.tmpl-btn:hover,.tmpl-btn.active{border-color:var(--accent);color:var(--accent)}
+
+/* Preview */
+.preview-wrap{position:sticky;top:20px}
+.ig-post{width:340px;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,.5)}
+.ig-header{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#000}
+.ig-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.ig-username{font-size:.8em;font-weight:600}
+.ig-image{width:340px;height:340px;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;position:relative;overflow:hidden}
+.ig-image .headline{font-weight:800;line-height:1.2;position:relative;z-index:1}
+.ig-image .subtext{font-size:.5em;font-weight:400;margin-top:10px;opacity:.8;position:relative;z-index:1}
+.ig-actions{display:flex;gap:14px;padding:10px 12px}
+.ig-actions span{font-size:1.1em;cursor:pointer}
+.ig-likes{padding:0 12px;font-size:.8em;font-weight:600}
+.ig-caption{padding:4px 12px 12px;font-size:.75em;line-height:1.4}
+.ig-caption .user{font-weight:600;margin-right:4px}
+.ig-caption .text{color:#ccc}
+
+.download-btn{display:block;width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:.95em;font-weight:600;cursor:pointer;margin-top:12px;transition:all .2s}
+.download-btn:hover{background:#0052cc}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>IG Post <span>Mockup</span></h1><p>Create Instagram post previews from your content batches.</p></header>
+
+<div class="layout">
+  <div class="editor">
+    <label>Templates</label>
+    <div class="template-btns">
+      <button class="tmpl-btn active" onclick="loadTemplate('tip')">AI Tip</button>
+      <button class="tmpl-btn" onclick="loadTemplate('launch')">Product Launch</button>
+      <button class="tmpl-btn" onclick="loadTemplate('story')">Story</button>
+      <button class="tmpl-btn" onclick="loadTemplate('fear')">Fear/Security</button>
+      <button class="tmpl-btn" onclick="loadTemplate('quote')">Quote</button>
+      <button class="tmpl-btn" onclick="loadTemplate('bts')">Behind Scenes</button>
+    </div>
+
+    <label>Headline</label>
+    <input type="text" id="headline" value="The $0 AI Employee" oninput="render()">
+
+    <label>Subtext</label>
+    <input type="text" id="subtext" value="How I replaced 3 tasks with AI agents that cost nothing" oninput="render()">
+
+    <label>Caption</label>
+    <textarea id="caption" oninput="render()">Stop paying for tools that do what AI can do for free. Here are the 3 tasks I automated this week using only free, local AI tools.</textarea>
+
+    <label>Colors</label>
+    <div class="color-row">
+      <div><small style="color:var(--muted)">BG</small><input type="color" id="bgColor" value="#0a0a0a" oninput="render()"></div>
+      <div><small style="color:var(--muted)">Text</small><input type="color" id="textColor" value="#ffffff" oninput="render()"></div>
+      <div><small style="color:var(--muted)">Accent</small><input type="color" id="accentColor" value="#0066ff" oninput="render()"></div>
+    </div>
+
+    <label>Font Size</label>
+    <input type="range" id="fontSize" min="18" max="48" value="32" oninput="render()" style="appearance:auto">
+
+    <label>Layout</label>
+    <select id="layout" onchange="render()">
+      <option value="center">Centered</option>
+      <option value="left">Left Aligned</option>
+      <option value="gradient">Gradient Overlay</option>
+      <option value="split">Split (color block)</option>
+    </select>
+
+    <label>Username</label>
+    <input type="text" id="username" value="behikeai" oninput="render()">
+  </div>
+
+  <div class="preview-wrap">
+    <div class="ig-post" id="igPost">
+      <div class="ig-header">
+        <div class="ig-avatar"></div>
+        <div class="ig-username" id="previewUser">behikeai</div>
+      </div>
+      <div class="ig-image" id="igImage">
+        <div>
+          <div class="headline" id="previewHeadline"></div>
+          <div class="subtext" id="previewSubtext"></div>
+        </div>
+      </div>
+      <div class="ig-actions"><span>&#10084;&#65039;</span><span>&#128172;</span><span>&#9993;&#65039;</span></div>
+      <div class="ig-likes">423 likes</div>
+      <div class="ig-caption"><span class="user" id="captionUser">behikeai</span><span class="text" id="captionText"></span></div>
+    </div>
+    <button class="download-btn" onclick="downloadMockup()">Download as PNG</button>
+  </div>
+</div>
+</div>
+
+<script>
+const TEMPLATES={
+  tip:{headline:"The $0 AI Employee",subtext:"How I replaced 3 tasks with AI agents that cost nothing",caption:"Stop paying for tools that do what AI can do for free. Here are the 3 tasks I automated this week using only free, local AI tools.",bg:"#0a0a0a",text:"#ffffff",accent:"#0066ff"},
+  launch:{headline:"New: AI Employee Guide",subtext:"The complete system for building your AI workforce. $19.99",caption:"It is here. The AI Employee Guide is everything I learned building a 6-agent AI system from scratch. Step-by-step setup, tool selection, prompt templates, and security checklist. Link in bio.",bg:"#0a0a0a",text:"#ffffff",accent:"#00c853"},
+  story:{headline:"I dropped out of engineering to build this",subtext:"Not because school was hard. Because I found something worth building.",caption:"Everyone told me to finish the degree first. But when you find something that pulls you harder than anything else, you follow it. This is what I am building.",bg:"#1a0a2e",text:"#ffffff",accent:"#8b5cf6"},
+  fear:{headline:"Your AI tools are leaking your data",subtext:"And most people have no idea it is happening.",caption:"I ran a security audit on my own AI setup and found 3 ways my data was exposed. Fixed all of them. Here is how to check yours.",bg:"#1a0000",text:"#ffffff",accent:"#ff4444"},
+  quote:{headline:"Build the system. Trust the system.",subtext:"The work you do today compounds into the life you want tomorrow.",caption:"Not every day feels productive. But every day you show up, you are building something. The system works even when motivation does not.",bg:"#0a0a0a",text:"#ffffff",accent:"#c9a84c"},
+  bts:{headline:"3 computers. 6 AI agents. $0/month.",subtext:"A look inside the system that runs while I sleep.",caption:"This is not a flex. This is what happens when you stop paying for SaaS and start building your own tools. Three machines, six agents, zero monthly cost.",bg:"#0a1a0a",text:"#ffffff",accent:"#06b6d4"}
+};
+
+function loadTemplate(t){
+  const d=TEMPLATES[t];
+  document.getElementById('headline').value=d.headline;
+  document.getElementById('subtext').value=d.subtext;
+  document.getElementById('caption').value=d.caption;
+  document.getElementById('bgColor').value=d.bg;
+  document.getElementById('textColor').value=d.text;
+  document.getElementById('accentColor').value=d.accent;
+  document.querySelectorAll('.tmpl-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+function render(){
+  const h=document.getElementById('headline').value;
+  const s=document.getElementById('subtext').value;
+  const c=document.getElementById('caption').value;
+  const bg=document.getElementById('bgColor').value;
+  const tc=document.getElementById('textColor').value;
+  const ac=document.getElementById('accentColor').value;
+  const fs=document.getElementById('fontSize').value;
+  const layout=document.getElementById('layout').value;
+  const user=document.getElementById('username').value;
+
+  const img=document.getElementById('igImage');
+  const hl=document.getElementById('previewHeadline');
+  const st=document.getElementById('previewSubtext');
+
+  hl.textContent=h;
+  hl.style.fontSize=fs+'px';
+  hl.style.color=tc;
+  st.textContent=s;
+  st.style.color=tc;
+
+  img.style.textAlign=layout==='left'?'left':'center';
+
+  if(layout==='gradient'){
+    img.style.background=`linear-gradient(135deg, ${bg}, ${ac}40)`;
+  }else if(layout==='split'){
+    img.style.background=`linear-gradient(to right, ${ac}30 0%, ${ac}30 40%, ${bg} 40%)`;
+    img.style.textAlign='right';
+  }else{
+    img.style.background=bg;
+  }
+
+  document.getElementById('previewUser').textContent=user;
+  document.getElementById('captionUser').textContent=user;
+  document.getElementById('captionText').textContent=c.substring(0,120)+(c.length>120?'...':'');
+}
+
+function downloadMockup(){
+  // Use html2canvas-like approach with canvas
+  const post=document.getElementById('igPost');
+  // Simple screenshot via canvas (basic)
+  alert('To save: right-click the preview and "Save as Image", or use a screenshot tool. Full canvas export coming soon.');
+}
+
+render();
+</script>
+</body>
+</html>

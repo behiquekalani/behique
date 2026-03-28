@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overnight Machine — eBay Product Research While You Sleep</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --blue: #0A84FF;
+      --green: #30D158;
+      --text: #FFFFFF;
+      --gray: #8E8E93;
+      --gray2: #555;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo { font-size: 17px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--blue); }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--green); color: #000;
+      padding: 8px 18px; border-radius: 980px;
+      font-size: 13px; font-weight: 700; text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 96px 24px 72px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 980px; padding: 7px 16px;
+      font-size: 12px; color: var(--gray);
+      margin-bottom: 32px;
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+    }
+    h1 {
+      font-size: clamp(38px, 6vw, 60px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.06;
+      margin-bottom: 22px;
+    }
+    h1 span { color: var(--blue); }
+    .hero-sub {
+      font-size: 18px; color: var(--gray);
+      line-height: 1.65; max-width: 540px;
+      margin: 0 auto 40px;
+    }
+    .hero-ctas {
+      display: flex; gap: 12px;
+      justify-content: center; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background: var(--green); color: #000;
+      padding: 15px 32px; border-radius: 980px;
+      font-size: 16px; font-weight: 700;
+      text-decoration: none; transition: opacity 0.15s;
+      display: inline-block;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+      padding: 15px 32px; border-radius: 980px;
+      font-size: 16px; font-weight: 600;
+      text-decoration: none; transition: border-color 0.15s;
+      display: inline-block;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.25); }
+    .hero-note { font-size: 13px; color: var(--gray2); }
+
+    /* SECTION WRAPPERS */
+    .section {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+    .section-sm {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; color: var(--blue);
+      text-transform: uppercase;
+      text-align: center; margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700; letter-spacing: -1px;
+      text-align: center; margin-bottom: 14px;
+    }
+    .section-sub {
+      text-align: center; color: var(--gray);
+      font-size: 16px; max-width: 540px;
+      margin: 0 auto 52px; line-height: 1.65;
+    }
+
+    /* HOW IT WORKS — 3 STEPS */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .step-card.visible { opacity: 1; transform: translateY(0); }
+    .step-num {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; color: var(--blue);
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+    .step-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+    .step-card p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+
+    /* WHAT'S INCLUDED */
+    .included-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .included-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex; gap: 16px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .included-card.visible { opacity: 1; transform: translateY(0); }
+    .included-icon {
+      font-size: 26px;
+      min-width: 36px; text-align: center;
+    }
+    .included-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .included-card p { font-size: 13px; color: var(--gray); line-height: 1.55; }
+
+    /* WHO IT'S FOR */
+    .personas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .persona-card.visible { opacity: 1; transform: translateY(0); }
+    .persona-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--blue); margin-bottom: 10px;
+    }
+    .persona-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .persona-card p { font-size: 13px; color: var(--gray); line-height: 1.55; }
+
+    /* TERMINAL */
+    .terminal-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    .terminal {
+      background: #0d0d0d;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: 'SF Mono', 'Fira Code', 'Monaco', monospace;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .terminal.visible { opacity: 1; transform: translateY(0); }
+    .terminal-bar {
+      background: #1a1a1a;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 11px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .t-red { background: #FF5F57; }
+    .t-yellow { background: #FFBD2E; }
+    .t-green { background: #28C941; }
+    .t-title { font-size: 12px; color: var(--gray2); margin-left: 8px; }
+    .terminal-body { padding: 24px; font-size: 13px; line-height: 1.7; }
+    .t-comment { color: #555; }
+    .t-header { color: var(--green); font-weight: 600; }
+    .t-divider { color: #333; }
+    .t-rank { color: var(--blue); }
+    .t-product { color: var(--text); }
+    .t-score { color: var(--green); }
+    .t-margin { color: #FF9F0A; }
+    .t-footer { color: var(--gray); margin-top: 8px; font-size: 12px; }
+
+    /* PRICING */
+    .pricing-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid rgba(10,132,255,0.3);
+      border-radius: 16px;
+      overflow: hidden;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .pricing-card.visible { opacity: 1; transform: translateY(0); }
+    .pricing-header {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pricing-name { font-size: 15px; font-weight: 600; }
+    .pricing-tag {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(10,132,255,0.12);
+      padding: 4px 10px; border-radius: 980px;
+    }
+    .pricing-body { padding: 28px; }
+    .pricing-amount {
+      font-size: 52px; font-weight: 700;
+      letter-spacing: -2px; line-height: 1;
+      margin-bottom: 6px;
+    }
+    .pricing-amount span { font-size: 24px; font-weight: 400; color: var(--gray); vertical-align: top; margin-top: 10px; display: inline-block; }
+    .pricing-once { font-size: 13px; color: var(--gray); margin-bottom: 28px; }
+    .pricing-items { list-style: none; margin-bottom: 28px; }
+    .pricing-items li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-items li:last-child { border-bottom: none; }
+    .check { color: var(--green); font-size: 15px; min-width: 16px; }
+    .pricing-cta {
+      display: block;
+      background: var(--green); color: #000;
+      text-align: center;
+      padding: 16px;
+      border-radius: 980px;
+      font-size: 16px; font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .pricing-cta:hover { opacity: 0.88; }
+    .pricing-guarantee {
+      text-align: center;
+      font-size: 12px; color: var(--gray);
+      margin-top: 16px;
+    }
+
+    /* FAQ */
+    .faq-list { max-width: 640px; margin: 0 auto; }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      cursor: pointer;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .faq-item.visible { opacity: 1; transform: translateY(0); }
+    .faq-q {
+      font-size: 15px; font-weight: 600;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px;
+    }
+    .faq-toggle {
+      color: var(--blue);
+      font-size: 20px; line-height: 1;
+      min-width: 20px; text-align: center;
+      transition: transform 0.2s;
+    }
+    .faq-toggle.open { transform: rotate(45deg); }
+    .faq-a {
+      font-size: 14px; color: var(--gray);
+      line-height: 1.65;
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.3s ease, padding-top 0.2s ease;
+    }
+    .faq-a.open { max-height: 200px; padding-top: 12px; }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px;
+      background: radial-gradient(ellipse at 50% 60%, rgba(10,132,255,0.06) 0%, transparent 65%);
+    }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700; letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cta-section p { font-size: 16px; color: var(--gray); margin-bottom: 32px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px; color: var(--gray2);
+    }
+    footer a { color: var(--gray); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* RESPONSIVE */
+    @media (max-width: 700px) {
+      .steps { grid-template-columns: 1fr; }
+      .included-grid { grid-template-columns: 1fr; }
+      .personas { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">Behike<span>.</span></a>
+  <div class="nav-links">
+    <a href="niche-sniper.html">Niche Sniper</a>
+    <a href="ecommerce-playbook.html">Ecommerce Playbook</a>
+    <a href="index.html">Store</a>
+  </div>
+  <a href="#pricing" class="nav-cta">Get It — $19.99</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge">
+    <div class="badge-dot"></div>
+    Python script + setup guide. Ready to run tonight.
+  </div>
+  <h1>Wake Up to <span>10 Winning Products</span> Every Morning</h1>
+  <p class="hero-sub">The Overnight Machine runs eBay research while you sleep and delivers a ranked product list before you finish your first coffee.</p>
+  <div class="hero-ctas">
+    <a href="#pricing" class="btn-primary">Get the Overnight Machine — $19.99</a>
+    <a href="#how-it-works" class="btn-secondary">See how it works</a>
+  </div>
+  <p class="hero-note">One-time payment. Runs on your machine. Python 3.8+ required.</p>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">Three steps. Zero guesswork.</h2>
+  <p class="section-sub">Setup takes five minutes. After that, the machine runs itself every night.</p>
+  <div class="steps">
+    <div class="step-card" data-animate>
+      <div class="step-num">Step 01</div>
+      <h3>Set it up before bed</h3>
+      <p>Install the script, add your eBay API key, set your target categories and margin floor. The setup guide walks you through every line. Five minutes and it is ready.</p>
+    </div>
+    <div class="step-card" data-animate>
+      <div class="step-num">Step 02</div>
+      <h3>It runs overnight</h3>
+      <p>The script scrapes eBay sold listings, pricing gaps, and demand signals across your selected categories. It scores every candidate on margin potential, competition, and sell-through velocity.</p>
+    </div>
+    <div class="step-card" data-animate>
+      <div class="step-num">Step 03</div>
+      <h3>You wake up to a ranked list</h3>
+      <p>A formatted report lands in your output folder with product names, scores, estimated margins, and competition data. Review in under ten minutes. Source the ones that pass your gut check.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INCLUDED -->
+<section class="section" style="padding-top: 0;" id="included">
+  <div class="section-label">What You Get</div>
+  <h2 class="section-title">Everything you need to run it tonight.</h2>
+  <p class="section-sub">Four components that cover the script, the setup, and the interpretation of results.</p>
+  <div class="included-grid">
+    <div class="included-card" data-animate>
+      <div class="included-icon">🐍</div>
+      <div>
+        <h3>overnight_machine.py</h3>
+        <p>The full Python script. Configured for eBay, ready to run. No modifications needed to get started. Commented so you understand every block.</p>
+      </div>
+    </div>
+    <div class="included-card" data-animate>
+      <div class="included-icon">📖</div>
+      <div>
+        <h3>Step-by-Step Setup Guide</h3>
+        <p>From installing dependencies to your first run. Covers Mac, Windows, and Linux. Includes screenshots for the API key setup and scheduler configuration.</p>
+      </div>
+    </div>
+    <div class="included-card" data-animate>
+      <div class="included-icon">📊</div>
+      <div>
+        <h3>Product Scoring Framework</h3>
+        <p>How to read the output. What each score field means. How to filter results by your specific margin requirements. Which signals to trust and which to verify manually.</p>
+      </div>
+    </div>
+    <div class="included-card" data-animate>
+      <div class="included-icon">💬</div>
+      <div>
+        <h3>30 Days of Telegram Support</h3>
+        <p>Direct access for setup questions and troubleshooting. If the script throws an error you cannot decode, send it over and get a real answer, not a link to documentation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="section" style="padding-top: 0;" id="who">
+  <div class="section-label">Who It's For</div>
+  <h2 class="section-title">Built for one type of seller.</h2>
+  <p class="section-sub">The one who is serious enough to want a system, but not yet ready to spend $200 a month on a SaaS tool.</p>
+  <div class="personas">
+    <div class="persona-card" data-animate>
+      <div class="persona-label">Persona 01</div>
+      <h3>The Manual Researcher</h3>
+      <p>You spend 2 to 3 hours a night going through eBay sold listings by hand. You know what you are looking for. You just want the scouting done before you wake up.</p>
+    </div>
+    <div class="persona-card" data-animate>
+      <div class="persona-label">Persona 02</div>
+      <h3>The Side Income Builder</h3>
+      <p>You have a day job. You are building eBay or Shopify as a side business. You need your research to happen in the background so your actual hours go toward sourcing and listing.</p>
+    </div>
+    <div class="persona-card" data-animate>
+      <div class="persona-label">Persona 03</div>
+      <h3>The Systems Thinker</h3>
+      <p>You want to own your tools, not rent them. A Python script you control is more valuable to you than a SaaS dashboard with features you do not need and a monthly fee you cannot turn off.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLE OUTPUT -->
+<div class="terminal-wrap" id="sample">
+  <div class="section-label" style="text-align:center; margin-bottom:16px;">Sample Output</div>
+  <h2 class="section-title" style="margin-bottom: 40px;">What it looks like in the morning.</h2>
+  <div class="terminal" data-animate>
+    <div class="terminal-bar">
+      <div class="t-dot t-red"></div>
+      <div class="t-dot t-yellow"></div>
+      <div class="t-dot t-green"></div>
+      <span class="t-title">overnight_machine_output.txt</span>
+    </div>
+    <div class="terminal-body">
+      <div class="t-comment">$ python overnight_machine.py --report</div>
+      <div>&nbsp;</div>
+      <div class="t-header">PRODUCT OPPORTUNITIES -- March 22, 2026</div>
+      <div class="t-divider">----------------------------------------</div>
+      <div>&nbsp;</div>
+      <div>
+        <span class="t-rank">1.</span>
+        <span class="t-product"> Vintage Casio Watch          </span>
+        <span class="t-score">Score: 94  </span>
+        <span class="t-margin">Est. Margin: $23-$41</span>
+      </div>
+      <div>
+        <span class="t-rank">2.</span>
+        <span class="t-product"> Mechanical Keyboard Caps     </span>
+        <span class="t-score">Score: 87  </span>
+        <span class="t-margin">Est. Margin: $12-$28</span>
+      </div>
+      <div>
+        <span class="t-rank">3.</span>
+        <span class="t-product"> Portable Jump Starter        </span>
+        <span class="t-score">Score: 82  </span>
+        <span class="t-margin">Est. Margin: $18-$35</span>
+      </div>
+      <div>
+        <span class="t-rank">4.</span>
+        <span class="t-product"> Retro Gaming Console Lot     </span>
+        <span class="t-score">Score: 79  </span>
+        <span class="t-margin">Est. Margin: $31-$58</span>
+      </div>
+      <div>
+        <span class="t-rank">5.</span>
+        <span class="t-product"> USB-C Multiport Adapter      </span>
+        <span class="t-score">Score: 76  </span>
+        <span class="t-margin">Est. Margin: $9-$19</span>
+      </div>
+      <div>&nbsp;</div>
+      <div class="t-divider">----------------------------------------</div>
+      <div class="t-footer">Scanned 847 listings across 4 categories.</div>
+      <div class="t-footer">Run time: 4h 12m. Next run: tonight at 11:00 PM.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="pricing-wrap" id="pricing">
+  <div class="section-label" style="text-align:center; margin-bottom:16px;">Pricing</div>
+  <h2 class="section-title" style="margin-bottom: 40px;">One payment. Yours forever.</h2>
+  <div class="pricing-card" data-animate>
+    <div class="pricing-header">
+      <span class="pricing-name">Overnight Machine Bundle</span>
+      <span class="pricing-tag">One-Time</span>
+    </div>
+    <div class="pricing-body">
+      <div class="pricing-amount"><span>$</span>19.99</div>
+      <div class="pricing-once">One-time payment. No subscription. No renewal.</div>
+      <ul class="pricing-items">
+        <li><span class="check">✓</span> overnight_machine.py — the full Python script</li>
+        <li><span class="check">✓</span> Step-by-step setup guide (Mac, Windows, Linux)</li>
+        <li><span class="check">✓</span> Product scoring framework (how to read the output)</li>
+        <li><span class="check">✓</span> 30 days of Telegram support for setup questions</li>
+      </ul>
+      <a href="https://behike.gumroad.com/l/overnight-machine" class="pricing-cta" target="_blank" rel="noopener">Get the Overnight Machine — $19.99</a>
+      <p class="pricing-guarantee">Requires Python 3.8+ and an eBay developer API key (free to get). If the script does not run on your machine within 30 days, full refund.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section class="section" style="padding-top: 0;" id="faq">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title" style="margin-bottom:48px;">Common questions.</h2>
+  <div class="faq-list">
+    <div class="faq-item" data-animate onclick="toggleFaq(this)">
+      <div class="faq-q">
+        Do I need to know how to code to use this?
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">No. You need to be able to open a terminal, run a pip install command, and paste an API key into a config file. The setup guide walks through every step with screenshots. If you have ever followed a README before, you will be fine.</div>
+    </div>
+    <div class="faq-item" data-animate onclick="toggleFaq(this)">
+      <div class="faq-q">
+        What does the script actually require to run?
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">Python 3.8 or higher, a few standard libraries (all installed via pip), and a free eBay developer API key. The API key takes about five minutes to set up on the eBay developer portal. No paid API tiers required for basic usage.</div>
+    </div>
+    <div class="faq-item" data-animate onclick="toggleFaq(this)">
+      <div class="faq-q">
+        How does the script find product opportunities?
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">It pulls recently sold eBay listings in your target categories, cross-references active listings to identify pricing gaps, and scores each product on demand signals, competition density, and estimated margin. The scoring framework guide explains exactly how each field is calculated so you can tune the weights to your sourcing strategy.</div>
+    </div>
+    <div class="faq-item" data-animate onclick="toggleFaq(this)">
+      <div class="faq-q">
+        Does this work for Shopify or only eBay?
+        <span class="faq-toggle">+</span>
+      </div>
+      <div class="faq-a">The data source is eBay. The output is a product opportunity list with scoring and margin estimates. That list is equally useful for sourcing decisions on Shopify, Facebook Marketplace, or any other platform. The script itself is eBay-specific because that is where the public sold data lives.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="cta-section">
+  <h2>Stop spending your evenings on research you could automate.</h2>
+  <p>Set it up tonight. Wake up to results tomorrow morning.</p>
+  <a href="#pricing" class="btn-primary" style="font-size:17px; padding:16px 36px;">Get the Overnight Machine — $19.99</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="https://behike.shop">behike.shop</a>
+  &nbsp;·&nbsp;
+  <a href="index.html">Store</a>
+  &nbsp;·&nbsp;
+  <a href="niche-sniper.html">Niche Sniper</a>
+  &nbsp;·&nbsp;
+  <a href="ecommerce-playbook.html">Ecommerce Playbook</a>
+  &nbsp;·&nbsp;
+  <a href="https://instagram.com/behikeai" target="_blank" rel="noopener">@behikeai</a>
+  <p style="margin-top: 14px;">Built in Puerto Rico.</p>
+</footer>
+
+<script>
+  // Scroll-triggered animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const siblings = el.parentElement.querySelectorAll('[data-animate]');
+        let delay = 0;
+        siblings.forEach((sib, idx) => { if (sib === el) delay = idx * 80; });
+        setTimeout(() => el.classList.add('visible'), delay);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+
+  // FAQ toggle
+  function toggleFaq(item) {
+    const a = item.querySelector('.faq-a');
+    const t = item.querySelector('.faq-toggle');
+    const isOpen = a.classList.contains('open');
+    document.querySelectorAll('.faq-a.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.faq-toggle.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) {
+      a.classList.add('open');
+      t.classList.add('open');
+    }
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Faceless Channel Blueprint — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --muted: #86868B;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+    }
+    .hero h1 span {
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+    .btn-cta:hover { opacity: 0.88; }
+    .hero-guarantee {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .thesis .container {
+      max-width: 720px;
+    }
+    .thesis p {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #D1D1D6;
+    }
+    .thesis p + p {
+      margin-top: 24px;
+    }
+    .thesis strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* WHAT YOU GET */
+    .what-you-get {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin-bottom: 48px;
+    }
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+    }
+    .what-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+    }
+    .what-card:first-child { border-radius: 12px 0 0 0; }
+    .what-card:nth-child(3) { border-radius: 0 12px 0 0; }
+    .what-card:nth-last-child(2) { border-radius: 0 0 0 12px; }
+    .what-card:last-child { border-radius: 0 0 12px 0; }
+    .what-number {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+    }
+    .what-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .what-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* SECTION PREVIEWS */
+    .previews {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .preview-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .preview-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+    .preview-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      padding-top: 3px;
+    }
+    .preview-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .preview-content p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* PRODUCT DETAILS */
+    .product-details {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .details-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    @media (max-width: 600px) {
+      .details-row { grid-template-columns: 1fr; }
+    }
+    .detail-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+    }
+    .detail-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .detail-value {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .bottom-cta h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .bottom-cta p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .price-display {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+    }
+    .price-display span {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--muted);
+      vertical-align: super;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <span class="nav-price">Digital Guide</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">Creator Series</div>
+      <h1>The Faceless<br><span>Channel Blueprint</span></h1>
+      <p class="hero-sub">Build a YouTube channel that generates views, income, and transferable assets. No face required. No personal brand needed. A real production system.</p>
+      <div class="hero-cta-group">
+        <a href="https://behike.gumroad.com/l/creators-faceless-channel-guide" class="btn-cta">Get the Guide &mdash; $20.99</a>
+        <span class="hero-guarantee">Instant PDF download. Yours forever.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="container">
+      <p>Most people think faceless channels are a shortcut. A way to make money without showing up. That framing is exactly why most faceless channels fail within six months.</p>
+      <p>A faceless channel is not an easier version of a personal brand. It is a different type of media business entirely. The rules that govern it, the failure modes that kill it, and the growth levers that scale it are all distinct.</p>
+      <p><strong>This guide gives you the full picture.</strong> Why the model works structurally, when it does not, and how to build one that becomes a real asset rather than a content treadmill.</p>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="what-you-get">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2 class="section-title">A complete production<br>system, not a list of tips.</h2>
+      <div class="what-grid">
+        <div class="what-card">
+          <div class="what-number">01</div>
+          <h3>The Failure Analysis</h3>
+          <p>The three specific reasons faceless channels die, and how to design around each one before you post a single video.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">02</div>
+          <h3>Niche Selection Framework</h3>
+          <p>Evergreen vs. trend-responsive. How to test demand before committing. What makes a niche work specifically for faceless content.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">03</div>
+          <h3>Three Content Models</h3>
+          <p>Compilation, narration, and animation. Honest comparison of production cost, differentiation ceiling, and scalability for each.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">04</div>
+          <h3>Faceless Scripting Rules</h3>
+          <p>What changes when there is no face on camera. The three structural principles that separate scripts that retain viewers from ones that lose them.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">05</div>
+          <h3>Legal Visual Sourcing</h3>
+          <p>Stock footage, AI-generated visuals, screen recording, and your own footage. Where to source each and when to use them.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">06</div>
+          <h3>Voice vs. AI TTS</h3>
+          <p>A direct comparison of your own voice versus AI text-to-speech tools. No hype. Pros, cons, and which is right for your situation.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">07</div>
+          <h3>Brand Without a Face</h3>
+          <p>How the most durable faceless channels build identity through name, thumbnail style, script tone, and topic coherence.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">08</div>
+          <h3>Monetization Stack</h3>
+          <p>AdSense, affiliate, digital products, and sponsorships. The correct sequencing and realistic revenue expectations at each stage.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">09</div>
+          <h3>Network Scaling</h3>
+          <p>How to go from one channel to multiple without burning out. The operational system that makes horizontal scaling possible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section class="previews">
+    <div class="container">
+      <div class="section-label">Section Previews</div>
+      <h2 class="section-title">What you'll actually read.</h2>
+      <ul class="preview-list">
+        <li class="preview-item">
+          <span class="preview-num">Part 1</span>
+          <div class="preview-content">
+            <h3>Why Faceless Channels Work (And When They Fail)</h3>
+            <p>Faceless channels work because audiences come for the information, not the person delivering it. The structural advantage is that growth decouples from personal exposure. The failure modes are specific: wrong niche, inconsistent cadence, poor audio. This section names all three precisely.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 3</span>
+          <div class="preview-content">
+            <h3>The Three Faceless Content Models</h3>
+            <p>Every successful faceless channel operates on one of three core production models. Compilation, narration, animation. Understanding which model you are building determines every downstream decision about tools, time, and team. This section gives you the honest comparison.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 4</span>
+          <div class="preview-content">
+            <h3>Scripting for Faceless Video</h3>
+            <p>Open with the result, not the setup. Structure for retention, not completion. Write for listening, not reading. Three principles with specific techniques for each. A faceless script at 8-10 minutes runs approximately 1,200 to 1,500 words. This section treats that seriously.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 8</span>
+          <div class="preview-content">
+            <h3>Monetization Path for Faceless Channels</h3>
+            <p>AdSense is the starting point, not the destination. The realistic monetization stack, the correct sequencing, and the reason a channel with 5,000 subscribers can outperform one with 50,000 if the product layer is built correctly.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 9</span>
+          <div class="preview-content">
+            <h3>Scaling From One Channel to a Network</h3>
+            <p>The faceless channel model scales horizontally in a way personal brand content never will. The practical path: months 1-6, months 7-12, year 2. What to document, what to delegate, and when the move from one to many becomes an operational question rather than a creative one.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PRODUCT DETAILS -->
+  <section class="product-details">
+    <div class="container">
+      <div class="section-label">Product Details</div>
+      <h2 class="section-title">What you're getting.</h2>
+      <div class="details-row">
+        <div class="detail-item">
+          <div class="detail-label">Format</div>
+          <div class="detail-value">PDF Guide</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Length</div>
+          <div class="detail-value">~2,500 words, 9 chapters</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Access</div>
+          <div class="detail-value">Instant download</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Price</div>
+          <div class="detail-value">$20.99 one-time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>A faceless channel is a real business.<br>Build it like one.</h2>
+      <p>Everything you need to start, structure, and scale. In one guide.</p>
+      <div class="price-display"><span>$</span>20.99</div>
+      <a href="https://behike.gumroad.com/l/creators-faceless-channel-guide" class="btn-cta">Get the Guide Now</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026. All rights reserved.</p>
+      <p>Digital product. No refunds after download.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

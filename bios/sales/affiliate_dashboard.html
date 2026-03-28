@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Affiliate Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  h1, h2, h3 { color: #C9A84C; }
+  h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .subtitle { color: #888; margin-bottom: 2rem; font-size: 0.9rem; }
+
+  /* Totals bar */
+  .totals-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat-card {
+    background: #141414;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #C9A84C;
+  }
+  .stat-card .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.7rem 1rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #C9A84C;
+    border-bottom: 1px solid #333;
+  }
+  td {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  tr:hover td { background: #1a1a1a; }
+  .code-link {
+    color: #C9A84C;
+    cursor: pointer;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    font: inherit;
+  }
+  .badge-active {
+    background: #1a3a1a;
+    color: #4caf50;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+  .badge-inactive {
+    background: #3a1a1a;
+    color: #f44336;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    display: none;
+    background: #111;
+    border: 1px solid #C9A84C33;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .detail-panel.open { display: block; }
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .detail-header h2 { font-size: 1.3rem; }
+  .close-btn {
+    background: #222;
+    color: #C9A84C;
+    border: 1px solid #C9A84C44;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .detail-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .detail-stat {
+    background: #0a0a0a;
+    padding: 0.8rem;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .detail-stat .value { font-size: 1.3rem; color: #C9A84C; font-weight: 700; }
+  .detail-stat .label { font-size: 0.65rem; color: #888; text-transform: uppercase; margin-top: 0.2rem; }
+
+  .history-section { margin-top: 1rem; }
+  .history-section h3 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+  /* Create form */
+  .create-section {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .create-section h2 { margin-bottom: 1rem; font-size: 1.1rem; }
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+  .form-group label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+  .form-group input {
+    background: #0a0a0a;
+    border: 1px solid #333;
+    color: #e0e0e0;
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  .form-group input:focus { outline: none; border-color: #C9A84C; }
+  .btn-gold {
+    background: #C9A84C;
+    color: #0a0a0a;
+    border: none;
+    padding: 0.55rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .btn-gold:hover { background: #d4b85c; }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #1a3a1a;
+    color: #4caf50;
+    border: 1px solid #4caf5044;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: none;
+    z-index: 999;
+  }
+  .toast.error { background: #3a1a1a; color: #f44336; border-color: #f4433644; }
+</style>
+</head>
+<body>
+
+<h1>Behike Affiliate Dashboard</h1>
+<p class="subtitle">Affiliate tracking and commission management</p>
+
+<!-- Totals -->
+<div class="totals-bar" id="totals-bar"></div>
+
+<!-- Detail panel -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <h2 id="detail-name"></h2>
+    <button class="close-btn" onclick="closeDetail()">Close</button>
+  </div>
+  <div class="detail-stats" id="detail-stats"></div>
+  <div class="history-section">
+    <h3>Recent Clicks</h3>
+    <table id="click-table"><thead><tr><th>Timestamp</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="history-section">
+    <h3>Recent Sales</h3>
+    <table id="sale-table"><thead><tr><th>Product</th><th>Amount</th><th>Commission</th><th>Timestamp</th></tr></thead><tbody></tbody></table>
+  </div>
+</div>
+
+<!-- Affiliates table -->
+<h2 style="margin-bottom:1rem;">Affiliates</h2>
+<table id="affiliates-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Code</th>
+      <th>Email</th>
+      <th>Commission %</th>
+      <th>Clicks</th>
+      <th>Sales</th>
+      <th>Revenue</th>
+      <th>Owed</th>
+      <th>Conv. %</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- Create form -->
+<div class="create-section">
+  <h2>Add Affiliate</h2>
+  <div class="form-row">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="inp-name" placeholder="John Doe">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="inp-email" placeholder="john@example.com">
+    </div>
+    <div class="form-group">
+      <label>Commission %</label>
+      <input type="number" id="inp-commission" value="20" min="1" max="100" style="width:80px;">
+    </div>
+    <button class="btn-gold" onclick="createAffiliate()">Create</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin;
+
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = isError ? 'toast error' : 'toast';
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}
+
+async function loadAdmin() {
+  try {
+    const res = await fetch(`${API}/affiliate/admin`);
+    const data = await res.json();
+    renderTotals(data.totals);
+    renderTable(data.affiliates);
+  } catch (e) {
+    toast('Failed to load data', true);
+  }
+}
+
+function renderTotals(t) {
+  document.getElementById('totals-bar').innerHTML = [
+    { v: t.affiliates, l: 'Affiliates' },
+    { v: t.clicks.toLocaleString(), l: 'Total Clicks' },
+    { v: t.sales.toLocaleString(), l: 'Total Sales' },
+    { v: `$${t.revenue.toLocaleString()}`, l: 'Revenue' },
+    { v: `$${t.commission_owed.toLocaleString()}`, l: 'Commission Owed' },
+  ].map(s => `<div class="stat-card"><div class="value">${s.v}</div><div class="label">${s.l}</div></div>`).join('');
+}
+
+function renderTable(affiliates) {
+  const tbody = document.querySelector('#affiliates-table tbody');
+  tbody.innerHTML = affiliates.map(a => `<tr>
+    <td>${a.name}</td>
+    <td><button class="code-link" onclick="openDetail('${a.code}')">${a.code}</button></td>
+    <td>${a.email}</td>
+    <td>${a.commission_pct}%</td>
+    <td>${a.clicks}</td>
+    <td>${a.sales}</td>
+    <td>$${a.revenue.toLocaleString()}</td>
+    <td>$${a.earnings_owed.toLocaleString()}</td>
+    <td>${a.conversion_rate_pct}%</td>
+    <td><span class="${a.active ? 'badge-active' : 'badge-inactive'}">${a.active ? 'Active' : 'Inactive'}</span></td>
+  </tr>`).join('');
+}
+
+async function openDetail(code) {
+  try {
+    const res = await fetch(`${API}/affiliate/dashboard/${code}`);
+    const d = await res.json();
+    const panel = document.getElementById('detail-panel');
+    panel.classList.add('open');
+    document.getElementById('detail-name').textContent = `${d.affiliate.name} (${d.affiliate.code})`;
+
+    document.getElementById('detail-stats').innerHTML = [
+      { v: d.stats.total_clicks, l: 'Clicks' },
+      { v: d.stats.total_sales, l: 'Sales' },
+      { v: `$${d.stats.total_revenue}`, l: 'Revenue' },
+      { v: `$${d.stats.total_earnings}`, l: 'Earnings' },
+      { v: `${d.stats.conversion_rate_pct}%`, l: 'Conversion' },
+      { v: `${d.affiliate.commission_pct}%`, l: 'Commission Rate' },
+    ].map(s => `<div class="detail-stat"><div class="value">${s.v}</div><div class="label">${s.l}</div></div>`).join('');
+
+    document.querySelector('#click-table tbody').innerHTML =
+      d.click_history.map(c => `<tr><td>${new Date(c.timestamp).toLocaleString()}</td></tr>`).join('') || '<tr><td>No clicks yet</td></tr>';
+
+    document.querySelector('#sale-table tbody').innerHTML =
+      d.sale_history.map(s => `<tr><td>${s.product}</td><td>$${s.amount}</td><td>$${s.commission}</td><td>${new Date(s.timestamp).toLocaleString()}</td></tr>`).join('') || '<tr><td colspan="4">No sales yet</td></tr>';
+
+    panel.scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    toast('Failed to load affiliate detail', true);
+  }
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+}
+
+async function createAffiliate() {
+  const name = document.getElementById('inp-name').value.trim();
+  const email = document.getElementById('inp-email').value.trim();
+  const commission_pct = parseFloat(document.getElementById('inp-commission').value) || 20;
+
+  if (!name || !email) { toast('Name and email required', true); return; }
+
+  try {
+    const res = await fetch(`${API}/affiliate/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, commission_pct }),
+    });
+    const data = await res.json();
+    if (!res.ok) { toast(data.detail || 'Error', true); return; }
+    toast(`Created! Code: ${data.affiliate_code} | Link: ${data.referral_link}`);
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-email').value = '';
+    loadAdmin();
+  } catch (e) {
+    toast('Failed to create affiliate', true);
+  }
+}
+
+loadAdmin();
+setInterval(loadAdmin, 15000);
+</script>
+</body>
+</html>

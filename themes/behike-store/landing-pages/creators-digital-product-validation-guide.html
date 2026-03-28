@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Product Validation Guide - Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --text: #ffffff;
+      --text-muted: #86868b;
+      --accent: #0a84ff;
+      --cta: #30d158;
+      --cta-hover: #28b94e;
+      --border: #1d1d1f;
+      --surface: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .hero {
+      padding: 100px 0 72px;
+      text-align: center;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(34px, 5.5vw, 58px);
+      font-weight: 700;
+      line-height: 1.07;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+    }
+    .hero p {
+      font-size: 19px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+    .price-block {
+      margin-bottom: 40px;
+    }
+    .price {
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .price-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 48px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .cta-btn:hover { background: var(--cta-hover); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 72px 0;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .evidence-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .evidence-item {
+      background: var(--surface);
+      padding: 24px 16px;
+      text-align: center;
+      border-radius: 4px;
+    }
+    .evidence-item:first-child { border-radius: 12px 4px 4px 12px; }
+    .evidence-item:last-child { border-radius: 4px 12px 12px 4px; }
+    .evidence-level {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .evidence-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .chapters {
+      display: grid;
+      gap: 2px;
+    }
+    .chapter-item {
+      background: var(--surface);
+      padding: 24px 28px;
+      border-radius: 4px;
+    }
+    .chapter-item:first-child { border-radius: 12px 12px 4px 4px; }
+    .chapter-item:last-child { border-radius: 4px 4px 12px 12px; }
+    .chapter-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .chapter-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .chapter-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .proof-section {
+      text-align: center;
+      padding: 72px 0;
+    }
+    .proof-section h2 {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .proof-section p {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .guarantee {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+    }
+    .guarantee-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .guarantee h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .guarantee p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .cta-section {
+      text-align: center;
+      padding: 80px 0;
+    }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .cta-section p {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">Behike</a>
+      <span class="nav-price">$18.99</span>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Product Validation Guide</p>
+      <h1>Stop building products nobody asked for.</h1>
+      <p>The complete digital product validation framework. Compress the feedback loop from months to days. Know if your idea will sell before you spend a single hour building it.</p>
+      <div class="price-block">
+        <div class="price">$18.99</div>
+        <div class="price-sub">One-time. Instant download. Yours forever.</div>
+      </div>
+      <a href="#" class="cta-btn">Get Instant Access</a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="container">
+      <p class="section-label">The Evidence Hierarchy</p>
+      <div class="evidence-row">
+        <div class="evidence-item">
+          <div class="evidence-level">L1</div>
+          <div class="evidence-label">People say it sounds interesting</div>
+        </div>
+        <div class="evidence-item">
+          <div class="evidence-level">L2</div>
+          <div class="evidence-label">People engage with free content on the topic</div>
+        </div>
+        <div class="evidence-item">
+          <div class="evidence-level">L3</div>
+          <div class="evidence-label">People ask how to buy before it exists</div>
+        </div>
+        <div class="evidence-item">
+          <div class="evidence-level">L4</div>
+          <div class="evidence-label">People pay money in advance</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <div class="chapters">
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 1</div>
+          <div class="chapter-title">What Validation Actually Means</div>
+          <div class="chapter-desc">The three failure modes of failed products, the evidence hierarchy from weak to ironclad, and why most creators stop at the weakest signal and call it validated.</div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 2</div>
+          <div class="chapter-title">Defining the Specific Problem</div>
+          <div class="chapter-desc">The problem stack, the three-why method for finding the real issue, the one-line problem statement format, and where to find evidence that the problem is real and widespread.</div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 3</div>
+          <div class="chapter-title">Audience Signal Testing</div>
+          <div class="chapter-desc">The content test, the direct question test, and the search autocomplete method for confirming people are actively seeking solutions before you build one.</div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 4</div>
+          <div class="chapter-title">Pre-Sell and Waitlist Validation</div>
+          <div class="chapter-desc">How to build a minimum waitlist page, the visit-to-signup benchmark, the ethics of presales, and what "ten payments in 48 hours" actually means for your decision.</div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 5</div>
+          <div class="chapter-title">Interpreting the Signals</div>
+          <div class="chapter-desc">The five-signal Validation Scorecard, how to identify false positives including friend enthusiasm and personal excitement, and what to do when signals are genuinely mixed.</div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 6</div>
+          <div class="chapter-title">From Validated Idea to Built Product</div>
+          <div class="chapter-desc">The minimum viable product scope decision, matching format to audience preference, the first-buyer feedback loop, and how to price toward outcome rather than production time.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="proof-section">
+    <div class="container">
+      <h2>The creators who build successful product businesses test fast and build only what clears the bar.</h2>
+      <p>You now have the complete framework. The only thing left is to pick the idea that has been sitting in your notes the longest and run it through the system.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section>
+    <div class="container">
+      <div class="guarantee">
+        <div class="guarantee-icon">30</div>
+        <h3>30-Day Guarantee</h3>
+        <p>Run one product idea through this validation framework. If you do not get clear signal one way or another within 30 days, email us for a full refund. No questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <h2>Know before you build.</h2>
+      <p>Instant download. 6 chapters. 15-item validation checklist.</p>
+      <a href="#" class="cta-btn">Get Instant Access &mdash; $18.99</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Behike Terminal v1.0</title>
+<meta name="description" content="25 products. 1 command line. The Behike Terminal is a plain-English interface over your entire AI business toolkit.">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg: #000000;
+    --text: #E5E5EA;
+    --secondary: #8E8E93;
+    --blue: #0A84FF;
+    --green: #30D158;
+    --amber: #FF9F0A;
+    --purple: #BF5AF2;
+    --red: #FF453A;
+    --surface: #111111;
+    --border: #2C2C2E;
+    --cmd-color: var(--blue);
+    --out-color: var(--green);
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* Scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Header bar */
+  #header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  #header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-red { background: #FF5F57; }
+  .dot-yellow { background: #FFBD2E; }
+  .dot-green { background: #28CA41; }
+
+  #header-title {
+    color: var(--secondary);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  #theme-indicator {
+    font-size: 11px;
+    color: var(--secondary);
+    letter-spacing: 0.08em;
+  }
+
+  /* Output area */
+  #output {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 8px;
+    scroll-behavior: smooth;
+  }
+
+  #output::-webkit-scrollbar {
+    width: 4px;
+  }
+  #output::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  #output::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+  }
+
+  .line {
+    margin-bottom: 2px;
+    word-break: break-word;
+    animation: fadein 0.1s ease;
+  }
+
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .line-cmd {
+    color: var(--cmd-color);
+  }
+
+  .line-out {
+    color: var(--out-color);
+  }
+
+  .line-info {
+    color: var(--text);
+  }
+
+  .line-error {
+    color: var(--red);
+  }
+
+  .line-secondary {
+    color: var(--secondary);
+  }
+
+  .line-amber {
+    color: var(--amber);
+  }
+
+  .line-purple {
+    color: var(--purple);
+  }
+
+  .line-blue {
+    color: var(--blue);
+  }
+
+  .line-blank {
+    height: 8px;
+  }
+
+  .line-divider {
+    color: var(--border);
+    user-select: none;
+  }
+
+  .line-product {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .line-product .prod-name {
+    color: var(--text);
+    flex: 1;
+  }
+
+  .line-product .prod-dots {
+    color: var(--border);
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .line-product .prod-price {
+    color: var(--amber);
+    white-space: nowrap;
+  }
+
+  .link-inline {
+    color: var(--blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+
+  .highlight {
+    background: rgba(48, 209, 88, 0.15);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  /* Input area */
+  #input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  #prompt-prefix {
+    color: var(--cmd-color);
+    white-space: nowrap;
+    user-select: none;
+    font-size: 14px;
+  }
+
+  #cmd-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--cmd-color);
+    font-family: inherit;
+    font-size: 14px;
+    caret-color: var(--cmd-color);
+  }
+
+  #cmd-input::placeholder {
+    color: var(--border);
+  }
+
+  #cursor-blink {
+    width: 8px;
+    height: 16px;
+    background: var(--cmd-color);
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    flex-shrink: 0;
+    opacity: 0;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* Subscribe form inline */
+  #subscribe-form {
+    display: none;
+    padding: 4px 0;
+  }
+
+  #subscribe-email {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 260px;
+    outline: none;
+  }
+
+  #subscribe-email:focus {
+    border-color: var(--blue);
+  }
+
+  #subscribe-btn {
+    background: var(--blue);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 6px 14px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  #subscribe-btn:hover {
+    background: #0066cc;
+  }
+
+  /* Timer display */
+  #timer-display {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 22px;
+    color: var(--amber);
+    z-index: 100;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.6);
+    user-select: none;
+    cursor: pointer;
+  }
+
+  #timer-display .timer-label {
+    font-size: 10px;
+    color: var(--secondary);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  #timer-display.timer-done {
+    color: var(--green);
+    border-color: var(--green);
+  }
+
+  /* Matrix canvas overlay */
+  #matrix-canvas {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 9999;
+    background: #000;
+  }
+
+  /* Autocomplete suggestion */
+  #autocomplete-hint {
+    color: var(--border);
+    font-size: 13px;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    html, body { font-size: 13px; }
+    #output { padding: 12px 12px 6px; }
+    #input-area { padding: 8px 12px 12px; }
+    #header { padding: 8px 12px; }
+    #timer-display { top: 50px; right: 10px; font-size: 18px; padding: 6px 10px; }
+    #subscribe-email { width: 180px; }
+    .line-product { flex-wrap: wrap; }
+    .line-product .prod-dots { display: none; }
+  }
+
+  /* Typing animation for startup */
+  .typing-line {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid var(--cmd-color);
+  }
+
+  /* Theme: blue */
+  body.theme-blue {
+    --cmd-color: #0A84FF;
+    --out-color: #64D2FF;
+  }
+
+  /* Theme: amber */
+  body.theme-amber {
+    --cmd-color: #FF9F0A;
+    --out-color: #FFD60A;
+  }
+
+  /* Theme: green (default) */
+  body.theme-green {
+    --cmd-color: #0A84FF;
+    --out-color: #30D158;
+  }
+</style>
+</head>
+<body class="theme-green">
+
+<div id="app">
+  <div id="header">
+    <div id="header-left">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span id="header-title">behike-terminal -- zsh -- 80x24</span>
+    </div>
+    <span id="theme-indicator">THEME: GREEN</span>
+  </div>
+
+  <div id="output"></div>
+
+  <div id="subscribe-form">
+    <input type="email" id="subscribe-email" placeholder="your@email.com" autocomplete="email">
+    <button id="subscribe-btn">Subscribe</button>
+  </div>
+
+  <div id="input-area">
+    <span id="prompt-prefix">behike@terminal:~$</span>
+    <input type="text" id="cmd-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type a command...">
+    <span id="autocomplete-hint"></span>
+  </div>
+</div>
+
+<div id="timer-display">
+  <span class="timer-label">FOCUS</span>
+  <span id="timer-value">25:00</span>
+</div>
+
+<canvas id="matrix-canvas"></canvas>
+
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  // DATA
+  // ============================================================
+
+  const PRODUCTS = [
+    { name: 'Ceiba Sanctuary',           price: 49.99,  url: '/ceiba-sanctuary.html',           tags: ['ai', 'system', 'premium', 'tool'] },
+    { name: 'Ghost Writer Kit',          price: 99.00,  url: '/ghost-writer.html',              tags: ['writing', 'content', 'premium'] },
+    { name: 'Focus DJ',                  price: 29.99,  url: '/focus-dj.html',                  tags: ['focus', 'productivity', 'music'] },
+    { name: 'Solopreneur OS Live',       price: 29.99,  url: '/solopreneur-os-live.html',       tags: ['business', 'productivity', 'system'] },
+    { name: 'AI Agent Installer Kit',    price: 29.99,  url: '/ai-agent-installer-kit.html',    tags: ['ai', 'agent', 'technical', 'tool'] },
+    { name: 'n8n Automation Pack',       price: 34.99,  url: '/n8n-automation-pack.html',       tags: ['automation', 'n8n', 'technical', 'workflow'] },
+    { name: 'FL Studio AI Guide',        price: 24.99,  url: '/fl-studio-ai-guide.html',        tags: ['music', 'ai', 'creative', 'audio'] },
+    { name: 'AI Employee Guide',         price: 19.99,  url: '/ai-employee-guide.html',         tags: ['ai', 'business', 'guide', 'productivity'] },
+    { name: 'Behike Method v2',          price: 19.99,  url: '/behike-method-v2.html',          tags: ['method', 'system', 'productivity', 'business'] },
+    { name: 'YouTube Channel Blueprint', price: 19.99,  url: '/youtube-channel-blueprint.html', tags: ['youtube', 'content', 'business', 'video'] },
+    { name: 'Claude Code Course',        price: 19.99,  url: '/claude-code-course.html',        tags: ['ai', 'coding', 'claude', 'technical'] },
+    { name: 'AI Security Guide',         price: 14.99,  url: '/ai-security-guide.html',         tags: ['ai', 'security', 'guide'] },
+    { name: 'Cash Flow Dashboard',       price: 14.99,  url: '/cash-flow-dashboard.html',       tags: ['finance', 'budget', 'dashboard', 'money'] },
+    { name: 'Ecommerce Playbook',        price: 14.99,  url: '/ecommerce-playbook.html',        tags: ['ecommerce', 'business', 'shopify', 'selling'] },
+    { name: 'Mastery for Builders',      price: 14.99,  url: '/mastery-for-builders.html',      tags: ['mindset', 'productivity', 'builder', 'business'] },
+    { name: 'Niche Sniper',              price: 14.99,  url: '/niche-sniper.html',              tags: ['research', 'niche', 'business', 'ebay'] },
+    { name: 'Solopreneur OS',            price: 12.99,  url: '/solopreneur-os.html',            tags: ['business', 'productivity', 'system', 'os'] },
+    { name: 'Budget Template',           price: 9.99,   url: '/budget-template.html',           tags: ['finance', 'budget', 'template', 'money'] },
+    { name: 'AI Prompt Cheat Sheet',     price: 9.99,   url: '/ai-prompt-cheat-sheet.html',     tags: ['ai', 'prompts', 'cheatsheet', 'tool'] },
+    { name: "Roblox Builder's Guide",    price: 9.99,   url: '/roblox-builders-guide.html',     tags: ['roblox', 'gaming', 'guide', 'creative'] },
+    { name: '3D Fashion Design Guide',   price: 9.99,   url: '/3d-fashion-guide.html',          tags: ['3d', 'fashion', 'design', 'creative'] },
+    { name: 'ADHD Finance',              price: 9.99,   url: '/adhd-finance.html',              tags: ['adhd', 'finance', 'budget', 'productivity'] },
+    { name: 'Self-Hosted Store Guide',   price: 4.99,   url: '/self-hosted-store.html',         tags: ['ecommerce', 'hosting', 'store', 'technical'] },
+    { name: 'AI News Tracker Guide',     price: 4.99,   url: '/ai-news-tracker-guide.html',     tags: ['ai', 'news', 'tracker', 'tool'] },
+    { name: 'Social Media Pipeline',     price: 4.99,   url: '/social-media-pipeline.html',     tags: ['social', 'content', 'pipeline', 'automation'] },
+  ];
+
+  const TIPS = [
+    'Ship ugly. Polish later. Ugly that works beats perfect that doesn\'t exist.',
+    'One deep work block beats five scattered hours.',
+    'The product is never done. The first sale is what matters.',
+    'Document what you build as you build it. Future you will thank you.',
+    'Constraints are features. Limits force creativity.',
+    'Revenue is feedback. Build things people pay for.',
+    'The gap between idea and execution is where most people live. Don\'t.',
+    'Automate the boring. Focus on the irreplaceable.',
+    'Ship weekly or you\'re not shipping.',
+    'Stack small wins. They compound faster than you think.',
+    'The best system is the one you actually use.',
+    'Rest is part of the work. Not separate from it.',
+    'Your niche found you. Stop searching and start building.',
+    'Content is not king. Consistency is king.',
+    'The first version is always embarrassing. Ship it anyway.',
+  ];
+
+  const VOICE_BIBLE = [
+    { label: 'Tone',      value: 'Direct. Depth over hype. Never corporate.' },
+    { label: 'Audience',  value: 'Builders, solopreneurs, ADHD minds, first-gen founders.' },
+    { label: 'Voice',     value: 'You\'re talking to a peer, not pitching to a customer.' },
+    { label: 'Format',    value: 'Short sentences. Active voice. Zero fluff.' },
+    { label: 'Never',     value: 'Motivational poster language. Fake urgency. Cliches.' },
+    { label: 'Always',    value: 'Specific examples. Real numbers. Earned confidence.' },
+    { label: 'Opener',    value: 'Start with the problem or the result. Never with "I".' },
+    { label: 'CTA',       value: 'One action per piece. Not three. One.' },
+    { label: 'Truth',     value: 'If it sounds like an AI wrote it, rewrite it.' },
+  ];
+
+  const COMMANDS = ['help', 'about', 'products', 'budget', 'focus', 'brief', 'quiz', 'search', 'random', 'buy', 'subscribe', 'voice', 'themes', 'matrix', 'clear', 'history'];
+
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  let cmdHistory = [];
+  let historyIndex = -1;
+  let currentInput = '';
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let currentTheme = 'green';
+  let matrixAnimId = null;
+  let startupDone = false;
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+
+  const output = document.getElementById('output');
+  const cmdInput = document.getElementById('cmd-input');
+  const timerDisplay = document.getElementById('timer-display');
+  const timerValue = document.getElementById('timer-value');
+  const matrixCanvas = document.getElementById('matrix-canvas');
+  const autocompleteHint = document.getElementById('autocomplete-hint');
+  const subscribeForm = document.getElementById('subscribe-form');
+  const themeIndicator = document.getElementById('theme-indicator');
+  const promptPrefix = document.getElementById('prompt-prefix');
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function fmt_price(p) { return '$' + p.toFixed(2); }
+
+  function now_date() {
+    const d = new Date();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  }
+
+  function now_time() {
+    const d = new Date();
+    return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function random_item(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function slug(name) {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  function dots(n) {
+    let s = '';
+    for (let i = 0; i < n; i++) s += '.';
+    return s;
+  }
+
+  // ============================================================
+  // OUTPUT RENDERING
+  // ============================================================
+
+  function addLine(text, cls, delay) {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.className = 'line ' + (cls || 'line-info');
+        div.innerHTML = text;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+        resolve();
+      }, delay || 0);
+    });
+  }
+
+  function addBlank(delay) {
+    return addLine('', 'line-blank', delay);
+  }
+
+  function addDivider(delay) {
+    return addLine('&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;', 'line-divider', delay);
+  }
+
+  function echoCmd(raw) {
+    addLine('$ ' + escapeHtml(raw), 'line-cmd');
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderProductLine(p, index) {
+    const num = String(index + 1).padStart(2, ' ');
+    const namePad = 28;
+    const name = p.name;
+    const nameLen = name.length;
+    const dCount = Math.max(2, namePad - nameLen);
+    const div = document.createElement('div');
+    div.className = 'line line-product';
+    div.innerHTML =
+      '<span class="line-secondary" style="margin-right:6px">' + num + '.</span>' +
+      '<span class="prod-name">' + escapeHtml(name) + '</span>' +
+      '<span class="prod-dots">' + dots(dCount) + '</span>' +
+      '<span class="prod-price">' + fmt_price(p.price) + '</span>';
+    output.appendChild(div);
+    output.scrollTop = output.scrollHeight;
+  }
+
+  // ============================================================
+  // STARTUP SEQUENCE
+  // ============================================================
+
+  async function runStartup() {
+    const lines = [
+      { text: 'BEHIKE TERMINAL v1.0', cls: 'line-out', delay: 0 },
+      { text: 'Initialized ' + now_date(), cls: 'line-secondary', delay: 120 },
+      { text: '25 products. 1 command line.', cls: 'line-info', delay: 240 },
+      { text: 'Type <span class="line-blue">help</span> to begin.', cls: 'line-info', delay: 360 },
+    ];
+
+    for (const l of lines) {
+      await addLine(l.text, l.cls, l.delay);
+    }
+    await addBlank(480);
+    startupDone = true;
+    cmdInput.focus();
+  }
+
+  // ============================================================
+  // COMMAND HANDLERS
+  // ============================================================
+
+  function cmd_help() {
+    addLine('AVAILABLE COMMANDS', 'line-out');
+    addDivider();
+    const cmds = [
+      ['help',           'Show this list'],
+      ['about',          'Who is Behike and what is this'],
+      ['products',       'List all 25 products with prices'],
+      ['budget',         'Open the Behike Finance product page'],
+      ['focus [min]',    'Start a countdown timer (default 25 min)'],
+      ['brief',          'Daily briefing: date, tip, product spotlight'],
+      ['quiz',           'Find your product match (opens quiz)'],
+      ['search [term]',  'Search products by keyword'],
+      ['random',         'Get a random product recommendation'],
+      ['buy [name]',     'Get a product link by name or number'],
+      ['subscribe',      'Join the email list'],
+      ['voice',          'The Behike Voice Bible'],
+      ['themes [1-3]',   'Switch color theme (1=green 2=blue 3=amber)'],
+      ['matrix',         'Easter egg'],
+      ['clear',          'Clear terminal'],
+      ['history',        'Show last 10 commands'],
+    ];
+    cmds.forEach(([cmd, desc]) => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      const cmdPad = 22;
+      const d = Math.max(2, cmdPad - cmd.length);
+      div.innerHTML =
+        '<span class="line-blue">' + escapeHtml(cmd) + '</span>' +
+        '<span class="line-secondary">' + dots(d) + '</span>' +
+        '<span class="line-secondary">' + escapeHtml(desc) + '</span>';
+      output.appendChild(div);
+    });
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_about() {
+    addLine('BEHIKE', 'line-out');
+    addDivider();
+    addLine('A solo AI business brand built in Puerto Rico.', 'line-info');
+    addBlank();
+    addLine('Built by Kalani, a computer engineering student and founder.', 'line-info');
+    addLine('Everything here is something that has been used, tested, and shipped.', 'line-info');
+    addBlank();
+    addLine('The mission: tools that help builders work smarter.', 'line-info');
+    addLine('No fluff. No filler. Real systems for real humans.', 'line-info');
+    addBlank();
+    addLine('Products range from $4.99 to $99.', 'line-secondary');
+    addLine('Type <span class="line-blue">products</span> to see the full catalog.', 'line-info');
+    addBlank();
+    addLine('Instagram: <span class="line-blue">@behikeai</span>', 'line-secondary');
+    addBlank();
+  }
+
+  function cmd_products() {
+    addLine('BEHIKE PRODUCT CATALOG (' + PRODUCTS.length + ' items)', 'line-out');
+    addDivider();
+    PRODUCTS.forEach((p, i) => renderProductLine(p, i));
+    addBlank();
+    addLine('Type <span class="line-blue">buy [name or number]</span> to get a direct link.', 'line-secondary');
+    addLine('Type <span class="line-blue">search [keyword]</span> to filter by topic.', 'line-secondary');
+    addBlank();
+  }
+
+  function cmd_budget() {
+    addLine('BEHIKE FINANCE', 'line-out');
+    addDivider();
+    addLine('Two finance tools built for ADHD brains and solo operators:', 'line-info');
+    addBlank();
+
+    const tools = [
+      { name: 'Cash Flow Dashboard', price: 14.99, url: '/cash-flow-dashboard.html', desc: 'Track money in, money out. No accounting degree required.' },
+      { name: 'Budget Template',     price: 9.99,  url: '/budget-template.html',     desc: 'A clean, simple budget that you will actually use.' },
+      { name: 'ADHD Finance',        price: 9.99,  url: '/adhd-finance.html',         desc: 'Money management designed for non-linear brains.' },
+    ];
+
+    tools.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      div.innerHTML =
+        '<span class="line-amber">' + escapeHtml(t.name) + '</span>' +
+        ' <span class="line-secondary">' + fmt_price(t.price) + '</span>' +
+        ' &mdash; <span class="line-secondary">' + escapeHtml(t.desc) + '</span>' +
+        ' [<a class="link-inline" href="' + t.url + '">' + t.url + '</a>]';
+      output.appendChild(div);
+    });
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_focus(args) {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerDisplay.style.display = 'none';
+      addLine('Previous timer stopped.', 'line-secondary');
+    }
+
+    let minutes = 25;
+    if (args && args.length > 0) {
+      const parsed = parseInt(args[0], 10);
+      if (!isNaN(parsed) && parsed > 0 && parsed <= 180) {
+        minutes = parsed;
+      } else {
+        addLine('Invalid time. Use a number between 1 and 180.', 'line-error');
+        return;
+      }
+    }
+
+    timerSeconds = minutes * 60;
+    timerDisplay.classList.remove('timer-done');
+    timerDisplay.style.display = 'block';
+
+    function updateDisplay() {
+      const m = Math.floor(timerSeconds / 60);
+      const s = timerSeconds % 60;
+      timerValue.textContent = pad(m) + ':' + pad(s);
+    }
+
+    updateDisplay();
+    addLine('Focus timer started: ' + minutes + ' min. Click the timer to dismiss.', 'line-amber');
+    addLine('The terminal stays active. Keep going.', 'line-secondary');
+    addBlank();
+
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      updateDisplay();
+
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerValue.textContent = 'DONE';
+        timerDisplay.classList.add('timer-done');
+        addLine('[FOCUS] Timer complete. Take a 5 minute break.', 'line-out');
+        addBlank();
+      }
+    }, 1000);
+  }
+
+  function cmd_brief() {
+    const tip = random_item(TIPS);
+    const product = random_item(PRODUCTS);
+    const timeStr = now_time();
+    const dateStr = now_date();
+
+    addLine('DAILY BRIEFING', 'line-out');
+    addDivider();
+    addLine('<span class="line-secondary">DATE</span>   ' + escapeHtml(dateStr), 'line-info');
+    addLine('<span class="line-secondary">TIME</span>   ' + timeStr, 'line-info');
+    addBlank();
+    addLine('TIP OF THE SESSION', 'line-amber');
+    addLine(escapeHtml(tip), 'line-info');
+    addBlank();
+    addLine('PRODUCT SPOTLIGHT', 'line-purple');
+
+    const spotDiv = document.createElement('div');
+    spotDiv.className = 'line';
+    spotDiv.innerHTML =
+      '<span class="line-text">' + escapeHtml(product.name) + '</span>' +
+      ' <span class="line-amber">' + fmt_price(product.price) + '</span>' +
+      ' [<a class="link-inline" href="' + product.url + '">' + product.url + '</a>]';
+    output.appendChild(spotDiv);
+
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_quiz() {
+    addLine('Opening product finder quiz...', 'line-out');
+    addLine('Redirecting to: <a class="link-inline" href="/quiz-product-finder.html">/quiz-product-finder.html</a>', 'line-info');
+    addBlank();
+    setTimeout(() => {
+      window.location.href = '/quiz-product-finder.html';
+    }, 1200);
+  }
+
+  function cmd_search(args) {
+    if (!args || args.length === 0 || args.join('').trim() === '') {
+      addLine('Usage: search [keyword]', 'line-error');
+      addLine('Example: search ai', 'line-secondary');
+      return;
+    }
+
+    const query = args.join(' ').toLowerCase().trim();
+    const results = PRODUCTS.filter(p => {
+      return (
+        p.name.toLowerCase().includes(query) ||
+        p.tags.some(t => t.includes(query)) ||
+        fmt_price(p.price).includes(query)
+      );
+    });
+
+    addLine('SEARCH: "' + escapeHtml(query) + '"  ' + results.length + ' result' + (results.length !== 1 ? 's' : ''), 'line-out');
+    addDivider();
+
+    if (results.length === 0) {
+      addLine('No products match "' + escapeHtml(query) + '".', 'line-secondary');
+      addLine('Try: ai, finance, content, automation, guide, business', 'line-secondary');
+    } else {
+      results.forEach((p, i) => renderProductLine(p, i));
+    }
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_random() {
+    const p = random_item(PRODUCTS);
+    addLine('RANDOM PICK', 'line-out');
+    addDivider();
+
+    const div = document.createElement('div');
+    div.className = 'line';
+    div.innerHTML =
+      '<span class="line-text" style="font-size:1.05em">' + escapeHtml(p.name) + '</span>' +
+      ' <span class="line-amber">' + fmt_price(p.price) + '</span>';
+    output.appendChild(div);
+
+    addBlank();
+    addLine('Tags: ' + p.tags.map(t => '<span class="line-secondary">' + escapeHtml(t) + '</span>').join(' '), 'line-info');
+    addLine('Link: <a class="link-inline" href="' + p.url + '">' + p.url + '</a>', 'line-info');
+    addBlank();
+    addLine('Type <span class="line-blue">random</span> again for another.', 'line-secondary');
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_buy(args) {
+    if (!args || args.length === 0) {
+      addLine('Usage: buy [product name or number]', 'line-error');
+      addLine('Example: buy focus dj', 'line-secondary');
+      addLine('Example: buy 3', 'line-secondary');
+      return;
+    }
+
+    const query = args.join(' ').toLowerCase().trim();
+
+    // Check if numeric
+    const num = parseInt(query, 10);
+    if (!isNaN(num) && num >= 1 && num <= PRODUCTS.length) {
+      const p = PRODUCTS[num - 1];
+      renderBuyResult(p);
+      return;
+    }
+
+    // Fuzzy name search
+    let best = null;
+    let bestScore = 0;
+    PRODUCTS.forEach(p => {
+      const pname = p.name.toLowerCase();
+      if (pname === query) { best = p; bestScore = 100; return; }
+      if (pname.includes(query)) {
+        const score = query.length / pname.length * 100;
+        if (score > bestScore) { best = p; bestScore = score; }
+      }
+      // word match
+      const words = query.split(' ');
+      const matchCount = words.filter(w => pname.includes(w) && w.length > 2).length;
+      if (matchCount > 0 && matchCount / words.length * 80 > bestScore) {
+        best = p;
+        bestScore = matchCount / words.length * 80;
+      }
+    });
+
+    if (best) {
+      renderBuyResult(best);
+    } else {
+      addLine('No product found matching "' + escapeHtml(query) + '".', 'line-error');
+      addLine('Type <span class="line-blue">products</span> to see the full list.', 'line-secondary');
+      addBlank();
+    }
+  }
+
+  function renderBuyResult(p) {
+    addLine('PRODUCT', 'line-out');
+    addDivider();
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'line';
+    nameDiv.innerHTML = '<span style="font-size:1.1em;color:var(--text)">' + escapeHtml(p.name) + '</span> <span class="line-amber">' + fmt_price(p.price) + '</span>';
+    output.appendChild(nameDiv);
+
+    addBlank();
+
+    const linkDiv = document.createElement('div');
+    linkDiv.className = 'line';
+    linkDiv.innerHTML = 'Link: <a class="link-inline" href="' + p.url + '">' + p.url + '</a>';
+    output.appendChild(linkDiv);
+
+    addBlank();
+    addLine('Type <span class="line-blue">products</span> to see everything else.', 'line-secondary');
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_subscribe() {
+    addLine('JOIN THE LIST', 'line-out');
+    addDivider();
+    addLine('Get product drops, free resources, and build logs direct to your inbox.', 'line-info');
+    addBlank();
+
+    subscribeForm.style.display = 'block';
+    subscribeForm.style.padding = '4px 16px 10px';
+
+    const email = document.getElementById('subscribe-email');
+    const btn = document.getElementById('subscribe-btn');
+
+    email.value = '';
+    setTimeout(() => email.focus(), 100);
+
+    btn.onclick = function() {
+      const val = email.value.trim();
+      if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+        addLine('Please enter a valid email address.', 'line-error');
+        return;
+      }
+      subscribeForm.style.display = 'none';
+      addBlank();
+      addLine('Subscribed: ' + escapeHtml(val), 'line-out');
+      addLine('You\'re on the list. Watch your inbox.', 'line-secondary');
+      addBlank();
+      cmdInput.focus();
+    };
+
+    email.onkeydown = function(e) {
+      if (e.key === 'Enter') btn.onclick();
+      if (e.key === 'Escape') {
+        subscribeForm.style.display = 'none';
+        addLine('Subscribe cancelled.', 'line-secondary');
+        addBlank();
+        cmdInput.focus();
+      }
+    };
+
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_voice() {
+    addLine('BEHIKE VOICE BIBLE', 'line-out');
+    addDivider();
+    addLine('The rules for how Behike content sounds.', 'line-secondary');
+    addBlank();
+
+    VOICE_BIBLE.forEach(rule => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      const labelPad = 10;
+      const d = Math.max(2, labelPad - rule.label.length);
+      div.innerHTML =
+        '<span class="line-amber">' + escapeHtml(rule.label) + '</span>' +
+        '<span class="line-secondary">' + dots(d) + '</span>' +
+        '<span class="line-info">' + escapeHtml(rule.value) + '</span>';
+      output.appendChild(div);
+    });
+
+    addBlank();
+    addLine('When in doubt: write it like you\'re texting a smart friend.', 'line-secondary');
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  function cmd_themes(args) {
+    const themeMap = {
+      '1': { name: 'green',  label: 'GREEN',  cls: 'theme-green'  },
+      '2': { name: 'blue',   label: 'BLUE',   cls: 'theme-blue'   },
+      '3': { name: 'amber',  label: 'AMBER',  cls: 'theme-amber'  },
+    };
+
+    const key = args && args[0] ? args[0].trim() : '';
+
+    if (!key || !themeMap[key]) {
+      addLine('THEMES', 'line-out');
+      addDivider();
+      addLine('[1] Green  &mdash; classic terminal (default)', 'line-out');
+      addLine('[2] Blue   &mdash; cold electric', 'line-blue');
+      addLine('[3] Amber  &mdash; warm retro', 'line-amber');
+      addBlank();
+      addLine('Usage: themes [1-3]', 'line-secondary');
+      addBlank();
+      return;
+    }
+
+    const t = themeMap[key];
+    document.body.className = t.cls;
+    currentTheme = t.name;
+    themeIndicator.textContent = 'THEME: ' + t.label;
+
+    addLine('Theme switched to ' + t.label + '.', 'line-out');
+    addBlank();
+  }
+
+  function cmd_matrix() {
+    addLine('Initiating matrix protocol...', 'line-out');
+    addBlank();
+
+    matrixCanvas.style.display = 'block';
+    const ctx = matrixCanvas.getContext('2d');
+    matrixCanvas.width = window.innerWidth;
+    matrixCanvas.height = window.innerHeight;
+
+    const cols = Math.floor(matrixCanvas.width / 16);
+    const drops = new Array(cols).fill(1);
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?abcdefghijklmnopqrstuvwxyz';
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      ctx.fillStyle = '#30D158';
+      ctx.font = '14px monospace';
+
+      drops.forEach((y, i) => {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(char, i * 16, y * 16);
+        if (y * 16 > matrixCanvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      });
+    }
+
+    matrixAnimId = setInterval(drawMatrix, 50);
+
+    matrixCanvas.onclick = stopMatrix;
+    matrixCanvas.ontouchend = stopMatrix;
+
+    setTimeout(stopMatrix, 5000);
+  }
+
+  function stopMatrix() {
+    if (matrixAnimId) {
+      clearInterval(matrixAnimId);
+      matrixAnimId = null;
+    }
+    matrixCanvas.style.display = 'none';
+    addLine('Matrix sequence terminated.', 'line-out');
+    addBlank();
+  }
+
+  function cmd_clear() {
+    output.innerHTML = '';
+    addLine('Terminal cleared.', 'line-secondary');
+    addBlank();
+  }
+
+  function cmd_history() {
+    if (cmdHistory.length === 0) {
+      addLine('No command history yet.', 'line-secondary');
+      addBlank();
+      return;
+    }
+    addLine('COMMAND HISTORY', 'line-out');
+    addDivider();
+    const recent = cmdHistory.slice(-10);
+    recent.forEach((cmd, i) => {
+      const div = document.createElement('div');
+      div.className = 'line';
+      div.innerHTML =
+        '<span class="line-secondary">' + String(i + 1).padStart(3, ' ') + '  </span>' +
+        '<span class="line-blue">' + escapeHtml(cmd) + '</span>';
+      output.appendChild(div);
+    });
+    addBlank();
+    output.scrollTop = output.scrollHeight;
+  }
+
+  // ============================================================
+  // COMMAND DISPATCH
+  // ============================================================
+
+  function dispatch(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    // Add to history
+    if (cmdHistory[cmdHistory.length - 1] !== trimmed) {
+      cmdHistory.push(trimmed);
+    }
+    if (cmdHistory.length > 100) cmdHistory.shift();
+    historyIndex = cmdHistory.length;
+
+    echoCmd(trimmed);
+
+    const parts = trimmed.split(/\s+/);
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    switch(cmd) {
+      case 'help':       cmd_help(); break;
+      case 'about':      cmd_about(); break;
+      case 'products':   cmd_products(); break;
+      case 'budget':     cmd_budget(); break;
+      case 'focus':      cmd_focus(args); break;
+      case 'brief':      cmd_brief(); break;
+      case 'quiz':       cmd_quiz(); break;
+      case 'search':     cmd_search(args); break;
+      case 'random':     cmd_random(); break;
+      case 'buy':        cmd_buy(args); break;
+      case 'subscribe':  cmd_subscribe(); break;
+      case 'voice':      cmd_voice(); break;
+      case 'themes':     cmd_themes(args); break;
+      case 'matrix':     cmd_matrix(); break;
+      case 'clear':      cmd_clear(); break;
+      case 'history':    cmd_history(); break;
+
+      // Natural language aliases
+      case 'ls':
+      case 'list':
+        cmd_products(); break;
+
+      case 'timer':
+      case 'pomodoro':
+        cmd_focus(args); break;
+
+      case 'store':
+      case 'shop':
+        cmd_products(); break;
+
+      case 'reset':
+        cmd_clear(); break;
+
+      case 'exit':
+      case 'quit':
+        addLine('There is no exit from building. Try <span class="line-blue">help</span>.', 'line-secondary');
+        addBlank();
+        break;
+
+      case 'sudo':
+        addLine('Nice try. You already have full access.', 'line-amber');
+        addBlank();
+        break;
+
+      case 'hello':
+      case 'hi':
+      case 'hey':
+        addLine('Hey. Type <span class="line-blue">help</span> to see what this thing can do.', 'line-out');
+        addBlank();
+        break;
+
+      case 'who':
+      case 'whoami':
+        addLine('A builder. Now type <span class="line-blue">about</span>.', 'line-out');
+        addBlank();
+        break;
+
+      case 'version':
+      case 'v':
+        addLine('Behike Terminal v1.0 (2026-03-22)', 'line-secondary');
+        addBlank();
+        break;
+
+      default:
+        addLine('Unknown command: <span class="line-amber">' + escapeHtml(cmd) + '</span>', 'line-error');
+        addLine('Type <span class="line-blue">help</span> for a list of commands.', 'line-secondary');
+        addBlank();
+        break;
+    }
+  }
+
+  // ============================================================
+  // INPUT HANDLING
+  // ============================================================
+
+  cmdInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const val = cmdInput.value;
+      cmdInput.value = '';
+      autocompleteHint.textContent = '';
+      historyIndex = cmdHistory.length;
+      currentInput = '';
+      dispatch(val);
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (historyIndex > 0) {
+        if (historyIndex === cmdHistory.length) {
+          currentInput = cmdInput.value;
+        }
+        historyIndex--;
+        cmdInput.value = cmdHistory[historyIndex] || '';
+        // Move cursor to end
+        setTimeout(() => {
+          cmdInput.selectionStart = cmdInput.selectionEnd = cmdInput.value.length;
+        }, 0);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIndex < cmdHistory.length) {
+        historyIndex++;
+        if (historyIndex === cmdHistory.length) {
+          cmdInput.value = currentInput;
+        } else {
+          cmdInput.value = cmdHistory[historyIndex] || '';
+        }
+        setTimeout(() => {
+          cmdInput.selectionStart = cmdInput.selectionEnd = cmdInput.value.length;
+        }, 0);
+      }
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const val = cmdInput.value.trim().toLowerCase();
+      if (!val) return;
+      const parts = val.split(/\s+/);
+      const base = parts[0];
+      if (parts.length === 1) {
+        const matches = COMMANDS.filter(c => c.startsWith(base));
+        if (matches.length === 1) {
+          cmdInput.value = matches[0] + ' ';
+          autocompleteHint.textContent = '';
+        } else if (matches.length > 1) {
+          autocompleteHint.textContent = matches.join('  ');
+        }
+      }
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      cmdInput.value = '';
+      autocompleteHint.textContent = '';
+      return;
+    }
+
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault();
+      cmd_clear();
+      return;
+    }
+
+    if (e.ctrlKey && e.key === 'c') {
+      e.preventDefault();
+      echoCmd(cmdInput.value + '^C');
+      cmdInput.value = '';
+      autocompleteHint.textContent = '';
+      addBlank();
+      return;
+    }
+  });
+
+  cmdInput.addEventListener('input', function() {
+    const val = cmdInput.value;
+    if (!val) {
+      autocompleteHint.textContent = '';
+      return;
+    }
+    const parts = val.trim().toLowerCase().split(/\s+/);
+    if (parts.length === 1 && parts[0].length > 0) {
+      const matches = COMMANDS.filter(c => c.startsWith(parts[0]) && c !== parts[0]);
+      if (matches.length === 1) {
+        autocompleteHint.textContent = matches[0].slice(parts[0].length) + '...';
+      } else {
+        autocompleteHint.textContent = '';
+      }
+    } else {
+      autocompleteHint.textContent = '';
+    }
+  });
+
+  // Keep focus on input when clicking in output area
+  output.addEventListener('click', function(e) {
+    if (e.target.tagName !== 'A') {
+      cmdInput.focus();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (document.activeElement !== cmdInput &&
+        document.activeElement !== document.getElementById('subscribe-email') &&
+        !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (e.key.length === 1 || e.key === 'Backspace') {
+        cmdInput.focus();
+      }
+    }
+  });
+
+  // Timer click to dismiss
+  timerDisplay.addEventListener('click', function() {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    timerDisplay.style.display = 'none';
+    addLine('Focus timer dismissed.', 'line-secondary');
+    addBlank();
+  });
+
+  // Prevent zoom on double tap mobile
+  document.addEventListener('touchend', function(e) {
+    if (e.target === cmdInput) return;
+  }, { passive: true });
+
+  // ============================================================
+  // INIT
+  // ============================================================
+
+  window.addEventListener('load', function() {
+    runStartup();
+  });
+
+})();
+</script>
+</body>
+</html>

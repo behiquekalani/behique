@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Social Media Batching System — A Month of Content in Two Sessions</title>
+  <meta name="description" content="Stop creating content daily. Batch a full week or month in one focused session. Template-driven system for serious creators.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+    .fade-up.delay-5 { transition-delay: 0.5s; }
+
+    /* ===================== HERO ===================== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(10,132,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 28px;
+      max-width: 780px;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin-bottom: 48px;
+      line-height: 1.5;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 32px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+
+    .hero-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hero-price-note {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ===================== PROBLEM ===================== */
+    #problem {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 24px;
+      max-width: 680px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 620px;
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .problem-card-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ===================== SOLUTION ===================== */
+    #solution {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .solution-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .solution-split { grid-template-columns: 1fr; gap: 48px; }
+    }
+
+    .solution-feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .solution-feature-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .feature-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 9px;
+      flex-shrink: 0;
+    }
+
+    .feature-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .feature-text span {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .stat-block {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 16px;
+    }
+
+    .stat-block .stat-number {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-block .stat-label {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* ===================== TOC ===================== */
+    #toc {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .toc-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .toc-card:hover {
+      border-color: rgba(10,132,255,0.4);
+    }
+
+    .toc-part {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .toc-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .toc-chapters {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toc-chapters li {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .toc-chapters li::before {
+      content: "-";
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+
+    /* ===================== CTA ===================== */
+    #cta {
+      padding: 120px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    #cta .cta-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      max-width: 640px;
+      margin: 0 auto 24px;
+    }
+
+    #cta .cta-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 48px;
+    }
+
+    .cta-price-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 32px;
+    }
+
+    .cta-price {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .cta-price-detail {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .cta-guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+
+    /* ===================== FOOTER ===================== */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="fade-up">
+      <span class="hero-label">Behike Digital Products</span>
+    </div>
+    <h1 class="hero-title fade-up delay-1">
+      Stop making content every day.<br>
+      <span>Batch it once. Let it run.</span>
+    </h1>
+    <p class="hero-sub fade-up delay-2">
+      A complete system for creating a full week or month of social media content in one or two focused sessions. Templates, frameworks, and the session structure that keeps batched content from sounding robotic.
+    </p>
+    <div class="hero-cta-group fade-up delay-3">
+      <a href="https://gumroad.com/l/creators-social-media-batching-system" class="btn-primary" target="_blank" rel="noopener">
+        Get the System — $18.99
+      </a>
+      <div>
+        <div class="hero-price">$18.99</div>
+        <div class="hero-price-note">PDF + 80-page guide</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">The daily content grind kills creativity before it compounds.</h2>
+    </div>
+    <p class="section-body fade-up delay-1">
+      Most creators are not struggling because they lack ideas. They are struggling because they treat each piece of content as an isolated task with no shared infrastructure. Every day: new idea, new format, new angle, new caption. Every decision costs cognitive energy.
+    </p>
+    <p class="section-body fade-up delay-2">
+      The result is average content produced under pressure, published from a depleted state. Consistency becomes a grind instead of a system.
+    </p>
+    <div class="problem-grid">
+      <div class="problem-card fade-up delay-1">
+        <div class="problem-card-icon">X</div>
+        <h3>Daily decision fatigue</h3>
+        <p>Deciding what to make today takes more energy than making it. By the time you sit down to write, the best part of your brain is already spent.</p>
+      </div>
+      <div class="problem-card fade-up delay-2">
+        <div class="problem-card-icon">X</div>
+        <h3>Context-switching cost</h3>
+        <p>Switching from content creation to other work and back costs 15-20 minutes of re-entry each time. Seven daily sessions waste more time than one weekly session.</p>
+      </div>
+      <div class="problem-card fade-up delay-3">
+        <div class="problem-card-icon">X</div>
+        <h3>No editorial distance</h3>
+        <p>Daily creators post in survival mode. There is no time to evaluate yesterday's work with fresh eyes, cut weak pieces, or recognize patterns that are not landing.</p>
+      </div>
+      <div class="problem-card fade-up delay-4">
+        <div class="problem-card-icon">X</div>
+        <h3>Batched content that sounds batched</h3>
+        <p>The common fix creates a new problem. Templates without specificity produce content that sounds like a machine wrote it. Readers feel the assembly line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">The System</div>
+      <h2 class="section-title">Concentrated effort replaces scattered effort.</h2>
+    </div>
+    <div class="solution-split">
+      <div>
+        <p class="section-body fade-up">
+          This is not "batch your content" as advice. It is the full architecture: content tiers, calendar structure, session design, template libraries, caption frameworks, scheduling protocols, and the quality control pass that keeps everything sharp.
+        </p>
+        <ul class="solution-feature-list fade-up delay-1">
+          <li>
+            <span class="feature-dot"></span>
+            <div class="feature-text">
+              <strong>Three-tier content architecture</strong>
+              <span>Core, derivative, and reactive content explained. One strong core piece generates 8-15 derivative pieces.</span>
+            </div>
+          </li>
+          <li>
+            <span class="feature-dot"></span>
+            <div class="feature-text">
+              <strong>The weekly batching session structure</strong>
+              <span>Exact block-by-block breakdown. Four blocks. 2.5 hours. Full week of content.</span>
+            </div>
+          </li>
+          <li>
+            <span class="feature-dot"></span>
+            <div class="feature-text">
+              <strong>8 templates that do not sound robotic</strong>
+              <span>Built-in specificity filters, voice variation, and rotation logic so no single template dominates.</span>
+            </div>
+          </li>
+          <li>
+            <span class="feature-dot"></span>
+            <div class="feature-text">
+              <strong>Caption framework system</strong>
+              <span>Four caption functions with templates for every platform. Instagram, LinkedIn, Twitter/X.</span>
+            </div>
+          </li>
+          <li>
+            <span class="feature-dot"></span>
+            <div class="feature-text">
+              <strong>Scheduling and maintenance protocols</strong>
+              <span>Queue management, staleness prevention, evergreen reserve, and the content audit habit.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div class="stat-block fade-up delay-1">
+          <div class="stat-number">2.5h</div>
+          <div class="stat-label">One focused session replaces seven days of daily scrambling</div>
+        </div>
+        <div class="stat-block fade-up delay-2">
+          <div class="stat-number">8-15</div>
+          <div class="stat-label">Derivative pieces generated from a single strong core piece</div>
+        </div>
+        <div class="stat-block fade-up delay-3">
+          <div class="stat-number">80%</div>
+          <div class="stat-label">Reduction in daily content decisions with a working content map</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section id="toc">
+  <div class="container">
+    <div class="fade-up">
+      <div class="section-label">What Is Inside</div>
+      <h2 class="section-title">15 chapters. 6 parts. Complete execution system.</h2>
+    </div>
+    <p class="section-body fade-up delay-1">
+      Every section is an operations manual, not theory. The last two chapters are step-by-step playbooks: your first batching session and your weekly maintenance ritual.
+    </p>
+    <div class="toc-grid">
+      <div class="toc-card fade-up delay-1">
+        <div class="toc-part">Part 1</div>
+        <h3>The Foundation</h3>
+        <ul class="toc-chapters">
+          <li>Why batching works: cognitive consolidation, context preservation, editorial distance</li>
+          <li>The three content tiers: core, derivative, reactive</li>
+          <li>Building your content calendar and 30-day content block</li>
+        </ul>
+      </div>
+      <div class="toc-card fade-up delay-2">
+        <div class="toc-part">Part 2</div>
+        <h3>The Batching Sessions</h3>
+        <ul class="toc-chapters">
+          <li>The weekly session: four blocks, exact timing, output targets</li>
+          <li>The monthly session: scale without chaos</li>
+          <li>The batching environment: single-application focus, pre-session ritual</li>
+        </ul>
+      </div>
+      <div class="toc-card fade-up delay-3">
+        <div class="toc-part">Part 3</div>
+        <h3>Templates and Frameworks</h3>
+        <ul class="toc-chapters">
+          <li>Why robotic content happens and how to prevent it</li>
+          <li>8 content templates with built-in specificity filters</li>
+          <li>Caption function system: 4 functions, platform defaults</li>
+        </ul>
+      </div>
+      <div class="toc-card fade-up delay-4">
+        <div class="toc-part">Part 4</div>
+        <h3>Scheduling and Maintenance</h3>
+        <ul class="toc-chapters">
+          <li>Platform-native vs. third-party schedulers</li>
+          <li>The 5-point quality control pass</li>
+          <li>Content backlog management and evergreen reserve</li>
+        </ul>
+      </div>
+      <div class="toc-card fade-up delay-5">
+        <div class="toc-part">Part 5</div>
+        <h3>Avoiding the Trap</h3>
+        <ul class="toc-chapters">
+          <li>Staleness risks and the content audit habit</li>
+          <li>The authenticity dial: 20% spontaneous fill</li>
+          <li>Scaling to a second platform and delegation architecture</li>
+        </ul>
+      </div>
+      <div class="toc-card fade-up delay-1">
+        <div class="toc-part">Part 6</div>
+        <h3>The Full Playbook</h3>
+        <ul class="toc-chapters">
+          <li>Your first batching session: step-by-step (day-of protocol)</li>
+          <li>Weekly maintenance: 20-minute ritual</li>
+          <li>Quick-reference checklist + template library</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="container">
+    <h2 class="cta-title fade-up">One session. A week of content. Done.</h2>
+    <p class="cta-sub fade-up delay-1">
+      The complete system for creators who want to produce consistently without living on the content treadmill.
+    </p>
+    <div class="fade-up delay-2">
+      <div class="cta-price-block">
+        <div class="cta-price">$18.99</div>
+        <div class="cta-price-detail">Instant PDF download. 80+ pages. No subscription.</div>
+      </div>
+    </div>
+    <div class="fade-up delay-3">
+      <a href="https://gumroad.com/l/creators-social-media-batching-system" class="btn-primary" target="_blank" rel="noopener">
+        Get the System
+      </a>
+      <p class="cta-guarantee">Immediate access after purchase.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Behike &copy; 2026. Built for serious creators, not beginners.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

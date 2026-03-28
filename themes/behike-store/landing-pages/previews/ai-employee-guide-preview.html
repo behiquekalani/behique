@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Preview - How I Built an AI Employee</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000000;
+            --bg2: #1D1D1F;
+            --accent: #0A84FF;
+            --text: #F5F5F7;
+            --gray: #86868B;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Banner */
+        .preview-banner {
+            background: var(--accent);
+            color: #fff;
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 56px);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Chapter Content */
+        .chapter-header {
+            border-top: 1px solid rgba(134, 134, 139, 0.3);
+            padding-top: 40px;
+            margin-bottom: 32px;
+        }
+
+        .chapter-label {
+            font-size: 13px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .chapter-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .chapter-content {
+            font-size: 17px;
+            color: rgba(245, 245, 247, 0.85);
+            line-height: 1.8;
+        }
+
+        .chapter-content p {
+            margin-bottom: 20px;
+        }
+
+        .chapter-content strong {
+            color: var(--text);
+        }
+
+        /* Architecture Diagram */
+        .diagram-section {
+            margin: 48px 0;
+            padding: 40px 24px;
+            background: var(--bg2);
+            border-radius: 16px;
+            border: 1px solid rgba(134, 134, 139, 0.2);
+        }
+
+        .diagram-title {
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 32px;
+        }
+
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .node {
+            background: var(--bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            min-width: 160px;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .node-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .node-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .node-role {
+            font-size: 12px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .node-spec {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .connector {
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .connector::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: -4px;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid var(--accent);
+            border-right: 2px solid var(--accent);
+            transform: rotate(45deg);
+        }
+
+        @media (max-width: 640px) {
+            .diagram {
+                flex-direction: column;
+                gap: 0;
+            }
+            .connector {
+                width: 2px;
+                height: 32px;
+            }
+            .connector::after {
+                right: -4px;
+                top: auto;
+                bottom: -4px;
+                transform: rotate(135deg);
+            }
+        }
+
+        /* Chapter List */
+        .chapter-list {
+            margin: 60px 0;
+        }
+
+        .chapter-list h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(134, 134, 139, 0.15);
+        }
+
+        .chapter-num {
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 600;
+            min-width: 32px;
+            padding-top: 2px;
+        }
+
+        .chapter-info {
+            flex: 1;
+        }
+
+        .chapter-info h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chapter-info .desc {
+            font-size: 14px;
+            color: var(--gray);
+            filter: blur(4px);
+            user-select: none;
+        }
+
+        .lock-icon {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 32px 0;
+            border-top: 1px solid rgba(134, 134, 139, 0.2);
+            border-bottom: 1px solid rgba(134, 134, 139, 0.2);
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .cta-price {
+            display: block;
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 13px;
+            color: var(--gray);
+            border-top: 1px solid rgba(134, 134, 139, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="preview-banner">Free Preview &mdash; Chapter 1 of 20</div>
+
+<div class="container">
+
+    <section class="hero">
+        <h1>How I Built an AI Employee</h1>
+        <p class="subtitle">A practical guide to building a multi-machine AI system that works for you 24/7, for $0/month in API costs.</p>
+    </section>
+
+    <section class="chapter-header">
+        <div class="chapter-label">Chapter 1</div>
+        <h2>The Cost Problem Nobody Talks About</h2>
+    </section>
+
+    <div class="chapter-content">
+        <p>Here is the math most AI tutorials skip. If you use GPT-4 through the API for anything serious, you are looking at $200 to $500 per month. That is not a one-time cost. That is a subscription to someone else's hardware running someone else's models on someone else's terms. For a solo builder or small business, that is a real line item. And it gets worse the more you use it.</p>
+
+        <p>I ran into this wall in early 2025. I had built a Telegram bot, a product research tool, and an automation pipeline, all powered by OpenAI's API. My monthly bill was climbing past $280 and I had not even started on the projects I actually wanted to build. Every API call cost money. Every experiment cost money. Every mistake cost money. I was paying to think.</p>
+
+        <p>So I asked a different question: <strong>what if the AI ran on machines I already owned?</strong></p>
+
+        <p>The answer is Ollama. It is an open-source tool that lets you run large language models locally, on your own hardware, with zero API costs. Models like Llama 3, Mistral, Phi, CodeGemma. Not toy models. Real, production-capable models that handle classification, summarization, code generation, and conversation. Once you download them, they are yours. No rate limits. No billing surprises. No terms of service changes that break your workflow overnight.</p>
+
+        <p>But one machine is not enough. A single laptop running a 7B parameter model can handle basic tasks, but it chokes on anything demanding. It cannot run inference and serve a web app and process a queue simultaneously. You need a fleet.</p>
+
+        <p><strong>That is what this guide is about: building a fleet architecture.</strong> Three machines, three roles, one system. The HQ machine handles orchestration, routing, and light inference. The GPU worker handles heavy model inference, image generation, and batch processing. The always-on machine handles scheduling, monitoring, and persistent services. Each one costs nothing to run beyond the electricity it already uses.</p>
+
+        <p>This is not theoretical. I built this system with a MacBook M4 with 16GB of RAM, a desktop with a GTX 1080 Ti and 11GB of VRAM, and a low-power mini PC that stays on 24/7. Total additional cost after setup: $0/month. The same workload on cloud APIs would cost me over $300/month. Over a year, that is $3,600 saved, and the gap only grows as you scale usage.</p>
+
+        <p>The rest of this guide walks you through every step. Hardware selection. Ollama installation and model management. Networking the machines together. Building the routing layer. Setting up task queues. Deploying real services on top of it all. By the end, you will have an AI employee that never sleeps, never bills you, and runs entirely on your own terms.</p>
+    </div>
+
+    <div class="diagram-section">
+        <div class="diagram-title">Fleet Architecture Overview</div>
+        <div class="diagram">
+            <div class="node">
+                <div class="node-icon">&#x1F4BB;</div>
+                <div class="node-name">Ceiba</div>
+                <div class="node-role">HQ / Orchestrator</div>
+                <div class="node-spec">M4, 16GB RAM</div>
+            </div>
+            <div class="connector"></div>
+            <div class="node">
+                <div class="node-icon">&#x1F5A5;</div>
+                <div class="node-name">Cobo</div>
+                <div class="node-role">GPU Worker</div>
+                <div class="node-spec">GTX 1080 Ti, 11GB VRAM</div>
+            </div>
+            <div class="connector"></div>
+            <div class="node">
+                <div class="node-icon">&#x26A1;</div>
+                <div class="node-name">Hutia</div>
+                <div class="node-role">Always-On</div>
+                <div class="node-spec">Low-power, 24/7</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="chapter-list">
+        <h3>Full Table of Contents</h3>
+
+        <div class="chapter-item">
+            <div class="chapter-num">01</div>
+            <div class="chapter-info">
+                <h4>The Cost Problem Nobody Talks About <span style="color: #30D158; font-size: 12px;">&#10003; Reading now</span></h4>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">02</div>
+            <div class="chapter-info">
+                <h4>Choosing Your Hardware <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">What to buy, what to repurpose, and the minimum specs that actually work for local LLMs.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">03</div>
+            <div class="chapter-info">
+                <h4>Ollama Deep Dive <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Installation, model management, quantization, and picking the right model for each task.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">04</div>
+            <div class="chapter-info">
+                <h4>The Three-Machine Architecture <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Why three roles matter. How to assign HQ, GPU worker, and always-on responsibilities.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">05</div>
+            <div class="chapter-info">
+                <h4>Networking Your Fleet <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">SSH tunnels, Tailscale, WireGuard. Connecting machines securely across locations.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">06</div>
+            <div class="chapter-info">
+                <h4>Building the Router <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">A lightweight routing layer that sends tasks to the right machine automatically.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">07</div>
+            <div class="chapter-info">
+                <h4>Task Queues and Job Management <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Redis, SQLite, or flat files. How to queue work and track completion across machines.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">08</div>
+            <div class="chapter-info">
+                <h4>Prompt Engineering for Local Models <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Local models need different prompts than GPT-4. How to get consistent, reliable output.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">09</div>
+            <div class="chapter-info">
+                <h4>Building Your First Agent <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">From script to autonomous agent. Tool use, memory, and decision loops explained.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">10</div>
+            <div class="chapter-info">
+                <h4>The Telegram Bot Pattern <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">How to build a Telegram bot that routes messages to your local AI fleet for processing.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">11</div>
+            <div class="chapter-info">
+                <h4>Persistent Memory Systems <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Giving your AI context that survives between sessions. File-based and database approaches.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">12</div>
+            <div class="chapter-info">
+                <h4>Monitoring and Health Checks <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Keeping your fleet alive. Uptime checks, auto-restart, and alerting when something breaks.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">13</div>
+            <div class="chapter-info">
+                <h4>Image Generation on Your GPU <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Running Stable Diffusion locally. ComfyUI setup, model selection, and batch workflows.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">14</div>
+            <div class="chapter-info">
+                <h4>Code Generation Workflows <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Using CodeGemma and DeepSeek Coder for real development tasks, not just demos.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">15</div>
+            <div class="chapter-info">
+                <h4>Web Scraping with AI <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Combining Playwright with local LLMs for intelligent data extraction at scale.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">16</div>
+            <div class="chapter-info">
+                <h4>Email and Content Automation <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Drafting emails, generating product descriptions, and scheduling content pipelines.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">17</div>
+            <div class="chapter-info">
+                <h4>Security and Access Control <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Locking down your fleet. Firewall rules, API keys, and keeping your data private.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">18</div>
+            <div class="chapter-info">
+                <h4>Scaling Beyond Three Machines <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Adding machines to your fleet. Load balancing, specialization, and cost analysis.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">19</div>
+            <div class="chapter-info">
+                <h4>Real-World Case Studies <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Five complete projects built on this architecture. Code included, lessons learned.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">20</div>
+            <div class="chapter-info">
+                <h4>The $0/Month AI Business <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">How to turn your AI fleet into a service you sell. Pricing, packaging, and client delivery.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value">20</div>
+            <div class="stat-label">Chapters</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">8,800</div>
+            <div class="stat-label">Words</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Fluff</div>
+        </div>
+    </div>
+
+    <section class="cta-section">
+        <a href="#" class="cta-btn">Unlock All 20 Chapters - $19.99</a>
+        <span class="cta-price">Instant download. PDF + Markdown. Lifetime updates.</span>
+    </section>
+
+    <footer>
+        &copy; 2026 Behike
+    </footer>
+
+</div>
+
+<script src="../settings-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Passive Income Architecture – Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+    .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+
+    .hero { padding: 100px 0 64px; text-align: center; }
+    .hero .label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #f5f5f5;
+      margin-bottom: 20px;
+    }
+    .hero .subtitle {
+      font-size: 18px;
+      color: #888;
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+    .price-block { margin-bottom: 36px; }
+    .price {
+      font-size: 64px;
+      font-weight: 700;
+      color: #f5f5f5;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .price-note { font-size: 14px; color: #555; margin-top: 8px; }
+    .cta-btn {
+      display: inline-block;
+      background: #f5f5f5;
+      color: #0a0a0a;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 48px;
+      border-radius: 4px;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.85; }
+
+    hr { border: none; border-top: 1px solid #1a1a1a; margin: 64px 0; }
+
+    .section { padding: 64px 0; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #f5f5f5;
+      margin-bottom: 20px;
+    }
+    .section p { color: #888; font-size: 16px; margin-bottom: 16px; max-width: 600px; }
+
+    .math-block {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 32px;
+      margin-top: 40px;
+    }
+    .math-block .math-label { font-size: 11px; color: #444; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+    .math-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 15px;
+    }
+    .math-row:last-child { border-bottom: none; }
+    .math-row .label { color: #555; }
+    .math-row .value { color: #f5f5f5; font-weight: 600; }
+    .math-total .value { color: #f5f5f5; font-size: 20px; }
+
+    .five-layers { margin-top: 40px; }
+    .layer {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid #141414;
+    }
+    .layer:last-child { border-bottom: none; }
+    .layer-num {
+      width: 28px;
+      height: 28px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #555;
+      flex-shrink: 0;
+    }
+    .layer-text h4 { font-size: 15px; font-weight: 600; color: #f5f5f5; margin-bottom: 2px; }
+    .layer-text p { font-size: 13px; color: #555; }
+
+    .chapters { padding: 64px 0; }
+    .chapters h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #f5f5f5;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+    }
+    .chapter-list { list-style: none; }
+    .chapter-list li {
+      display: flex;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid #141414;
+      align-items: flex-start;
+    }
+    .chapter-list li:last-child { border-bottom: none; }
+    .ch-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      min-width: 32px;
+      padding-top: 2px;
+      letter-spacing: 0.05em;
+    }
+    .ch-content h3 { font-size: 16px; font-weight: 600; color: #f5f5f5; margin-bottom: 4px; }
+    .ch-content p { font-size: 14px; color: #555; }
+
+    .includes { padding: 64px 0; }
+    .includes h2 { font-size: 28px; font-weight: 700; color: #f5f5f5; margin-bottom: 32px; letter-spacing: -0.02em; }
+    .include-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .include-item {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+      padding: 20px;
+    }
+    .include-item .icon { font-size: 20px; margin-bottom: 8px; }
+    .include-item h4 { font-size: 14px; font-weight: 600; color: #f5f5f5; margin-bottom: 4px; }
+    .include-item p { font-size: 13px; color: #555; }
+
+    .guarantee {
+      background: #0f0f0f;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      margin: 64px 0;
+    }
+    .guarantee h3 { font-size: 22px; font-weight: 700; color: #f5f5f5; margin-bottom: 12px; }
+    .guarantee p { font-size: 15px; color: #666; max-width: 480px; margin: 0 auto; }
+
+    .bottom-cta { text-align: center; padding: 64px 0 100px; }
+    .bottom-cta h2 { font-size: 32px; font-weight: 700; color: #f5f5f5; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .bottom-cta p { color: #555; font-size: 15px; margin-bottom: 36px; }
+    .bottom-cta .price { font-size: 48px; margin-bottom: 24px; }
+
+    footer { border-top: 1px solid #141414; padding: 24px 0; text-align: center; }
+    footer p { font-size: 13px; color: #333; }
+
+    @media (max-width: 560px) {
+      .include-grid { grid-template-columns: 1fr; }
+      .price { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Hero -->
+    <section class="hero">
+      <span class="label">Behike Digital Products</span>
+      <h1>Passive Income<br>Architecture</h1>
+      <p class="subtitle">Build Systems That Generate Revenue While You Sleep</p>
+      <div class="price-block">
+        <div class="price">$24.99</div>
+        <div class="price-note">Instant PDF download. No subscription.</div>
+      </div>
+      <a href="#" class="cta-btn">Get Instant Access</a>
+    </section>
+
+    <hr>
+
+    <!-- Problem / Reframe -->
+    <section class="section">
+      <div class="section-label">The Reality</div>
+      <h2>Passive income is not a fantasy.<br>It is an engineering challenge.</h2>
+      <p>Every passive income stream requires real upfront work. The difference between active and passive income is not whether work is required. It is when. Active income trades time for money in real time. Passive income front-loads the work and distributes the revenue over years.</p>
+      <p>Most attempts fail because people build the product and nothing else. A passive income stream is a product plus a traffic system plus a conversion system plus an automated delivery mechanism. This guide builds the whole architecture.</p>
+
+      <div class="math-block">
+        <div class="math-label">The Math on One Product</div>
+        <div class="math-row">
+          <span class="label">500 monthly visitors</span>
+          <span class="value">from one traffic source</span>
+        </div>
+        <div class="math-row">
+          <span class="label">2% conversion rate</span>
+          <span class="value">10 buyers/month</span>
+        </div>
+        <div class="math-row">
+          <span class="label">$47 product price</span>
+          <span class="value">$470/month</span>
+        </div>
+        <div class="math-row math-total">
+          <span class="label">After 12 months</span>
+          <span class="value">$5,640 from one product built once</span>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- Five Layers -->
+    <section class="section">
+      <div class="section-label">The Framework</div>
+      <h2>The Five Layers of Passive Income Architecture</h2>
+      <div class="five-layers">
+        <div class="layer">
+          <div class="layer-num">1</div>
+          <div class="layer-text">
+            <h4>Traffic</h4>
+            <p>How people discover your product without your real-time involvement.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-num">2</div>
+          <div class="layer-text">
+            <h4>Lead Capture</h4>
+            <p>How you collect information and build a relationship before the sale.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-num">3</div>
+          <div class="layer-text">
+            <h4>Conversion</h4>
+            <p>How you turn interested people into buyers with automated sequences.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-num">4</div>
+          <div class="layer-text">
+            <h4>Delivery</h4>
+            <p>How the product reaches the customer without your involvement.</p>
+          </div>
+        </div>
+        <div class="layer">
+          <div class="layer-num">5</div>
+          <div class="layer-text">
+            <h4>Maintenance</h4>
+            <p>What minimal ongoing attention keeps the system healthy and performing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- Chapters -->
+    <section class="chapters">
+      <h2>What You Will Learn</h2>
+      <ul class="chapter-list">
+        <li>
+          <span class="ch-num">01</span>
+          <div class="ch-content">
+            <h3>The Architecture Mindset</h3>
+            <p>Why most passive income attempts fail and how front-loading effort changes the math entirely.</p>
+          </div>
+        </li>
+        <li>
+          <span class="ch-num">02</span>
+          <div class="ch-content">
+            <h3>Digital Products as the Foundation</h3>
+            <p>Productizing your knowledge, pricing for perceived value, and building a suite instead of a single product.</p>
+          </div>
+        </li>
+        <li>
+          <span class="ch-num">03</span>
+          <div class="ch-content">
+            <h3>Traffic Systems That Work Without You</h3>
+            <p>SEO as a long-term asset, email automation as evergreen conversion, and content that compounds.</p>
+          </div>
+        </li>
+        <li>
+          <span class="ch-num">04</span>
+          <div class="ch-content">
+            <h3>Automated Conversion Systems</h3>
+            <p>The funnel as infrastructure, lead magnets that set up the sale, and sales pages that close without you.</p>
+          </div>
+        </li>
+        <li>
+          <span class="ch-num">05</span>
+          <div class="ch-content">
+            <h3>Diversifying Your Passive Income Streams</h3>
+            <p>The rule of three streams, affiliate income done right, licensing, and subscriptions.</p>
+          </div>
+        </li>
+        <li>
+          <span class="ch-num">06</span>
+          <div class="ch-content">
+            <h3>Maintaining and Scaling Your Architecture</h3>
+            <p>The quarterly optimization cycle, when to add new streams, and building toward a portfolio that replaces active income.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <hr>
+
+    <!-- What's inside -->
+    <section class="includes">
+      <h2>What Is Included</h2>
+      <div class="include-grid">
+        <div class="include-item">
+          <div class="icon">&#9670;</div>
+          <h4>Complete PDF Guide</h4>
+          <p>6 chapters, architecture-first approach to building passive revenue.</p>
+        </div>
+        <div class="include-item">
+          <div class="icon">&#9670;</div>
+          <h4>The Five-Layer Checklist</h4>
+          <p>Audit your current or planned income stream against all five architecture layers.</p>
+        </div>
+        <div class="include-item">
+          <div class="icon">&#9670;</div>
+          <h4>Three-Stream Roadmap Template</h4>
+          <p>Plan and sequence your first three passive income streams with the right dependencies.</p>
+        </div>
+        <div class="include-item">
+          <div class="icon">&#9670;</div>
+          <h4>Action Checklist</h4>
+          <p>10 concrete tasks from product conception to automated delivery setup.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guarantee -->
+    <div class="guarantee">
+      <h3>30-Day Guarantee</h3>
+      <p>Read this guide and use the five-layer framework to evaluate or build your first passive income stream. If you do not find the architecture actionable and applicable to your specific situation within 30 days, reply for a full refund.</p>
+    </div>
+
+    <!-- Bottom CTA -->
+    <section class="bottom-cta">
+      <h2>Build the System Once.<br>Earn From It for Years.</h2>
+      <p>One purchase. Instant access. Yours to keep.</p>
+      <div class="price">$24.99</div>
+      <a href="#" class="cta-btn">Get Instant Access</a>
+    </section>
+
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

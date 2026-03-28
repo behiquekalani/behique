@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Thumbnail Generator - Behike</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#141414;--border:#222;--text:#fff;--muted:#888;--accent:#0066ff}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+header{text-align:center;padding:20px 0}
+header h1{font-size:1.5em;font-weight:700}
+header h1 span{color:var(--accent)}
+header p{color:var(--muted);font-size:.85em;margin-top:4px}
+
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+
+.editor{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.editor label{display:block;font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;margin-top:12px}
+.editor label:first-child{margin-top:0}
+.editor input,.editor textarea,.editor select{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.9em;font-family:inherit}
+.editor textarea{min-height:60px;resize:vertical}
+.editor input:focus,.editor textarea:focus,.editor select:focus{outline:none;border-color:var(--accent)}
+.color-row{display:flex;gap:8px;align-items:center}
+.color-row input[type="color"]{width:40px;height:32px;border:1px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;background:var(--bg)}
+.color-row small{color:var(--muted);font-size:.7em}
+.templates{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tmpl{padding:5px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:.7em;cursor:pointer;font-family:inherit;transition:all .15s}
+.tmpl:hover,.tmpl.active{border-color:var(--accent);color:var(--accent)}
+
+/* Thumbnail preview */
+.preview-section{position:sticky;top:20px}
+.thumb-wrap{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;position:relative;box-shadow:0 4px 30px rgba(0,0,0,.5)}
+.thumb-canvas{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+.thumb-canvas .main-text{font-weight:900;line-height:1.05;position:relative;z-index:2;text-shadow:3px 3px 6px rgba(0,0,0,.7)}
+.thumb-canvas .sub-text{position:absolute;bottom:16px;right:20px;font-size:.5em;font-weight:700;z-index:2;text-shadow:2px 2px 4px rgba(0,0,0,.7)}
+.thumb-canvas .badge-text{position:absolute;top:16px;left:16px;padding:4px 12px;border-radius:6px;font-size:.4em;font-weight:700;z-index:2}
+.thumb-canvas .overlay{position:absolute;inset:0;z-index:1}
+
+.yt-meta{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:8px}
+.yt-avatar{width:36px;height:36px;border-radius:50%;background:#333;flex-shrink:0}
+.yt-info .title{font-size:.85em;font-weight:600;line-height:1.3}
+.yt-info .channel{color:var(--muted);font-size:.75em;margin-top:2px}
+
+.download-btn{display:block;width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:.95em;font-weight:600;cursor:pointer;margin-top:12px}
+.download-btn:hover{background:#0052cc}
+footer{text-align:center;padding:20px 0;color:var(--muted);font-size:.75em}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>YT Thumbnail <span>Generator</span></h1><p>Create click-worthy thumbnails for your videos.</p></header>
+
+<div class="layout">
+  <div class="editor">
+    <label>Template</label>
+    <div class="templates">
+      <button class="tmpl active" onclick="loadTmpl('shock')">Shock Value</button>
+      <button class="tmpl" onclick="loadTmpl('how')">How-To</button>
+      <button class="tmpl" onclick="loadTmpl('money')">Money</button>
+      <button class="tmpl" onclick="loadTmpl('vs')">VS / Compare</button>
+      <button class="tmpl" onclick="loadTmpl('list')">Listicle</button>
+      <button class="tmpl" onclick="loadTmpl('dark')">Dark/Warning</button>
+    </div>
+
+    <label>Main Text (2-5 words)</label>
+    <input type="text" id="mainText" value="I QUIT MY JOB" oninput="render()">
+
+    <label>Sub Text (optional)</label>
+    <input type="text" id="subText" value="for AI" oninput="render()">
+
+    <label>Badge (top-left)</label>
+    <input type="text" id="badgeText" value="STORY TIME" oninput="render()">
+
+    <label>Video Title (preview)</label>
+    <input type="text" id="videoTitle" value="I Quit My Engineering Degree to Build AI Products" oninput="render()">
+
+    <label>Colors</label>
+    <div class="color-row">
+      <div><small>BG</small><input type="color" id="bgCol" value="#0a0a0a" oninput="render()"></div>
+      <div><small>Text</small><input type="color" id="textCol" value="#ffffff" oninput="render()"></div>
+      <div><small>Accent</small><input type="color" id="accentCol" value="#ff0000" oninput="render()"></div>
+      <div><small>Badge</small><input type="color" id="badgeCol" value="#ff0000" oninput="render()"></div>
+    </div>
+
+    <label>Font Size</label>
+    <input type="range" id="fontSize" min="28" max="72" value="48" oninput="render()" style="appearance:auto">
+
+    <label>Overlay Style</label>
+    <select id="overlay" onchange="render()">
+      <option value="none">None</option>
+      <option value="gradient">Gradient (bottom dark)</option>
+      <option value="vignette">Vignette</option>
+      <option value="split">Split (left dark)</option>
+      <option value="diagonal" selected>Diagonal</option>
+    </select>
+
+    <label>Text Align</label>
+    <select id="textAlign" onchange="render()">
+      <option value="center">Center</option>
+      <option value="left">Left</option>
+      <option value="right">Right</option>
+    </select>
+  </div>
+
+  <div class="preview-section">
+    <div class="thumb-wrap">
+      <div class="thumb-canvas" id="canvas">
+        <div class="overlay" id="overlayEl"></div>
+        <div class="badge-text" id="badgeEl"></div>
+        <div class="main-text" id="mainEl"></div>
+        <div class="sub-text" id="subEl"></div>
+      </div>
+    </div>
+    <div class="yt-meta">
+      <div class="yt-avatar"></div>
+      <div class="yt-info">
+        <div class="title" id="ytTitle"></div>
+        <div class="channel">Behike AI | 1.2K views | 2 hours ago</div>
+      </div>
+    </div>
+    <button class="download-btn" onclick="downloadThumb()">Download Thumbnail (1280x720)</button>
+  </div>
+</div>
+<footer>Behike Tools. For best results, add a face photo in your video editor.</footer>
+</div>
+
+<script>
+const TEMPLATES={
+  shock:{main:'I QUIT MY JOB',sub:'for AI',badge:'STORY TIME',bg:'#0a0a0a',text:'#ffffff',accent:'#ff0000',badgeBg:'#ff0000',overlay:'diagonal',title:'I Quit My Engineering Degree to Build AI Products'},
+  how:{main:'HOW I BUILT',sub:'an AI team for $0',badge:'TUTORIAL',bg:'#0a1a2e',text:'#ffffff',accent:'#0066ff',badgeBg:'#0066ff',overlay:'gradient',title:'How I Built a 6-Agent AI System That Costs Nothing'},
+  money:{main:'$10K/MONTH',sub:'with AI products',badge:'RESULTS',bg:'#0a0a0a',text:'#ffffff',accent:'#00c853',badgeBg:'#00c853',overlay:'vignette',title:'How to Make $10K/Month Selling AI Digital Products'},
+  vs:{main:'CLAUDE vs GPT',sub:'which one wins?',badge:'COMPARISON',bg:'#1a0a2e',text:'#ffffff',accent:'#8b5cf6',badgeBg:'#8b5cf6',overlay:'split',title:'Claude vs ChatGPT: Which AI Is Actually Better in 2026?'},
+  list:{main:'5 AI TOOLS',sub:'you need right now',badge:'FREE TOOLS',bg:'#0a1a0a',text:'#ffffff',accent:'#00c853',badgeBg:'#00c853',overlay:'diagonal',title:'5 Free AI Tools That Will Change How You Work'},
+  dark:{main:'YOUR DATA',sub:'is being stolen',badge:'WARNING',bg:'#1a0000',text:'#ffffff',accent:'#ff4444',badgeBg:'#ff4444',overlay:'vignette',title:'Your AI Tools Are Leaking Your Data (Here Is How to Stop It)'}
+};
+
+function loadTmpl(t){
+  const d=TEMPLATES[t];
+  document.getElementById('mainText').value=d.main;
+  document.getElementById('subText').value=d.sub;
+  document.getElementById('badgeText').value=d.badge;
+  document.getElementById('videoTitle').value=d.title;
+  document.getElementById('bgCol').value=d.bg;
+  document.getElementById('textCol').value=d.text;
+  document.getElementById('accentCol').value=d.accent;
+  document.getElementById('badgeCol').value=d.badgeBg;
+  document.getElementById('overlay').value=d.overlay;
+  document.querySelectorAll('.tmpl').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+function render(){
+  const main=document.getElementById('mainText').value;
+  const sub=document.getElementById('subText').value;
+  const badge=document.getElementById('badgeText').value;
+  const bg=document.getElementById('bgCol').value;
+  const tc=document.getElementById('textCol').value;
+  const ac=document.getElementById('accentCol').value;
+  const bc=document.getElementById('badgeCol').value;
+  const fs=document.getElementById('fontSize').value;
+  const ov=document.getElementById('overlay').value;
+  const align=document.getElementById('textAlign').value;
+
+  const canvas=document.getElementById('canvas');
+  const overlayEl=document.getElementById('overlayEl');
+  const mainEl=document.getElementById('mainEl');
+  const subEl=document.getElementById('subEl');
+  const badgeEl=document.getElementById('badgeEl');
+
+  canvas.style.background=bg;
+  canvas.style.justifyContent=align==='left'?'flex-start':align==='right'?'flex-end':'center';
+  canvas.style.textAlign=align;
+
+  mainEl.textContent=main;
+  mainEl.style.fontSize=fs+'px';
+  mainEl.style.color=tc;
+
+  subEl.textContent=sub;
+  subEl.style.color=ac;
+
+  badgeEl.textContent=badge;
+  badgeEl.style.background=bc;
+  badgeEl.style.color='#fff';
+  badgeEl.style.display=badge?'block':'none';
+
+  // Overlay
+  switch(ov){
+    case'gradient':overlayEl.style.background='linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%)';break;
+    case'vignette':overlayEl.style.background='radial-gradient(circle,transparent 40%,rgba(0,0,0,.6) 100%)';break;
+    case'split':overlayEl.style.background='linear-gradient(to right,rgba(0,0,0,.6) 0%,rgba(0,0,0,.6) 45%,transparent 55%)';break;
+    case'diagonal':overlayEl.style.background=`linear-gradient(135deg,${ac}30 0%,transparent 50%,${bg}90 100%)`;break;
+    default:overlayEl.style.background='none';
+  }
+
+  document.getElementById('ytTitle').textContent=document.getElementById('videoTitle').value;
+}
+
+function downloadThumb(){
+  // Create a canvas element for download
+  const c=document.createElement('canvas');
+  c.width=1280;c.height=720;
+  const ctx=c.getContext('2d');
+  const bg=document.getElementById('bgCol').value;
+  const tc=document.getElementById('textCol').value;
+  const ac=document.getElementById('accentCol').value;
+  const bc=document.getElementById('badgeCol').value;
+  const main=document.getElementById('mainText').value;
+  const sub=document.getElementById('subText').value;
+  const badge=document.getElementById('badgeText').value;
+
+  // Background
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,1280,720);
+
+  // Overlay
+  const ov=document.getElementById('overlay').value;
+  if(ov==='gradient'){
+    const g=ctx.createLinearGradient(0,720,0,300);
+    g.addColorStop(0,'rgba(0,0,0,0.7)');g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,1280,720);
+  }else if(ov==='diagonal'){
+    const g=ctx.createLinearGradient(0,0,1280,720);
+    g.addColorStop(0,ac+'50');g.addColorStop(0.5,'transparent');g.addColorStop(1,bg+'E0');
+    ctx.fillStyle=g;ctx.fillRect(0,0,1280,720);
+  }
+
+  // Badge
+  if(badge){
+    ctx.fillStyle=bc;
+    const bw=ctx.measureText(badge).width+40;
+    ctx.beginPath();
+    ctx.roundRect(30,25,Math.max(bw,100),32,8);
+    ctx.fill();
+    ctx.fillStyle='#fff';
+    ctx.font='bold 18px -apple-system, sans-serif';
+    ctx.fillText(badge,50,48);
+  }
+
+  // Main text
+  ctx.fillStyle=tc;
+  ctx.font=`900 ${Math.round(parseInt(document.getElementById('fontSize').value)*1.5)}px -apple-system, sans-serif`;
+  ctx.textAlign='center';
+  ctx.shadowColor='rgba(0,0,0,0.7)';
+  ctx.shadowBlur=10;
+  ctx.shadowOffsetX=4;ctx.shadowOffsetY=4;
+
+  // Word wrap
+  const words=main.split(' ');
+  const maxW=1100;
+  let lines=[];let line='';
+  words.forEach(w=>{
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW){lines.push(line);line=w}
+    else line=test;
+  });
+  if(line)lines.push(line);
+
+  const lineH=Math.round(parseInt(document.getElementById('fontSize').value)*1.6);
+  const startY=360-(lines.length*lineH/2);
+  lines.forEach((l,i)=>ctx.fillText(l,640,startY+i*lineH));
+
+  // Sub text
+  if(sub){
+    ctx.fillStyle=ac;
+    ctx.font='bold 36px -apple-system, sans-serif';
+    ctx.shadowBlur=6;
+    ctx.fillText(sub,640,startY+lines.length*lineH+20);
+  }
+
+  ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;
+
+  // Download
+  const link=document.createElement('a');
+  link.download='thumbnail.png';
+  link.href=c.toDataURL('image/png');
+  link.click();
+}
+
+render();
+</script>
+</body>
+</html>

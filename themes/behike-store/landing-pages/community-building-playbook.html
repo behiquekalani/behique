@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Building Playbook — Behike</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #000000;
+    color: #F5F5F7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 0;
+  }
+  nav .nav-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  nav .brand { font-size: 15px; font-weight: 600; color: #F5F5F7; letter-spacing: 0.02em; }
+  nav .nav-cta {
+    background: #30D158;
+    color: #000;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  nav .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    padding: 100px 0 80px;
+    text-align: center;
+  }
+  .hero .price-badge {
+    display: inline-block;
+    background: rgba(10,132,255,0.15);
+    border: 1px solid rgba(10,132,255,0.35);
+    color: #0A84FF;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 980px;
+    margin-bottom: 28px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 5.5vw, 60px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 22px;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero .tagline {
+    font-size: clamp(18px, 2.2vw, 22px);
+    color: rgba(245,245,247,0.65);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    font-weight: 400;
+  }
+  .hero .cta-btn {
+    display: inline-block;
+    background: #30D158;
+    color: #000;
+    font-size: 17px;
+    font-weight: 600;
+    padding: 16px 40px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .hero .cta-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* SECTION BASE */
+  section { padding: 80px 0; }
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0A84FF;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 48px;
+  }
+
+  /* PROBLEM */
+  .problem { background: #0A0A0A; }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .problem-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .problem-card.visible { opacity: 1; transform: translateY(0); }
+  .problem-card .icon { font-size: 28px; margin-bottom: 16px; }
+  .problem-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+  .problem-card p { color: rgba(245,245,247,0.6); font-size: 15px; }
+
+  /* WHAT'S INSIDE */
+  .inside { }
+  .chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .chapter-item {
+    background: rgba(10,132,255,0.06);
+    border: 1px solid rgba(10,132,255,0.18);
+    border-radius: 12px;
+    padding: 24px 28px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .chapter-item.visible { opacity: 1; transform: translateY(0); }
+  .chapter-item .ch-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0A84FF;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .chapter-item h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .chapter-item p { font-size: 14px; color: rgba(245,245,247,0.55); }
+
+  /* WHO IT'S FOR */
+  .for-section { background: #0A0A0A; }
+  .for-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .for-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 24px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .for-item.visible { opacity: 1; transform: translateY(0); }
+  .for-item .check { color: #30D158; font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .for-item p { font-size: 15px; color: rgba(245,245,247,0.8); }
+
+  /* TESTIMONIALS */
+  .testimonials { }
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .testimonial-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .testimonial-card.visible { opacity: 1; transform: translateY(0); }
+  .testimonial-card .stars { color: #FFD60A; margin-bottom: 14px; font-size: 15px; }
+  .testimonial-card blockquote { font-size: 15px; color: rgba(245,245,247,0.75); margin-bottom: 18px; font-style: italic; }
+  .testimonial-card .author { font-size: 13px; font-weight: 600; color: #F5F5F7; }
+  .testimonial-card .role { font-size: 12px; color: rgba(245,245,247,0.4); }
+
+  /* PRICING */
+  .pricing { background: #0A0A0A; }
+  .pricing-box {
+    max-width: 520px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 48px 44px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .pricing-box.visible { opacity: 1; transform: translateY(0); }
+  .pricing-box .product-name { font-size: 13px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #0A84FF; margin-bottom: 12px; }
+  .pricing-box .price { font-size: 56px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 6px; }
+  .pricing-box .price-note { font-size: 14px; color: rgba(245,245,247,0.4); margin-bottom: 32px; }
+  .pricing-box .includes { list-style: none; text-align: left; margin-bottom: 36px; }
+  .pricing-box .includes li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 15px;
+    color: rgba(245,245,247,0.75);
+  }
+  .pricing-box .includes li:last-child { border-bottom: none; }
+  .pricing-box .includes li .tick { color: #30D158; font-size: 16px; }
+  .pricing-box .buy-btn {
+    display: block;
+    background: #30D158;
+    color: #000;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 0;
+    border-radius: 980px;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .pricing-box .buy-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .guarantee {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(245,245,247,0.4);
+    line-height: 1.5;
+  }
+  .guarantee strong { color: rgba(245,245,247,0.65); }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    padding: 100px 0;
+  }
+  .final-cta h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    margin-bottom: 20px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .final-cta p {
+    font-size: 18px;
+    color: rgba(245,245,247,0.55);
+    margin-bottom: 36px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .final-cta .cta-btn {
+    display: inline-block;
+    background: #30D158;
+    color: #000;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 48px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .final-cta .cta-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 36px 0;
+    text-align: center;
+  }
+  footer p { font-size: 13px; color: rgba(245,245,247,0.3); }
+  footer a { color: rgba(245,245,247,0.4); text-decoration: none; }
+  footer a:hover { color: rgba(245,245,247,0.7); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="brand">Behike</span>
+    <a href="#pricing" class="nav-cta">Get it — $22.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="price-badge">$22.99 — Instant Access</div>
+    <h1>Build an Online Community That Generates Recurring Revenue</h1>
+    <p class="tagline">Build an online community that generates recurring revenue.</p>
+    <a href="#pricing" class="cta-btn">Get the Playbook</a>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">Most online communities die within 90 days.</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">&#9762;</div>
+        <h3>Wrong platform, wrong audience</h3>
+        <p>You built on a platform that owns your relationship with members. When reach drops, your community disappears with it.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">&#9762;</div>
+        <h3>No path from free to paid</h3>
+        <p>You have active members who like your content but zero structure to convert that attention into consistent income.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">&#9762;</div>
+        <h3>Trying to do too much too soon</h3>
+        <p>The instinct is to build everything at once. Channels, tiers, events, content. The result is a complicated ghost town.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section class="inside">
+  <div class="container">
+    <div class="section-label">What's Inside</div>
+    <h2 class="section-title">A system for building communities that pay.</h2>
+    <div class="chapter-grid">
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 01</div>
+        <h4>Platform Selection Framework</h4>
+        <p>How to choose between Discord, Circle, Skool, and Telegram based on your specific audience type and monetization goal.</p>
+      </div>
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 02</div>
+        <h4>Minimum Viable Community</h4>
+        <p>The exact structure you need on day one. Three channels, one weekly ritual, one clear transformation. Nothing else.</p>
+      </div>
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 03</div>
+        <h4>Pricing Tiers That Convert</h4>
+        <p>How to structure free, core, and premium tiers so members naturally upgrade over time without feeling pressured.</p>
+      </div>
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 04</div>
+        <h4>Free-to-Paid Flywheel</h4>
+        <p>The content and engagement loop that turns lurkers into paying members, and paying members into advocates.</p>
+      </div>
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 05</div>
+        <h4>Retention Over Acquisition</h4>
+        <p>Why keeping ten members is worth more than finding a hundred new ones, and the weekly actions that make retention automatic.</p>
+      </div>
+      <div class="chapter-item">
+        <div class="ch-num">Chapter 06</div>
+        <h4>Scaling Without Burning Out</h4>
+        <p>The moderation model, community-led content systems, and automation tools that let the community run without you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="for-section">
+  <div class="container">
+    <div class="section-label">Who This Is For</div>
+    <h2 class="section-title">This is not for everyone.</h2>
+    <div class="for-grid">
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>Solopreneurs who want recurring revenue without launching a new product every month</p>
+      </div>
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>Creators with an audience who have never turned that attention into a paid membership</p>
+      </div>
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>Service providers who want to package their expertise into a scalable community offer</p>
+      </div>
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>Builders who tried a community once and watched it die because they had no flywheel</p>
+      </div>
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>People who want a business model that compounds over time instead of resetting every month</p>
+      </div>
+      <div class="for-item">
+        <span class="check">&#10003;</span>
+        <p>Anyone willing to do consistent, unglamorous community work for 90 days to build something durable</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="container">
+    <div class="section-label">Results</div>
+    <h2 class="section-title">From the people who used it.</h2>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"I had a Discord server with 200 people that was completely dead. Six weeks after using this playbook, I launched a paid tier and hit $800 MRR in the first month."</blockquote>
+        <div class="author">Marcus T.</div>
+        <div class="role">UX Designer, Community Builder</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"The free-to-paid flywheel section alone was worth ten times the price. I finally understood why my old community failed and exactly what to do differently."</blockquote>
+        <div class="author">Priya S.</div>
+        <div class="role">Independent Educator</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"I was overthinking the platform choice for months. The framework in chapter one made the decision clear in 20 minutes. Now I have 60 paying members and growing."</blockquote>
+        <div class="author">Dani R.</div>
+        <div class="role">Fitness Coach</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title" style="text-align:center;">One price. Permanent access.</h2>
+    <div class="pricing-box">
+      <div class="product-name">Community Building Playbook</div>
+      <div class="price">$22.99</div>
+      <div class="price-note">One-time payment. No subscription.</div>
+      <ul class="includes">
+        <li><span class="tick">&#10003;</span> Full Community Building Playbook (PDF)</li>
+        <li><span class="tick">&#10003;</span> Platform Selection Scorecard</li>
+        <li><span class="tick">&#10003;</span> Minimum Viable Community Template</li>
+        <li><span class="tick">&#10003;</span> Pricing Tier Worksheet</li>
+        <li><span class="tick">&#10003;</span> 90-Day Launch Timeline</li>
+        <li><span class="tick">&#10003;</span> Free-to-Paid Flywheel Diagram</li>
+      </ul>
+      <a href="#" class="buy-btn">Get Instant Access</a>
+      <p class="guarantee"><strong>30-day money-back guarantee.</strong> If you follow the playbook and it does not work, you get a full refund. No questions asked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2>Your community is either a revenue stream or a time drain. Choose.</h2>
+    <p>The playbook gives you the system. You provide the consistency.</p>
+    <a href="#pricing" class="cta-btn">Get the Playbook — $22.99</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>
+      &copy; 2026 Behike. All rights reserved.
+      &nbsp;&nbsp;
+      <a href="#">Privacy Policy</a>
+      &nbsp;&nbsp;
+      <a href="#">Terms</a>
+      &nbsp;&nbsp;
+      <a href="#">Contact</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  // IntersectionObserver scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll(
+    '.problem-card, .chapter-item, .for-item, .testimonial-card, .pricing-box'
+  ).forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

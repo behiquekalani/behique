@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADHD Finance: A Budgeting System Built for How Your Brain Works — Behike</title>
+  <meta name="description" content="Not another app that requires daily check-ins. A budgeting system built around five categories, a 24-hour impulse cooldown, and a 10-minute weekly review. $9.99.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface2: #111111;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --muted: #888888;
+      --accent: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --red: #FF453A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(245,245,247,0.07);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-cta {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.88; transform: scale(1.02); }
+
+    /* Hero */
+    .hero {
+      padding: 148px 24px 96px;
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10,132,255,0.08);
+      border: 1px solid rgba(10,132,255,0.2);
+      border-radius: 980px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 5vw, 58px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.88; transform: scale(1.02); }
+
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: rgba(245,245,247,0.3); }
+
+    .hero-meta {
+      margin-top: 28px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Shared section */
+    .section {
+      padding: 80px 24px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* Problem cards */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      padding: 36px 32px;
+    }
+
+    .problem-icon {
+      font-size: 22px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .problem-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .problem-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(245,245,247,0.14);
+      transform: translateY(-2px);
+    }
+
+    .feature-accent {
+      width: 4px;
+      height: 32px;
+      border-radius: 2px;
+      background: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* What's inside */
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .inside-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .inside-card:hover { border-color: rgba(245,245,247,0.14); }
+
+    .inside-num {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .inside-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .inside-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Design decisions */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .decision-item {
+      background: var(--surface);
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .decision-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.4;
+    }
+
+    .decision-text {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .decision-text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Who it's for */
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .profile-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(10,132,255,0.12);
+      border: 1px solid rgba(10,132,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .profile-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .profile-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Value stack */
+    .value-stack {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .value-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 32px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .value-row:last-child { border-bottom: none; }
+    .value-item-name { color: var(--muted); }
+    .value-price { font-weight: 600; color: var(--text); }
+
+    .value-row.total-row { background: rgba(255,255,255,0.02); }
+
+    .value-row.total-row .value-item-name {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .value-row.total-row .value-price {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .value-row.final-row {
+      background: rgba(10,132,255,0.06);
+      padding: 24px 32px;
+    }
+
+    .value-row.final-row .value-item-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .value-row.final-row .value-price {
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    /* FAQ */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .faq-item {
+      background: var(--surface);
+      padding: 28px 32px;
+    }
+
+    .faq-q {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .faq-a {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* CTA block */
+    .cta-section {
+      padding: 80px 24px;
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    .cta-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .cta-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    /* Cross-sell */
+    .crosssell-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .crosssell-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 28px;
+      display: block;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .crosssell-card:hover {
+      border-color: rgba(245,245,247,0.14);
+      transform: translateY(-2px);
+    }
+
+    .crosssell-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .crosssell-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .crosssell-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .crosssell-price {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 32px;
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--muted);
+      width: 100%;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+
+      .problem-grid,
+      .features-grid,
+      .inside-grid,
+      .profiles-grid,
+      .crosssell-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .decision-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .section { padding: 60px 20px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero { padding: 120px 20px 72px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="https://behikeai.gumroad.com" class="nav-logo">Behike</a>
+    <a href="https://behikeai.gumroad.com/l/adhd-finance" class="nav-cta">Get the guide &mdash; $9.99</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      Available now
+    </div>
+    <h1>A budgeting system designed for <span>ADHD brains.</span></h1>
+    <p class="hero-sub">Not another app that requires daily check-ins. A spreadsheet that works with how your brain actually handles money.</p>
+    <div class="hero-actions">
+      <a href="https://behikeai.gumroad.com/l/adhd-finance" class="btn-primary">Get ADHD Finance &mdash; $9.99</a>
+      <a href="https://behikeai.gumroad.com" class="btn-secondary">Browse all products</a>
+    </div>
+    <div class="hero-meta">
+      <span>PDF + 3 templates</span>
+      <span>One-time purchase</span>
+      <span>Instant download</span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- The problem -->
+  <section class="section">
+    <p class="section-label">The problem</p>
+    <h2 class="section-title">Every other system was built for a different brain.</h2>
+    <p class="section-sub">ADHD is not a discipline problem. Budget apps that fail you are a design problem.</p>
+    <div class="problem-grid reveal">
+      <div class="problem-card">
+        <span class="problem-icon">&#9999;&#65039;</span>
+        <h3 class="problem-title">Standard budgeting apps assume you will remember to open them.</h3>
+        <p class="problem-desc">YNAB, Mint, and spreadsheet templates require you to log in regularly, categorize every transaction, and feel motivated by watching numbers move. That assumption does not describe you.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">&#128368;</span>
+        <h3 class="problem-title">ADHD makes time blindness a financial problem.</h3>
+        <p class="problem-desc">The ADHD brain has a weaker response to delayed consequences. Future-you running out of money feels abstract. Present-you wanting something feels urgent and real. Systems built around delayed-reward motivation miss you entirely.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">&#128260;</span>
+        <h3 class="problem-title">The shame spiral: miss one week, quit the system entirely.</h3>
+        <p class="problem-desc">Most budget systems have no recovery mechanism. You fall behind, the gap feels too big to close, and the system dies. That is not a character flaw. It is a predictable output of bad system design.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- How this is different -->
+  <section class="section">
+    <p class="section-label">How this is different</p>
+    <h2 class="section-title">Built around four principles that match your neurotype.</h2>
+    <p class="section-sub">Each structural decision exists because of how the ADHD brain actually works, not how it is supposed to work.</p>
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feature-accent"></div>
+        <h3 class="feature-title">Weekly, not daily.</h3>
+        <p class="feature-desc">Daily check-ins fail because one missed day feels like failure. This system runs on a 10-minute weekly review. One session per week is a commitment most ADHD brains can keep. Three bad days do not break the whole month.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-accent" style="background: var(--green);"></div>
+        <h3 class="feature-title">Visual, not numerical.</h3>
+        <p class="feature-desc">Five categories, color-coded. You see where your money goes without parsing rows of figures. The goal is instant comprehension, not accounting precision. You understand your budget in under thirty seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-accent" style="background: var(--amber);"></div>
+        <h3 class="feature-title">Forgiveness-first.</h3>
+        <p class="feature-desc">One bad week does not break the system. The recovery rule: never miss two reviews in a row. One miss is a gap. Two misses is the start of abandonment. The rule gives you an out without letting the whole thing collapse.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-accent" style="background: var(--red);"></div>
+        <h3 class="feature-title">Crisis mode.</h3>
+        <p class="feature-desc">A separate view for when everything goes wrong. Rent due, unexpected expense, income disruption. The crisis view strips the system to the minimum needed to survive the month, so you do not have to maintain everything when you are in survival mode.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- What's inside -->
+  <section class="section">
+    <p class="section-label">What's inside</p>
+    <h2 class="section-title">Seven chapters and three templates.</h2>
+    <p class="section-sub">Each chapter is a self-contained module. Read one, implement it, come back when you are ready for the next.</p>
+    <div class="inside-grid reveal">
+      <div class="inside-card">
+        <p class="inside-num">Chapter 1</p>
+        <h3 class="inside-title">Why every budget app has failed you.</h3>
+        <p class="inside-desc">Four documented patterns in ADHD brains that make standard budgeting systems break. Understanding the root cause is the first step to picking a system that does not repeat the same failure.</p>
+      </div>
+      <div class="inside-card">
+        <p class="inside-num">Chapter 2</p>
+        <h3 class="inside-title">The five categories.</h3>
+        <p class="inside-desc">Needs, Wants, Savings, Debt, Fun. Every expense goes into one of five buckets. No subcategories, no tags, no overthinking. Fewer categories mean more compliance. You will not use a forty-category system, no matter how logical it looks on setup day.</p>
+      </div>
+      <div class="inside-card">
+        <p class="inside-num">Chapter 3</p>
+        <h3 class="inside-title">The impulse cooldown protocol.</h3>
+        <p class="inside-desc">Any unplanned purchase over $20 gets a 24-hour pause. You do not decide not to buy it. You decide to wait. After one day, most impulse purchases feel optional. The system does the filtering without requiring willpower.</p>
+      </div>
+      <div class="inside-card">
+        <p class="inside-num">Chapter 4</p>
+        <h3 class="inside-title">The subscription audit.</h3>
+        <p class="inside-desc">Subscriptions are the most common source of financial leakage for ADHD adults. Novelty fades, the charge keeps coming. A quarterly 15-minute audit catches what your working memory misses. Most first-time audits find two to four forgotten services.</p>
+      </div>
+      <div class="inside-card">
+        <p class="inside-num">Chapter 5</p>
+        <h3 class="inside-title">Zero-friction logging.</h3>
+        <p class="inside-desc">Every budget system lives or dies on one question: how hard is it to log an expense? This chapter brings it to one step. Amount, category, optional note. Under ten seconds per transaction. The habit of logging is worth more than any analysis layer built on top of it.</p>
+      </div>
+      <div class="inside-card">
+        <p class="inside-num">Chapters 6 and 7</p>
+        <h3 class="inside-title">The weekly review and dopamine-driven progress.</h3>
+        <p class="inside-desc">Chapter 6 is three questions, ten minutes, same time every week. Chapter 7 explains why standard budgets offer no immediate rewards and how to build a milestone reward structure that makes staying on track feel good rather than neutral.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ADHD design decisions -->
+  <section class="section">
+    <p class="section-label">Design decisions</p>
+    <h2 class="section-title">Why this system is built the way it is.</h2>
+    <p class="section-sub">Every structural choice has a documented reason. Here are four that matter most.</p>
+    <div class="decisions-list reveal">
+      <div class="decision-item">
+        <p class="decision-label">Five categories only</p>
+        <p class="decision-text"><strong>Cognitive load research is clear:</strong> the more categories in a tracking system, the less likely a person is to maintain it past month one. This effect is stronger with ADHD because every categorization decision is a small cognitive cost. With five categories, the question "where does this go?" almost always has an obvious answer in under three seconds.</p>
+      </div>
+      <div class="decision-item">
+        <p class="decision-label">24-hour rule</p>
+        <p class="decision-text"><strong>Willpower depletes faster for ADHD brains.</strong> The fix is structural, not motivational. A 24-hour pause before unplanned purchases over $20 removes the decision from the moment of maximum impulsivity. You do not say no. You say "ask me tomorrow." Research consistently shows desire drops significantly within hours of the initial trigger.</p>
+      </div>
+      <div class="decision-item">
+        <p class="decision-label">Weekly not monthly reviews</p>
+        <p class="decision-text"><strong>Monthly feedback loops are too long for ADHD brains.</strong> By the time you review, the data from week one is emotionally irrelevant. A week is short enough that the numbers are still fresh and short enough to course-correct before drift becomes a pattern.</p>
+      </div>
+      <div class="decision-item">
+        <p class="decision-label">Built-in recovery rule</p>
+        <p class="decision-text"><strong>Every system fails occasionally.</strong> Most systems have no protocol for what happens when they do, so a miss becomes a quit. This system has one rule: never miss two reviews in a row. One miss is data. Two misses is avoidance. The rule reframes the first miss as normal instead of shameful.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Who it's for -->
+  <section class="section">
+    <p class="section-label">Who it's for</p>
+    <h2 class="section-title">Three people this system fits.</h2>
+    <p class="section-sub">Written around real patterns, not idealized personas.</p>
+    <div class="profiles-grid reveal">
+      <div class="profile-card">
+        <div class="profile-avatar">&#127979;</div>
+        <h3 class="profile-title">The college student living alone for the first time.</h3>
+        <p class="profile-desc">First time managing rent, groceries, and subscriptions without anyone watching. Tried a budgeting app in orientation week, opened it twice. Needs something with low setup friction and a structure that does not require daily maintenance.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar">&#128187;</div>
+        <h3 class="profile-title">The freelancer with inconsistent income and variable medication.</h3>
+        <p class="profile-desc">Good months and slow months. Medication sometimes, not always. The fixed-budget model stops making sense when income varies week to week. Needs a system that adjusts to actual take-home instead of a static monthly number.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-avatar">&#128260;</div>
+        <h3 class="profile-title">The person who has tried and abandoned five other systems.</h3>
+        <p class="profile-desc">YNAB. Mint. A Reddit spreadsheet. Envelope budgeting. A paper journal. All started strong, all gone by week three. The problem was not discipline. The problem was that every system required a neurotype they do not have.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Value stack -->
+  <section class="section" style="text-align: center;">
+    <p class="section-label">What you get</p>
+    <h2 class="section-title">Everything included at one price.</h2>
+    <p class="section-sub" style="margin: 0 auto 40px;">The full guide plus all three templates. No upsell after checkout.</p>
+    <div class="value-stack reveal">
+      <div class="value-row">
+        <span class="value-item-name">ADHD Finance Guide (7 chapters)</span>
+        <span class="value-price">$9.99</span>
+      </div>
+      <div class="value-row">
+        <span class="value-item-name">Weekly budget tracking template</span>
+        <span class="value-price">$4.99</span>
+      </div>
+      <div class="value-row">
+        <span class="value-item-name">Crisis budget mode view</span>
+        <span class="value-price">$4.99</span>
+      </div>
+      <div class="value-row total-row">
+        <span class="value-item-name">Total value</span>
+        <span class="value-price">$19.97</span>
+      </div>
+      <div class="value-row final-row">
+        <span class="value-item-name">Your price</span>
+        <span class="value-price">$9.99</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- FAQ -->
+  <section class="section">
+    <p class="section-label">Questions</p>
+    <h2 class="section-title">Answered.</h2>
+    <p class="section-sub" style="margin-bottom: 40px;">Anything not here, reply to your Gumroad receipt.</p>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <h3 class="faq-q">Do I need Excel or a paid app?</h3>
+        <p class="faq-a">No. The guide works with any spreadsheet tool, including Google Sheets. The templates open anywhere. The zero-friction logging chapter works with a basic notes app or Telegram. Nothing requires a subscription.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-q">What happens if I miss a week?</h3>
+        <p class="faq-a">The system has a built-in recovery rule: never miss two reviews in a row. One missed week is normal. You do not try to reconstruct what happened. You start fresh from today. The guide covers this in Chapter 6.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-q">Does this only work for people with a formal ADHD diagnosis?</h3>
+        <p class="faq-a">No. The system is designed around documented ADHD patterns, but those same patterns appear in many people without a formal diagnosis. If you have started and abandoned multiple budgeting systems, that is the relevant qualifier.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-q">Does it work with variable or freelance income?</h3>
+        <p class="faq-a">Yes. The system works from weekly take-home numbers, not a fixed monthly salary. Chapter 2 explains how to set category targets when income varies. Slow weeks get a smaller budget. Good weeks give you more room.</p>
+      </div>
+      <div class="faq-item">
+        <h3 class="faq-q">What format is it?</h3>
+        <p class="faq-a">PDF. You get the full guide plus three templates as separate files. Everything downloads from your Gumroad receipt immediately after purchase. No login to a separate platform, no waiting.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <p class="section-label" style="text-align: center;">Get the guide</p>
+    <h2>A budget system you will actually use.</h2>
+    <p>Seven chapters. Three templates. One price. Built for the brain you have, not the one the other apps assumed you had.</p>
+    <p class="cta-price">$9.99</p>
+    <p class="cta-note">Instant download. PDF. One-time purchase, no subscription.</p>
+    <a href="https://behikeai.gumroad.com/l/adhd-finance" class="btn-primary" style="font-size: 17px; padding: 16px 40px;">Get ADHD Finance</a>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Cross-sell -->
+  <section class="section">
+    <p class="section-label">Also from Behike</p>
+    <h2 class="section-title">Related products.</h2>
+    <p class="section-sub" style="margin-bottom: 40px;">Other tools built for the same person.</p>
+    <div class="crosssell-grid reveal">
+      <a href="https://behikeai.gumroad.com" class="crosssell-card">
+        <p class="crosssell-label">Template</p>
+        <h3 class="crosssell-title">Budget Template</h3>
+        <p class="crosssell-desc">The five-category tracker as a standalone spreadsheet. Set targets, log expenses, run your weekly review. Works with Google Sheets or Excel.</p>
+        <span class="crosssell-price">View on Gumroad &rarr;</span>
+      </a>
+      <a href="https://behikeai.gumroad.com" class="crosssell-card">
+        <p class="crosssell-label">Template</p>
+        <h3 class="crosssell-title">Cash Flow Dashboard</h3>
+        <p class="crosssell-desc">A visual monthly view of income versus expenses. See the shape of your money over time without needing to build the formulas yourself.</p>
+        <span class="crosssell-price">View on Gumroad &rarr;</span>
+      </a>
+      <a href="https://behikeai.gumroad.com/l/solopreneur-os-live" class="crosssell-card">
+        <p class="crosssell-label">Dashboard</p>
+        <h3 class="crosssell-title">Solopreneur OS Live</h3>
+        <p class="crosssell-desc">Revenue tracking, habit streaks, content calendar, project status. One tab for your entire operation. Built with the same ADHD-aware design principles.</p>
+        <span class="crosssell-price">$29.99 &rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <span class="footer-logo">Behike</span>
+    <div class="footer-links">
+      <a href="https://behikeai.gumroad.com">Store</a>
+      <a href="https://instagram.com/behikeai">Instagram</a>
+      <a href="mailto:hello@behike.ai">Contact</a>
+    </div>
+    <p class="footer-copy">Copyright 2026 Behike. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

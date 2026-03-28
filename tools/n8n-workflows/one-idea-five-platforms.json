@@ -1,0 +1,389 @@
+{
+  "name": "One Idea to Five Platforms",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789001",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-cred-1",
+          "name": "Telegram Bot API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Write a single tweet (max 280 characters) based on this idea.\nBe direct. Lead with the insight, not the context.\nNo hashtags. No emojis. Sound like a founder, not a marketer.\n\nIdea: {{ $json.message.text }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 120
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789002",
+      "name": "OpenAI Twitter",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [460, 100],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Write a LinkedIn post (150-250 words) based on this idea.\nStart with a one-line hook. Follow with 3-4 short paragraphs.\nProfessional but personal. No buzzwords.\nEnd with a question that invites real responses.\n\nIdea: {{ $('Telegram Trigger').item.json.message.text }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 400
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789003",
+      "name": "OpenAI LinkedIn",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [460, 240],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Write an Instagram caption based on this idea.\n3 short paragraphs max. First line is the hook (under 8 words).\nNo hashtags in the caption. Sound personal, not promotional.\n\nIdea: {{ $('Telegram Trigger').item.json.message.text }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 300
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789004",
+      "name": "OpenAI Instagram",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [460, 380],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Write a YouTube video description (100-150 words) based on this idea as a video topic.\nFirst paragraph: what the video is about and why it matters.\nSecond paragraph: 3-4 bullet points of what the viewer will learn.\nEnd with a subscribe call to action (one direct sentence).\n\nIdea: {{ $('Telegram Trigger').item.json.message.text }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 350
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789005",
+      "name": "OpenAI YouTube",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [460, 520],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Write a newsletter paragraph (80-120 words) based on this idea.\nPersonal, thoughtful, honest. Like a letter to a smart friend.\nStart with a specific observation. Connect it to a bigger pattern.\nEnd with one practical insight.\n\nIdea: {{ $('Telegram Trigger').item.json.message.text }}",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 250
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789006",
+      "name": "OpenAI Newsletter",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [460, 660],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect outputs from all 5 OpenAI nodes\nconst originalIdea = $('Telegram Trigger').item.json.message.text;\nconst chatId = $('Telegram Trigger').item.json.message.chat.id;\n\nconst twitter = $('OpenAI Twitter').item.json.message?.content || $('OpenAI Twitter').item.json.choices?.[0]?.message?.content || '';\nconst linkedin = $('OpenAI LinkedIn').item.json.message?.content || $('OpenAI LinkedIn').item.json.choices?.[0]?.message?.content || '';\nconst instagram = $('OpenAI Instagram').item.json.message?.content || $('OpenAI Instagram').item.json.choices?.[0]?.message?.content || '';\nconst youtube = $('OpenAI YouTube').item.json.message?.content || $('OpenAI YouTube').item.json.choices?.[0]?.message?.content || '';\nconst newsletter = $('OpenAI Newsletter').item.json.message?.content || $('OpenAI Newsletter').item.json.choices?.[0]?.message?.content || '';\n\nconst structured = {\n  original_idea: originalIdea,\n  chat_id: chatId,\n  timestamp: new Date().toISOString(),\n  twitter,\n  linkedin,\n  instagram,\n  youtube,\n  newsletter\n};\n\n// Build Telegram reply message (split if needed)\nconst telegramMsg = [\n  `*Your idea:* ${originalIdea}`,\n  '',\n  '*TWITTER/X:*',\n  twitter,\n  '',\n  '*LINKEDIN:*',\n  linkedin,\n  '',\n  '*INSTAGRAM:*',\n  instagram,\n  '',\n  '*YOUTUBE:*',\n  youtube,\n  '',\n  '*NEWSLETTER:*',\n  newsletter\n].join('\\n');\n\nreturn [{ json: { ...structured, telegram_reply: telegramMsg } }];"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789007",
+      "name": "Format All 5",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Original Idea": "={{ $json.original_idea }}",
+            "Twitter": "={{ $json.twitter }}",
+            "LinkedIn": "={{ $json.linkedin }}",
+            "Instagram": "={{ $json.instagram }}",
+            "YouTube": "={{ $json.youtube }}",
+            "Newsletter": "={{ $json.newsletter }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789008",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [920, 400],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gsheets-cred-1",
+          "name": "Google Sheets Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Format All 5').item.json.chat_id }}",
+        "text": "={{ $('Format All 5').item.json.telegram_reply.substring(0, 4000) }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789009",
+      "name": "Telegram Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1140, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-cred-1",
+          "name": "Telegram Bot API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Twitter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI LinkedIn",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI Instagram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI YouTube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Twitter": {
+      "main": [
+        [
+          {
+            "node": "Format All 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Format All 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Instagram": {
+      "main": [
+        [
+          {
+            "node": "Format All 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI YouTube": {
+      "main": [
+        [
+          {
+            "node": "Format All 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Newsletter": {
+      "main": [
+        [
+          {
+            "node": "Format All 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format All 5": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Telegram Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "content",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    },
+    {
+      "name": "telegram",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,694 @@
+<!--
+  ORGANIC WELLNESS THEME
+  Warm, natural aesthetic with cream backgrounds and forest green accents.
+
+  SHOPIFY LIQUID CONVERSION GUIDE:
+  =========================================
+  1. Rename this file to theme.liquid or split into sections/
+  2. Replace product cards with {% for product in collections.frontpage.products %}
+  3. Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  4. Replace prices with {{ product.price | money }}
+  5. Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  6. Replace navigation with {% for link in linklists.main-menu.links %}
+  7. Replace footer links with {% for link in linklists.footer.links %}
+  8. Replace newsletter form action with Shopify customer endpoint
+  9. Move CSS custom properties into theme settings via settings_schema.json
+  10. Cart icon badge: {{ cart.item_count }}
+  =========================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organic Wellness</title>
+  <style>
+    /* ============================================
+       CSS Custom Properties
+       ============================================ */
+    :root {
+      --color-bg: #faf6f0;
+      --color-bg-card: #ffffff;
+      --color-bg-dark: #2d5a27;
+      --color-text: #2c2c2c;
+      --color-text-secondary: #7a7067;
+      --color-accent: #2d5a27;
+      --color-accent-light: #4a8c3f;
+      --color-accent-bg: rgba(45, 90, 39, 0.06);
+      --color-warm: #d4a574;
+      --color-border: #e8e0d6;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-heading: Georgia, 'Times New Roman', serif;
+      --max-width: 1200px;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 100px;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --shadow-sm: 0 2px 8px rgba(44, 44, 44, 0.04);
+      --shadow-md: 0 4px 20px rgba(44, 44, 44, 0.06);
+      --shadow-lg: 0 8px 40px rgba(44, 44, 44, 0.08);
+      --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
+
+    /* ============================================
+       Navigation
+       ============================================ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(250, 246, 240, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .nav__logo {
+      font-family: var(--font-heading);
+      font-size: 1.375rem; font-weight: 400;
+      color: var(--color-accent);
+      letter-spacing: 0.02em;
+    }
+    .nav__links { display: flex; gap: var(--spacing-md); list-style: none; }
+    .nav__links a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .nav__links a:hover { color: var(--color-accent); }
+    .nav__right { display: flex; align-items: center; gap: var(--spacing-sm); }
+    .nav__cart {
+      background: none; border: none; color: var(--color-text);
+      position: relative;
+    }
+    .nav__cart-count {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--color-accent); color: #fff;
+      font-size: 0.6rem; font-weight: 700;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav__mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--color-text); }
+
+    /* ============================================
+       Hero
+       ============================================ */
+    .hero {
+      padding: var(--spacing-xl) 0;
+      position: relative;
+    }
+    .hero__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg); align-items: center;
+    }
+    .hero__eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--color-accent); margin-bottom: var(--spacing-sm);
+    }
+    .hero__eyebrow::before {
+      content: ''; width: 24px; height: 1px;
+      background: var(--color-accent);
+    }
+    .hero__title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 400; line-height: 1.2;
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-text);
+    }
+    .hero__description {
+      color: var(--color-text-secondary);
+      font-size: 1.0625rem; line-height: 1.8;
+      margin-bottom: var(--spacing-md);
+    }
+    .hero__image {
+      aspect-ratio: 4/5;
+      background: linear-gradient(135deg, #e8e0d6 0%, #d4c8b8 100%);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+      box-shadow: var(--shadow-lg);
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.9375rem 2rem;
+      font-size: 0.875rem; font-weight: 500;
+      border-radius: var(--radius-full);
+      transition: all var(--transition);
+      border: none;
+    }
+    .btn--primary {
+      background: var(--color-accent); color: #fff;
+      box-shadow: 0 4px 15px rgba(45, 90, 39, 0.2);
+    }
+    .btn--primary:hover {
+      background: var(--color-accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(45, 90, 39, 0.3);
+    }
+    .btn--outline {
+      background: transparent;
+      color: var(--color-accent);
+      border: 1.5px solid var(--color-accent);
+    }
+    .btn--outline:hover {
+      background: var(--color-accent); color: #fff;
+    }
+
+    /* ============================================
+       Trust Bar
+       ============================================ */
+    .trust-bar {
+      padding: var(--spacing-md) 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .trust-bar__inner {
+      display: flex; justify-content: center; gap: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+    .trust-bar__item {
+      text-align: center; font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+    .trust-bar__item strong {
+      display: block; font-size: 0.875rem;
+      color: var(--color-accent); font-weight: 600;
+    }
+
+    /* ============================================
+       Products
+       ============================================ */
+    .products { padding: var(--spacing-xl) 0; }
+    .section-header { text-align: center; margin-bottom: var(--spacing-lg); }
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 400;
+    }
+    .section-header p {
+      color: var(--color-text-secondary); margin-top: var(--spacing-xs);
+      font-size: 1rem;
+    }
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .product-card {
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .product-card__image {
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #e8e0d6 0%, #f0ebe4 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .product-card__info { padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md); text-align: center; }
+    .product-card__tag {
+      display: inline-block; padding: 3px 10px;
+      background: var(--color-accent-bg); color: var(--color-accent);
+      font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; border-radius: var(--radius-full);
+      margin-bottom: var(--spacing-xs);
+    }
+    .product-card__name {
+      font-family: var(--font-heading);
+      font-size: 1.0625rem; font-weight: 400;
+      margin-bottom: var(--spacing-xs);
+    }
+    .product-card__price {
+      font-size: 0.9375rem; color: var(--color-accent); font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+    .product-card__btn {
+      width: 100%; padding: 0.75rem;
+      background: var(--color-accent); color: #fff;
+      border: none; border-radius: var(--radius-full);
+      font-size: 0.8125rem; font-weight: 500;
+      transition: all var(--transition);
+    }
+    .product-card__btn:hover {
+      background: var(--color-accent-light);
+    }
+
+    /* ============================================
+       About
+       ============================================ */
+    .about {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      margin: 0 var(--spacing-md);
+    }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg); align-items: center;
+      max-width: var(--max-width); margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+    .about__image {
+      aspect-ratio: 4/3;
+      background: linear-gradient(135deg, #d4c8b8 0%, #e8e0d6 100%);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .about__content h2 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 400;
+      margin-bottom: var(--spacing-sm);
+    }
+    .about__content p {
+      color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);
+      line-height: 1.9; font-size: 1rem;
+    }
+    .about__values {
+      display: flex; gap: var(--spacing-md); margin-top: var(--spacing-md);
+    }
+    .about__value {
+      flex: 1; text-align: center;
+      padding: var(--spacing-sm);
+    }
+    .about__value-icon {
+      width: 48px; height: 48px; margin: 0 auto var(--spacing-xs);
+      border-radius: 50%; background: var(--color-accent-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+    }
+    .about__value h4 {
+      font-family: var(--font-heading);
+      font-size: 0.9375rem; font-weight: 400;
+    }
+    .about__value p {
+      font-size: 0.8125rem; color: var(--color-text-secondary);
+      margin-top: 4px;
+    }
+
+    /* ============================================
+       Testimonials
+       ============================================ */
+    .testimonials { padding: var(--spacing-xl) 0; }
+    .testimonials__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .testimonial {
+      padding: var(--spacing-md);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+    .testimonial__stars {
+      color: var(--color-warm); font-size: 0.875rem;
+      margin-bottom: var(--spacing-sm); letter-spacing: 2px;
+    }
+    .testimonial__text {
+      font-family: var(--font-heading);
+      font-size: 1rem; font-style: italic;
+      line-height: 1.8; color: var(--color-text);
+      margin-bottom: var(--spacing-sm);
+    }
+    .testimonial__author { font-size: 0.875rem; font-weight: 600; }
+    .testimonial__detail { font-size: 0.75rem; color: var(--color-text-secondary); }
+
+    /* ============================================
+       Newsletter Banner
+       ============================================ */
+    .newsletter-banner {
+      padding: var(--spacing-lg);
+      background: var(--color-accent);
+      border-radius: var(--radius-lg);
+      margin: 0 var(--spacing-md) var(--spacing-xl);
+      text-align: center; color: #fff;
+    }
+    .newsletter-banner h2 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem; font-weight: 400;
+      margin-bottom: var(--spacing-xs);
+    }
+    .newsletter-banner p {
+      opacity: 0.85; margin-bottom: var(--spacing-md);
+      font-size: 1rem;
+    }
+    .newsletter-banner__form {
+      display: flex; gap: 0;
+      max-width: 440px; margin: 0 auto;
+    }
+    .newsletter-banner__form input {
+      flex: 1; padding: 0.875rem 1rem;
+      border: none; border-radius: var(--radius-full) 0 0 var(--radius-full);
+      font-size: 0.9375rem; outline: none;
+      font-family: var(--font-body);
+    }
+    .newsletter-banner__form button {
+      padding: 0.875rem 1.5rem;
+      background: var(--color-text); color: #fff;
+      border: none; border-radius: 0 var(--radius-full) var(--radius-full) 0;
+      font-size: 0.875rem; font-weight: 600;
+      transition: background var(--transition);
+    }
+    .newsletter-banner__form button:hover { background: #444; }
+
+    /* ============================================
+       Footer
+       ============================================ */
+    .footer {
+      padding: var(--spacing-lg) 0 var(--spacing-md);
+      border-top: 1px solid var(--color-border);
+    }
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--spacing-md); margin-bottom: var(--spacing-lg);
+    }
+    .footer__brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem; color: var(--color-accent);
+    }
+    .footer__brand p {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      margin-top: var(--spacing-xs);
+    }
+    .footer h4 {
+      font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--color-accent);
+      margin-bottom: var(--spacing-sm);
+    }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: var(--spacing-xs); }
+    .footer ul a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .footer ul a:hover { color: var(--color-accent); }
+    .footer__social { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+    .footer__social a {
+      width: 36px; height: 36px;
+      border: 1px solid var(--color-border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: var(--color-text-secondary);
+      transition: all var(--transition);
+    }
+    .footer__social a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .footer__certifications {
+      display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+    .footer__cert {
+      padding: 4px 10px; border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 0.6875rem; color: var(--color-text-secondary);
+    }
+    .footer__bottom {
+      text-align: center; padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border);
+      font-size: 0.75rem; color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       Responsive
+       ============================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__mobile-toggle { display: block; }
+      .hero__inner { grid-template-columns: 1fr; }
+      .hero__image { max-width: 400px; margin: 0 auto; }
+      .about__inner { grid-template-columns: 1fr; }
+      .about__values { flex-direction: column; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+      .trust-bar__inner { gap: var(--spacing-md); }
+    }
+    @media (max-width: 480px) {
+      .footer__grid { grid-template-columns: 1fr; }
+      .newsletter-banner__form { flex-direction: column; }
+      .newsletter-banner__form input { border-radius: var(--radius-full); }
+      .newsletter-banner__form button { border-radius: var(--radius-full); }
+      .about { margin: 0; border-radius: 0; }
+      .newsletter-banner { margin: 0 0 var(--spacing-xl); border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">Verdana Wellness</a>
+      <ul class="nav__links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+      <div class="nav__right">
+        <button class="nav__cart" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="nav__cart-count">0</span>
+        </button>
+        <button class="nav__mobile-toggle" aria-label="Menu">&#9776;</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__inner">
+        <div>
+          <p class="hero__eyebrow">Plant-Powered Wellness</p>
+          <h1 class="hero__title">Nourish your body with nature's best ingredients</h1>
+          <p class="hero__description">Sustainably sourced, small-batch wellness products made from organic botanicals. Good for you, gentle on the earth.</p>
+          <div style="display:flex;gap:var(--spacing-sm);flex-wrap:wrap;">
+            <a href="#products" class="btn btn--primary">Shop Now</a>
+            <a href="#about" class="btn btn--outline">Our Mission</a>
+          </div>
+        </div>
+        <div class="hero__image">540 x 675</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Bar -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-bar__inner">
+        <div class="trust-bar__item">
+          <strong>100% Organic</strong>
+          Certified ingredients
+        </div>
+        <div class="trust-bar__item">
+          <strong>Cruelty Free</strong>
+          Never tested on animals
+        </div>
+        <div class="trust-bar__item">
+          <strong>Sustainable</strong>
+          Eco-friendly packaging
+        </div>
+        <div class="trust-bar__item">
+          <strong>Small Batch</strong>
+          Freshly made to order
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Bestselling Botanicals</h2>
+        <p>Handcrafted with care from seed to shelf</p>
+      </div>
+      <div class="products__grid">
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <span class="product-card__tag">Bestseller</span>
+            <h3 class="product-card__name">Calm Herbal Blend</h3>
+            <p class="product-card__price">$32.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <span class="product-card__tag">New</span>
+            <h3 class="product-card__name">Rose Face Serum</h3>
+            <p class="product-card__price">$48.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <span class="product-card__tag">Organic</span>
+            <h3 class="product-card__name">Lavender Body Oil</h3>
+            <p class="product-card__price">$38.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <span class="product-card__tag">Bundle</span>
+            <h3 class="product-card__name">Wellness Starter Kit</h3>
+            <p class="product-card__price">$85.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="about__inner">
+      <div class="about__image">800 x 600</div>
+      <div class="about__content">
+        <h2>Rooted in nature, guided by science</h2>
+        <p>We believe wellness should be simple, honest, and accessible. Every product we create starts with organic, ethically sourced botanicals and is formulated without synthetic additives or harmful chemicals.</p>
+        <p>Founded on a small farm in the Pacific Northwest, Verdana has grown into a community of people who care deeply about what they put on and into their bodies.</p>
+        <div class="about__values">
+          <div class="about__value">
+            <div class="about__value-icon">&#127793;</div>
+            <h4>Organic First</h4>
+            <p>Always organic, always clean</p>
+          </div>
+          <div class="about__value">
+            <div class="about__value-icon">&#127758;</div>
+            <h4>Earth Kind</h4>
+            <p>Zero waste packaging goal</p>
+          </div>
+          <div class="about__value">
+            <div class="about__value-icon">&#128156;</div>
+            <h4>Community Led</h4>
+            <p>10% of profits donated</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Our Community Says</h2>
+        <p>Real stories from real people</p>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"The Calm Herbal Blend changed my nighttime routine completely. I fall asleep faster and wake up feeling genuinely rested. Nothing else has worked this well for me."</p>
+          <p class="testimonial__author">Rachel W.</p>
+          <p class="testimonial__detail">Verified Buyer, Portland OR</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"I switched all my skincare to Verdana six months ago. My skin has never looked better. The rose serum is my holy grail product, and the ingredients are things I can actually pronounce."</p>
+          <p class="testimonial__author">Tina M.</p>
+          <p class="testimonial__detail">Verified Buyer, Austin TX</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"The packaging is beautiful, the products smell incredible, and I love knowing that everything is ethically sourced. This is a brand I feel good supporting."</p>
+          <p class="testimonial__author">David K.</p>
+          <p class="testimonial__detail">Verified Buyer, Denver CO</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter Banner -->
+  <div class="newsletter-banner">
+    <h2>Join the Verdana Community</h2>
+    <p>Get 10% off your first order plus wellness tips, new product launches, and seasonal recipes.</p>
+    <form class="newsletter-banner__form" onsubmit="return false;">
+      <input type="email" placeholder="your@email.com" aria-label="Email address">
+      <button type="submit">Subscribe</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <p class="footer__brand-name">Verdana Wellness</p>
+          <p>Plant-powered wellness for everyday living. Made with love in the Pacific Northwest.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Pinterest">PI</a>
+            <a href="#" aria-label="TikTok">TK</a>
+          </div>
+          <div class="footer__certifications">
+            <span class="footer__cert">USDA Organic</span>
+            <span class="footer__cert">Cruelty Free</span>
+            <span class="footer__cert">B Corp</span>
+          </div>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="#">All Products</a></li>
+            <li><a href="#">Skincare</a></li>
+            <li><a href="#">Herbal Blends</a></li>
+            <li><a href="#">Gift Sets</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Learn</h4>
+          <ul>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Ingredients</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">Wholesale</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 Verdana Wellness. All rights reserved. Made with love and organic botanicals.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Freelance Rate Calculator Guide — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1c1c1e;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: #F5F5F7;
+      letter-spacing: -0.3px;
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: #30D158;
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: #1c1c1e;
+      color: #0A84FF;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 980px;
+      margin-bottom: 32px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      max-width: 820px;
+      margin: 0 auto 28px;
+    }
+    .hero h1 span { color: #0A84FF; }
+    .hero-sub {
+      font-size: 20px;
+      color: #8e8e93;
+      max-width: 580px;
+      margin: 0 auto 48px;
+      line-height: 1.55;
+    }
+    .price-block {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #F5F5F7;
+    }
+    .price-meta {
+      text-align: left;
+      font-size: 13px;
+      color: #636366;
+      line-height: 1.4;
+    }
+    .cta-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 18px 44px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      letter-spacing: -0.2px;
+    }
+    .cta-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-detail {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #48484a;
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid #1c1c1e;
+      margin: 0;
+    }
+
+    /* PROBLEM */
+    .problem {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #636366;
+      margin-bottom: 24px;
+    }
+    .problem h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      max-width: 680px;
+      margin-bottom: 24px;
+    }
+    .problem p {
+      font-size: 18px;
+      color: #8e8e93;
+      max-width: 660px;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    /* FORMULA BLOCK */
+    .formula-block {
+      background: #0a0a0a;
+      border: 1px solid #1c1c1e;
+      border-left: 3px solid #0A84FF;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-top: 40px;
+      max-width: 660px;
+    }
+    .formula-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    .formula-line {
+      font-size: 15px;
+      color: #ebebf0;
+      padding: 8px 0;
+      border-bottom: 1px solid #1c1c1e;
+      line-height: 1.5;
+    }
+    .formula-line:last-child { border-bottom: none; }
+    .formula-line strong { color: #F5F5F7; }
+
+    /* THREE NUMBERS */
+    .three-numbers {
+      padding: 80px 0;
+      background: #080808;
+    }
+    .three-numbers h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+      max-width: 640px;
+    }
+    .numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .number-card {
+      background: #0f0f0f;
+      border: 1px solid #1c1c1e;
+      border-radius: 16px;
+      padding: 32px 28px;
+    }
+    .number-badge {
+      display: inline-block;
+      background: #0A84FF18;
+      color: #0A84FF;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 980px;
+      margin-bottom: 20px;
+    }
+    .number-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+      margin-bottom: 12px;
+      color: #F5F5F7;
+    }
+    .number-card p {
+      font-size: 15px;
+      color: #636366;
+      line-height: 1.55;
+    }
+
+    /* WHAT YOU GET */
+    .what-you-get {
+      padding: 80px 0;
+    }
+    .what-you-get h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+      max-width: 600px;
+    }
+    .outcomes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .outcome-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: #0a0a0a;
+      border: 1px solid #1c1c1e;
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .outcome-icon {
+      width: 36px;
+      height: 36px;
+      background: #30D15818;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+    .outcome-text {
+      font-size: 15px;
+      color: #ebebf0;
+      line-height: 1.5;
+    }
+
+    /* CHAPTERS */
+    .chapters {
+      padding: 80px 0;
+      background: #080808;
+    }
+    .chapters h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 48px;
+    }
+    .chapter-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid #1c1c1e;
+    }
+    .chapter-item:last-child { border-bottom: none; }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      letter-spacing: 0.05em;
+      min-width: 72px;
+      padding-top: 2px;
+    }
+    .chapter-content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+      color: #F5F5F7;
+    }
+    .chapter-content p {
+      font-size: 15px;
+      color: #636366;
+      line-height: 1.55;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid #1c1c1e;
+    }
+    .cta-section h2 {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1.2px;
+      line-height: 1.1;
+      max-width: 640px;
+      margin: 0 auto 20px;
+    }
+    .cta-section p {
+      font-size: 18px;
+      color: #8e8e93;
+      margin-bottom: 48px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .cta-price-note {
+      font-size: 15px;
+      color: #636366;
+    }
+    .cta-price-note strong { color: #F5F5F7; }
+    .guarantee {
+      margin-top: 32px;
+      font-size: 13px;
+      color: #48484a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1c1c1e;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #48484a;
+    }
+    footer a {
+      color: #636366;
+      text-decoration: none;
+    }
+    footer a:hover { color: #8e8e93; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .price { font-size: 32px; }
+      .cta-primary { font-size: 16px; padding: 16px 32px; }
+      .chapter-item { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="brand">Behike</a>
+      <a href="#buy" class="nav-cta">Get the Guide — $17.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tag">Digital Guide — PDF Format</div>
+      <h1>Your rate is not a guess. It is <span>a calculation.</span></h1>
+      <p class="hero-sub">A systematic method for setting freelance rates that are sustainable, competitive, and grounded in real math. For solopreneurs done guessing.</p>
+      <div class="price-block">
+        <div class="price">$17.99</div>
+        <div class="price-meta">One-time purchase<br>Instant PDF download<br>~40 pages</div>
+      </div>
+      <br>
+      <a href="#buy" class="cta-primary">Get the Guide</a>
+      <p class="hero-detail">No subscription. No upsell. One framework that tells you exactly what to charge.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="section-label">The Real Problem</div>
+      <h2>Underpricing is not a confidence problem. It is a math problem you have not solved yet.</h2>
+      <p>Most freelancers set their rates by looking at what someone else charges and picking a number slightly below it to be competitive. That is not a strategy. That is how you end up overworked at rates that do not support a real business.</p>
+      <p>The rate you charge is not a number you find. It is a number you calculate. There is specific math that determines what you must charge to stay in business, what you should charge to be profitable, and what you can charge based on the value you create. Most freelancers only know the first number vaguely and ignore the other two entirely.</p>
+      <div class="formula-block">
+        <div class="formula-label">The Three Numbers You Need</div>
+        <div class="formula-line"><strong>Minimum Viable Rate:</strong> The floor below which you are subsidizing your clients, not running a business.</div>
+        <div class="formula-line"><strong>Profitable Rate:</strong> What you need to charge to build real margins and handle bad months without crisis.</div>
+        <div class="formula-line"><strong>Value-Based Ceiling:</strong> What you can charge when you price on outcomes, not hours. Usually much higher than you think.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- THREE NUMBERS -->
+  <section class="three-numbers">
+    <div class="container">
+      <div class="section-label">What Changes When You Know Your Numbers</div>
+      <h2>Every negotiation gets easier when you know your floor, your target, and your ceiling.</h2>
+      <div class="numbers-grid">
+        <div class="number-card">
+          <div class="number-badge">Minimum Viable Rate</div>
+          <h3>Stop taking losing trades</h3>
+          <p>When you know your MVR, you can evaluate any project in seconds. Below that number, you are not running a business. That clarity is not optional.</p>
+        </div>
+        <div class="number-card">
+          <div class="number-badge">Profitable Rate</div>
+          <h3>Operate with margin, not desperation</h3>
+          <p>At your Profitable Rate, slow months are manageable. You can say no to the wrong clients. That selectivity signals quality to better clients.</p>
+        </div>
+        <div class="number-card">
+          <div class="number-badge">Value-Based Ceiling</div>
+          <h3>Charge for outcomes, not hours</h3>
+          <p>When your work generates $40,000 in revenue for a client, charging $1,500 for it is not humility. It is a pricing mistake. Know what your work is actually worth.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- WHAT YOU GET -->
+  <section class="what-you-get">
+    <div class="container">
+      <div class="section-label">What You Walk Away With</div>
+      <h2>A complete rate system. Plus the negotiation skills to hold it.</h2>
+      <div class="outcomes-grid">
+        <div class="outcome-item">
+          <div class="outcome-icon">&#128200;</div>
+          <div class="outcome-text">Your Minimum Viable Rate calculated with real numbers from your actual cost of living and business expenses.</div>
+        </div>
+        <div class="outcome-item">
+          <div class="outcome-icon">&#128181;</div>
+          <div class="outcome-text">Your Profitable Rate including growth allocation, emergency reserves, and professional development budget.</div>
+        </div>
+        <div class="outcome-item">
+          <div class="outcome-icon">&#128176;</div>
+          <div class="outcome-text">A value-based pricing framework for translating your work into client outcomes that justify premium rates.</div>
+        </div>
+        <div class="outcome-item">
+          <div class="outcome-icon">&#128230;</div>
+          <div class="outcome-text">A three-tier packaging structure that increases average project value without adding more hours of work.</div>
+        </div>
+        <div class="outcome-item">
+          <div class="outcome-icon">&#9994;</div>
+          <div class="outcome-text">A negotiation framework for holding your rates under pressure, including the exact language that works when clients push back.</div>
+        </div>
+        <div class="outcome-item">
+          <div class="outcome-icon">&#128197;</div>
+          <div class="outcome-text">A 30-day rate increase plan for transitioning from current rates to sustainable rates without losing the right clients.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- CHAPTERS -->
+  <section class="chapters">
+    <div class="container">
+      <div class="section-label">Inside the Guide</div>
+      <h2>Seven chapters. One complete pricing system.</h2>
+      <div class="chapter-list">
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 1</div>
+          <div class="chapter-content">
+            <h3>The Hidden Cost of Underpricing</h3>
+            <p>The Cheap Client Trap and why it compounds over time. The real math of freelance income including taxes, health insurance, equipment, and lost utilization hours most new freelancers never account for.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 2</div>
+          <div class="chapter-content">
+            <h3>Minimum Viable Rate: The Math You Cannot Skip</h3>
+            <p>Step-by-step calculation with a worked example. The annual billable hours reality check. Why this number needs to be recalculated every year and what happens when you ignore it.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 3</div>
+          <div class="chapter-content">
+            <h3>Your Profitable Rate: What Sustainable Actually Looks Like</h3>
+            <p>Adding growth allocation, emergency reserves, and professional development to your baseline. The math of retainer arrangements. Why operating at your MVR keeps you one bad month from crisis.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 4</div>
+          <div class="chapter-content">
+            <h3>Value-Based Pricing: Setting Your Ceiling</h3>
+            <p>The shift from selling hours to selling outcomes. How to quantify the value of your work in client terms. The anchor effect in pricing negotiations and how to use it.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 5</div>
+          <div class="chapter-content">
+            <h3>Packaging Services for Higher Average Project Value</h3>
+            <p>The three-tier pricing structure that makes the middle option the obvious choice. Productized services and when they apply. How retainer packaging creates recurring income from existing clients.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 6</div>
+          <div class="chapter-content">
+            <h3>Negotiation and Rate Holding</h3>
+            <p>The three positions every freelancer needs. Why discounting scope is always better than discounting rate. The exact language for when clients say "another freelancer charges half your rate."</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">Chapter 7</div>
+          <div class="chapter-content">
+            <h3>Building a Rate Increase Plan</h3>
+            <p>How to stagger increases across your client roster. Why the portfolio upgrade is as important as the rate conversation. What to say when announcing a rate increase to long-term clients.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="buy">
+    <div class="container">
+      <h2>Know your number. Hold your rate. Build a business worth staying in.</h2>
+      <p>One guide. The complete framework for pricing freelance work systematically instead of guessing.</p>
+      <div class="cta-stack">
+        <a href="https://behike.gumroad.com/l/solopreneurs-freelance-rate-calculator-guide" class="cta-primary">Get the Guide — $17.99</a>
+        <div class="cta-price-note">Instant PDF download. <strong>One-time payment.</strong> No subscription.</div>
+      </div>
+      <div class="guarantee">
+        <span>&#9679;</span> 30-day money-back guarantee if it does not deliver value
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike Digital Products &nbsp;&middot;&nbsp; <a href="/">behike.com</a> &nbsp;&middot;&nbsp; Built for builders.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Competitor Radar — Know What Your Competitors Are Doing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --accent: #0A84FF;
+      --green: #30D158;
+      --text: #FFFFFF;
+      --muted: #8E8E93;
+      --card-bg: #111111;
+      --border: #1C1C1E;
+      --radius-card: 12px;
+      --radius-pill: 980px;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .nav-cta {
+      background: var(--green);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      margin-bottom: 32px;
+      letter-spacing: 0.03em;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 780px;
+      margin: 0 auto 24px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: clamp(16px, 2.5vw, 19px);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.65;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    .btn-primary:hover { transform: scale(1.02); opacity: 0.9; }
+    .hero-sub {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION SHARED */
+    section { padding: 80px 0; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* PROBLEM */
+    .problem { background: #000; }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+    .problem-card:hover { border-color: #3A3A3C; }
+    .problem-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FEATURES */
+    .features { border-top: 1px solid var(--border); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      border-color: rgba(10, 132, 255, 0.4);
+      transform: translateY(-2px);
+    }
+    .feature-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .feature-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* WHO */
+    .who { border-top: 1px solid var(--border); }
+    .who-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .who-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+    }
+    .who-card .who-tag {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 16px;
+    }
+    .who-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .who-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* SAMPLE REPORT */
+    .sample { border-top: 1px solid var(--border); }
+    .terminal-wrap {
+      background: #0A0A0A;
+      border: 1px solid #2A2A2E;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .terminal-bar {
+      background: #1C1C1E;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #FF453A; }
+    .dot-yellow { background: #FFD60A; }
+    .dot-green { background: #30D158; }
+    .terminal-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 8px;
+    }
+    .terminal-body {
+      padding: 24px;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .t-header { color: #0A84FF; font-weight: 700; }
+    .t-divider { color: #3A3A3C; }
+    .t-seller { color: #FFD60A; }
+    .t-new { color: #30D158; }
+    .t-change { color: #FF9F0A; }
+    .t-update { color: #BF5AF2; }
+    .t-muted { color: #636366; }
+
+    /* PRICING */
+    .pricing { border-top: 1px solid var(--border); text-align: center; }
+    .price-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      border-radius: 20px;
+      padding: 48px 40px;
+      max-width: 460px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .price-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+    }
+    .price-amount {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin: 16px 0 8px;
+      line-height: 1;
+    }
+    .price-amount span {
+      font-size: 28px;
+      font-weight: 500;
+      vertical-align: super;
+      margin-right: 2px;
+    }
+    .price-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .includes-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+    .includes-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .includes-list li:last-child { border-bottom: none; }
+    .check {
+      color: var(--green);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .btn-buy {
+      display: block;
+      width: 100%;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-buy:hover { opacity: 0.9; transform: scale(1.01); }
+    .price-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* FAQ */
+    .faq { border-top: 1px solid var(--border); }
+    .faq-list {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      padding: 24px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: inherit;
+    }
+    .faq-icon {
+      color: var(--accent);
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+    .faq-a {
+      display: none;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-bottom: 24px;
+    }
+    .faq-item.open .faq-a { display: block; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .footer-logo {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+    .footer-links a {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      font-size: 12px;
+      color: #3A3A3C;
+    }
+
+    /* SCROLL ANIMATIONS */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* MOBILE */
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      section { padding: 56px 0; }
+      .price-card { padding: 36px 24px; }
+      .price-amount { font-size: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="https://behike.shop" class="nav-logo">Behike</a>
+      <a href="#pricing" class="nav-cta">Get Competitor Radar</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Python Tool + Guide Bundle</div>
+      <h1>Know What Your Competitors Are Doing <span>Before Your Customers Do</span></h1>
+      <p>Competitor Radar monitors Gumroad sellers in your niche and alerts you to price changes, new products, and positioning gaps. Automatically.</p>
+      <a href="#pricing" class="btn-primary">Get Competitor Radar &mdash; $14.99</a>
+      <p class="hero-sub">One-time purchase. No subscription.</p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <p class="section-label fade-in">The Problem</p>
+      <h2 class="section-title fade-in">You're flying blind in your market</h2>
+      <p class="section-sub fade-in">Every hour you spend manually checking competitors is an hour you're not building. And the information you find is already outdated.</p>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <div class="problem-icon">💸</div>
+          <h3>You find out competitors dropped their price after you lost the sale</h3>
+          <p>By the time you notice, they've already captured the buyers you needed. You react, they act.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">📊</div>
+          <h3>You have no idea what's working in your niche until it's too late</h3>
+          <p>When a competitor launches something that takes off, you find out through a viral post, not a warning. The window is already closing.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">⏱</div>
+          <h3>Manual research takes 2 hours a week you don't have</h3>
+          <p>Tabs, spreadsheets, bookmarks. You know you should track this stuff. You never do. There's always something more urgent.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="container">
+      <p class="section-label fade-in">What It Does</p>
+      <h2 class="section-title fade-in">Automated market intelligence, running while you build</h2>
+      <p class="section-sub fade-in">Competitor Radar is a Python script you run once to set up. After that, it works for you daily.</p>
+      <div class="features-grid">
+        <div class="feature-card fade-in">
+          <p class="feature-num">01</p>
+          <h3>Monitors up to 20 Gumroad sellers automatically</h3>
+          <p>Add any Gumroad seller handle to your watchlist. The script checks each one on a schedule you control.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <p class="feature-num">02</p>
+          <h3>Detects price changes, new products, and description updates</h3>
+          <p>Not just prices. If they rewrite their sales copy, reposition a product, or quietly launch something new, you know.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <p class="feature-num">03</p>
+          <h3>Sends a daily summary report to your Telegram or email</h3>
+          <p>One clean message every morning with everything that changed. Nothing to check, nothing to miss.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <p class="feature-num">04</p>
+          <h3>Exports data to CSV for your own analysis</h3>
+          <p>Full historical tracking. See pricing trends over time, launch frequency, and positioning patterns across your whole watchlist.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO -->
+  <section class="who">
+    <div class="container">
+      <p class="section-label fade-in">Who It's For</p>
+      <h2 class="section-title fade-in">Built for people who sell digital products</h2>
+      <p class="section-sub fade-in">If you have skin in the game on Gumroad, this is the tool your competitors wish you didn't have.</p>
+      <div class="who-grid">
+        <div class="who-card fade-in">
+          <span class="who-tag">Seller</span>
+          <h3>Digital product sellers on Gumroad</h3>
+          <p>You're already selling. You just want to know if someone undercut you or launched something adjacent to your niche before your next campaign.</p>
+        </div>
+        <div class="who-card fade-in">
+          <span class="who-tag">Builder</span>
+          <h3>Solopreneurs building in competitive niches</h3>
+          <p>You need market intelligence but you don't have a team or a budget for expensive tools. This runs on your machine for nothing after setup.</p>
+        </div>
+        <div class="who-card fade-in">
+          <span class="who-tag">Researcher</span>
+          <h3>Anyone who wants market intelligence without manual work</h3>
+          <p>You're early in a niche and want to understand the landscape. Set it up once, let it run, and let the data tell you what to build next.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE REPORT -->
+  <section class="sample">
+    <div class="container" style="text-align:center;">
+      <p class="section-label fade-in">Sample Output</p>
+      <h2 class="section-title fade-in">This is what lands in your Telegram every morning</h2>
+      <p class="section-sub fade-in" style="margin: 0 auto 40px;">Clean, structured, actionable. No noise.</p>
+      <div class="terminal-wrap fade-in">
+        <div class="terminal-bar">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span class="terminal-title">competitor_radar.py</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-header">COMPETITOR RADAR</span> <span class="t-muted">--</span> <span class="t-header">Daily Report</span></div>
+          <div><span class="t-divider">================================</span></div>
+          <div><span class="t-muted">Run at:</span> 2026-03-22 07:00:01 | <span class="t-muted">Watching:</span> 20 sellers</div>
+          <br>
+          <div><span class="t-seller">seller:</span> designvault</div>
+          <div>&nbsp;&nbsp;<span class="t-new">[NEW]</span> &nbsp;"Brand Kit Templates" &mdash; $27.00</div>
+          <div>&nbsp;&nbsp;<span class="t-change">[PRICE]</span> "Icon Bundle" $19 &#x2192; $14 <span class="t-muted">(&#x2193;26%)</span></div>
+          <br>
+          <div><span class="t-seller">seller:</span> promptlab</div>
+          <div>&nbsp;&nbsp;<span class="t-update">[UPDATE]</span> "ChatGPT Masterclass" description changed <span class="t-muted">(3 diffs)</span></div>
+          <br>
+          <div><span class="t-seller">seller:</span> contentops</div>
+          <div>&nbsp;&nbsp;<span class="t-muted">[OK]</span> &nbsp;&nbsp;&nbsp;No changes detected</div>
+          <br>
+          <div><span class="t-divider">================================</span></div>
+          <div><span class="t-muted">Summary: 2 sellers changed. 1 new product. 1 price drop. 1 copy update.</span></div>
+          <div><span class="t-muted">CSV exported: ./reports/2026-03-22.csv</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <p class="section-label fade-in">Pricing</p>
+      <h2 class="section-title fade-in">One price. Yours forever.</h2>
+      <p class="section-sub fade-in" style="margin: 0 auto 48px;">No monthly fee. No seat limits. Run it on every machine you own.</p>
+      <div class="price-card fade-in">
+        <p style="font-size:14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;">Competitor Radar</p>
+        <div class="price-amount"><span>$</span>14<span style="font-size:36px; vertical-align: baseline; margin-left:0;">.99</span></div>
+        <p class="price-label">One-time purchase</p>
+        <ul class="includes-list">
+          <li><span class="check">&#x2713;</span> <span>competitor_radar.py &mdash; full Python source code</span></li>
+          <li><span class="check">&#x2713;</span> <span>Step-by-step setup guide (PDF + Markdown)</span></li>
+          <li><span class="check">&#x2713;</span> <span>Telegram notification integration walkthrough</span></li>
+          <li><span class="check">&#x2713;</span> <span>Email alert setup (optional)</span></li>
+          <li><span class="check">&#x2713;</span> <span>CSV export module</span></li>
+          <li><span class="check">&#x2713;</span> <span>Sample watchlist config to get started fast</span></li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/competitor-radar" class="btn-buy">Get Competitor Radar &mdash; $14.99</a>
+        <p class="price-note">Delivered instantly. Works on Mac, Windows, and Linux.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container">
+      <p class="section-label fade-in" style="text-align:center;">FAQ</p>
+      <h2 class="section-title fade-in" style="text-align:center; margin-bottom:48px;">Questions</h2>
+      <div class="faq-list">
+
+        <div class="faq-item fade-in">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What do I need to run this?
+            <span class="faq-icon">+</span>
+          </button>
+          <p class="faq-a">Python 3.8 or higher. That's the main requirement. The guide walks you through installing the two small libraries the script depends on. If you can run a Python script, you can run this. Setup takes about 10 minutes.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Does it work on any Gumroad seller, or just specific ones?
+            <span class="faq-icon">+</span>
+          </button>
+          <p class="faq-a">Any public Gumroad seller. You build your own watchlist by adding their Gumroad handles to the config file. Up to 20 sellers by default, though you can extend that in the source code yourself.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How does the Telegram notification work?
+            <span class="faq-icon">+</span>
+          </button>
+          <p class="faq-a">The guide includes a complete walkthrough for creating a free Telegram bot and connecting it to the script. You get a bot token, paste it into your config, and from that point the script sends you a message directly through Telegram. No third-party services, no subscriptions.</p>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Is this a one-time thing or does it run continuously?
+            <span class="faq-icon">+</span>
+          </button>
+          <p class="faq-a">You control the schedule. The guide shows you how to set it up as a cron job (Mac/Linux) or Task Scheduler (Windows) so it runs automatically, once a day or more. You set it up once, then forget it. The reports just show up.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p class="footer-logo">Behike</p>
+      <div class="footer-links">
+        <a href="https://behike.shop">Store</a>
+        <a href="https://behike.shop/pages/about">About</a>
+        <a href="mailto:hello@behike.shop">Contact</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 behike.shop. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      item.classList.toggle('open');
+    }
+
+    // Scroll fade-in
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    document.querySelectorAll('.fade-in').forEach((el) => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

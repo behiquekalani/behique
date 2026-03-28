@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Behike Launchpad</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-hover: #1a1a1a;
+    --border: #222;
+    --border-light: #333;
+    --text: #e5e5e5;
+    --text-dim: #777;
+    --text-muted: #555;
+    --accent: #fff;
+    --green: #34d399;
+    --green-dim: rgba(52, 211, 153, 0.15);
+    --green-glow: rgba(52, 211, 153, 0.08);
+    --bar-bg: #1a1a1a;
+    --bar-fill: #34d399;
+    --check-border: #444;
+    --check-active: #34d399;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 0 0 120px 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px 16px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .header .subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .global-progress {
+    margin-top: 16px;
+  }
+
+  .global-progress .stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .global-progress .percent {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: -1px;
+  }
+
+  .global-progress .count {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bar-bg);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--bar-fill);
+    border-radius: 3px;
+    transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .section {
+    margin-bottom: 24px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .section-header:active {
+    background: var(--surface-hover);
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+  }
+
+  .section-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .section-bar {
+    width: 60px;
+    height: 4px;
+    background: var(--bar-bg);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .section-bar .fill {
+    height: 100%;
+    background: var(--bar-fill);
+    border-radius: 2px;
+    transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .section.collapsed .chevron {
+    transform: rotate(-90deg);
+  }
+
+  .section-items {
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .section.collapsed .section-items {
+    max-height: 0 !important;
+    border-top-color: transparent;
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .item:active {
+    background: var(--surface-hover);
+  }
+
+  .item + .item {
+    border-top: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--check-border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s ease;
+  }
+
+  .item.checked .checkbox {
+    background: var(--check-active);
+    border-color: var(--check-active);
+  }
+
+  .checkmark {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .item.checked .checkmark {
+    opacity: 1;
+  }
+
+  .item-text {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    transition: opacity 0.2s ease;
+    flex: 1;
+  }
+
+  .item.checked .item-text {
+    opacity: 0.35;
+    text-decoration: line-through;
+    text-decoration-color: var(--text-muted);
+  }
+
+  .item-price {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+    display: block;
+  }
+
+  .item.checked .item-price {
+    opacity: 0.35;
+  }
+
+  /* Revenue Tracker */
+  .revenue-section {
+    margin-bottom: 24px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .revenue-header {
+    padding: 16px 20px;
+  }
+
+  .revenue-header .section-title {
+    margin-bottom: 12px;
+  }
+
+  .revenue-total {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: -1.5px;
+  }
+
+  .revenue-label {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .revenue-input-row {
+    display: flex;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .revenue-input-row input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 16px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .revenue-input-row input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .revenue-input-row input:focus {
+    border-color: var(--green);
+  }
+
+  .revenue-input-row select {
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    -webkit-appearance: none;
+    min-width: 110px;
+  }
+
+  .revenue-btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-appearance: none;
+  }
+
+  .revenue-btn:active {
+    opacity: 0.8;
+  }
+
+  .revenue-entries {
+    border-top: 1px solid var(--border);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .revenue-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .revenue-entry + .revenue-entry {
+    border-top: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .revenue-entry .entry-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .revenue-entry .entry-source {
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+
+  .revenue-entry .entry-date {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  .revenue-entry .entry-amount {
+    color: var(--green);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .revenue-entry .entry-delete {
+    color: var(--text-muted);
+    font-size: 18px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  .revenue-entry .entry-delete:active {
+    color: #f87171;
+  }
+
+  .revenue-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+
+  .revenue-stat {
+    background: var(--surface);
+    padding: 14px 16px;
+    text-align: center;
+  }
+
+  .revenue-stat .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .revenue-stat .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* Reset button */
+  .reset-zone {
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .reset-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-family: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+
+  .reset-btn:active {
+    border-color: #f87171;
+    color: #f87171;
+  }
+
+  /* Section complete indicator */
+  .section-complete {
+    background: var(--green-glow);
+  }
+
+  .section-complete .section-title {
+    color: var(--green);
+  }
+
+  /* Animations */
+  @keyframes checkPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .item.just-checked .checkbox {
+    animation: checkPop 0.25s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Behike Launchpad</h1>
+  <div class="subtitle">Everything between you and $10K/mo</div>
+  <div class="global-progress">
+    <div class="stats">
+      <span class="percent" id="globalPercent">0%</span>
+      <span class="count" id="globalCount">0 of 0 complete</span>
+    </div>
+    <div class="progress-bar">
+      <div class="fill" id="globalBar" style="width: 0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="content">
+  <div class="revenue-section" id="revenueSection">
+    <div class="revenue-header">
+      <div class="section-title">Revenue Tracker</div>
+      <div class="revenue-total" id="revenueTotal">$0.00</div>
+      <div class="revenue-label">Total recorded revenue</div>
+    </div>
+    <div class="revenue-summary" id="revenueSummary">
+      <div class="revenue-stat">
+        <div class="stat-value" id="revThisWeek">$0</div>
+        <div class="stat-label">This Week</div>
+      </div>
+      <div class="revenue-stat">
+        <div class="stat-value" id="revThisMonth">$0</div>
+        <div class="stat-label">This Month</div>
+      </div>
+      <div class="revenue-stat">
+        <div class="stat-value" id="revEntryCount">0</div>
+        <div class="stat-label">Entries</div>
+      </div>
+    </div>
+    <div class="revenue-input-row">
+      <input type="number" id="revAmount" placeholder="Amount" inputmode="decimal" step="0.01" min="0">
+      <select id="revSource">
+        <option value="Gumroad">Gumroad</option>
+        <option value="Service">Service</option>
+        <option value="Affiliate">Affiliate</option>
+        <option value="YouTube">YouTube</option>
+        <option value="Newsletter">Newsletter</option>
+        <option value="Polymarket">Polymarket</option>
+        <option value="Other">Other</option>
+      </select>
+      <button class="revenue-btn" onclick="addRevenue()">Add</button>
+    </div>
+    <div class="revenue-entries" id="revenueEntries"></div>
+  </div>
+
+  <div class="reset-zone">
+    <button class="reset-btn" onclick="resetAll()">Reset All Data</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id: 'accounts',
+    title: 'Accounts to Create',
+    items: [
+      'Instagram @behikeai (business account)',
+      'Instagram @kalaniandrez (personal account)',
+      'TikTok @behikeai',
+      'X/Twitter @behikeai',
+      'YouTube: Behike AI (main channel)',
+      'YouTube: AI News Daily (faceless channel)',
+      'YouTube: Money Moves (finance faceless channel)',
+      'Polymarket account',
+      'ConvertKit or Systeme.io (email marketing, free tier)',
+      'Behike.shop domain (if not already owned)',
+      'Google Analytics on all pages'
+    ]
+  },
+  {
+    id: 'legal',
+    title: 'Legal / Protection',
+    items: [
+      'Copyright registration for "Behike" brand name',
+      'Trademark (TM) filing for "Behike" (check USPTO)',
+      'Terms of Service page on website',
+      'Privacy Policy page on website',
+      'Refund Policy page on website',
+      'Business email: hello@behike.shop or similar'
+    ]
+  },
+  {
+    id: 'gumroad',
+    title: 'Gumroad - List Products',
+    items: [
+      { text: 'Gumroad Starter Kit', price: '$4.99', note: 'list this first' },
+      { text: 'AI Employee Guide', price: '$19.99' },
+      { text: 'Behike Method v2', price: '$14.99' },
+      { text: 'Solopreneur OS', price: '$14.99' },
+      { text: 'Prompt Engineering Cheat Sheet', price: '$9.99' },
+      { text: 'AI Security Guide', price: '$14.99' },
+      { text: 'n8n Automation Pack', price: '$29.99' },
+      { text: 'Ghost Writer Kit', price: '$19.99' },
+      { text: 'Claude Code Course', price: '$19.99' },
+      { text: 'Content Franchise Kit', price: '$14.99' },
+      { text: 'Zero Dollar AI Stack', price: 'FREE', note: 'lead magnet' },
+      { text: 'AI Safety Checklist', price: 'FREE', note: 'lead magnet' },
+      { text: '5 AI Tools Lead Magnet', price: 'FREE', note: 'lead magnet' }
+    ]
+  },
+  {
+    id: 'website',
+    title: 'Website',
+    items: [
+      'Deploy behike.shop main store',
+      'Connect domain to hosting',
+      'Test all product links',
+      'Set up email capture on landing page',
+      'Connect email capture to ConvertKit/Systeme.io'
+    ]
+  },
+  {
+    id: 'content',
+    title: 'Content - First Week',
+    items: [
+      'Post first 5 Instagram posts from batch 1',
+      'Post first X/Twitter thread',
+      'Upload first YouTube video',
+      'Send first newsletter',
+      'Schedule 1 week of TikTok content'
+    ]
+  },
+  {
+    id: 'funnels',
+    title: 'Funnels',
+    items: [
+      'Deploy fear funnel squeeze page',
+      'Set up email welcome sequence (5 emails ready)',
+      'Create Facebook/IG ad account',
+      'Launch first ad ($5/day test)'
+    ]
+  },
+  {
+    id: 'revenue',
+    title: 'Revenue Streams to Activate',
+    items: [
+      'Gumroad digital products (immediate)',
+      'AI Agent Installation Service (list on landing page)',
+      'Affiliate links in products (Amazon Associates, tool referrals)',
+      'YouTube ad revenue (after 1000 subs)',
+      'Newsletter sponsorships (after 500 subs)',
+      'Polymarket trading (after account setup)'
+    ]
+  },
+  {
+    id: 'weekly',
+    title: 'Weekly Recurring',
+    items: [
+      'Post 5x/week on Instagram',
+      'Post 3x/week on TikTok',
+      'Post 2x/week on X',
+      'Send 1 newsletter/week',
+      'Upload 1 YouTube video/week',
+      'Review Gumroad analytics',
+      'Check Polymarket positions'
+    ]
+  }
+];
+
+const STORAGE_KEY = 'behike-launchpad-checks';
+const REVENUE_KEY = 'behike-launchpad-revenue';
+
+function loadChecks() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveChecks(checks) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(checks));
+}
+
+function loadRevenue() {
+  try {
+    return JSON.parse(localStorage.getItem(REVENUE_KEY)) || [];
+  } catch { return []; }
+}
+
+function saveRevenue(entries) {
+  localStorage.setItem(REVENUE_KEY, JSON.stringify(entries));
+}
+
+function getItemKey(sectionId, index) {
+  return `${sectionId}-${index}`;
+}
+
+function getItemText(item) {
+  if (typeof item === 'string') return item;
+  let text = item.text;
+  if (item.note) text += ` (${item.note})`;
+  return text;
+}
+
+function getItemPrice(item) {
+  if (typeof item === 'object' && item.price) return item.price;
+  return null;
+}
+
+function render() {
+  const checks = loadChecks();
+  const container = document.getElementById('content');
+  container.innerHTML = '';
+
+  let totalItems = 0;
+  let totalChecked = 0;
+
+  SECTIONS.forEach(section => {
+    const sectionEl = document.createElement('div');
+    sectionEl.className = 'section';
+
+    const sectionChecked = section.items.filter((_, i) => checks[getItemKey(section.id, i)]).length;
+    const sectionTotal = section.items.length;
+    totalItems += sectionTotal;
+    totalChecked += sectionChecked;
+
+    const isComplete = sectionChecked === sectionTotal;
+    if (isComplete) sectionEl.classList.add('section-complete');
+
+    // Check collapsed state
+    const collapsedKey = `behike-collapsed-${section.id}`;
+    if (localStorage.getItem(collapsedKey) === 'true') {
+      sectionEl.classList.add('collapsed');
+    }
+
+    const pct = sectionTotal > 0 ? Math.round((sectionChecked / sectionTotal) * 100) : 0;
+
+    sectionEl.innerHTML = `
+      <div class="section-header" data-section="${section.id}">
+        <span class="section-title">${section.title}</span>
+        <div class="section-badge">
+          <span class="section-count">${sectionChecked} / ${sectionTotal}</span>
+          <div class="section-bar"><div class="fill" style="width: ${pct}%"></div></div>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+      </div>
+      <div class="section-items" style="max-height: 2000px;">
+        ${section.items.map((item, i) => {
+          const key = getItemKey(section.id, i);
+          const checked = checks[key] ? 'checked' : '';
+          const price = getItemPrice(item);
+          const priceHtml = price ? `<span class="item-price">${price}</span>` : '';
+          return `
+            <div class="item ${checked}" data-key="${key}">
+              <div class="checkbox">
+                <svg class="checkmark" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <path d="M2.5 7.5L5.5 10.5L11.5 4" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="item-text">${getItemText(item)}${priceHtml}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    container.appendChild(sectionEl);
+  });
+
+  // Update global progress
+  const globalPct = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+  document.getElementById('globalPercent').textContent = `${globalPct}%`;
+  document.getElementById('globalCount').textContent = `${totalChecked} of ${totalItems} complete`;
+  document.getElementById('globalBar').style.width = `${globalPct}%`;
+
+  // Bind events
+  document.querySelectorAll('.section-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const section = header.closest('.section');
+      const sectionId = header.dataset.section;
+      section.classList.toggle('collapsed');
+      localStorage.setItem(`behike-collapsed-${sectionId}`, section.classList.contains('collapsed'));
+    });
+  });
+
+  document.querySelectorAll('.item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const key = item.dataset.key;
+      const checks = loadChecks();
+      const wasChecked = !!checks[key];
+      checks[key] = !wasChecked;
+      if (!checks[key]) delete checks[key];
+      saveChecks(checks);
+
+      if (!wasChecked) {
+        item.classList.add('checked', 'just-checked');
+        setTimeout(() => item.classList.remove('just-checked'), 300);
+      } else {
+        item.classList.remove('checked');
+      }
+
+      // Update counts without full re-render
+      updateCounts();
+    });
+  });
+
+  renderRevenue();
+}
+
+function updateCounts() {
+  const checks = loadChecks();
+  let totalItems = 0;
+  let totalChecked = 0;
+
+  SECTIONS.forEach(section => {
+    const sectionChecked = section.items.filter((_, i) => checks[getItemKey(section.id, i)]).length;
+    const sectionTotal = section.items.length;
+    totalItems += sectionTotal;
+    totalChecked += sectionChecked;
+
+    const pct = sectionTotal > 0 ? Math.round((sectionChecked / sectionTotal) * 100) : 0;
+    const sectionEl = document.querySelector(`[data-section="${section.id}"]`);
+    if (sectionEl) {
+      sectionEl.querySelector('.section-count').textContent = `${sectionChecked} / ${sectionTotal}`;
+      sectionEl.querySelector('.section-bar .fill').style.width = `${pct}%`;
+
+      const parent = sectionEl.closest('.section');
+      if (sectionChecked === sectionTotal) {
+        parent.classList.add('section-complete');
+      } else {
+        parent.classList.remove('section-complete');
+      }
+    }
+  });
+
+  const globalPct = totalItems > 0 ? Math.round((totalChecked / totalItems) * 100) : 0;
+  document.getElementById('globalPercent').textContent = `${globalPct}%`;
+  document.getElementById('globalCount').textContent = `${totalChecked} of ${totalItems} complete`;
+  document.getElementById('globalBar').style.width = `${globalPct}%`;
+}
+
+function addRevenue() {
+  const amountInput = document.getElementById('revAmount');
+  const sourceSelect = document.getElementById('revSource');
+  const amount = parseFloat(amountInput.value);
+
+  if (!amount || amount <= 0) return;
+
+  const entries = loadRevenue();
+  entries.unshift({
+    amount: amount,
+    source: sourceSelect.value,
+    date: new Date().toISOString()
+  });
+  saveRevenue(entries);
+  amountInput.value = '';
+  renderRevenue();
+}
+
+function deleteRevenue(index) {
+  const entries = loadRevenue();
+  entries.splice(index, 1);
+  saveRevenue(entries);
+  renderRevenue();
+}
+
+function renderRevenue() {
+  const entries = loadRevenue();
+  const total = entries.reduce((sum, e) => sum + e.amount, 0);
+
+  document.getElementById('revenueTotal').textContent = `$${total.toFixed(2)}`;
+
+  // This week
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay());
+  weekStart.setHours(0, 0, 0, 0);
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const thisWeek = entries
+    .filter(e => new Date(e.date) >= weekStart)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  const thisMonth = entries
+    .filter(e => new Date(e.date) >= monthStart)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  document.getElementById('revThisWeek').textContent = `$${thisWeek.toFixed(0)}`;
+  document.getElementById('revThisMonth').textContent = `$${thisMonth.toFixed(0)}`;
+  document.getElementById('revEntryCount').textContent = entries.length;
+
+  // Render entries
+  const container = document.getElementById('revenueEntries');
+  if (entries.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = entries.map((entry, i) => {
+    const d = new Date(entry.date);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `
+      <div class="revenue-entry">
+        <div class="entry-info">
+          <span class="entry-source">${entry.source}</span>
+          <span class="entry-date">${dateStr}</span>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <span class="entry-amount">+$${entry.amount.toFixed(2)}</span>
+          <span class="entry-delete" onclick="deleteRevenue(${i})">x</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function resetAll() {
+  if (confirm('Reset all checklist progress and revenue data? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(REVENUE_KEY);
+    SECTIONS.forEach(s => localStorage.removeItem(`behike-collapsed-${s.id}`));
+    render();
+  }
+}
+
+// Init
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueprint de Negocio E-Commerce</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f; --card: #1a1a2e; --inner: #141420; --border: #2d2d3d;
+    --white: #F5F5F7; --gray: #86868B; --cyan: #00D4FF;
+    --font: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  }
+  body { background: var(--bg); color: var(--white); font-family: var(--font); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 900px; margin: 0 auto; padding: 60px 32px; }
+  .header { text-align: center; padding: 80px 0 60px; }
+  .header h1 { font-size: 48px; font-weight: 700; letter-spacing: -0.02em; }
+  .header .sub { font-size: 16px; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 60px; height: 2px; background: var(--cyan); margin: 24px auto; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 48px; margin-bottom: 32px;  }
+  .module-num { font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; }
+  .module-title { font-size: 28px; font-weight: 700; margin-bottom: 32px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 6px; }
+  .fill { border-bottom: 1px dotted #333; min-height: 28px; margin-bottom: 14px; }
+  .inner { background: var(--inner); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .inner h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 14px; line-height: 2.2; display: flex; align-items: center; gap: 10px; }
+  .checklist li::before { content: ''; display: inline-block; width: 16px; height: 16px; min-width: 16px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .funnel { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 16px 0; }
+  .funnel-stage { display: flex; align-items: center; justify-content: center; height: 48px; font-size: 14px; font-weight: 600; border-radius: 6px; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+  .flow .step { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 600; }
+  .flow .arrow { color: var(--cyan); font-size: 18px; padding: 0 6px; }
+  .kpi { background: var(--inner); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; }
+  .kpi .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 12px; }
+  .kpi .kpi-value { font-size: 24px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted #333; padding-bottom: 8px; }
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .phase-card.highlight { border-color: var(--cyan); box-shadow: 0 0 30px rgba(0,212,255,0.06); }
+  .phase-card .phase-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 4px; }
+  .phase-card .phase-range { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 13px; line-height: 2; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 12px; }
+  
+    .module { break-inside: avoid;  }
+  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Blueprint de Negocio E-Commerce</h1>
+    <div class="sub">Desde tu primer listado hasta una operaci&oacute;n escalada</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- 01 CONFIGURACI&Oacute;N DE TIENDA -->
+  <div class="module">
+    <div class="module-num">01 / Configuraci&oacute;n de Tienda</div>
+    <div class="module-title">Fundaci&oacute;n</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Nombre de la Tienda</div><div class="fill"></div>
+        <div class="label">Plataforma</div><div class="fill"></div>
+        <div class="label">Nicho / Categor&iacute;a</div><div class="fill"></div>
+        <div class="label">Cliente Objetivo</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Checklist de Lanzamiento</h4>
+        <ul class="checklist">
+          <li>Dominio registrado</li>
+          <li>Pasarela de pago conectada</li>
+          <li>Tarifas de env&iacute;o configuradas</li>
+          <li>Pol&iacute;tica de devoluci&oacute;n escrita</li>
+          <li>P&aacute;ginas legales (T&eacute;rminos, Privacidad)</li>
+          <li>Anal&iacute;ticas instaladas</li>
+          <li>Captura de email activa</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 ABASTECIMIENTO DE PRODUCTOS -->
+  <div class="module">
+    <div class="module-num">02 / Abastecimiento de Productos</div>
+    <div class="module-title">Cadena de Suministro</div>
+    <div class="label">Modelo de Abastecimiento</div>
+    <div class="flow" style="margin-bottom:24px;">
+      <div class="step">Dropship</div><span class="arrow">/</span>
+      <div class="step">Mayorista</div><span class="arrow">/</span>
+      <div class="step">Marca Propia</div><span class="arrow">/</span>
+      <div class="step">Arbitraje</div>
+    </div>
+    <hr class="sep">
+    <div class="grid-2">
+      <div>
+        <div class="label">Proveedor 1</div><div class="fill"></div>
+        <div class="label">Proveedor 2</div><div class="fill"></div>
+        <div class="label">Proveedor 3</div><div class="fill"></div>
+        <div class="label">Tiempo de Entrega (prom.)</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Criterios de Proveedor</h4>
+        <ul class="checklist">
+          <li>Rese&ntilde;as / referencias verificadas</li>
+          <li>Env&iacute;o en menos de 7 d&iacute;as</li>
+          <li>Muestra probada</li>
+          <li>Margen superior al 30%</li>
+          <li>Proceso de devoluci&oacute;n confirmado</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 OPTIMIZACI&Oacute;N DE LISTADOS -->
+  <div class="module">
+    <div class="module-num">03 / Optimizaci&oacute;n de Listados</div>
+    <div class="module-title">Convierte Visitantes en Compradores</div>
+    <div class="inner" style="margin-bottom:24px;">
+      <h4>Anatom&iacute;a del Listado</h4>
+      <div class="funnel">
+        <div class="funnel-stage" style="width:100%;background:rgba(0,212,255,0.25);">T&iacute;tulo (rico en keywords, 80 chars m&aacute;x)</div>
+        <div class="funnel-stage" style="width:90%;background:rgba(0,212,255,0.20);">Imagen Principal (fondo blanco, foto lifestyle)</div>
+        <div class="funnel-stage" style="width:80%;background:rgba(0,212,255,0.16);">Puntos Clave (5 beneficios, no caracter&iacute;sticas)</div>
+        <div class="funnel-stage" style="width:70%;background:rgba(0,212,255,0.12);">Descripci&oacute;n (historia + especificaciones)</div>
+        <div class="funnel-stage" style="width:60%;background:rgba(0,212,255,0.08);">Prueba Social (rese&ntilde;as, insignias)</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Keywords Principales</div><div class="fill"></div><div class="fill"></div>
+        <div class="label">Punto de Precio</div><div class="fill"></div>
+        <div class="label">Rango de Precio Competencia</div><div class="fill"></div>
+      </div>
+      <div>
+        <div class="label">Fotos por Listado</div><div class="fill"></div>
+        <div class="label">Elemento A/B Test</div><div class="fill"></div>
+        <div class="label">Meta de Conversi&oacute;n</div><div class="fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 CANALES DE MARKETING -->
+  <div class="module">
+    <div class="module-num">04 / Canales de Marketing</div>
+    <div class="module-title">Motor de Tr&aacute;fico</div>
+    <div class="grid-3">
+      <div class="inner">
+        <h4>Org&aacute;nico</h4>
+        <ul class="checklist">
+          <li>SEO / B&uacute;squeda en plataforma</li>
+          <li>Contenido en redes sociales</li>
+          <li>Secuencias de email</li>
+          <li>Blog / Marketing de contenido</li>
+        </ul>
+      </div>
+      <div class="inner">
+        <h4>Pagado</h4>
+        <ul class="checklist">
+          <li>Anuncios en plataforma (PPC)</li>
+          <li>Anuncios sociales (Meta/TikTok)</li>
+          <li>Campa&ntilde;as de retargeting</li>
+          <li>Colaboraciones con influencers</li>
+        </ul>
+      </div>
+      <div class="inner">
+        <h4>Referidos</h4>
+        <ul class="checklist">
+          <li>Programa de afiliados</li>
+          <li>Bono por referir clientes</li>
+          <li>Incentivos por rese&ntilde;as</li>
+          <li>Construcci&oacute;n de comunidad</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="label">Presupuesto Mensual de Anuncios</div><div class="fill"></div>
+    <div class="label">ROAS Objetivo</div><div class="fill"></div>
+  </div>
+
+  <!-- 05 CUMPLIMIENTO -->
+  <div class="module">
+    <div class="module-num">05 / Cumplimiento</div>
+    <div class="module-title">Del Pedido a la Puerta</div>
+    <div class="flow" style="margin-bottom:24px;">
+      <div class="step">Pedido</div><span class="arrow">&rarr;</span>
+      <div class="step">Preparar</div><span class="arrow">&rarr;</span>
+      <div class="step">Enviar</div><span class="arrow">&rarr;</span>
+      <div class="step">Rastrear</div><span class="arrow">&rarr;</span>
+      <div class="step">Entregar</div><span class="arrow">&rarr;</span>
+      <div class="step">Seguimiento</div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="label">M&eacute;todo de Cumplimiento</div><div class="fill"></div>
+        <div class="label">Transportista</div><div class="fill"></div>
+        <div class="label">Tiempo de Env&iacute;o Prom.</div><div class="fill"></div>
+      </div>
+      <div>
+        <div class="label">Tipo de Empaque</div><div class="fill"></div>
+        <div class="label">Costo por Env&iacute;o</div><div class="fill"></div>
+        <div class="label">Meta de Tasa de Devoluci&oacute;n</div><div class="fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 SERVICIO AL CLIENTE -->
+  <div class="module">
+    <div class="module-num">06 / Servicio al Cliente</div>
+    <div class="module-title">M&aacute;quina de Retenci&oacute;n</div>
+    <div class="grid-2">
+      <div class="inner">
+        <h4>Est&aacute;ndares de Respuesta</h4>
+        <div class="label">Tiempo de Primera Respuesta</div><div class="fill"></div>
+        <div class="label">Tiempo de Resoluci&oacute;n</div><div class="fill"></div>
+        <div class="label">Canales de Soporte</div><div class="fill"></div>
+        <div class="label">Cantidad de FAQ</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Playbook de Retenci&oacute;n</h4>
+        <ul class="checklist">
+          <li>Secuencia de email post-compra</li>
+          <li>Solicitar rese&ntilde;a (d&iacute;a 7)</li>
+          <li>Oferta de upsell (d&iacute;a 14)</li>
+          <li>Campa&ntilde;a de recuperaci&oacute;n (d&iacute;a 60)</li>
+          <li>Programa de lealtad activo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 FASES DE CRECIMIENTO -->
+  <div class="module">
+    <div class="module-num">07 / Crecimiento y Escalamiento</div>
+    <div class="module-title">Hoja de Ruta</div>
+    <div class="grid-3">
+      <div class="phase-card">
+        <div class="phase-label">Fase 1</div>
+        <div class="phase-range">$0 - $5K<span style="color:var(--gray);font-size:14px;font-weight:400;">/mes</span></div>
+        <ul class="checklist">
+          <li>Validar 3-5 productos</li>
+          <li>Optimizar listado principal</li>
+          <li>Construir base de rese&ntilde;as</li>
+          <li>Probar 1 canal de anuncios</li>
+          <li>Automatizar cumplimiento</li>
+        </ul>
+      </div>
+      <div class="phase-card highlight">
+        <div class="phase-label">Fase 2</div>
+        <div class="phase-range">$5K - $15K<span style="color:var(--gray);font-size:14px;font-weight:400;">/mes</span></div>
+        <ul class="checklist">
+          <li>Expandir a 10-15 SKUs</li>
+          <li>Escalar anuncios ganadores</li>
+          <li>Contratar VA para soporte</li>
+          <li>A&ntilde;adir segunda plataforma</li>
+          <li>Lista de email a 1K+</li>
+        </ul>
+      </div>
+      <div class="phase-card">
+        <div class="phase-label">Fase 3</div>
+        <div class="phase-range">$15K+<span style="color:var(--gray);font-size:14px;font-weight:400;">/mes</span></div>
+        <ul class="checklist">
+          <li>Marca propia en top sellers</li>
+          <li>Construir presencia de marca</li>
+          <li>Cuentas de mayorista</li>
+          <li>Equipo de 2-3</li>
+          <li>Sincronizaci&oacute;n multi-canal</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 REGISTRO DE INGRESOS -->
+  <div class="module">
+    <div class="module-num">08 / Registro de Ingresos</div>
+    <div class="module-title">Scorecard Mensual</div>
+    <div class="grid-4" style="margin-bottom:24px;">
+      <div class="kpi"><div class="kpi-label">Ingresos</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Costo</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Gasto en Ads</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Ganancia Neta</div><div class="kpi-value">$</div></div>
+    </div>
+    <table class="clean">
+      <thead>
+        <tr><th>Mes</th><th>Ingresos</th><th>&Oacute;rdenes</th><th>AOV</th><th>Gasto Ads</th><th>ROAS</th><th>Ganancia</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Mes 1</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Mes 2</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Mes 3</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Mes 4</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Mes 5</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Mes 6</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <strong>BEHIKE.CO</strong><br>
+    Hecho en Puerto Rico
+  </div>
+
+</div>
+</body>
+</html>

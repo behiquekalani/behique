@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Network Effect Playbook — Behike</title>
+  <meta name="description" content="How to build the relationships that open opportunities without networking events, LinkedIn spam, or asking for favors. $20.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --border: #222222;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* NAV */
+    nav {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    #hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(34px, 5.5vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      max-width: 820px;
+      margin: 0 auto 28px;
+    }
+    .hero-sub {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 44px;
+      line-height: 1.55;
+    }
+    .price-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .price-amount {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.4;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .hero-meta {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 90px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 42px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 640px;
+    }
+
+    /* PROBLEM */
+    #problem .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 52px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .problem-card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* TIER MAP */
+    #tier-map {
+      background: var(--surface);
+    }
+    .tier-map-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .tier-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .tier-item {
+      padding: 40px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .tier-item:last-child { border-right: none; }
+    .tier-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 980px;
+      margin-bottom: 20px;
+    }
+    .tier-badge.t1 { background: rgba(10,132,255,0.15); color: var(--accent); }
+    .tier-badge.t2 { background: rgba(48,209,88,0.15); color: var(--cta); }
+    .tier-badge.t3 { background: rgba(255,214,10,0.15); color: #FFD60A; }
+    .tier-item h3 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .tier-item .tier-count {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .tier-item p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .tier-purpose {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    @media (max-width: 720px) {
+      .tiers { grid-template-columns: 1fr; }
+      .tier-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .tier-item:last-child { border-bottom: none; }
+    }
+
+    /* WHAT'S INSIDE */
+    #inside .chapters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 52px;
+    }
+    .chapter-item {
+      display: flex;
+      gap: 18px;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      align-items: flex-start;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .chapter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .appendix-note {
+      margin-top: 28px;
+      padding: 22px 28px;
+      background: rgba(10,132,255,0.06);
+      border: 1px solid rgba(10,132,255,0.2);
+      border-radius: 12px;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    .appendix-note strong { color: var(--text); }
+
+    /* TESTIMONIALS */
+    #testimonials .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 52px;
+    }
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .stars {
+      color: #FFD60A;
+      font-size: 15px;
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+    }
+    .testimonial blockquote {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 22px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .author-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .author-role {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* WHO IT'S FOR */
+    #for .list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .for-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .for-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(10,132,255,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+    }
+    .for-text {
+      font-size: 15px;
+      color: var(--muted);
+      padding-top: 5px;
+      line-height: 1.55;
+    }
+    .for-text strong { color: var(--text); }
+
+    /* NOT FOR */
+    .not-for {
+      margin-top: 52px;
+      padding: 28px 32px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .not-for h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      color: var(--muted);
+    }
+    .not-for ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .not-for li {
+      font-size: 15px;
+      color: var(--muted);
+      padding-left: 20px;
+      position: relative;
+    }
+    .not-for li::before {
+      content: "x";
+      position: absolute;
+      left: 0;
+      color: #FF453A;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* PRICING */
+    #pricing {
+      text-align: center;
+    }
+    .price-card {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 52px 60px;
+      max-width: 480px;
+      width: 100%;
+      margin-top: 48px;
+    }
+    .price-main {
+      font-size: 64px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+    .price-sub {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .price-features {
+      list-style: none;
+      margin-bottom: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .price-features li {
+      font-size: 15px;
+      color: var(--muted);
+      padding-left: 22px;
+      position: relative;
+    }
+    .price-features li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--cta);
+      font-weight: 700;
+    }
+    .guarantee {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* FINAL CTA */
+    #final-cta {
+      text-align: center;
+      padding: 100px 0;
+      border-bottom: none;
+    }
+    .final-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      max-width: 680px;
+      margin: 0 auto 20px;
+      line-height: 1.1;
+    }
+    .final-sub {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-brand">Behike</a>
+    <a href="https://behikeai.gumroad.com/l/network-effect-playbook" class="nav-cta">Get it for $20.99</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="wrap">
+      <div class="reveal">
+        <span class="hero-label">Behike Digital</span>
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        The best opportunities are not posted.<br>They are passed between people<br>who know each other.
+      </h1>
+      <p class="hero-sub reveal reveal-delay-2">
+        How to build the relationships that open opportunities without networking events, LinkedIn spam, or asking for favors.
+      </p>
+      <div class="reveal reveal-delay-3">
+        <div class="price-display">
+          <span class="price-amount">$20.99</span>
+          <span class="price-note">One-time purchase.<br>Instant PDF download.</span>
+        </div>
+        <br>
+        <a href="https://behikeai.gumroad.com/l/network-effect-playbook" class="btn-primary">Get The Playbook</a>
+        <p class="hero-meta">8 chapters + appendix. 5,000+ words. Tactical and specific.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-label">The Problem</p>
+        <h2 class="section-title">Three ways traditional<br>networking backfires</h2>
+        <p class="section-body">Most networking advice optimizes for the wrong thing. It teaches you how to ask, not how to give. It builds volume, not trust. Here is where the standard playbook breaks down.</p>
+      </div>
+      <div class="grid">
+        <div class="problem-card reveal reveal-delay-1">
+          <p class="problem-number">01</p>
+          <h3>The transactional trap</h3>
+          <p>You reach out when you need something. The person on the receiving end immediately reads you as someone trying to extract value. There is no prior deposit, no history of reciprocity. The ask arrives in isolation and it fails.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-2">
+          <p class="problem-number">02</p>
+          <h3>LinkedIn is a cold calling platform</h3>
+          <p>The platform's architecture trains people to treat outreach like volume sales. Most inboxes have a two-bucket filter: people I know, and people trying to sell me something. Template messages land in the second bucket regardless of intent.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3">
+          <p class="problem-number">03</p>
+          <h3>Deficit networking</h3>
+          <p>People network when they need something, which means they are always operating from a position of urgency. Urgency reads as desperation. Desperation is the least compelling posture you can bring to a new relationship.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIER MAP -->
+  <section id="tier-map">
+    <div class="tier-map-inner">
+      <div class="tier-header">
+        <div class="reveal">
+          <p class="section-label">The Framework</p>
+          <h2 class="section-title">The 3-Tier Network Map</h2>
+          <p class="section-body" style="margin: 0 auto;">Not everyone in your network deserves the same attention. These three tiers create a structure for who to focus on, how to engage differently, and where the real leverage lives.</p>
+        </div>
+      </div>
+      <div class="tiers reveal">
+        <div class="tier-item">
+          <span class="tier-badge t1">Tier 1</span>
+          <h3>Peers</h3>
+          <p class="tier-count">15-30 contacts. Monthly touchpoints.</p>
+          <p>People at your current level or within one tier. Building in the same space, facing the same problems. The most undervalued relationships in most people's networks.</p>
+          <p class="tier-purpose">The person who is your peer today is a key decision-maker in three years. Build now, before there is a power differential.</p>
+        </div>
+        <div class="tier-item">
+          <span class="tier-badge t2">Tier 2</span>
+          <h3>Aspirational</h3>
+          <p class="tier-count">5-10 contacts. Quarterly touchpoints.</p>
+          <p>People 1-3 tiers above your current level whose work is specifically relevant to where you are heading. Not generically impressive. Specifically relevant to your trajectory.</p>
+          <p class="tier-purpose">Quality over quantity. One strong Tier 2 relationship outperforms fifty dormant connections with senior people.</p>
+        </div>
+        <div class="tier-item">
+          <span class="tier-badge t3">Tier 3</span>
+          <h3>Connectors</h3>
+          <p class="tier-count">3-7 contacts. High reciprocity required.</p>
+          <p>People whose value is the breadth and quality of their own network. Community builders, podcast hosts, organizers. They can compress the timeline from months to days.</p>
+          <p class="tier-purpose">One introduction from the right connector is worth more than a hundred cold messages. These relationships require genuine reciprocity first.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="inside">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-label">The Playbook</p>
+        <h2 class="section-title">What's inside</h2>
+        <p class="section-body">Eight chapters that move from strategy to execution. Each one is specific and tactical, not a collection of platitudes about being genuine.</p>
+      </div>
+      <div class="chapters">
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">Ch.1</span>
+          <div class="chapter-text">
+            <h4>Why Traditional Networking Fails</h4>
+            <p>The structural problems: the ask-before-give pattern, why LinkedIn outreach gets ignored at the architectural level, and the different approach.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">Ch.2</span>
+          <div class="chapter-text">
+            <h4>The Visibility-First Strategy</h4>
+            <p>How to become known in your space through content before any direct outreach. The ambient awareness effect and platform-specific tactics.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-3">
+          <span class="chapter-num">Ch.3</span>
+          <div class="chapter-text">
+            <h4>Building Your Network Map</h4>
+            <p>The three-tier system in full. How to identify who belongs where, how to audit your existing network, and how to prioritize the next 90 days.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">Ch.4</span>
+          <div class="chapter-text">
+            <h4>The Value-First Outreach System</h4>
+            <p>Four types of value you can offer before asking for anything: signal amplification, introductions, information, and work. Message structures that work.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">Ch.5</span>
+          <div class="chapter-text">
+            <h4>Online Community Strategy</h4>
+            <p>How to choose communities where your target network congregates, the contribution formula, and the timeline for becoming a recognized presence.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-3">
+          <span class="chapter-num">Ch.6</span>
+          <div class="chapter-text">
+            <h4>The Collaboration Model</h4>
+            <p>Joint venture structures for creators, how to propose mutually beneficial collaborations, the guest post and podcast trade, and post-collaboration momentum.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">Ch.7</span>
+          <div class="chapter-text">
+            <h4>Converting Connections to Opportunities</h4>
+            <p>Readiness signals, the warm introduction request, when and how to ask for referrals, and the opportunity presentation format.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">Ch.8</span>
+          <div class="chapter-text">
+            <h4>Maintaining Your Network</h4>
+            <p>The relationship CRM, target cadence by tier, the annual check-in format, and how to stay top of mind without being the person everyone dreads hearing from.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-note reveal">
+        <strong>Appendix included:</strong> Network map template (spreadsheet-ready), five outreach message templates you can use immediately, community contribution tracker, and the full 90-day network build checklist.
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-label">Results</p>
+        <h2 class="section-title">What readers say</h2>
+      </div>
+      <div class="grid">
+        <div class="testimonial reveal reveal-delay-1">
+          <div class="stars">★★★★★</div>
+          <blockquote>"The tier system completely changed how I think about my contacts. I had been treating every connection the same way and wondering why nothing was converting. Chapter 3 alone was worth the price."</blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">Marcus T.</span>
+            <span class="author-role">Freelance product consultant</span>
+          </div>
+        </div>
+        <div class="testimonial reveal reveal-delay-2">
+          <div class="stars">★★★★★</div>
+          <blockquote>"I had been grinding LinkedIn for six months with almost no results. The visibility-first approach flipped the script. Two Tier 2 contacts reached out to me after I started using the content strategy in Chapter 2."</blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">Priya N.</span>
+            <span class="author-role">UX designer, career transition</span>
+          </div>
+        </div>
+        <div class="testimonial reveal reveal-delay-3">
+          <div class="stars">★★★★★</div>
+          <blockquote>"The message templates in the appendix are the most honest outreach copy I have ever seen. They actually sound like a human being wrote them. Sent three of them in the first week. Got two responses within 48 hours."</blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">Carlos M.</span>
+            <span class="author-role">Early-stage founder</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="for">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-label">Fit</p>
+        <h2 class="section-title">Who this is for</h2>
+        <p class="section-body">This playbook is tactical and specific. It works best for people who are willing to play a longer game and invest in relationships before they need them.</p>
+      </div>
+      <div class="list">
+        <div class="for-item reveal reveal-delay-1">
+          <span class="for-icon">01</span>
+          <p class="for-text"><strong>Builders and solopreneurs</strong> who want to generate inbound opportunities without a sales team or an outbound budget.</p>
+        </div>
+        <div class="for-item reveal reveal-delay-2">
+          <span class="for-icon">02</span>
+          <p class="for-text"><strong>Professionals in transition</strong> who are changing roles, industries, or levels and need to build relevant connections in a new space quickly.</p>
+        </div>
+        <div class="for-item reveal reveal-delay-3">
+          <span class="for-icon">03</span>
+          <p class="for-text"><strong>Creators and consultants</strong> who want to build a reputation in a specific domain that attracts the right clients and collaborators without cold pitching.</p>
+        </div>
+        <div class="for-item reveal reveal-delay-1">
+          <span class="for-icon">04</span>
+          <p class="for-text"><strong>Students and early-career people</strong> who want to start building relationships before they need them and avoid the deficit-networking trap entirely.</p>
+        </div>
+        <div class="for-item reveal reveal-delay-2">
+          <span class="for-icon">05</span>
+          <p class="for-text"><strong>Anyone who hates traditional networking</strong> and wants a framework that feels honest, not performative.</p>
+        </div>
+        <div class="for-item reveal reveal-delay-3">
+          <span class="for-icon">06</span>
+          <p class="for-text"><strong>People who already have a network</strong> but have never systematized it and are leaving value dormant in their existing connections.</p>
+        </div>
+      </div>
+      <div class="not-for reveal">
+        <h3>This is not for you if:</h3>
+        <ul>
+          <li>You are looking for shortcuts to extract value from people quickly</li>
+          <li>You want automated tools to do the relationship work for you</li>
+          <li>You are not willing to contribute before asking for anything</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">One price. No subscription.</h2>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-main">$20.99</div>
+        <p class="price-sub">One-time payment. Keep it forever.</p>
+        <ul class="price-features">
+          <li>The full 5,000+ word playbook (PDF)</li>
+          <li>8 tactical chapters</li>
+          <li>5 outreach message templates</li>
+          <li>Network map template (spreadsheet-ready)</li>
+          <li>Community contribution tracker</li>
+          <li>90-day network build checklist</li>
+          <li>Instant download after purchase</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/network-effect-playbook" class="btn-primary" style="width: 100%; text-align: center; display: block;">Get The Playbook</a>
+        <p class="guarantee">30-day full refund if it is not worth it. No questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="final-cta">
+    <div class="wrap">
+      <h2 class="final-title reveal">Stop networking after you need something.</h2>
+      <p class="final-sub reveal reveal-delay-1">The relationships that change your trajectory take time to build. Start before you need them.</p>
+      <div class="reveal reveal-delay-2">
+        <a href="https://behikeai.gumroad.com/l/network-effect-playbook" class="btn-primary">Get The Playbook for $20.99</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Behike. <a href="privacy.html">Privacy</a> &bull; <a href="terms.html">Terms</a> &bull; <a href="refund.html">Refund Policy</a></p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

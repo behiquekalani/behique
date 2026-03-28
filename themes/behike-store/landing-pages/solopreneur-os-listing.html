@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solopreneur OS — Behike</title>
+  <meta name="description" content="The operating system for a one-person business. Weekly review, revenue tracking, content calendar, project management for solo operators. Every system, one place. $29.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-w: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+
+    .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); text-decoration: none; }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    #hero { padding: 160px 0 100px; text-align: center; }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      max-width: 800px;
+      margin: 0 auto 24px;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 20px;
+      margin-bottom: 32px;
+    }
+
+    .price-amount { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .price-label { font-size: 13px; color: var(--text-secondary); }
+
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .btn-cta:active { transform: translateY(0); }
+
+    .hero-meta { margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
+
+    section { padding: 96px 0; }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-intro { font-size: 18px; color: var(--text-secondary); max-width: 600px; line-height: 1.6; margin-bottom: 60px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    #problem { background: #050505; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 32px 28px; }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #0A1829;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .card h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 10px; }
+    .card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+
+    #inside { background: var(--bg); }
+
+    .chapters-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+
+    .chapter-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+
+    .chapter-number {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #0A1829;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chapter-text h4 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 4px; }
+    .chapter-text p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+    .appendix-banner {
+      margin-top: 24px;
+      background: linear-gradient(135deg, #0A1829 0%, #001533 100%);
+      border: 1px solid #0A2444;
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .appendix-banner h4 { font-size: 16px; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+    .appendix-banner p { font-size: 14px; color: var(--text-secondary); }
+
+    #social-proof { background: #050505; }
+
+    .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .testimonial { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 28px; }
+
+    .stars { color: #FFD60A; font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 15px; line-height: 1.65; color: var(--text); margin-bottom: 20px; }
+
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+
+    .author-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0A84FF, #30D158);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .author-name { font-size: 14px; font-weight: 600; }
+    .author-title { font-size: 12px; color: var(--text-secondary); }
+
+    #audience { background: var(--bg); }
+
+    .audience-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    @media (max-width: 600px) { .audience-grid { grid-template-columns: 1fr; } }
+
+    .audience-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 18px; padding: 28px; }
+    .audience-card.for { border-top: 2px solid var(--cta); }
+    .audience-card.not-for { border-top: 2px solid #3A3A3C; }
+
+    .audience-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+
+    .audience-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .audience-card ul li { font-size: 15px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+
+    .li-icon { flex-shrink: 0; margin-top: 2px; }
+    .for .li-icon { color: var(--cta); }
+    .not-for .li-icon { color: #3A3A3C; }
+
+    #price { background: #050505; }
+
+    .price-box { max-width: 560px; margin: 0 auto; text-align: center; }
+
+    .price-big { font-size: clamp(48px, 8vw, 80px); font-weight: 700; letter-spacing: -0.04em; color: var(--text); margin-bottom: 8px; }
+
+    .price-comparison { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; }
+    .price-comparison s { color: #3A3A3C; }
+
+    .guarantee { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px 24px; margin-bottom: 32px; display: flex; gap: 14px; align-items: flex-start; text-align: left; }
+
+    .guarantee-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+    .guarantee h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .guarantee p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+
+    .includes-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 36px; text-align: left; }
+
+    .includes-item { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--text-secondary); }
+    .includes-item .check { color: var(--cta); font-size: 16px; flex-shrink: 0; }
+
+    #final-cta { background: var(--bg); text-align: center; padding: 120px 0; }
+    #final-cta h2 { max-width: 640px; margin: 0 auto 20px; }
+    #final-cta p { font-size: 18px; color: var(--text-secondary); max-width: 480px; margin: 0 auto 40px; }
+
+    footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; }
+    footer p { font-size: 13px; color: var(--text-secondary); }
+    footer a { color: var(--text-secondary); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .fade-up { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up-delay-1 { transition-delay: 0.1s; }
+    .fade-up-delay-2 { transition-delay: 0.2s; }
+    .fade-up-delay-3 { transition-delay: 0.3s; }
+    .fade-up-delay-4 { transition-delay: 0.4s; }
+
+    @media (max-width: 768px) {
+      section { padding: 72px 0; }
+      #hero { padding: 120px 0 72px; }
+      .container { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">Behike</a>
+      <a href="https://behike.gumroad.com/l/solopreneur-os" class="nav-cta">Get the OS — $29.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <span class="eyebrow fade-up">Digital Product</span>
+      <h1 class="fade-up fade-up-delay-1">The operating system for a one-person business.<br><span>Every system, one place.</span></h1>
+      <p class="hero-sub fade-up fade-up-delay-2">Weekly review, revenue tracking, content calendar, and project management built specifically for solo operators. Not a corporate framework ported down. A system designed from scratch for one person running everything.</p>
+      <div class="price-badge fade-up fade-up-delay-3">
+        <span class="price-amount">$29.99</span>
+        <span class="price-label">One-time. Instant download. PDF + Markdown.</span>
+      </div>
+      <br />
+      <a href="https://behike.gumroad.com/l/solopreneur-os" class="btn-cta fade-up fade-up-delay-4">Get the Solopreneur OS</a>
+      <p class="hero-meta fade-up fade-up-delay-4">6,500+ words. 10 chapters. Weekly review template. Revenue tracker. Project management framework for one-person operations.</p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label fade-up">The Problem</p>
+      <h2 class="fade-up">Three ways solopreneurs lose control of their business</h2>
+      <p class="section-intro fade-up">Running everything alone does not mean doing everything randomly. The absence of systems is what turns a business into a full-time emergency.</p>
+      <div class="cards-grid">
+        <div class="card fade-up fade-up-delay-1">
+          <div class="card-icon">01</div>
+          <h3>No weekly operating rhythm</h3>
+          <p>Most solo operators start each week reactively. They respond to what's loudest instead of what's most important. Without a weekly review structure, the work that builds the business keeps getting displaced by the work that maintains it.</p>
+        </div>
+        <div class="card fade-up fade-up-delay-2">
+          <div class="card-icon">02</div>
+          <h3>Revenue tracking as a monthly surprise</h3>
+          <p>Checking revenue once a month means you find out too late when something is not working. The tracking layer in the Solopreneur OS makes revenue visible at a glance, weekly. Problems become visible early enough to act on them.</p>
+        </div>
+        <div class="card fade-up fade-up-delay-3">
+          <div class="card-icon">03</div>
+          <h3>Using project management tools built for teams</h3>
+          <p>Asana, Jira, and ClickUp are built for teams that need coordination. Running them solo creates overhead without benefit. The Solopreneur OS is a minimal project structure that handles everything one person needs without the noise of tools built for ten.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- WHAT'S INSIDE -->
+  <section id="inside">
+    <div class="container">
+      <p class="section-label fade-up">What's Inside</p>
+      <h2 class="fade-up">10 chapters. Every system in one place.</h2>
+      <p class="section-intro fade-up">Each chapter covers one operating system. Together they form the complete infrastructure for running a one-person business without things falling through the cracks.</p>
+      <div class="chapters-list">
+        <div class="chapter-item fade-up fade-up-delay-1">
+          <div class="chapter-number">1</div>
+          <div class="chapter-text">
+            <h4>Why Solo Operating Systems Are Different</h4>
+            <p>What changes when one person is the entire company. The design principles behind a system built for one.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-2">
+          <div class="chapter-number">2</div>
+          <div class="chapter-text">
+            <h4>The Weekly Review System</h4>
+            <p>The 45-minute review structure. What to assess, what to decide, what to move. The exact format used weekly.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-1">
+          <div class="chapter-number">3</div>
+          <div class="chapter-text">
+            <h4>Revenue Tracking for One-Person Businesses</h4>
+            <p>The minimal revenue dashboard. Weekly visibility without accounting software. How to read your numbers in under 10 minutes.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-2">
+          <div class="chapter-number">4</div>
+          <div class="chapter-text">
+            <h4>The Content Calendar Layer</h4>
+            <p>Integrating content planning into business operations. The calendar structure that keeps content and revenue aligned.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-1">
+          <div class="chapter-number">5</div>
+          <div class="chapter-text">
+            <h4>Project Management for Solo Operators</h4>
+            <p>A minimal project structure with three layers: active, queued, and archived. How to decide what gets worked on and when.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-2">
+          <div class="chapter-number">6</div>
+          <div class="chapter-text">
+            <h4>The Daily Operating Routine</h4>
+            <p>The 3-block day structure. How to protect deep work time inside a business that demands constant switching.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-1">
+          <div class="chapter-number">7</div>
+          <div class="chapter-text">
+            <h4>The Quarterly Planning Session</h4>
+            <p>How to set 90-day targets that are honest and achievable. The review framework for evaluating what worked and what to stop.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-2">
+          <div class="chapter-number">8</div>
+          <div class="chapter-text">
+            <h4>Managing Energy, Not Just Time</h4>
+            <p>The work schedule that accounts for how solopreneurs actually operate. High-energy tasks versus low-energy tasks mapped to the day.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-1">
+          <div class="chapter-number">9</div>
+          <div class="chapter-text">
+            <h4>The Customer and Product Tracker</h4>
+            <p>A lightweight system for tracking what you sell, who bought it, and what they said. Feedback loops without CRM complexity.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-up fade-up-delay-2">
+          <div class="chapter-number">10</div>
+          <div class="chapter-text">
+            <h4>Running the Full OS Week One</h4>
+            <p>The exact sequence for setting up and running the complete system in the first week. No partial implementation. The full thing.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-banner fade-up">
+        <div>
+          <h4>Appendix Included</h4>
+          <p>Weekly review template (fillable). Revenue dashboard structure. 90-day planning worksheet. Daily block schedule template. Project tracker framework with example entries.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- SOCIAL PROOF -->
+  <section id="social-proof">
+    <div class="container">
+      <p class="section-label fade-up">Results</p>
+      <h2 class="fade-up">From solo operators who got their business under control</h2>
+      <p class="section-intro fade-up">Early readers of the framework behind this system.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial fade-up fade-up-delay-1">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I was running four products, a newsletter, and a consulting practice with no system connecting them. Every week felt like starting over. The weekly review structure in Chapter 2 was the first thing I implemented and it immediately made everything else more manageable. Three months later I still run it every Sunday."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">BE</div>
+            <div>
+              <div class="author-name">Ben E.</div>
+              <div class="author-title">Solo consultant and digital product seller</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial fade-up fade-up-delay-2">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The revenue tracker changed how I make decisions. I was looking at my numbers maybe twice a month and always reacting late. Now I check weekly in under 10 minutes. I caught a product that was underperforming in week 3 instead of month 3. The difference in response time is the whole value."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">YC</div>
+            <div>
+              <div class="author-name">Yara C.</div>
+              <div class="author-title">Online course creator, 2 years solo</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial fade-up fade-up-delay-3">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I tried Notion, Asana, and Trello before reading this. The problem was never the tool. It was using tools built for teams when I just needed a clean solo structure. The project management chapter gave me a system I actually use because it does not require maintenance to maintain. That's the key insight."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">FN</div>
+            <div>
+              <div class="author-name">Felix N.</div>
+              <div class="author-title">Freelancer transitioning to products</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- AUDIENCE -->
+  <section id="audience">
+    <div class="container">
+      <p class="section-label fade-up">Fit</p>
+      <h2 class="fade-up">This OS is for a specific type of operator</h2>
+      <p class="section-intro fade-up">If you are running a one-person business and feel like you are always behind, this was built for you.</p>
+      <div class="audience-grid">
+        <div class="audience-card for fade-up fade-up-delay-1">
+          <h3><span style="color: var(--cta);">Who it's for</span></h3>
+          <ul>
+            <li><span class="li-icon">+</span> Solo operators who feel like they are running without a system</li>
+            <li><span class="li-icon">+</span> Solopreneurs managing multiple revenue streams with no unified view</li>
+            <li><span class="li-icon">+</span> Freelancers transitioning to products who need better operational structure</li>
+            <li><span class="li-icon">+</span> Anyone who starts each week without a clear plan and ends it feeling behind</li>
+            <li><span class="li-icon">+</span> People who have tried team productivity tools and found them too heavy for one person</li>
+          </ul>
+        </div>
+        <div class="audience-card not-for fade-up fade-up-delay-2">
+          <h3><span style="color: #A1A1A6;">Who it's not for</span></h3>
+          <ul>
+            <li><span class="li-icon" style="color: #3A3A3C;">-</span> Teams that need shared coordination and delegation systems</li>
+            <li><span class="li-icon" style="color: #3A3A3C;">-</span> People who have not started a business yet and are still in planning mode</li>
+            <li><span class="li-icon" style="color: #3A3A3C;">-</span> Operators who already have a functioning system and are past the setup phase</li>
+            <li><span class="li-icon" style="color: #3A3A3C;">-</span> Anyone looking for accounting or financial modeling software</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- PRICE -->
+  <section id="price">
+    <div class="container">
+      <div class="price-box">
+        <p class="section-label fade-up" style="text-align: center;">Pricing</p>
+        <h2 class="fade-up" style="text-align: center;">One price. Everything included.</h2>
+        <div class="price-big fade-up">$29.99</div>
+        <p class="price-comparison fade-up">One-time purchase. No subscription. <s>Comparable productivity courses: $200-$500+</s></p>
+        <div class="guarantee fade-up">
+          <div class="guarantee-icon">&#9632;</div>
+          <div>
+            <h4>30-day money-back guarantee</h4>
+            <p>Run the system for two weeks. If it does not bring the clarity and control it describes, email for a full refund. No questions asked.</p>
+          </div>
+        </div>
+        <div class="includes-list fade-up">
+          <div class="includes-item"><span class="check">&#10003;</span> Full guide: 6,500+ words across 10 chapters</div>
+          <div class="includes-item"><span class="check">&#10003;</span> Weekly review template (fillable format)</div>
+          <div class="includes-item"><span class="check">&#10003;</span> Revenue dashboard structure with weekly tracking layout</div>
+          <div class="includes-item"><span class="check">&#10003;</span> 90-day planning worksheet and quarterly review framework</div>
+          <div class="includes-item"><span class="check">&#10003;</span> Project tracker framework. Daily block schedule template.</div>
+          <div class="includes-item"><span class="check">&#10003;</span> PDF + Markdown versions. Lifetime access.</div>
+        </div>
+        <a href="https://behike.gumroad.com/l/solopreneur-os" class="btn-cta fade-up" style="width: 100%; text-align: center; display: block; padding: 18px;">Get Instant Access — $29.99</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- FINAL CTA -->
+  <section id="final-cta">
+    <div class="container">
+      <span class="eyebrow fade-up">Solopreneur OS</span>
+      <h2 class="fade-up">Running a one-person business without systems<br>is just running in place.</h2>
+      <p class="fade-up">The weekly review, revenue tracker, content calendar, and project framework are the four systems that keep a one-person business moving forward instead of constantly resetting. They are all here.</p>
+      <a href="https://behike.gumroad.com/l/solopreneur-os" class="btn-cta fade-up">Get the Solopreneur OS — $29.99</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; Digital products for one-person businesses. <a href="https://behique.com">behique.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      var heroEls = document.querySelectorAll('#hero .fade-up');
+      heroEls.forEach(function (el) { el.classList.add('visible'); });
+
+      var allFadeUp = document.querySelectorAll('section:not(#hero) .fade-up, footer .fade-up');
+      allFadeUp.forEach(function (el) { observer.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>

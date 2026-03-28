@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Coaching Business Blueprint — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --muted: #8E8E93;
+      --card: #1C1C1E;
+      --border: #2C2C2E;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-brand span { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 62px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #A1A1A6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 21px);
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-price {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .hero-price-note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-cta:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .hero-meta {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: #A1A1A6;
+      line-height: 1.7;
+      max-width: 680px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* WHAT'S INSIDE */
+    .chapters-list {
+      margin-top: 48px;
+      display: grid;
+      gap: 16px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .chapter-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .chapter-text h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 48px;
+    }
+    @media (max-width: 600px) {
+      .audience-grid { grid-template-columns: 1fr; }
+    }
+    .audience-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .audience-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .audience-card.good { border-color: rgba(48, 209, 88, 0.3); }
+    .audience-card.bad { border-color: rgba(255, 69, 58, 0.2); }
+    .audience-card .tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 20px;
+    }
+    .audience-card.good .tag {
+      background: rgba(48, 209, 88, 0.15);
+      color: var(--cta);
+    }
+    .audience-card.bad .tag {
+      background: rgba(255, 69, 58, 0.1);
+      color: #FF453A;
+    }
+    .audience-card ul { list-style: none; }
+    .audience-card ul li {
+      font-size: 15px;
+      color: #A1A1A6;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .audience-card ul li:last-child { border-bottom: none; }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .cta-section h2 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+    .cta-section p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto 40px;
+    }
+    .cta-price-block {
+      margin-bottom: 36px;
+    }
+    .cta-price {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+    }
+    .cta-price-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .guarantee {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* ANIMATIONS */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 60px 0 50px; }
+      section { padding: 60px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behi<span>ke</span></a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Digital Product</div>
+      <h1>Creator's Coaching<br>Business Blueprint</h1>
+      <p class="hero-sub">
+        How to build a profitable coaching or consulting practice around what you already know, without burning out or undercharging.
+      </p>
+      <div class="hero-price">$27.99</div>
+      <p class="hero-price-note">One-time purchase. Instant download. PDF included.</p>
+      <a href="#buy" class="btn-cta">Get the Blueprint</a>
+      <p class="hero-meta">9 chapters. 5,000+ words. Built for creator-coaches.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up">The Problem</p>
+      <h2 class="section-title fade-up">Most creators drift into coaching. That is the mistake.</h2>
+      <p class="section-body fade-up">
+        Without deliberate positioning, pricing, and systems, coaching turns into the highest-effort, lowest-leverage work you can do. You take on the wrong clients, charge too little, and eventually resent the thing you were excited about.
+      </p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">&#9746;</div>
+          <h3>Vague positioning</h3>
+          <p>You describe yourself as a business coach, a mindset coach, or a "helping people grow" person. Nobody specific recognizes themselves.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9746;</div>
+          <h3>Underpriced packages</h3>
+          <p>You set prices based on what you think someone will say yes to, not the value of the outcome you deliver. The result is clients who are grateful but underpay.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9746;</div>
+          <h3>No onboarding system</h3>
+          <p>Every new client starts differently. Sessions lack structure. Progress is hard to track. And you spend half the call catching up instead of doing the actual work.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#9746;</div>
+          <h3>Burnout by month four</h3>
+          <p>Too many clients, no capacity limit, and no clear decision framework for when to scale versus when to protect your energy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up">What's Inside</p>
+      <h2 class="section-title fade-up">Nine chapters that cover the complete lifecycle of a coaching practice.</h2>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <div class="chapter-num">01</div>
+          <div class="chapter-text">
+            <h4>The Difference Between a Creator and a Coach</h4>
+            <p>What coaching actually is, the difference between coaching and consulting, and why your content background is an asset if you use it correctly.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">02</div>
+          <div class="chapter-text">
+            <h4>Positioning Your Expertise for 1:1 Work</h4>
+            <p>The three questions that define your positioning, how to pass the recognition test, and why narrowing your focus increases your client flow rather than limiting it.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">03</div>
+          <div class="chapter-text">
+            <h4>Pricing Your Coaching Packages</h4>
+            <p>How to price to the value of the outcome, the three package structures that work for creator-coaches, and how to build the evidence base that makes pricing conversations easier.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">04</div>
+          <div class="chapter-text">
+            <h4>The Discovery Call Framework</h4>
+            <p>A complete framework for running discovery calls as diagnostics rather than pitches, with the exact questions that surface real motivation and qualify buyers.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">05</div>
+          <div class="chapter-text">
+            <h4>Client Onboarding Systems</h4>
+            <p>Welcome sequence, intake form design, shared workspaces, session structure, and offboarding. Every component of onboarding that builds trust before the real work begins.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">06</div>
+          <div class="chapter-text">
+            <h4>Avoiding Burnout While Scaling</h4>
+            <p>How to find your capacity number, energy budgeting for intensive work, setting boundaries in writing, and the renewal decision framework.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">07</div>
+          <div class="chapter-text">
+            <h4>Building Sustainable Client Acquisition</h4>
+            <p>The lightweight flywheel that keeps your pipeline moving even when you are fully booked, and how to make referrals a system rather than a hope.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">08</div>
+          <div class="chapter-text">
+            <h4>When to Productize vs. Keep It Personal</h4>
+            <p>The signals that you are ready to scale beyond 1:1, the most common productization paths, and a decision framework that prevents premature scaling.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">09</div>
+          <div class="chapter-text">
+            <h4>The Business Behind the Practice</h4>
+            <p>Revenue structure, the right tools, legal and operational basics, and how to build a mixed income model that does not depend entirely on your calendar being full.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up">Who It's For</p>
+      <h2 class="section-title fade-up">This is built for a specific person.</h2>
+      <div class="audience-grid">
+        <div class="audience-card good">
+          <span class="tag">Right for you</span>
+          <ul>
+            <li>You create content and have people asking to work with you</li>
+            <li>You are coaching but have no formal pricing or package structure</li>
+            <li>You are fully booked and burning out with no system to fix it</li>
+            <li>You want to build a practice that does not require constant hustle to fill</li>
+            <li>You are trying to decide whether to productize or stay 1:1</li>
+          </ul>
+        </div>
+        <div class="audience-card bad">
+          <span class="tag">Not for you</span>
+          <ul>
+            <li>You want a certified coaching credential or formal training program</li>
+            <li>You are looking for scripts to pressure people into buying</li>
+            <li>You have no specific expertise to coach around yet</li>
+            <li>You want a get-rich-quick path with no actual client work</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="buy">
+    <div class="container">
+      <h2 class="fade-up">Build the practice that does not burn you out.</h2>
+      <p class="fade-up">Nine chapters. Everything from positioning to knowing when to stop selling your time. One price, no upsells.</p>
+      <div class="cta-price-block fade-up">
+        <div class="cta-price">$27.99</div>
+        <p class="cta-price-sub">One-time. Instant download. PDF included.</p>
+      </div>
+      <a href="#" class="btn-cta">Get the Blueprint Now</a>
+      <p class="guarantee">Instant access on purchase. No subscription. No recurring charges.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. Built by <a href="https://behikeai.com">behikeai.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll(
+      '.fade-up, .problem-card, .chapter-item, .audience-card'
+    ).forEach((el, i) => {
+      el.style.transitionDelay = `${(i % 4) * 80}ms`;
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

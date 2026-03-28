@@ -1,0 +1,619 @@
+<!--
+  BOLD STREETWEAR THEME
+  High contrast cyberpunk aesthetic with neon green accents. Supreme meets cyberpunk.
+
+  SHOPIFY LIQUID CONVERSION GUIDE:
+  =========================================
+  1. Rename this file to theme.liquid or split into sections/
+  2. Replace product cards with {% for product in collections.frontpage.products %}
+  3. Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  4. Replace prices with {{ product.price | money }}
+  5. Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  6. Replace navigation with {% for link in linklists.main-menu.links %}
+  7. Replace footer links with {% for link in linklists.footer.links %}
+  8. Replace newsletter form action with Shopify customer endpoint
+  9. Move CSS custom properties into theme settings via settings_schema.json
+  10. Cart icon badge: {{ cart.item_count }}
+  =========================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bold Streetwear</title>
+  <style>
+    /* ============================================
+       CSS Custom Properties
+       ============================================ */
+    :root {
+      --color-bg: #0d0d0d;
+      --color-bg-card: #151515;
+      --color-bg-elevated: #1c1c1c;
+      --color-text: #ffffff;
+      --color-text-secondary: #888888;
+      --color-accent: #39ff14;
+      --color-accent-dim: rgba(57, 255, 20, 0.08);
+      --color-accent-glow: rgba(57, 255, 20, 0.4);
+      --color-danger: #ff3131;
+      --color-border: rgba(57, 255, 20, 0.15);
+      --color-border-subtle: rgba(255, 255, 255, 0.06);
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --transition: 0.3s ease;
+    }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
+
+    /* Utility: glow text */
+    .glow { text-shadow: 0 0 20px var(--color-accent-glow), 0 0 40px rgba(57, 255, 20, 0.2); }
+
+    /* ============================================
+       Marquee Banner
+       ============================================ */
+    .marquee {
+      background: var(--color-accent);
+      color: var(--color-bg);
+      padding: 6px 0;
+      overflow: hidden; white-space: nowrap;
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .marquee__inner {
+      display: inline-block;
+      animation: marquee 20s linear infinite;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ============================================
+       Navigation
+       ============================================ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13, 13, 13, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav__logo {
+      font-size: 1.5rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: -0.02em;
+      color: var(--color-accent);
+    }
+    .nav__links { display: flex; gap: var(--spacing-md); list-style: none; }
+    .nav__links a {
+      font-size: 0.8125rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .nav__links a:hover { color: var(--color-accent); }
+    .nav__right { display: flex; align-items: center; gap: var(--spacing-sm); }
+    .nav__cart {
+      background: none; border: none; color: var(--color-text);
+      position: relative;
+    }
+    .nav__cart-count {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--color-danger); color: #fff;
+      font-size: 0.6rem; font-weight: 900;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav__mobile-toggle { display: none; background: none; border: none; color: var(--color-text); font-size: 1.5rem; }
+
+    /* ============================================
+       Hero
+       ============================================ */
+    .hero {
+      padding: var(--spacing-xl) 0;
+      position: relative; overflow: hidden;
+    }
+    .hero__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg); align-items: center;
+    }
+    .hero__tag {
+      display: inline-block;
+      background: var(--color-accent); color: var(--color-bg);
+      padding: 4px 12px; font-size: 0.6875rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: var(--spacing-sm);
+    }
+    .hero__title {
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 900; text-transform: uppercase;
+      line-height: 0.95; letter-spacing: -0.03em;
+      margin-bottom: var(--spacing-sm);
+    }
+    .hero__title span { color: var(--color-accent); }
+    .hero__description {
+      color: var(--color-text-secondary);
+      font-size: 1rem; margin-bottom: var(--spacing-md);
+      max-width: 400px;
+    }
+    .hero__image {
+      aspect-ratio: 1; background: var(--color-bg-card);
+      border: 2px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+      position: relative;
+    }
+    .hero__image::before {
+      content: ''; position: absolute; inset: -8px;
+      border: 1px solid var(--color-border);
+      z-index: -1;
+    }
+    .btn {
+      display: inline-block; padding: 1rem 2.5rem;
+      font-size: 0.8125rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      background: var(--color-accent); color: var(--color-bg);
+      border: 2px solid var(--color-accent);
+      transition: all var(--transition);
+    }
+    .btn:hover {
+      background: transparent; color: var(--color-accent);
+      box-shadow: 0 0 20px var(--color-accent-glow);
+    }
+    .btn--outline {
+      background: transparent; color: var(--color-accent);
+    }
+    .btn--outline:hover {
+      background: var(--color-accent); color: var(--color-bg);
+    }
+
+    /* ============================================
+       Products
+       ============================================ */
+    .products { padding: var(--spacing-xl) 0; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: var(--spacing-lg);
+      border-bottom: 2px solid var(--color-border-subtle);
+      padding-bottom: var(--spacing-sm);
+    }
+    .section-header h2 {
+      font-size: 2rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: -0.02em;
+    }
+    .section-header a {
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; color: var(--color-accent);
+      letter-spacing: 0.08em;
+    }
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-sm);
+    }
+    .product-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-subtle);
+      transition: border-color var(--transition), transform var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .product-card:hover {
+      border-color: var(--color-accent);
+      transform: scale(1.02);
+    }
+    .product-card__badge {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      background: var(--color-danger); color: #fff;
+      padding: 4px 10px; font-size: 0.625rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .product-card__image {
+      aspect-ratio: 1; background: var(--color-bg-elevated);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .product-card__info { padding: var(--spacing-sm); }
+    .product-card__name {
+      font-size: 0.9375rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.02em;
+      margin-bottom: var(--spacing-xs);
+    }
+    .product-card__price {
+      font-size: 1rem; font-weight: 800;
+      color: var(--color-accent); margin-bottom: var(--spacing-sm);
+    }
+    .product-card__btn {
+      width: 100%; padding: 0.75rem;
+      background: transparent; border: 2px solid var(--color-accent);
+      color: var(--color-accent);
+      font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      transition: all var(--transition);
+    }
+    .product-card__btn:hover {
+      background: var(--color-accent); color: var(--color-bg);
+    }
+
+    /* ============================================
+       About / Brand Story
+       ============================================ */
+    .about {
+      padding: var(--spacing-xl) 0;
+      border-top: 2px solid var(--color-border-subtle);
+    }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg); align-items: center;
+    }
+    .about__content h2 {
+      font-size: 2.5rem; font-weight: 900;
+      text-transform: uppercase; line-height: 1;
+      margin-bottom: var(--spacing-sm);
+    }
+    .about__content h2 span { color: var(--color-accent); }
+    .about__content p {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm); line-height: 1.8;
+    }
+    .about__stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-sm); margin-top: var(--spacing-md);
+    }
+    .about__stat {
+      text-align: center; padding: var(--spacing-sm);
+      border: 1px solid var(--color-border-subtle);
+    }
+    .about__stat-number {
+      font-size: 2rem; font-weight: 900;
+      color: var(--color-accent); line-height: 1;
+    }
+    .about__stat-label {
+      font-size: 0.6875rem; text-transform: uppercase;
+      color: var(--color-text-secondary); letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    /* ============================================
+       Testimonials
+       ============================================ */
+    .testimonials {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg-card);
+    }
+    .testimonials__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-sm);
+    }
+    .testimonial {
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border-subtle);
+      border-left: 3px solid var(--color-accent);
+      background: var(--color-bg);
+    }
+    .testimonial__text {
+      font-size: 0.9375rem; line-height: 1.8;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm);
+    }
+    .testimonial__author {
+      font-size: 0.875rem; font-weight: 700;
+      text-transform: uppercase;
+    }
+    .testimonial__handle {
+      font-size: 0.75rem; color: var(--color-accent);
+    }
+
+    /* ============================================
+       Footer
+       ============================================ */
+    .footer {
+      padding: var(--spacing-lg) 0 var(--spacing-md);
+      border-top: 2px solid var(--color-border-subtle);
+    }
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--spacing-md); margin-bottom: var(--spacing-lg);
+    }
+    .footer__brand-name {
+      font-size: 1.5rem; font-weight: 900;
+      text-transform: uppercase; color: var(--color-accent);
+    }
+    .footer__brand p {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem; margin-top: var(--spacing-xs);
+    }
+    .footer h4 {
+      font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--color-accent); margin-bottom: var(--spacing-sm);
+    }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: var(--spacing-xs); }
+    .footer ul a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .footer ul a:hover { color: var(--color-accent); }
+    .footer__newsletter-form {
+      display: flex; gap: 0; margin-top: var(--spacing-xs);
+    }
+    .footer__newsletter-form input {
+      flex: 1; padding: 0.75rem;
+      background: var(--color-bg-elevated);
+      border: 2px solid var(--color-border-subtle); border-right: none;
+      color: var(--color-text); font-size: 0.875rem;
+      font-family: var(--font-body); outline: none;
+    }
+    .footer__newsletter-form input::placeholder { color: var(--color-text-secondary); }
+    .footer__newsletter-form input:focus { border-color: var(--color-accent); }
+    .footer__newsletter-form button {
+      padding: 0.75rem 1.25rem;
+      background: var(--color-accent); color: var(--color-bg);
+      border: 2px solid var(--color-accent);
+      font-size: 0.75rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      transition: all var(--transition);
+    }
+    .footer__newsletter-form button:hover {
+      background: transparent; color: var(--color-accent);
+      box-shadow: 0 0 15px var(--color-accent-glow);
+    }
+    .footer__social { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+    .footer__social a {
+      width: 36px; height: 36px;
+      border: 2px solid var(--color-border-subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--color-text-secondary);
+      transition: all var(--transition);
+    }
+    .footer__social a:hover {
+      border-color: var(--color-accent); color: var(--color-accent);
+      box-shadow: 0 0 10px var(--color-accent-glow);
+    }
+    .footer__bottom {
+      text-align: center; padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border-subtle);
+      font-size: 0.75rem; color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       Responsive
+       ============================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__mobile-toggle { display: block; }
+      .hero__inner { grid-template-columns: 1fr; }
+      .hero__image { max-width: 400px; }
+      .about__inner { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .footer__grid { grid-template-columns: 1fr; }
+      .about__stats { grid-template-columns: 1fr; }
+      .section-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Marquee Banner -->
+  <div class="marquee">
+    <div class="marquee__inner">
+      FREE SHIPPING ON ALL ORDERS OVER $100 &nbsp;&bull;&nbsp; NEW DROP EVERY FRIDAY &nbsp;&bull;&nbsp; LIMITED EDITION PIECES &nbsp;&bull;&nbsp; FREE SHIPPING ON ALL ORDERS OVER $100 &nbsp;&bull;&nbsp; NEW DROP EVERY FRIDAY &nbsp;&bull;&nbsp; LIMITED EDITION PIECES &nbsp;&bull;&nbsp;
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">DRPX</a>
+      <ul class="nav__links">
+        <li><a href="#products">Drops</a></li>
+        <li><a href="#about">Culture</a></li>
+        <li><a href="#testimonials">Community</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+      <div class="nav__right">
+        <button class="nav__cart" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="nav__cart-count">0</span>
+        </button>
+        <button class="nav__mobile-toggle" aria-label="Menu">&#9776;</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__inner">
+        <div>
+          <span class="hero__tag">New Drop</span>
+          <h1 class="hero__title">WEAR THE <span>FUTURE</span></h1>
+          <p class="hero__description">Street culture meets digital design. Limited runs. No restocks. If you sleep on it, it is gone.</p>
+          <div style="display:flex;gap:var(--spacing-sm);flex-wrap:wrap;">
+            <a href="#products" class="btn">Shop the Drop</a>
+            <a href="#about" class="btn btn--outline">Our Story</a>
+          </div>
+        </div>
+        <div class="hero__image">540 x 540</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Latest Drop</h2>
+        <a href="#">View All &rarr;</a>
+      </div>
+      <div class="products__grid">
+        <div class="product-card">
+          <span class="product-card__badge">Sold Out</span>
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Neon Circuit Hoodie</h3>
+            <p class="product-card__price">$128.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Glitch Logo Tee</h3>
+            <p class="product-card__price">$58.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <span class="product-card__badge">Last Few</span>
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Cargo Tech Pants</h3>
+            <p class="product-card__price">$168.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Data Mesh Cap</h3>
+            <p class="product-card__price">$42.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about__inner">
+        <div class="about__content">
+          <h2>BORN FROM <span>THE GRID</span></h2>
+          <p>DRPX started in a basement with a screen printer and a vision. We make clothes for the people who live between the physical and digital worlds. For the builders, the creators, the ones who refuse to blend in.</p>
+          <p>Every piece is designed in limited quantities. When it is gone, it is gone. No exceptions, no restocks. That is how we keep it real.</p>
+          <div class="about__stats">
+            <div class="about__stat">
+              <div class="about__stat-number">50K+</div>
+              <div class="about__stat-label">Community</div>
+            </div>
+            <div class="about__stat">
+              <div class="about__stat-number">200+</div>
+              <div class="about__stat-label">Drops</div>
+            </div>
+            <div class="about__stat">
+              <div class="about__stat-number">12</div>
+              <div class="about__stat-label">Countries</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero__image" style="aspect-ratio:4/5;">640 x 800</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>The Community</h2>
+        <a href="#">All Reviews &rarr;</a>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testimonial">
+          <p class="testimonial__text">"The hoodie quality is insane. Heavyweight, double stitched, and the print has survived 30+ washes easy. Nothing else comes close at this price."</p>
+          <p class="testimonial__author">ALEX R.</p>
+          <p class="testimonial__handle">@alexruns</p>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__text">"I have been rocking DRPX since drop 3. The designs are always ahead of the curve. If you know, you know. If you do not, start paying attention."</p>
+          <p class="testimonial__author">MAYA K.</p>
+          <p class="testimonial__handle">@mayacreates</p>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__text">"Copped the cargo pants and they are literally the best fitting techwear I own. The pockets actually work. Function over flash, but both."</p>
+          <p class="testimonial__author">DIEGO M.</p>
+          <p class="testimonial__handle">@diegomvmt</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <p class="footer__brand-name">DRPX</p>
+          <p>Street culture. Digital design. Limited everything. Based nowhere, shipping everywhere.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="TikTok">TK</a>
+            <a href="#" aria-label="Discord">DC</a>
+            <a href="#" aria-label="Twitter">X</a>
+          </div>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="#">Latest Drop</a></li>
+            <li><a href="#">Archive</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Gift Cards</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Info</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Size Guide</a></li>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Drop Alerts</h4>
+          <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-xs);">Be the first to know when we drop something new.</p>
+          <form class="footer__newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" aria-label="Email address">
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 DRPX. All rights reserved. Sleep on it and it is gone.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Chat Widget</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+#behike-chat-bubble{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:#0e0e0e;border:2px solid #00e5ff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:9999;box-shadow:0 4px 20px rgba(0,229,255,.3);transition:transform .2s,box-shadow .2s}
+#behike-chat-bubble:hover{transform:scale(1.08);box-shadow:0 4px 28px rgba(0,229,255,.5)}
+#behike-chat-bubble svg{width:28px;height:28px;fill:#00e5ff;transition:opacity .2s}
+#behike-chat-bubble.open svg.icon-chat{display:none}
+#behike-chat-bubble:not(.open) svg.icon-close{display:none}
+
+#behike-chat-panel{position:fixed;bottom:96px;right:24px;width:370px;max-height:520px;border-radius:16px;background:rgba(14,14,14,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(0,229,255,.25);display:flex;flex-direction:column;z-index:9998;opacity:0;transform:translateY(16px) scale(.96);pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+#behike-chat-panel.visible{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+
+.bc-header{padding:16px 20px;border-bottom:1px solid rgba(0,229,255,.15);display:flex;align-items:center;gap:10px}
+.bc-header .dot{width:10px;height:10px;border-radius:50%;background:#00e5ff;box-shadow:0 0 8px #00e5ff}
+.bc-header span{color:#fff;font-family:system-ui,sans-serif;font-size:15px;font-weight:600;letter-spacing:.3px}
+
+.bc-messages{flex:1;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.3) transparent}
+.bc-messages::-webkit-scrollbar{width:5px}
+.bc-messages::-webkit-scrollbar-thumb{background:rgba(0,229,255,.3);border-radius:4px}
+
+.bc-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-family:system-ui,sans-serif;font-size:14px;line-height:1.5;word-wrap:break-word}
+.bc-msg.user{align-self:flex-end;background:rgba(0,229,255,.15);color:#e0f7fa;border-bottom-right-radius:4px}
+.bc-msg.bot{align-self:flex-start;background:rgba(255,255,255,.08);color:#ddd;border-bottom-left-radius:4px}
+
+.bc-typing{align-self:flex-start;padding:10px 18px;display:none;gap:5px;align-items:center}
+.bc-typing.active{display:flex}
+.bc-typing span{width:7px;height:7px;border-radius:50%;background:#00e5ff;animation:bounce .6s infinite alternate}
+.bc-typing span:nth-child(2){animation-delay:.15s}
+.bc-typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{to{opacity:.3;transform:translateY(-6px)}}
+
+.bc-input-row{padding:12px 16px;border-top:1px solid rgba(0,229,255,.15);display:flex;gap:8px}
+.bc-input-row input{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(0,229,255,.2);border-radius:10px;padding:10px 14px;color:#fff;font-family:system-ui,sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.bc-input-row input::placeholder{color:rgba(255,255,255,.35)}
+.bc-input-row input:focus{border-color:rgba(0,229,255,.6)}
+.bc-input-row button{background:#00e5ff;border:none;border-radius:10px;width:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.bc-input-row button:hover{background:#00bcd4}
+.bc-input-row button svg{width:18px;height:18px;fill:#0e0e0e}
+
+.bc-footer{text-align:center;padding:8px;font-family:system-ui,sans-serif;font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.5px}
+
+@media(max-width:440px){
+  #behike-chat-panel{width:calc(100vw - 16px);right:8px;bottom:88px;max-height:70vh}
+}
+</style>
+</head>
+<body>
+
+<!-- Chat Bubble -->
+<div id="behike-chat-bubble" onclick="BehikeChat.toggle()">
+  <svg class="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/><path d="M7 9h10v2H7zm0-3h10v2H7z"/></svg>
+  <svg class="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</div>
+
+<!-- Chat Panel -->
+<div id="behike-chat-panel">
+  <div class="bc-header"><div class="dot"></div><span>Behike Support</span></div>
+  <div class="bc-messages" id="bc-messages">
+    <div class="bc-typing" id="bc-typing"><span></span><span></span><span></span></div>
+  </div>
+  <div class="bc-input-row">
+    <input type="text" id="bc-input" placeholder="Ask us anything..." autocomplete="off">
+    <button onclick="BehikeChat.send()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+  <div class="bc-footer">Powered by Behike</div>
+</div>
+
+<script>
+const BehikeChat = (() => {
+  const STORAGE_KEY = 'behike_chat_history';
+
+  const FAQ = [
+    { keys: ['format', 'pdf', 'html', 'file', 'download', 'goodnotes', 'printable'],
+      a: 'PDF + HTML. Both printable and GoodNotes compatible.' },
+    { keys: ['update', 'updates', 'lifetime', 'new version'],
+      a: 'Yes, lifetime updates included with every purchase.' },
+    { keys: ['refund', 'money back', 'return', 'guarantee', 'cancel'],
+      a: '30-day money back guarantee, no questions asked.' },
+    { keys: ['behike os', 'operating system', 'os', 'modules', '10 module', 'what is behike'],
+      a: 'A 10-module business operating system. Maps your entire business on paper.' },
+    { keys: ['bundle', 'bundles', 'price', 'cost', 'how much', 'pricing', 'starter', 'complete', 'spanish', 'paquete'],
+      a: 'Yes. Starter ($47, 3 blueprints), Complete ($97, all 13+), Spanish ($47).' },
+    { keys: ['how do i use', 'how to use', 'instructions', 'get started', 'start', 'how does it work'],
+      a: 'Print it or open in GoodNotes. Grab a pen. Fill in the dotted lines, check the boxes.' },
+    { keys: ['hello', 'hi', 'hey', 'hola', 'sup', 'yo'],
+      a: 'Hey! How can I help you today? Ask me about our blueprints, pricing, or anything else.' },
+    { keys: ['thanks', 'thank you', 'gracias', 'thx'],
+      a: 'You\'re welcome! Let me know if you need anything else.' },
+  ];
+
+  const FALLBACK = "I don't have an answer for that yet. Email us at hello@behike.co";
+
+  const panel = () => document.getElementById('behike-chat-panel');
+  const bubble = () => document.getElementById('behike-chat-bubble');
+  const messagesEl = () => document.getElementById('bc-messages');
+  const typingEl = () => document.getElementById('bc-typing');
+  const inputEl = () => document.getElementById('bc-input');
+
+  function loadHistory() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveHistory(history) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(history)); } catch {}
+  }
+
+  function appendMsg(text, role, save = true) {
+    const div = document.createElement('div');
+    div.className = 'bc-msg ' + role;
+    div.textContent = text;
+    const container = messagesEl();
+    container.insertBefore(div, typingEl());
+    container.scrollTop = container.scrollHeight;
+    if (save) {
+      const history = loadHistory();
+      history.push({ role, text });
+      saveHistory(history);
+    }
+  }
+
+  function matchFAQ(input) {
+    const lower = input.toLowerCase().replace(/[^\w\s]/g, '');
+    let best = null, bestScore = 0;
+    for (const faq of FAQ) {
+      let score = 0;
+      for (const key of faq.keys) {
+        if (lower.includes(key)) score += key.split(' ').length;
+      }
+      if (score > bestScore) { bestScore = score; best = faq; }
+    }
+    return bestScore > 0 ? best.a : FALLBACK;
+  }
+
+  function showTyping() { typingEl().classList.add('active'); messagesEl().scrollTop = messagesEl().scrollHeight; }
+  function hideTyping() { typingEl().classList.remove('active'); }
+
+  function send() {
+    const input = inputEl();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    appendMsg(text, 'user');
+    showTyping();
+    const delay = 400 + Math.random() * 600;
+    setTimeout(() => {
+      hideTyping();
+      appendMsg(matchFAQ(text), 'bot');
+    }, delay);
+  }
+
+  function toggle() {
+    const p = panel();
+    const b = bubble();
+    const isOpen = p.classList.contains('visible');
+    if (isOpen) {
+      p.classList.remove('visible');
+      b.classList.remove('open');
+    } else {
+      p.classList.add('visible');
+      b.classList.add('open');
+      inputEl().focus();
+    }
+  }
+
+  function init() {
+    const history = loadHistory();
+    if (history.length === 0) {
+      appendMsg('Hey! I\'m the Behike assistant. Ask me about blueprints, pricing, formats, or anything else.', 'bot');
+    } else {
+      for (const msg of history) appendMsg(msg.text, msg.role, false);
+    }
+    inputEl().addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  return { toggle, send };
+})();
+</script>
+</body>
+</html>

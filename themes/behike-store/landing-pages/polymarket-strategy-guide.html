@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Prediction Market Playbook: Research, Bet, and Profit on Polymarket — Behike</title>
+  <meta name="description" content="A 10-chapter research-based framework for trading prediction markets. Kelly Criterion position sizing, edge identification, bias avoidance, and a $500 deployment plan. $14.99. Educational content only.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface2: #111111;
+      --border: #2a2a2a;
+      --text: #F5F5F7;
+      --muted: #888888;
+      --accent: #0A84FF;
+      --green: #30D158;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(0,0,0,0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(245,245,247,0.07);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+
+    .nav-cta {
+      background: var(--green);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: 980px;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .disclaimer-bar {
+      background: #1a1200;
+      border-bottom: 1px solid #3a2800;
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-top: 56px;
+    }
+
+    .hero {
+      padding: 80px 0 100px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .hero-price {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .hero-price strong {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-right: 8px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 980px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .hero-guarantee {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    section {
+      padding: 96px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 56px;
+      line-height: 1.5;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .pain-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .pain-icon { font-size: 28px; margin-bottom: 16px; }
+
+    .pain-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .pain-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .chapter-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .chapter-card.visible { opacity: 1; transform: translateY(0); }
+
+    .chapter-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .chapter-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+
+    .chapter-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* Key concept callout */
+    .concept-box {
+      background: rgba(10, 132, 255, 0.06);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-top: 48px;
+      text-align: center;
+    }
+
+    .concept-box p {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+    }
+
+    .concept-box p em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .for-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .for-list li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .testimonial.visible { opacity: 1; transform: translateY(0); }
+
+    .testimonial blockquote {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .pricing-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .pricing-box .price {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .pricing-box .price-note {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .feature-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 15px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-list li:last-child { border-bottom: none; }
+
+    .feature-list li::before {
+      content: '';
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+      background-size: 11px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .guarantee-text {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    .final-cta {
+      padding: 120px 0;
+      text-align: center;
+      border-bottom: none;
+    }
+
+    .final-cta h2 { max-width: 640px; margin: 0 auto 24px; }
+
+    .final-cta p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Behike</a>
+  <a href="https://behike.gumroad.com/l/polymarket-strategy-guide" class="nav-cta">Get the Playbook — $14.99</a>
+</nav>
+
+<div class="disclaimer-bar">
+  Educational content only. Nothing in this guide constitutes financial or investment advice. Prediction markets involve real financial risk. Never risk money you cannot afford to lose.
+</div>
+
+<main>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-label">The Prediction Market Playbook</span>
+      <h1>How to Research, Bet, and <span>Profit on Polymarket</span></h1>
+      <p class="hero-sub">A 10-chapter research framework for trading prediction markets. Kelly Criterion position sizing, edge identification, bias avoidance, and a structured $500 deployment plan.</p>
+      <div class="hero-price"><strong>$14.99</strong> one-time, instant download</div>
+      <a href="https://behike.gumroad.com/l/polymarket-strategy-guide" class="btn-primary">Get Instant Access</a>
+      <p class="hero-guarantee">30-day money-back guarantee. No questions asked.</p>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Real Problem</div>
+      <h2>Most people approach prediction markets like gambling. It is not gambling.</h2>
+      <p class="section-sub">The gambler bets on preference. The investor holds indefinitely. The prediction market trader buys a probability assessment and profits if their estimate is more accurate than the market's. These are structurally different activities.</p>
+      <div class="pain-grid">
+        <div class="pain-card">
+          <div class="pain-icon">&#127922;</div>
+          <h3>Trading sentiment instead of probability</h3>
+          <p>Most new traders start from social media and general opinion. They are not trading mispriced probabilities. They are trading sentiment that has already been priced in by people who formed the same opinion earlier. That is negative expected value by definition.</p>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">&#128200;</div>
+          <h3>No position sizing framework</h3>
+          <p>Betting too much destroys accounts even with a real edge. Betting too little wastes the edge you have. Without a mathematical framework for how much to risk on any position, even correct analysis produces poor returns.</p>
+        </div>
+        <div class="pain-card">
+          <div class="pain-icon">&#128064;</div>
+          <h3>Not knowing when you have edge</h3>
+          <p>The question is never "what do I think will happen." It is "is the market mispricing this event, and do I have a specific reason to believe it is?" If you cannot answer that specifically, you do not have identified edge. You have an opinion.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What's Inside -->
+  <section>
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>Ten chapters covering the complete trading framework.</h2>
+      <p class="section-sub">From contract mechanics to Kelly Criterion to the meta-game of following sharp money. Built for people who want to trade with a system, not intuition.</p>
+      <div class="chapters-grid">
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 1</div>
+          <h3>What Polymarket Is and Why It Has Structural Advantages</h3>
+          <p>The binary contract mechanics. Why the time-bounded nature of prediction markets creates faster feedback loops than traditional investing. How a beginner can have 30 resolved positions in 60 days.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 2</div>
+          <h3>How Prediction Markets Actually Work</h3>
+          <p>The price IS the probability. Order book mechanics, bid-ask spreads as transaction costs, UMA resolution disputes, and why reading the resolution criteria is the most undervalued skill in the space.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 3</div>
+          <h3>The 5 Types of Markets Worth Trading</h3>
+          <p>Elections, crypto prices, sports outcomes, news events, and technology milestones. Which categories have consistent retail edge and which are efficient enough that edge requires specialist-level knowledge.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 4</div>
+          <h3>Research Framework: Finding Edge Before Betting</h3>
+          <p>Four-tier source hierarchy. Base rate calibration. The 48-hour rule. The counterargument requirement. The edge identification test that separates a specific advantage from a general opinion.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 5</div>
+          <h3>The Kelly Criterion Simplified</h3>
+          <p>The full formula, why you use quarter Kelly instead of full Kelly, the 5 percent single-position cap, and a practical sizing table for positions across different edge levels.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 6</div>
+          <h3>Common Biases That Destroy Accounts</h3>
+          <p>Availability bias, narrative bias, anchoring to initial impressions, overconfidence in domain knowledge. The specific patterns that cause smart people to lose systematically.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 7</div>
+          <h3>The $500 Deployment Framework</h3>
+          <p>How to structure a starting capital base. Position sizing across the first 30 days. Why the learning goal precedes the return goal. The portfolio allocation approach for early-stage capital.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 8</div>
+          <h3>Case Studies: 3 Market Types with Analysis</h3>
+          <p>Specific market categories analyzed with the full research framework applied. What the research process looks like in practice, not in theory.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 9</div>
+          <h3>Risk Management: The Full Framework</h3>
+          <p>Maximum position size, drawdown limits, stop conditions, portfolio diversification across market types. The rules that protect capital when individual analyses are wrong.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Chapter 10</div>
+          <h3>The Meta-Game: Following Sharp Money</h3>
+          <p>How to read price movements for information signals. What rapid price movement without obvious news indicates. The difference between following sharp money and chasing noise.</p>
+        </div>
+      </div>
+
+      <div class="concept-box">
+        <p>You are not picking winners. You are finding <em>mispriced probabilities.</em> That is the only question worth asking on any contract.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who It's For -->
+  <section>
+    <div class="container">
+      <div class="section-label">Who It's For</div>
+      <h2>Traders who want a research-based system, not tips.</h2>
+      <p class="section-sub">This is not a shortcut guide. It is a framework for thinking about probability more accurately than the market does in specific domains.</p>
+      <ul class="for-list">
+        <li>You are familiar with prediction markets and want a systematic approach beyond general research</li>
+        <li>You have domain expertise in one or more areas (politics, tech, finance, sports) and want to convert that into trading edge</li>
+        <li>You understand that losing positions are part of any probabilistic system and want a framework for managing them correctly</li>
+        <li>You want to deploy a specific amount of capital with a clear position sizing methodology</li>
+        <li>You are willing to pass on markets where you cannot identify specific edge, even when you have a strong opinion</li>
+        <li>You treat this as a discipline-based activity, not a source of entertainment</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Social Proof -->
+  <section>
+    <div class="container">
+      <div class="section-label">What Readers Say</div>
+      <h2>People who changed how they approach prediction markets.</h2>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <blockquote>"The edge identification test in Chapter 4 changed how I evaluate every position. I used to ask myself if I thought something would happen. Now I ask whether I have a specific reason the market is mispriced. I pass on far more markets than before, and my win rate on the ones I take has improved significantly."</blockquote>
+          <div class="testimonial-author">James H., prediction market trader</div>
+        </div>
+        <div class="testimonial">
+          <blockquote>"I work in tech and had been loosely following AI milestone markets for months without a framework for sizing positions. Chapter 5 on Kelly Criterion gave me the mathematical structure I was missing. I now treat position sizing as a separate decision from market selection instead of conflating the two."</blockquote>
+          <div class="testimonial-author">Tasha R., software engineer and trader</div>
+        </div>
+        <div class="testimonial">
+          <blockquote>"The $500 deployment framework was the specific thing I needed. I had the capital and the willingness, but no structure for how to allocate it across positions without overexposing myself in the early learning phase. The framework made the first 30 days coherent instead of ad hoc."</blockquote>
+          <div class="testimonial-author">Marco V., first-time prediction market trader</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section>
+    <div class="container">
+      <div class="section-label">Get the Playbook</div>
+      <h2 style="text-align:center; margin-bottom:48px;">One price. The complete framework.</h2>
+      <div class="pricing-box">
+        <div class="price">$14.99</div>
+        <div class="price-note">One-time payment. Instant PDF download.</div>
+        <ul class="feature-list">
+          <li>Complete 10-chapter guide (PDF)</li>
+          <li>Kelly Criterion calculator reference</li>
+          <li>$500 deployment framework</li>
+          <li>4-tier source hierarchy reference card</li>
+          <li>Edge identification checklist</li>
+          <li>Risk management rules reference</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/polymarket-strategy-guide" class="btn-primary" style="width:100%; display:block; text-align:center;">Get Instant Access</a>
+        <p class="guarantee-text">30-day money-back guarantee. Educational content. Not financial advice. Prediction markets involve real financial risk.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>The serious question is never what you think will happen. It is whether the market has mispriced it.</h2>
+      <p>Prediction markets do not have a guaranteed house edge. The price is set by other participants. If your analysis is more accurate than the crowd's in a specific domain, that is positive expected value.</p>
+      <a href="https://behike.gumroad.com/l/polymarket-strategy-guide" class="btn-primary">Get the Playbook — $14.99</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>The Prediction Market Playbook &copy; 2026 Behike. All rights reserved. &nbsp;&middot;&nbsp; <a href="/privacy.html" style="color:var(--muted)">Privacy</a> &nbsp;&middot;&nbsp; <a href="/terms.html" style="color:var(--muted)">Terms</a></p>
+    <p style="margin-top:10px; font-size:12px; color:#555;">Educational content only. Nothing in this guide constitutes financial or investment advice. Never risk money you cannot afford to lose entirely.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.chapter-card, .testimonial').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

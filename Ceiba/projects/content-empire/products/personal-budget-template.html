@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>Personal Budget Tracker | Behike</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1a1a1a;
+    --surface-3: #222;
+    --border: #2a2a2a;
+    --border-focus: #444;
+    --text: #e8e8e8;
+    --text-2: #999;
+    --text-3: #666;
+    --accent: #c4a35a;
+    --accent-dim: rgba(196, 163, 90, 0.15);
+    --accent-glow: rgba(196, 163, 90, 0.3);
+    --green: #4a9;
+    --green-dim: rgba(68, 170, 153, 0.15);
+    --red: #c55;
+    --red-dim: rgba(204, 85, 85, 0.15);
+    --blue: #5a9cd6;
+    --blue-dim: rgba(90, 156, 214, 0.15);
+    --orange: #d4943a;
+    --orange-dim: rgba(212, 148, 58, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    padding: 48px 0 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  header p {
+    font-size: 15px;
+    color: var(--text-2);
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  /* Navigation tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 14px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: inherit;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Panels */
+  .panel { display: none; padding: 32px 0; }
+  .panel.active { display: block; }
+
+  /* Section titles */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-2);
+    margin-bottom: 16px;
+  }
+
+  /* Month selector */
+  .month-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .month-selector button {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .month-selector button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .month-selector .current-month {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 180px;
+    text-align: center;
+  }
+
+  /* Budget table */
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+
+  .budget-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .budget-table th:nth-child(2),
+  .budget-table th:nth-child(3),
+  .budget-table th:nth-child(4) {
+    text-align: right;
+    width: 140px;
+  }
+
+  .budget-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .budget-table tr:last-child td { border-bottom: none; }
+
+  .budget-table .cat-icon {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    text-align: center;
+    line-height: 28px;
+    font-size: 14px;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  .budget-table .cat-name {
+    font-weight: 500;
+    vertical-align: middle;
+  }
+
+  .budget-table input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    width: 120px;
+    text-align: right;
+    transition: border-color 0.2s;
+  }
+
+  .budget-table input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .budget-table input::placeholder { color: var(--text-3); }
+
+  .budget-table td:nth-child(2),
+  .budget-table td:nth-child(3),
+  .budget-table td:nth-child(4) {
+    text-align: right;
+  }
+
+  .budget-table .remaining { font-weight: 600; }
+  .budget-table .remaining.positive { color: var(--green); }
+  .budget-table .remaining.negative { color: var(--red); }
+  .budget-table .remaining.zero { color: var(--text-3); }
+
+  /* Totals row */
+  .totals-row {
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .total-item { text-align: center; }
+
+  .total-item .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+
+  .total-item .value {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .total-item .value.budget-val { color: var(--blue); }
+  .total-item .value.spent-val { color: var(--orange); }
+  .total-item .value.remaining-val { color: var(--green); }
+  .total-item .value.remaining-val.negative { color: var(--red); }
+
+  /* 50/30/20 Rule */
+  .rule-section {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+  }
+
+  .rule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .rule-card {
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .rule-card .rule-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .rule-card .rule-target {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+
+  .rule-card .rule-actual {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 4px;
+  }
+
+  .rule-card .rule-amount {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .rule-bar {
+    height: 6px;
+    background: var(--surface-3);
+    border-radius: 3px;
+    margin-top: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .rule-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .rule-bar-target {
+    position: absolute;
+    top: -2px;
+    width: 2px;
+    height: 10px;
+    background: var(--text-2);
+    border-radius: 1px;
+  }
+
+  .needs-card .rule-label { color: var(--blue); }
+  .needs-card .rule-actual { color: var(--blue); }
+  .needs-card .rule-bar-fill { background: var(--blue); }
+
+  .wants-card .rule-label { color: var(--accent); }
+  .wants-card .rule-actual { color: var(--accent); }
+  .wants-card .rule-bar-fill { background: var(--accent); }
+
+  .savings-card .rule-label { color: var(--green); }
+  .savings-card .rule-actual { color: var(--green); }
+  .savings-card .rule-bar-fill { background: var(--green); }
+
+  /* Category assignment for 50/30/20 */
+  .cat-type-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cat-type-need { background: var(--blue-dim); color: var(--blue); }
+  .cat-type-want { background: var(--accent-dim); color: var(--accent); }
+  .cat-type-saving { background: var(--green-dim); color: var(--green); }
+
+  /* Savings Goal */
+  .goal-section {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+  }
+
+  .goal-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .goal-input-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+
+  .goal-input-group input {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .goal-input-group input:focus { outline: none; border-color: var(--accent); }
+
+  .goal-progress {
+    margin-top: 16px;
+  }
+
+  .goal-progress-bar {
+    height: 12px;
+    background: var(--surface-3);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .goal-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    min-width: 0;
+  }
+
+  .goal-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .goal-stats .highlight { color: var(--accent); font-weight: 600; }
+
+  /* 12-month overview */
+  .overview-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .overview-table th {
+    padding: 10px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .overview-table th:first-child { text-align: left; }
+
+  .overview-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .overview-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .overview-table tr:hover { background: var(--surface-2); }
+
+  .overview-table .current-month-col { background: var(--accent-dim); }
+  .overview-positive { color: var(--green); }
+  .overview-negative { color: var(--red); }
+  .overview-zero { color: var(--text-3); }
+
+  /* Action buttons */
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover { background: #d4b36a; color: #000; }
+
+  .btn-danger {
+    border-color: var(--red);
+    color: var(--red);
+    background: transparent;
+  }
+
+  .btn-danger:hover { background: var(--red-dim); }
+
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface-2);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+  /* Footer */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    h1 { font-size: 28px; }
+    .container { padding: 0 16px; }
+    .budget-table input { width: 90px; padding: 6px 8px; font-size: 13px; }
+    .totals-row { grid-template-columns: 1fr; gap: 12px; }
+    .total-item .value { font-size: 20px; }
+    .rule-grid { grid-template-columns: 1fr; }
+    .goal-inputs { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 12px 12px; font-size: 12px; }
+    .month-selector .current-month { font-size: 16px; min-width: 140px; }
+    .overview-table { font-size: 11px; }
+    .overview-table th, .overview-table td { padding: 6px 4px; }
+  }
+
+  @media (max-width: 480px) {
+    .budget-table th:nth-child(4),
+    .budget-table td:nth-child(4) { display: none; }
+    .goal-stats { flex-direction: column; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <span class="badge">Behike Tools</span>
+    <h1>Personal Budget Tracker</h1>
+    <p>Track every dollar. See where your money goes. Build the future you want.</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('monthly')">Monthly Budget</button>
+  <button class="tab" onclick="switchTab('rule')">50/30/20 Rule</button>
+  <button class="tab" onclick="switchTab('goals')">Savings Goals</button>
+  <button class="tab" onclick="switchTab('overview')">12-Month View</button>
+</div>
+
+<div class="container">
+
+  <!-- MONTHLY BUDGET PANEL -->
+  <div id="panel-monthly" class="panel active">
+    <div class="month-selector">
+      <button onclick="changeMonth(-1)" aria-label="Previous month">&#8249;</button>
+      <span class="current-month" id="currentMonth"></span>
+      <button onclick="changeMonth(1)" aria-label="Next month">&#8250;</button>
+    </div>
+
+    <div class="totals-row">
+      <div class="total-item">
+        <div class="label">Total Budget</div>
+        <div class="value budget-val" id="totalBudget">$0.00</div>
+      </div>
+      <div class="total-item">
+        <div class="label">Total Spent</div>
+        <div class="value spent-val" id="totalSpent">$0.00</div>
+      </div>
+      <div class="total-item">
+        <div class="label">Remaining</div>
+        <div class="value remaining-val" id="totalRemaining">$0.00</div>
+      </div>
+    </div>
+
+    <table class="budget-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Budget</th>
+          <th>Actual</th>
+          <th>Remaining</th>
+        </tr>
+      </thead>
+      <tbody id="budgetBody"></tbody>
+    </table>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="exportCSV()">Export CSV</button>
+      <button class="btn" onclick="copyMonth()">Copy to Next Month</button>
+      <button class="btn btn-danger" onclick="clearMonth()">Clear Month</button>
+    </div>
+  </div>
+
+  <!-- 50/30/20 RULE PANEL -->
+  <div id="panel-rule" class="panel">
+    <h2>The 50/30/20 Rule</h2>
+    <p style="color: var(--text-2); margin-bottom: 8px; font-size: 14px;">
+      Allocate 50% of income to needs, 30% to wants, 20% to savings.
+      Click the badge next to each category to reclassify it.
+    </p>
+
+    <div class="goal-input-group" style="max-width: 300px; margin-bottom: 24px;">
+      <label>Monthly Income (After Tax)</label>
+      <input type="text" id="monthlyIncome" placeholder="$0.00" oninput="handleIncomeInput(this)" onblur="formatIncomeField(this)">
+    </div>
+
+    <div class="rule-grid">
+      <div class="rule-card needs-card">
+        <div class="rule-label">Needs (50%)</div>
+        <div class="rule-target">Target: <span id="needsTarget">$0</span></div>
+        <div class="rule-actual" id="needsActual">0%</div>
+        <div class="rule-amount" id="needsAmount">$0 spent</div>
+        <div class="rule-bar">
+          <div class="rule-bar-fill" id="needsBar" style="width: 0%"></div>
+          <div class="rule-bar-target" style="left: 50%"></div>
+        </div>
+      </div>
+      <div class="rule-card wants-card">
+        <div class="rule-label">Wants (30%)</div>
+        <div class="rule-target">Target: <span id="wantsTarget">$0</span></div>
+        <div class="rule-actual" id="wantsActual">0%</div>
+        <div class="rule-amount" id="wantsAmount">$0 spent</div>
+        <div class="rule-bar">
+          <div class="rule-bar-fill" id="wantsBar" style="width: 0%"></div>
+          <div class="rule-bar-target" style="left: 50%"></div>
+        </div>
+      </div>
+      <div class="rule-card savings-card">
+        <div class="rule-label">Savings (20%)</div>
+        <div class="rule-target">Target: <span id="savingsTarget">$0</span></div>
+        <div class="rule-actual" id="savingsActual">0%</div>
+        <div class="rule-amount" id="savingsAmount">$0 spent</div>
+        <div class="rule-bar">
+          <div class="rule-bar-fill" id="savingsBar" style="width: 0%"></div>
+          <div class="rule-bar-target" style="left: 50%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <h3>Category Classification</h3>
+      <div id="categoryClassification"></div>
+    </div>
+  </div>
+
+  <!-- SAVINGS GOALS PANEL -->
+  <div id="panel-goals" class="panel">
+    <h2>Savings Goals</h2>
+
+    <div id="goalsContainer"></div>
+
+    <button class="btn" onclick="addGoal()" style="margin-top: 16px;">+ Add Goal</button>
+  </div>
+
+  <!-- 12-MONTH OVERVIEW PANEL -->
+  <div id="panel-overview" class="panel">
+    <h2>12-Month Overview</h2>
+    <p style="color: var(--text-2); margin-bottom: 24px; font-size: 14px;">
+      Year at a glance. All data saved locally in your browser.
+    </p>
+
+    <div style="overflow-x: auto;">
+      <table class="overview-table" id="overviewTable"></table>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="exportYearCSV()">Export Full Year CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>Personal Budget Tracker by <a href="#">Behike</a>. All data stored locally in your browser.</p>
+    <p style="margin-top: 4px;">Copyright 2026 Behike. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA LAYER
+// ============================================================
+
+const STORAGE_KEY = 'behike_budget_v1';
+const CATEGORIES = [
+  { id: 'housing',       name: 'Housing',        icon: '\u{1F3E0}', color: '#5a9cd6', type: 'need' },
+  { id: 'food',          name: 'Food',            icon: '\u{1F6D2}', color: '#4a9',    type: 'need' },
+  { id: 'transport',     name: 'Transport',       icon: '\u{1F697}', color: '#d4943a', type: 'need' },
+  { id: 'entertainment', name: 'Entertainment',   icon: '\u{1F3AC}', color: '#c4a35a', type: 'want' },
+  { id: 'health',        name: 'Health',          icon: '\u{2764}',  color: '#c55',    type: 'need' },
+  { id: 'education',     name: 'Education',       icon: '\u{1F4DA}', color: '#7a8cd6', type: 'need' },
+  { id: 'savings',       name: 'Savings',         icon: '\u{1F4B0}', color: '#4a9',    type: 'saving' },
+  { id: 'other',         name: 'Other',           icon: '\u{1F4CC}', color: '#999',    type: 'want' }
+];
+
+const TYPE_CYCLE = ['need', 'want', 'saving'];
+const TYPE_LABELS = { need: 'Need', want: 'Want', saving: 'Saving' };
+
+let currentDate = new Date();
+let data = loadData();
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* corrupted data, start fresh */ }
+  return { months: {}, goals: [], income: {}, categoryTypes: {} };
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function getMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function getMonthData(key) {
+  if (!data.months[key]) {
+    data.months[key] = {};
+    CATEGORIES.forEach(c => {
+      data.months[key][c.id] = { budget: 0, actual: 0 };
+    });
+  }
+  return data.months[key];
+}
+
+function getCategoryType(catId) {
+  if (data.categoryTypes && data.categoryTypes[catId]) return data.categoryTypes[catId];
+  const cat = CATEGORIES.find(c => c.id === catId);
+  return cat ? cat.type : 'want';
+}
+
+function setCategoryType(catId, type) {
+  if (!data.categoryTypes) data.categoryTypes = {};
+  data.categoryTypes[catId] = type;
+  saveData();
+}
+
+// ============================================================
+// FORMATTING
+// ============================================================
+
+function fmt(num) {
+  const n = parseFloat(num) || 0;
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function parseCurrency(str) {
+  if (typeof str === 'number') return str;
+  const cleaned = String(str).replace(/[^0-9.\-]/g, '');
+  return parseFloat(cleaned) || 0;
+}
+
+function getMonthName(date) {
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+function getShortMonth(monthIdx) {
+  const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return names[monthIdx];
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+
+let toastTimeout;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const panels = ['monthly', 'rule', 'goals', 'overview'];
+    t.classList.toggle('active', panels[i] === tabId);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === `panel-${tabId}`);
+  });
+  if (tabId === 'rule') updateRulePanel();
+  if (tabId === 'goals') renderGoals();
+  if (tabId === 'overview') renderOverview();
+}
+
+// ============================================================
+// MONTHLY BUDGET
+// ============================================================
+
+function changeMonth(delta) {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  renderBudget();
+}
+
+function renderBudget() {
+  const key = getMonthKey(currentDate);
+  const monthData = getMonthData(key);
+
+  document.getElementById('currentMonth').textContent = getMonthName(currentDate);
+
+  const tbody = document.getElementById('budgetBody');
+  tbody.innerHTML = '';
+
+  let totalBudget = 0, totalActual = 0;
+
+  CATEGORIES.forEach(cat => {
+    const row = monthData[cat.id] || { budget: 0, actual: 0 };
+    const budget = parseFloat(row.budget) || 0;
+    const actual = parseFloat(row.actual) || 0;
+    const remaining = budget - actual;
+
+    totalBudget += budget;
+    totalActual += actual;
+
+    const tr = document.createElement('tr');
+
+    // Category cell
+    const tdCat = document.createElement('td');
+    const iconSpan = document.createElement('span');
+    iconSpan.className = 'cat-icon';
+    iconSpan.style.background = cat.color + '22';
+    iconSpan.textContent = cat.icon;
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'cat-name';
+    nameSpan.textContent = cat.name;
+    tdCat.appendChild(iconSpan);
+    tdCat.appendChild(nameSpan);
+    tr.appendChild(tdCat);
+
+    // Budget input
+    const tdBudget = document.createElement('td');
+    const budgetInput = document.createElement('input');
+    budgetInput.type = 'text';
+    budgetInput.placeholder = '$0.00';
+    budgetInput.value = budget ? fmt(budget) : '';
+    budgetInput.dataset.cat = cat.id;
+    budgetInput.dataset.field = 'budget';
+    budgetInput.addEventListener('focus', handleFocus);
+    budgetInput.addEventListener('blur', handleBlur);
+    budgetInput.addEventListener('input', handleInput);
+    tdBudget.appendChild(budgetInput);
+    tr.appendChild(tdBudget);
+
+    // Actual input
+    const tdActual = document.createElement('td');
+    const actualInput = document.createElement('input');
+    actualInput.type = 'text';
+    actualInput.placeholder = '$0.00';
+    actualInput.value = actual ? fmt(actual) : '';
+    actualInput.dataset.cat = cat.id;
+    actualInput.dataset.field = 'actual';
+    actualInput.addEventListener('focus', handleFocus);
+    actualInput.addEventListener('blur', handleBlur);
+    actualInput.addEventListener('input', handleInput);
+    tdActual.appendChild(actualInput);
+    tr.appendChild(tdActual);
+
+    // Remaining
+    const tdRem = document.createElement('td');
+    tdRem.className = 'remaining';
+    if (remaining > 0.005) tdRem.classList.add('positive');
+    else if (remaining < -0.005) tdRem.classList.add('negative');
+    else tdRem.classList.add('zero');
+    tdRem.textContent = fmt(remaining);
+    tr.appendChild(tdRem);
+
+    tbody.appendChild(tr);
+  });
+
+  const totalRemaining = totalBudget - totalActual;
+  document.getElementById('totalBudget').textContent = fmt(totalBudget);
+  document.getElementById('totalSpent').textContent = fmt(totalActual);
+
+  const remEl = document.getElementById('totalRemaining');
+  remEl.textContent = fmt(totalRemaining);
+  remEl.classList.toggle('negative', totalRemaining < -0.005);
+}
+
+function handleFocus(e) {
+  const val = parseCurrency(e.target.value);
+  e.target.value = val ? val.toString() : '';
+  e.target.select();
+}
+
+function handleBlur(e) {
+  const val = parseCurrency(e.target.value);
+  const key = getMonthKey(currentDate);
+  const monthData = getMonthData(key);
+  const catId = e.target.dataset.cat;
+  const field = e.target.dataset.field;
+
+  // Round to 2 decimal places to avoid floating point issues
+  const rounded = Math.round(val * 100) / 100;
+  monthData[catId][field] = rounded;
+  e.target.value = rounded ? fmt(rounded) : '';
+
+  saveData();
+  renderBudget();
+}
+
+function handleInput(e) {
+  // Allow typing, will save on blur
+  // Strip non-numeric except decimal and minus
+  const raw = e.target.value;
+  const cleaned = raw.replace(/[^0-9.\-]/g, '');
+  // Prevent multiple decimals
+  const parts = cleaned.split('.');
+  if (parts.length > 2) {
+    e.target.value = parts[0] + '.' + parts.slice(1).join('');
+  }
+}
+
+function clearMonth() {
+  if (!confirm('Clear all data for ' + getMonthName(currentDate) + '?')) return;
+  const key = getMonthKey(currentDate);
+  delete data.months[key];
+  saveData();
+  renderBudget();
+  showToast('Month cleared');
+}
+
+function copyMonth() {
+  const srcKey = getMonthKey(currentDate);
+  const srcData = getMonthData(srcKey);
+  const nextDate = new Date(currentDate);
+  nextDate.setMonth(nextDate.getMonth() + 1);
+  const destKey = getMonthKey(nextDate);
+  const destData = getMonthData(destKey);
+
+  CATEGORIES.forEach(cat => {
+    if (srcData[cat.id]) {
+      destData[cat.id].budget = srcData[cat.id].budget;
+      // Don't copy actuals, only budget
+    }
+  });
+
+  saveData();
+  showToast('Budget copied to ' + getMonthName(nextDate));
+}
+
+// ============================================================
+// 50/30/20 RULE
+// ============================================================
+
+function handleIncomeInput(el) {
+  const raw = el.value.replace(/[^0-9.\-]/g, '');
+  const parts = raw.split('.');
+  if (parts.length > 2) el.value = parts[0] + '.' + parts.slice(1).join('');
+}
+
+function formatIncomeField(el) {
+  const val = parseCurrency(el.value);
+  const rounded = Math.round(val * 100) / 100;
+  const key = getMonthKey(currentDate);
+  if (!data.income) data.income = {};
+  data.income[key] = rounded;
+  el.value = rounded ? fmt(rounded) : '';
+  saveData();
+  updateRulePanel();
+}
+
+function updateRulePanel() {
+  const key = getMonthKey(currentDate);
+  const monthData = getMonthData(key);
+  const income = (data.income && data.income[key]) || 0;
+
+  // Load income into field
+  const incomeField = document.getElementById('monthlyIncome');
+  if (incomeField && income) incomeField.value = fmt(income);
+
+  let needsTotal = 0, wantsTotal = 0, savingsTotal = 0;
+
+  CATEGORIES.forEach(cat => {
+    const actual = parseFloat((monthData[cat.id] || {}).actual) || 0;
+    const type = getCategoryType(cat.id);
+    if (type === 'need') needsTotal += actual;
+    else if (type === 'want') wantsTotal += actual;
+    else if (type === 'saving') savingsTotal += actual;
+  });
+
+  const totalSpent = needsTotal + wantsTotal + savingsTotal;
+  const base = income > 0 ? income : (totalSpent > 0 ? totalSpent : 1);
+
+  const needsPct = (needsTotal / base) * 100;
+  const wantsPct = (wantsTotal / base) * 100;
+  const savingsPct = (savingsTotal / base) * 100;
+
+  document.getElementById('needsTarget').textContent = fmt(income * 0.5);
+  document.getElementById('wantsTarget').textContent = fmt(income * 0.3);
+  document.getElementById('savingsTarget').textContent = fmt(income * 0.2);
+
+  document.getElementById('needsActual').textContent = needsPct.toFixed(1) + '%';
+  document.getElementById('wantsActual').textContent = wantsPct.toFixed(1) + '%';
+  document.getElementById('savingsActual').textContent = savingsPct.toFixed(1) + '%';
+
+  document.getElementById('needsAmount').textContent = fmt(needsTotal) + ' spent';
+  document.getElementById('wantsAmount').textContent = fmt(wantsTotal) + ' spent';
+  document.getElementById('savingsAmount').textContent = fmt(savingsTotal) + ' allocated';
+
+  // Bars: show percentage relative to 100%, capped at 100% width
+  document.getElementById('needsBar').style.width = Math.min(needsPct, 100) + '%';
+  document.getElementById('wantsBar').style.width = Math.min(wantsPct, 100) + '%';
+  document.getElementById('savingsBar').style.width = Math.min(savingsPct, 100) + '%';
+
+  // Category classification list
+  const container = document.getElementById('categoryClassification');
+  container.innerHTML = '';
+  CATEGORIES.forEach(cat => {
+    const type = getCategoryType(cat.id);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);';
+
+    const left = document.createElement('span');
+    left.style.cssText = 'font-size:14px;';
+    left.textContent = cat.icon + ' ' + cat.name;
+
+    const badge = document.createElement('span');
+    badge.className = 'cat-type-badge cat-type-' + type;
+    badge.textContent = TYPE_LABELS[type];
+    badge.title = 'Click to change';
+    badge.addEventListener('click', () => {
+      const currentIdx = TYPE_CYCLE.indexOf(getCategoryType(cat.id));
+      const nextType = TYPE_CYCLE[(currentIdx + 1) % TYPE_CYCLE.length];
+      setCategoryType(cat.id, nextType);
+      updateRulePanel();
+    });
+
+    div.appendChild(left);
+    div.appendChild(badge);
+    container.appendChild(div);
+  });
+}
+
+// ============================================================
+// SAVINGS GOALS
+// ============================================================
+
+function renderGoals() {
+  if (!data.goals) data.goals = [];
+  const container = document.getElementById('goalsContainer');
+  container.innerHTML = '';
+
+  if (data.goals.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-3);font-size:14px;">No goals yet. Add one to start tracking your progress.</p>';
+    return;
+  }
+
+  data.goals.forEach((goal, idx) => {
+    const saved = parseFloat(goal.saved) || 0;
+    const target = parseFloat(goal.target) || 1;
+    const pct = Math.min((saved / target) * 100, 100);
+    const remaining = Math.max(target - saved, 0);
+
+    const section = document.createElement('div');
+    section.className = 'goal-section';
+    section.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="margin-bottom:0;">${escapeHtml(goal.name || 'Untitled Goal')}</h3>
+        <button class="btn btn-danger" style="padding:4px 12px;font-size:11px;" onclick="removeGoal(${idx})">Remove</button>
+      </div>
+      <div class="goal-inputs">
+        <div class="goal-input-group">
+          <label>Goal Name</label>
+          <input type="text" value="${escapeHtml(goal.name || '')}" onblur="updateGoal(${idx},'name',this.value)">
+        </div>
+        <div class="goal-input-group">
+          <label>Target Amount</label>
+          <input type="text" value="${goal.target ? fmt(goal.target) : ''}" placeholder="$0.00"
+            onfocus="this.value=parseCurrency(this.value)||''"
+            onblur="updateGoal(${idx},'target',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''">
+        </div>
+        <div class="goal-input-group">
+          <label>Amount Saved</label>
+          <input type="text" value="${goal.saved ? fmt(goal.saved) : ''}" placeholder="$0.00"
+            onfocus="this.value=parseCurrency(this.value)||''"
+            onblur="updateGoal(${idx},'saved',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''">
+        </div>
+      </div>
+      <div class="goal-progress">
+        <div class="goal-progress-bar">
+          <div class="goal-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="goal-stats">
+          <span><span class="highlight">${pct.toFixed(1)}%</span> complete</span>
+          <span>${fmt(saved)} saved of ${fmt(target)}</span>
+          <span>${fmt(remaining)} to go</span>
+        </div>
+      </div>
+    `;
+    container.appendChild(section);
+  });
+}
+
+function addGoal() {
+  if (!data.goals) data.goals = [];
+  data.goals.push({ name: '', target: 0, saved: 0 });
+  saveData();
+  renderGoals();
+  showToast('Goal added');
+}
+
+function removeGoal(idx) {
+  if (!confirm('Remove this goal?')) return;
+  data.goals.splice(idx, 1);
+  saveData();
+  renderGoals();
+  showToast('Goal removed');
+}
+
+function updateGoal(idx, field, value) {
+  if (field === 'name') {
+    data.goals[idx].name = value;
+  } else {
+    data.goals[idx][field] = Math.round(parseCurrency(value) * 100) / 100;
+  }
+  saveData();
+  renderGoals();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ============================================================
+// 12-MONTH OVERVIEW
+// ============================================================
+
+function renderOverview() {
+  const table = document.getElementById('overviewTable');
+  const year = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+
+  let html = '<thead><tr><th>Category</th>';
+  for (let m = 0; m < 12; m++) {
+    const isCurrent = (m === currentMonth);
+    html += `<th class="${isCurrent ? 'current-month-col' : ''}">${getShortMonth(m)}</th>`;
+  }
+  html += '<th>Total</th></tr></thead><tbody>';
+
+  // Row per category (showing actuals)
+  CATEGORIES.forEach(cat => {
+    html += `<tr><td>${cat.icon} ${cat.name}</td>`;
+    let yearTotal = 0;
+    for (let m = 0; m < 12; m++) {
+      const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+      const md = data.months[key];
+      const val = md && md[cat.id] ? (parseFloat(md[cat.id].actual) || 0) : 0;
+      yearTotal += val;
+      const isCurrent = (m === currentMonth);
+      const cls = isCurrent ? 'current-month-col' : '';
+      html += `<td class="${cls}">${val ? fmt(val) : '<span style="color:var(--text-3)">-</span>'}</td>`;
+    }
+    html += `<td style="font-weight:600">${fmt(yearTotal)}</td></tr>`;
+  });
+
+  // Total budget row
+  html += '<tr style="border-top:2px solid var(--border);font-weight:600"><td>Total Budget</td>';
+  let yearBudgetTotal = 0;
+  for (let m = 0; m < 12; m++) {
+    const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+    const md = data.months[key];
+    let monthTotal = 0;
+    if (md) CATEGORIES.forEach(c => monthTotal += (parseFloat((md[c.id] || {}).budget) || 0));
+    yearBudgetTotal += monthTotal;
+    const isCurrent = (m === currentMonth);
+    html += `<td class="${isCurrent ? 'current-month-col' : ''} budget-val">${monthTotal ? fmt(monthTotal) : '-'}</td>`;
+  }
+  html += `<td class="budget-val">${fmt(yearBudgetTotal)}</td></tr>`;
+
+  // Total spent row
+  html += '<tr style="font-weight:600"><td>Total Spent</td>';
+  let yearSpentTotal = 0;
+  for (let m = 0; m < 12; m++) {
+    const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+    const md = data.months[key];
+    let monthTotal = 0;
+    if (md) CATEGORIES.forEach(c => monthTotal += (parseFloat((md[c.id] || {}).actual) || 0));
+    yearSpentTotal += monthTotal;
+    const isCurrent = (m === currentMonth);
+    html += `<td class="${isCurrent ? 'current-month-col' : ''}" style="color:var(--orange)">${monthTotal ? fmt(monthTotal) : '-'}</td>`;
+  }
+  html += `<td style="color:var(--orange)">${fmt(yearSpentTotal)}</td></tr>`;
+
+  // Net row
+  html += '<tr style="font-weight:600"><td>Net (Budget - Spent)</td>';
+  let yearNetTotal = 0;
+  for (let m = 0; m < 12; m++) {
+    const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+    const md = data.months[key];
+    let budgetM = 0, spentM = 0;
+    if (md) {
+      CATEGORIES.forEach(c => {
+        budgetM += (parseFloat((md[c.id] || {}).budget) || 0);
+        spentM += (parseFloat((md[c.id] || {}).actual) || 0);
+      });
+    }
+    const net = budgetM - spentM;
+    yearNetTotal += net;
+    const isCurrent = (m === currentMonth);
+    const colorCls = net > 0.005 ? 'overview-positive' : (net < -0.005 ? 'overview-negative' : 'overview-zero');
+    html += `<td class="${isCurrent ? 'current-month-col' : ''} ${colorCls}">${(budgetM || spentM) ? fmt(net) : '-'}</td>`;
+  }
+  const netCls = yearNetTotal > 0.005 ? 'overview-positive' : (yearNetTotal < -0.005 ? 'overview-negative' : 'overview-zero');
+  html += `<td class="${netCls}">${fmt(yearNetTotal)}</td></tr>`;
+
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+
+function exportCSV() {
+  const key = getMonthKey(currentDate);
+  const monthData = getMonthData(key);
+
+  let csv = 'Category,Budget,Actual,Remaining\n';
+  let totalB = 0, totalA = 0;
+
+  CATEGORIES.forEach(cat => {
+    const b = parseFloat((monthData[cat.id] || {}).budget) || 0;
+    const a = parseFloat((monthData[cat.id] || {}).actual) || 0;
+    const r = b - a;
+    totalB += b;
+    totalA += a;
+    csv += `"${cat.name}",${b.toFixed(2)},${a.toFixed(2)},${r.toFixed(2)}\n`;
+  });
+
+  csv += `"TOTAL",${totalB.toFixed(2)},${totalA.toFixed(2)},${(totalB - totalA).toFixed(2)}\n`;
+
+  downloadCSV(csv, `budget-${key}.csv`);
+  showToast('CSV exported');
+}
+
+function exportYearCSV() {
+  const year = currentDate.getFullYear();
+  let csv = 'Category';
+  for (let m = 0; m < 12; m++) csv += `,${getShortMonth(m)} Budget,${getShortMonth(m)} Actual`;
+  csv += ',Year Budget,Year Actual\n';
+
+  CATEGORIES.forEach(cat => {
+    csv += `"${cat.name}"`;
+    let yb = 0, ya = 0;
+    for (let m = 0; m < 12; m++) {
+      const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+      const md = data.months[key];
+      const b = md && md[cat.id] ? (parseFloat(md[cat.id].budget) || 0) : 0;
+      const a = md && md[cat.id] ? (parseFloat(md[cat.id].actual) || 0) : 0;
+      yb += b; ya += a;
+      csv += `,${b.toFixed(2)},${a.toFixed(2)}`;
+    }
+    csv += `,${yb.toFixed(2)},${ya.toFixed(2)}\n`;
+  });
+
+  downloadCSV(csv, `budget-${year}-full.csv`);
+  showToast('Year CSV exported');
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+renderBudget();
+
+</script>
+</body>
+</html>

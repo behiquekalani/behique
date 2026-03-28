@@ -1,0 +1,147 @@
+{
+  "name": "Gumroad Daily Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "c9d0e1f2-0001-4000-8000-000000000001",
+      "name": "Schedule Trigger - 8am Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.gumroad.com/v2/sales",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "access_token", "value": "YOUR_GUMROAD_ACCESS_TOKEN_HERE" },
+            { "name": "after", "value": "={{ $now.minus(1, 'day').startOf('day').toISO() }}" },
+            { "name": "before", "value": "={{ $now.startOf('day').toISO() }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c9d0e1f2-0002-4000-8000-000000000002",
+      "name": "HTTP Request - Gumroad Sales",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate daily revenue and product breakdown\nconst response = $input.first().json;\nconst sales = response.sales || [];\n\nif (sales.length === 0) {\n  return [{\n    json: {\n      date: new Date().toISOString().split('T')[0],\n      totalRevenue: 0,\n      totalSales: 0,\n      topProduct: 'No sales yesterday',\n      productBreakdown: [],\n      avgOrderValue: 0,\n      message: 'Zero sales day. Time to push content.'\n    }\n  }];\n}\n\n// Aggregate by product\nconst byProduct = {};\nlet totalRevenue = 0;\n\nfor (const sale of sales) {\n  const productName = sale.product_name || 'Unknown Product';\n  const amount = parseFloat(sale.price || 0) / 100; // Gumroad returns cents\n  totalRevenue += amount;\n  \n  if (!byProduct[productName]) {\n    byProduct[productName] = { name: productName, revenue: 0, count: 0 };\n  }\n  byProduct[productName].revenue += amount;\n  byProduct[productName].count += 1;\n}\n\nconst breakdown = Object.values(byProduct)\n  .sort((a, b) => b.revenue - a.revenue);\n\nconst topProduct = breakdown[0];\nconst avgOrderValue = totalRevenue / sales.length;\n\nreturn [{\n  json: {\n    date: new Date().toISOString().split('T')[0],\n    totalRevenue: totalRevenue.toFixed(2),\n    totalSales: sales.length,\n    topProduct: topProduct?.name || 'N/A',\n    topProductRevenue: topProduct?.revenue.toFixed(2) || '0',\n    topProductCount: topProduct?.count || 0,\n    productBreakdown: breakdown,\n    avgOrderValue: avgOrderValue.toFixed(2),\n    message: totalRevenue > 100 ? 'Solid day.' : totalRevenue > 50 ? 'Decent. Keep pushing.' : 'Light day. Need more traffic.'\n  }\n}];"
+      },
+      "id": "c9d0e1f2-0003-4000-8000-000000000003",
+      "name": "Code - Calculate Daily Revenue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID_HERE",
+        "text": "Morning Revenue Report — {{ $json.date }}\n\nRevenue: ${{ $json.totalRevenue }}\nSales: {{ $json.totalSales }}\nAvg Order: ${{ $json.avgOrderValue }}\n\nTop Product: {{ $json.topProduct }}\n  ${{ $json.topProductRevenue }} from {{ $json.topProductCount }} sales\n\n{{ $json.productBreakdown.map(p => `${p.name}: $${p.revenue.toFixed(2)} (${p.count}x)`).join('\\n') }}\n\n{{ $json.message }}",
+        "additionalFields": {}
+      },
+      "id": "c9d0e1f2-0004-4000-8000-000000000004",
+      "name": "Telegram - Morning Report",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "DailyRevenue",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date }}",
+            "TotalRevenue": "={{ $json.totalRevenue }}",
+            "TotalSales": "={{ $json.totalSales }}",
+            "AvgOrderValue": "={{ $json.avgOrderValue }}",
+            "TopProduct": "={{ $json.topProduct }}",
+            "TopProductRevenue": "={{ $json.topProductRevenue }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "c9d0e1f2-0005-4000-8000-000000000005",
+      "name": "Google Sheets - Log Daily Metrics",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1120, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - 8am Daily": {
+      "main": [
+        [
+          { "node": "HTTP Request - Gumroad Sales", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "HTTP Request - Gumroad Sales": {
+      "main": [
+        [
+          { "node": "Code - Calculate Daily Revenue", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Code - Calculate Daily Revenue": {
+      "main": [
+        [
+          { "node": "Telegram - Morning Report", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Telegram - Morning Report": {
+      "main": [
+        [
+          { "node": "Google Sheets - Log Daily Metrics", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "gumroad", "revenue", "analytics"]
+}

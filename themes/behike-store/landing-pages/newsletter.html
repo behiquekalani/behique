@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Behike Brief — Weekly AI + Builder Newsletter</title>
+  <meta name="description" content="A weekly letter from Kalani. One thing that worked, one mistake, one tool. Built by a computer engineering student in Puerto Rico. Free to subscribe.">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface2: #111111;
+      --surface3: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --muted: #888888;
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --accent: #0A84FF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { font-size: 14px; color: var(--muted); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      padding: 140px 32px 80px;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .issue-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10,132,255,0.08);
+      border: 1px solid rgba(10,132,255,0.2);
+      color: var(--blue);
+      padding: 6px 14px;
+      border-radius: 980px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+    .dot-pulse {
+      width: 6px; height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 58px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.55;
+    }
+
+    /* SUBSCRIBE BOX */
+    .subscribe-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 520px;
+      margin: 0 auto 80px;
+    }
+    .sub-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      text-align: left;
+    }
+    .sub-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .sub-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 980px;
+      padding: 12px 20px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .sub-input:focus { border-color: var(--accent); }
+    .sub-input::placeholder { color: var(--muted); }
+    .sub-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 980px;
+      padding: 12px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .sub-btn:hover { opacity: 0.85; }
+    .sub-perks {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sub-perk {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .perk-dot {
+      width: 16px;
+      height: 16px;
+      min-width: 16px;
+      border-radius: 50%;
+      background: rgba(48,209,88,0.15);
+      border: 1px solid rgba(48,209,88,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .perk-check { font-size: 9px; color: var(--green); font-weight: 700; }
+    .sub-success {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .sub-success h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--green); }
+    .sub-success p { font-size: 15px; color: var(--muted); }
+    .sub-count { font-size: 12px; color: var(--muted); margin-top: 12px; text-align: center; }
+    .sub-count strong { color: var(--text); }
+
+    /* WHAT YOU GET */
+    section { padding: 64px 32px; max-width: 800px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .section-h2 {
+      font-size: clamp(26px, 3vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-sub { font-size: 17px; color: var(--muted); margin-bottom: 40px; line-height: 1.5; }
+
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    .what-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .what-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+    .what-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .what-card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    /* ISSUE PREVIEWS */
+    .issues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 64px;
+    }
+    .issue-item {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .issue-item:first-child { border-top: 1px solid var(--border); }
+    .issue-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .issue-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+    .issue-date { font-size: 12px; color: var(--muted); }
+    .issue-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.2px; }
+    .issue-excerpt { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .issue-tag {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 3px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ABOUT */
+    .about-strip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      margin-bottom: 64px;
+    }
+    .author-avatar {
+      width: 64px;
+      height: 64px;
+      min-width: 64px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .author-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .author-title { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+    .author-bio { font-size: 15px; color: var(--muted); line-height: 1.65; }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      text-align: center;
+      padding-bottom: 80px;
+    }
+    .bottom-cta h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+    .bottom-cta p { font-size: 16px; color: var(--muted); margin-bottom: 28px; }
+    .bottom-form {
+      display: flex;
+      gap: 8px;
+      max-width: 440px;
+      margin: 0 auto 12px;
+    }
+    .bottom-count { font-size: 13px; color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .foot-left { font-size: 13px; color: var(--muted); }
+    .foot-links { display: flex; gap: 16px; }
+    .foot-links a { font-size: 13px; color: var(--muted); }
+    .foot-links a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 110px 20px 60px; }
+      nav { padding: 14px 20px; }
+      .subscribe-box { padding: 24px; }
+      .sub-form { flex-direction: column; }
+      .sub-btn { width: 100%; }
+      section { padding: 48px 20px; }
+      .what-grid { grid-template-columns: 1fr; }
+      .about-strip { flex-direction: column; }
+      .bottom-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Behike</a>
+  <div class="nav-links">
+    <a href="index.html">Store</a>
+    <a href="learn.html">Learn</a>
+    <a href="about.html">About</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="issue-counter">
+    <span class="dot-pulse"></span>
+    Issue 43 published this week
+  </div>
+  <h1>One letter, every week.<br>Built not written.</h1>
+  <p class="hero-sub">A personal letter from Kalani. One thing that worked, one mistake, one tool worth knowing. Written by a builder, for builders. Not a roundup. Not a digest.</p>
+
+  <div class="subscribe-box">
+    <div class="sub-label">Free to subscribe. No spam. One email per week.</div>
+    <form class="sub-form" id="hero-form" onsubmit="handleSub(event, 'hero')">
+      <input type="email" class="sub-input" placeholder="your@email.com" required>
+      <button type="submit" class="sub-btn">Subscribe</button>
+    </form>
+    <div class="sub-perks">
+      <div class="sub-perk">
+        <div class="perk-dot"><span class="perk-check">✓</span></div>
+        <span>Get Chapter 1 of the AI Employee Guide for free on signup</span>
+      </div>
+      <div class="sub-perk">
+        <div class="perk-dot"><span class="perk-check">✓</span></div>
+        <span>First 100 subscribers get 30% off any product, permanently</span>
+      </div>
+      <div class="sub-perk">
+        <div class="perk-dot"><span class="perk-check">✓</span></div>
+        <span>Unsubscribe with one click, no questions asked</span>
+      </div>
+    </div>
+    <div id="hero-success" class="sub-success">
+      <h3>You are in.</h3>
+      <p>Check your inbox for the welcome email and your free Chapter 1 download.</p>
+    </div>
+    <div class="sub-count"><strong>312 builders</strong> reading this week</div>
+  </div>
+</div>
+
+<!-- WHAT YOU GET -->
+<section>
+  <div class="section-label">What's Inside</div>
+  <div class="section-h2">Every issue is one thing.<br>Never a roundup.</div>
+  <p class="section-sub">Most newsletters are link dumps with a paragraph of commentary. This is not that. Each issue is one idea, worked through completely.</p>
+
+  <div class="what-grid">
+    <div class="what-card">
+      <span class="what-icon">🔧</span>
+      <h3>What I built this week</h3>
+      <p>The specific thing I shipped. What it does, how it works, what broke, what I would do differently. Real builds, not hypotheticals.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">📉</span>
+      <h3>One honest mistake</h3>
+      <p>What did not work and why. This is the part most builders skip in public. Specific failure, specific lesson, no redemption arc required.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🛠</span>
+      <h3>One tool that matters</h3>
+      <p>A tool, script, or workflow that I actually use. With enough detail to implement it yourself in an afternoon. Not a sponsored mention.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">💡</span>
+      <h3>One idea to sit with</h3>
+      <p>Something I read, heard, or thought about. Connects AI to wider questions about how to build a life that does not depend on one client or one platform.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ISSUE PREVIEWS -->
+<section style="padding-top: 0;">
+  <div class="section-label">Recent Issues</div>
+  <div class="section-h2">What you have missed.</div>
+  <p class="section-sub" style="margin-bottom: 32px;">Subscribers get the full archive. Here are the last five titles.</p>
+
+  <div class="issues-list">
+    <div class="issue-item">
+      <div class="issue-meta">
+        <span class="issue-num">Issue 43</span>
+        <span class="issue-date">March 22, 2026</span>
+      </div>
+      <div class="issue-title">Building Something Before Anyone Else Sees the Market</div>
+      <div class="issue-excerpt">About timing. Why being early in LATAM AI education is the same bet I would make in English three years ago. What it means to build for a market that does not know it needs you yet.</div>
+      <span class="issue-tag">Business</span>
+    </div>
+    <div class="issue-item">
+      <div class="issue-meta">
+        <span class="issue-num">Issue 42</span>
+        <span class="issue-date">March 15, 2026</span>
+      </div>
+      <div class="issue-title">What My Abuela's Business Taught Me About AI</div>
+      <div class="issue-excerpt">My grandmother ran a neighborhood business from memory. Names, debts, birthdays. Everything. I think about her when I build AI memory systems. The technology is different. The skill is the same.</div>
+      <span class="issue-tag">Personal</span>
+    </div>
+    <div class="issue-item">
+      <div class="issue-meta">
+        <span class="issue-num">Issue 41</span>
+        <span class="issue-date">March 8, 2026</span>
+      </div>
+      <div class="issue-title">The $2,200 Nobody Is Leaving On The Table</div>
+      <div class="issue-excerpt">Why most creators ignore the Spanish-speaking market. Not because it is hard to reach. Because they never thought to look. The math on what it costs to leave 680 million people out of your plan.</div>
+      <span class="issue-tag">Revenue</span>
+    </div>
+    <div class="issue-item">
+      <div class="issue-meta">
+        <span class="issue-num">Issue 40</span>
+        <span class="issue-date">March 1, 2026</span>
+      </div>
+      <div class="issue-title">The eBay Overnight Test</div>
+      <div class="issue-excerpt">What happened when I ran the niche sniper overnight for the first time. Which products it found. Which products flopped. The one category I did not expect.</div>
+      <span class="issue-tag">eBay</span>
+    </div>
+    <div class="issue-item">
+      <div class="issue-meta">
+        <span class="issue-num">Issue 39</span>
+        <span class="issue-date">February 22, 2026</span>
+      </div>
+      <div class="issue-title">Three Machines, Zero Cloud Bills</div>
+      <div class="issue-excerpt">The month I moved everything off cloud and onto my own hardware. The cost breakdown. What I gained and what I gave up. Why I would not go back even if it were free.</div>
+      <span class="issue-tag">Infrastructure</span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="padding-top: 0;">
+  <div class="section-label">Who Writes This</div>
+  <div class="about-strip">
+    <div class="author-avatar">K</div>
+    <div>
+      <div class="author-name">Kalani Andre Gomez Padin</div>
+      <div class="author-title">Computer engineering student, Puerto Rico. Builder.</div>
+      <div class="author-bio">I built three networked AI agents on computers in my bedroom before most people knew what an AI agent was. I have ADHD, which means I process deeply before acting and hyperfocus when something clicks. I write this letter because building in public is the most honest thing I know how to do. Faith and family are the foundation. Everything else is leverage.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section style="padding-top: 0;">
+  <div class="bottom-cta">
+    <h2>One email, every week.</h2>
+    <p>No roundups. No link dumps. One builder writing honestly about what is working and what is not.</p>
+    <form class="bottom-form" onsubmit="handleSub(event, 'bottom')">
+      <input type="email" class="sub-input" id="bottom-email" placeholder="your@email.com" required>
+      <button type="submit" class="sub-btn">Subscribe free</button>
+    </form>
+    <div id="bottom-success" style="display:none;color:var(--green);font-size:15px;margin-top:12px;">You are in. Check your inbox.</div>
+    <div class="bottom-count"><strong>312 builders</strong> subscribed</div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-left">2026 Behike. Built in Puerto Rico.</div>
+  <div class="foot-links">
+    <a href="index.html">Store</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+  </div>
+</footer>
+
+<script>
+  function handleSub(e, source) {
+    e.preventDefault();
+    const form = e.target;
+    const successId = source === 'hero' ? 'hero-success' : 'bottom-success';
+    const success = document.getElementById(successId);
+    if (source === 'hero') {
+      form.style.display = 'none';
+    } else {
+      form.style.display = 'none';
+    }
+    success.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

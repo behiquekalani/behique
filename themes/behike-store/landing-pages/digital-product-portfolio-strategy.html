@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Product Portfolio Strategy — Behike</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #000000; --text: #F5F5F7; --text-secondary: #A1A1A6;
+    --accent: #0A84FF; --cta: #30D158; --cta-hover: #25a845;
+    --border: #1d1d1f; --card-bg: #0d0d0e; --max: 980px;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: var(--max); margin: 0 auto; padding: 0 24px; height: 52px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: 0.02em; text-transform: uppercase; }
+  .nav-cta { display: inline-block; background: var(--cta); color: #000; font-weight: 600; font-size: 14px; padding: 7px 18px; border-radius: 980px; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--cta-hover); }
+  .hero { padding: 160px 0 100px; text-align: center; }
+  .hero-eyebrow { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+  .hero h1 { font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; max-width: 800px; margin: 0 auto 24px; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub { font-size: clamp(16px, 2vw, 20px); color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px; line-height: 1.5; }
+  .hero-price { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 28px; }
+  .hero-price span { font-size: 16px; font-weight: 400; color: var(--text-secondary); margin-left: 8px; }
+  .btn-primary { display: inline-block; background: var(--cta); color: #000; font-weight: 700; font-size: 17px; padding: 16px 40px; border-radius: 980px; transition: background 0.2s, transform 0.15s; }
+  .btn-primary:hover { background: var(--cta-hover); transform: scale(1.03); }
+  .hero-guarantee { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+  section { padding: 96px 0; }
+  .section-label { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  .section-title { font-size: clamp(28px, 4vw, 42px); font-weight: 700; line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 24px; }
+  .section-body { font-size: 18px; color: var(--text-secondary); max-width: 660px; line-height: 1.65; }
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2px; margin-top: 56px; border: 1px solid var(--border); }
+  .problem-card { background: var(--card-bg); padding: 40px 36px; border: 1px solid var(--border); }
+  .problem-number { font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.08em; margin-bottom: 16px; }
+  .problem-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; line-height: 1.3; }
+  .problem-card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+  .tier-section { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 56px; }
+  .tier-card { border: 1px solid var(--border); border-radius: 12px; padding: 36px; background: #0a0a0b; }
+  .tier-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .tier-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .tier-price-range { font-size: 14px; color: var(--cta); font-weight: 600; margin-bottom: 14px; }
+  .tier-card p { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+  .chapters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2px; margin-top: 56px; border: 1px solid var(--border); }
+  .chapter-card { background: var(--card-bg); border: 1px solid var(--border); padding: 32px; transition: background 0.2s; }
+  .chapter-card:hover { background: #111113; }
+  .chapter-num { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px; }
+  .chapter-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; line-height: 1.35; }
+  .chapter-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.55; }
+  .testimonials-section { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 56px; }
+  .testimonial { background: #111113; border: 1px solid var(--border); border-radius: 12px; padding: 32px; }
+  .testimonial-stars { color: #FFD60A; font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+  .testimonial-text { font-size: 16px; line-height: 1.65; color: var(--text); margin-bottom: 20px; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--cta)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: #000; flex-shrink: 0; }
+  .author-name { font-size: 14px; font-weight: 600; }
+  .author-title { font-size: 13px; color: var(--text-secondary); }
+  .audience-list { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+  .audience-item { display: flex; align-items: flex-start; gap: 16px; padding: 20px 24px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; }
+  .audience-check { width: 22px; height: 22px; border-radius: 50%; background: rgba(48,209,88,0.15); border: 1px solid rgba(48,209,88,0.3); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--cta); flex-shrink: 0; margin-top: 1px; }
+  .audience-item p { font-size: 16px; color: var(--text); line-height: 1.5; }
+  .price-section { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .price-box { border: 1px solid var(--border); border-radius: 16px; padding: 56px 48px; max-width: 560px; margin: 56px auto 0; text-align: center; background: #0a0a0b; }
+  .price-tag { font-size: 56px; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 8px; }
+  .price-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.5; }
+  .price-includes { text-align: left; margin-bottom: 36px; }
+  .price-includes h4 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-secondary); margin-bottom: 14px; }
+  .price-includes ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .price-includes li { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .price-includes li::before { content: "✓"; color: var(--cta); font-weight: 700; font-size: 13px; }
+  .guarantee-badge { margin-top: 20px; font-size: 13px; color: var(--text-secondary); }
+  .final-cta { text-align: center; padding: 120px 0; }
+  .final-cta h2 { font-size: clamp(28px, 4vw, 46px); font-weight: 700; letter-spacing: -0.025em; max-width: 660px; margin: 0 auto 24px; line-height: 1.15; }
+  .final-cta p { font-size: 18px; color: var(--text-secondary); max-width: 520px; margin: 0 auto 40px; line-height: 1.6; }
+  footer { border-top: 1px solid var(--border); padding: 40px 0; text-align: center; }
+  footer p { font-size: 13px; color: var(--text-secondary); }
+  @media (max-width: 600px) { section { padding: 72px 0; } .hero { padding: 120px 0 80px; } .price-box { padding: 40px 24px; } }
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <span class="nav-brand">Behike</span>
+    <a href="#buy" class="nav-cta">Get the Strategy</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="reveal"><span class="hero-eyebrow">Behike Digital Products</span></div>
+    <h1 class="reveal reveal-delay-1">One product is a transaction.<br><em>A portfolio</em> is a business.</h1>
+    <p class="hero-sub reveal reveal-delay-2">The complete architecture for building 5-10 digital products that work together, generate multiple revenue streams, and create a natural path for customers to spend more.</p>
+    <div class="hero-price reveal reveal-delay-3">$22.99 <span>one-time. Instant download.</span></div>
+    <div class="reveal">
+      <a href="#buy" class="btn-primary">Get the Strategy — $22.99</a>
+      <p class="hero-guarantee">30-day money-back guarantee. No questions.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">The Real Problem</p>
+      <h2 class="section-title">A collection of products is not a portfolio</h2>
+      <p class="section-body">Most creators build products in isolation. Each one is its own separate business. The result is a catalog that looks like a list, not a system. Revenue stays flat no matter how many products you add.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card reveal reveal-delay-1">
+        <p class="problem-number">01</p>
+        <h3>Single point of failure</h3>
+        <p>One product means one traffic source, one conversion rate, one price point. Any variable that moves against you hits the whole business at once. There is no cushion.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-2">
+        <p class="problem-number">02</p>
+        <h3>No customer journey</h3>
+        <p>Buyers purchase once and leave. You have no architecture to move them from a $12 entry product to a $39 core product to a $127 premium offer. Revenue per customer stays low.</p>
+      </div>
+      <div class="problem-card reveal reveal-delay-3">
+        <p class="problem-number">03</p>
+        <h3>Revenue ceiling</h3>
+        <p>At $22.99 with a 2% conversion rate, you need 6,800 monthly visitors to hit $3,000. With a portfolio, the same traffic earns more because each visitor has more places to spend money with you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="tier-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <p class="section-label">The Architecture</p>
+      <h2 class="section-title">Three tiers. Every product has a purpose.</h2>
+      <p class="section-body" style="margin: 0 auto;">Assign every product to a tier and the entire system comes into focus. Revenue per customer increases. The catalog earns trust instead of creating confusion.</p>
+    </div>
+    <div class="tier-grid">
+      <div class="tier-card reveal reveal-delay-1">
+        <p class="tier-label">Tier 1</p>
+        <h3>Entry Products</h3>
+        <p class="tier-price-range">$7 – $19</p>
+        <p>Convert strangers into buyers. Their job is not revenue. It is trust. A buyer who pays you $9 and gets $40 worth of value is warm for your $39 product. Over-deliver at this tier and everything downstream gets easier.</p>
+      </div>
+      <div class="tier-card reveal reveal-delay-2">
+        <p class="tier-label">Tier 2</p>
+        <h3>Core Products</h3>
+        <p class="tier-price-range">$19 – $49</p>
+        <p>The backbone of the portfolio. Your clearest frameworks, deepest expertise, best demonstrations of what you know. These carry most of your revenue and serve as the components for your bundles. Each should address a distinct problem.</p>
+      </div>
+      <div class="tier-card reveal reveal-delay-3">
+        <p class="tier-label">Tier 3</p>
+        <h3>Premium Offers</h3>
+        <p class="tier-price-range">$97 – $500+</p>
+        <p>Where the economics change completely. One premium sale equals 10-15 core sales in revenue. Buyers who reach this tier already trust your work. A portfolio without a premium tier is leaving its highest-value segment without a home.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">What Is Inside</p>
+      <h2 class="section-title">8 chapters. The complete portfolio system.</h2>
+      <p class="section-body">From the structural argument for multiple products to the exact systems for managing a 10-product catalog without losing your mind.</p>
+    </div>
+    <div class="chapters-grid">
+      <div class="chapter-card reveal reveal-delay-1">
+        <p class="chapter-num">Chapter 1</p>
+        <h3>Why One Product Is a Fragile Business</h3>
+        <p>The mathematics of single-product income, the attention economy problem, and the trust signal that only a catalog can send.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-2">
+        <p class="chapter-num">Chapter 2</p>
+        <h3>The Three-Tier Portfolio Architecture</h3>
+        <p>Entry, Core, and Premium. What belongs in each tier, how many products each tier needs, and the ratio of revenue you should expect from each.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-3">
+        <p class="chapter-num">Chapter 3</p>
+        <h3>The Customer Journey Through Your Portfolio</h3>
+        <p>Mapping the five stages from Discovery to Premium Offer. Every gap in the journey is revenue you are not capturing. This chapter shows you where the gaps are.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-1">
+        <p class="chapter-num">Chapter 4</p>
+        <h3>Pricing Ladder Design</h3>
+        <p>The mathematics of jump size between tiers, anchoring across the portfolio, when to raise prices, and why discounting destroys ladders.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-2">
+        <p class="chapter-num">Chapter 5</p>
+        <h3>Natural Upsells Without Pressure</h3>
+        <p>The timing principle, embedded recommendations, the four-email post-purchase sequence, and how to use your thank-you page as a conversion asset.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-3">
+        <p class="chapter-num">Chapter 6</p>
+        <h3>The Bundle and Bundle-Breaking Strategy</h3>
+        <p>Three roles of a bundle in a portfolio, the bundle-breaking tactic that routes buyers toward higher-value transactions, and when not to bundle.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-1">
+        <p class="chapter-num">Chapter 7</p>
+        <h3>When to Kill a Product vs. Iterate</h3>
+        <p>The three-month rule, the four-question decision framework, and why dead weight in your catalog costs more than the absence of a product.</p>
+      </div>
+      <div class="chapter-card reveal reveal-delay-2">
+        <p class="chapter-num">Chapter 8</p>
+        <h3>Managing Multiple Products Without Overwhelm</h3>
+        <p>The monthly maintenance calendar, the single-source-of-truth document, the reuse system, and when to start delegating catalog operations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="testimonials-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <p class="section-label">What People Say</p>
+      <h2 class="section-title">The architecture works when you follow it</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal reveal-delay-1">
+        <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">"I had six products and was treating them like six separate businesses. Chapter two gave me the tier structure and I restructured everything in a weekend. My average order value went up immediately."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">M</div>
+          <div><p class="author-name">Marcus T.</p><p class="author-title">Digital Product Creator</p></div>
+        </div>
+      </div>
+      <div class="testimonial reveal reveal-delay-2">
+        <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">"The customer journey mapping chapter is worth the full price. I drew the arrows between my products and found three gaps that were costing me repeat sales. I built two of those missing products in the next month."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">R</div>
+          <div><p class="author-name">Rachel O.</p><p class="author-title">Online Educator</p></div>
+        </div>
+      </div>
+      <div class="testimonial reveal reveal-delay-3">
+        <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">"I used the kill-versus-iterate framework on my weakest three products. Cut two, rewrote one sales page. The rewritten product now converts. The two I killed freed up mental space that was costing me more than I realized."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">D</div>
+          <div><p class="author-name">David L.</p><p class="author-title">Solopreneur</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Who It Is For</p>
+      <h2 class="section-title">Built for creators ready to think in systems, not products</h2>
+      <p class="section-body">If you have at least one digital product and want to build around it intentionally, this is the architecture you need before you build the next one.</p>
+    </div>
+    <div class="audience-list">
+      <div class="audience-item reveal reveal-delay-1">
+        <div class="audience-check">&#10003;</div>
+        <p>Digital product creators who have one or more products and want to build the next ones as part of a coherent system rather than a random catalog</p>
+      </div>
+      <div class="audience-item reveal reveal-delay-2">
+        <div class="audience-check">&#10003;</div>
+        <p>Solopreneurs who have hit a revenue plateau and want to increase earnings without acquiring more traffic</p>
+      </div>
+      <div class="audience-item reveal reveal-delay-3">
+        <div class="audience-check">&#10003;</div>
+        <p>Creators with multiple products who have never mapped the customer journey between them and want to understand why repeat purchases are rare</p>
+      </div>
+      <div class="audience-item reveal reveal-delay-1">
+        <div class="audience-check">&#10003;</div>
+        <p>Anyone who wants to add a premium tier to their product line but is not sure what belongs there or how to price it</p>
+      </div>
+      <div class="audience-item reveal reveal-delay-2">
+        <div class="audience-check">&#10003;</div>
+        <p>Creators who have products that are not selling and want a clear framework for deciding whether to fix them or remove them</p>
+      </div>
+      <div class="audience-item reveal reveal-delay-3">
+        <div class="audience-check">&#10003;</div>
+        <p>Anyone who wants a sustainable digital product business, not just a collection of one-time transactions with strangers</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="buy" class="price-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <p class="section-label">Get Instant Access</p>
+      <h2 class="section-title">Build the portfolio. Stop rebuilding from zero every month.</h2>
+    </div>
+    <div class="price-box reveal">
+      <div class="price-tag">$22.99</div>
+      <p class="price-desc">One-time payment. Instant PDF download. No subscription, no upsell sequence, no expiry.</p>
+      <div class="price-includes">
+        <h4>What you get</h4>
+        <ul>
+          <li>Full PDF guide (8 chapters, 5,000+ words)</li>
+          <li>Three-tier portfolio architecture framework</li>
+          <li>Customer journey mapping template</li>
+          <li>Pricing ladder design methodology</li>
+          <li>Natural upsell system and email templates</li>
+          <li>Bundle and bundle-breaking strategy</li>
+          <li>Kill vs. iterate decision framework</li>
+          <li>60-day portfolio build action plan</li>
+          <li>Quick-reference appendix and checklists</li>
+        </ul>
+      </div>
+      <a href="#" class="btn-primary" style="display:block; text-align:center;">Get the Portfolio Strategy — $22.99</a>
+      <p class="guarantee-badge">30-day money-back guarantee. If you do not find the framework useful, email us and we will refund you in full.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="container">
+    <h2 class="reveal">Your next product should strengthen the ones you already have.</h2>
+    <p class="reveal reveal-delay-1">The portfolio architecture tells you which product to build next, where to price it, and how it connects to everything else. That clarity is worth more than any individual product you could add.</p>
+    <a href="#buy" class="btn-primary reveal reveal-delay-2">Get the Strategy — $22.99</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Behike Digital Products. Part of the solopreneur product library. <a href="https://behike.shop">behike.shop</a></p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

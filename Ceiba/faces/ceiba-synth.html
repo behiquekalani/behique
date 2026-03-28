@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEIBA SYNTH — Signal Laboratory</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0c10;
+  --panel: #13161d;
+  --border: #1e2330;
+  --green: #00ff6a;
+  --green-dim: rgba(0,255,106,0.15);
+  --green-glow: rgba(0,255,106,0.6);
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0,229,255,0.1);
+  --text: #d0d4dc;
+  --text-dim: #6a7080;
+  --red: #ff3b3b;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* VHS Scanlines */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(0,0,0,0.08) 2px 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* VHS tracking lines */
+@keyframes vhsTrack {
+  0% { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: rgba(0,255,106,0.08);
+  animation: vhsTrack 8s linear infinite;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.header h1 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 14px;
+  color: var(--green);
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px var(--green-glow);
+  margin-bottom: 8px;
+}
+.header .sub {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+/* Visualizer Canvas */
+.viz-panel {
+  border: 2px solid var(--border);
+  background: var(--panel);
+  position: relative;
+  margin-bottom: 20px;
+}
+.viz-panel .label {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+#vizCanvas {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.ctrl-panel {
+  border: 2px solid var(--border);
+  background: var(--panel);
+  padding: 16px;
+  position: relative;
+}
+.ctrl-panel .label {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.ctrl-panel .label.green { color: var(--green); }
+.ctrl-panel .label.cyan { color: var(--cyan); }
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.slider-row:last-child { margin-bottom: 0; }
+.slider-row span {
+  font-size: 1rem;
+  color: var(--text-dim);
+  min-width: 80px;
+}
+.slider-row .val {
+  color: var(--green);
+  min-width: 50px;
+  text-align: right;
+  font-size: 1.1rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  margin: 0 10px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--green);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--green-glow);
+}
+
+/* Transport */
+.transport {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 12px 24px;
+  border: 2px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.btn:hover {
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 12px var(--green-dim);
+}
+.btn.active {
+  border-color: var(--green);
+  color: var(--bg);
+  background: var(--green);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+.btn.stop:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Status bar */
+.status-bar {
+  border: 2px solid var(--border);
+  background: var(--panel);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: var(--text-dim);
+  position: relative;
+}
+.status-bar .label {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+.status-bar .active-text { color: var(--green); }
+
+/* Scope selector */
+.scope-select {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.scope-btn {
+  font-family: 'VT323', monospace;
+  font-size: 1rem;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.scope-btn:hover { border-color: var(--green); color: var(--text); }
+.scope-btn.active {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--green-dim);
+}
+
+/* Pattern display */
+.pattern-panel {
+  border: 2px solid var(--border);
+  background: var(--panel);
+  padding: 16px;
+  position: relative;
+  margin-bottom: 20px;
+}
+.pattern-panel .label {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+.pattern-grid {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.step {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.step.on {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green-glow);
+  border-color: var(--green);
+}
+.step.current {
+  border-color: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan-dim);
+}
+.step:hover { border-color: var(--green); }
+
+@media (max-width: 600px) {
+  .controls { grid-template-columns: 1fr; }
+  #vizCanvas { height: 200px; }
+  .step { width: 22px; height: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>⬡ CEIBA SYNTH</h1>
+    <div class="sub">SIGNAL LABORATORY v1.0</div>
+  </div>
+
+  <!-- Visualization Mode -->
+  <div class="scope-select">
+    <button class="scope-btn active" data-mode="oscilloscope">SCOPE</button>
+    <button class="scope-btn" data-mode="frequency">FREQ</button>
+    <button class="scope-btn" data-mode="wireframe">WIRE</button>
+  </div>
+
+  <!-- Main Visualizer -->
+  <div class="viz-panel">
+    <div class="label">SIGNAL OUTPUT</div>
+    <canvas id="vizCanvas"></canvas>
+  </div>
+
+  <!-- Pattern Sequencer -->
+  <div class="pattern-panel">
+    <div class="label">SEQUENCER — 16 STEPS</div>
+    <div class="pattern-grid" id="patternGrid"></div>
+  </div>
+
+  <!-- Transport Controls -->
+  <div class="transport">
+    <button class="btn" id="btnPlay" onclick="togglePlay()">▶ PLAY</button>
+    <button class="btn stop" id="btnStop" onclick="stopAll()">■ STOP</button>
+  </div>
+
+  <!-- Synth Controls -->
+  <div class="controls">
+    <div class="ctrl-panel">
+      <div class="label green">LEAD</div>
+      <div class="slider-row">
+        <span>FILTER</span>
+        <input type="range" id="leadFilter" min="100" max="8000" value="2000">
+        <span class="val" id="leadFilterVal">2000</span>
+      </div>
+      <div class="slider-row">
+        <span>DETUNE</span>
+        <input type="range" id="leadDetune" min="0" max="50" value="10">
+        <span class="val" id="leadDetuneVal">10</span>
+      </div>
+      <div class="slider-row">
+        <span>VOLUME</span>
+        <input type="range" id="leadVol" min="0" max="100" value="60">
+        <span class="val" id="leadVolVal">60</span>
+      </div>
+    </div>
+
+    <div class="ctrl-panel">
+      <div class="label green">BASS</div>
+      <div class="slider-row">
+        <span>FILTER</span>
+        <input type="range" id="bassFilter" min="50" max="4000" value="800">
+        <span class="val" id="bassFilterVal">800</span>
+      </div>
+      <div class="slider-row">
+        <span>DETUNE</span>
+        <input type="range" id="bassDetune" min="0" max="80" value="30">
+        <span class="val" id="bassDetuneVal">30</span>
+      </div>
+      <div class="slider-row">
+        <span>VOLUME</span>
+        <input type="range" id="bassVol" min="0" max="100" value="50">
+        <span class="val" id="bassVolVal">50</span>
+      </div>
+    </div>
+
+    <div class="ctrl-panel">
+      <div class="label cyan">KICK</div>
+      <div class="slider-row">
+        <span>PUNCH</span>
+        <input type="range" id="kickPunch" min="50" max="300" value="150">
+        <span class="val" id="kickPunchVal">150</span>
+      </div>
+      <div class="slider-row">
+        <span>DECAY</span>
+        <input type="range" id="kickDecay" min="100" max="800" value="350">
+        <span class="val" id="kickDecayVal">350</span>
+      </div>
+      <div class="slider-row">
+        <span>VOLUME</span>
+        <input type="range" id="kickVol" min="0" max="100" value="70">
+        <span class="val" id="kickVolVal">70</span>
+      </div>
+    </div>
+
+    <div class="ctrl-panel">
+      <div class="label cyan">MASTER</div>
+      <div class="slider-row">
+        <span>BPM</span>
+        <input type="range" id="bpm" min="100" max="180" value="138">
+        <span class="val" id="bpmVal">138</span>
+      </div>
+      <div class="slider-row">
+        <span>DUCK</span>
+        <input type="range" id="duckDepth" min="0" max="100" value="80">
+        <span class="val" id="duckDepthVal">80</span>
+      </div>
+      <div class="slider-row">
+        <span>REVERB</span>
+        <input type="range" id="reverbMix" min="0" max="100" value="25">
+        <span class="val" id="reverbMixVal">25</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="label">STATUS</div>
+    <span id="statusText">STANDBY</span>
+    <span>BPM: <span class="active-text" id="bpmDisplay">138</span></span>
+    <span>STEP: <span class="active-text" id="stepDisplay">--</span></span>
+    <span>KEY: <span class="active-text">Gm</span></span>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CEIBA SYNTH — Web Audio Synthesizer
+// G minor trance: sawtooth lead, trance kick, super saw bass
+// ═══════════════════════════════════════════════════════════
+
+let ctx, masterGain, analyser, compressor, reverbNode, reverbGain, dryGain;
+let isPlaying = false;
+let currentStep = 0;
+let stepInterval = null;
+
+// G minor scale notes (Hz) — one octave down from middle
+const G_MINOR = {
+  'G3': 196.00, 'A3': 220.00, 'Bb3': 233.08,
+  'C4': 261.63, 'D4': 293.66, 'Eb4': 311.13,
+  'F4': 349.23, 'G4': 392.00
+};
+
+// Lead pattern: 0,4,0,9,7 mapped to G minor (16th notes)
+// 0=G, 4=D, 9=high G (up), 7=F
+const LEAD_NOTES = [
+  196.00, null, null, null,    // G3
+  293.66, null, null, null,    // D4
+  196.00, null, null, null,    // G3
+  392.00, null,                // G4 (octave up)
+  349.23, null                 // F4
+];
+
+// Bass: follows root, simple pattern (half the speed)
+const BASS_NOTES = [
+  98.00, null, null, null,     // G2
+  null, null, null, null,
+  98.00, null, null, null,     // G2
+  null, null, null, null
+];
+
+// Kick: four on the floor
+const KICK_PATTERN = [
+  1, 0, 0, 0,
+  1, 0, 0, 0,
+  1, 0, 0, 0,
+  1, 0, 0, 0
+];
+
+// Sequencer grid
+const STEPS = 16;
+let userPattern = [...LEAD_NOTES.map(n => n !== null)];
+
+// Init pattern grid
+const grid = document.getElementById('patternGrid');
+for (let i = 0; i < STEPS; i++) {
+  const step = document.createElement('button');
+  step.className = 'step' + (userPattern[i] ? ' on' : '');
+  step.dataset.step = i;
+  step.onclick = () => {
+    userPattern[i] = !userPattern[i];
+    step.classList.toggle('on');
+  };
+  grid.appendChild(step);
+}
+
+// Visualization mode
+let vizMode = 'oscilloscope';
+document.querySelectorAll('.scope-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    vizMode = btn.dataset.mode;
+  };
+});
+
+// Slider bindings
+function bindSlider(id) {
+  const el = document.getElementById(id);
+  const val = document.getElementById(id + 'Val');
+  el.oninput = () => {
+    val.textContent = el.value;
+    updateParams();
+  };
+}
+['leadFilter','leadDetune','leadVol','bassFilter','bassDetune','bassVol',
+ 'kickPunch','kickDecay','kickVol','bpm','duckDepth','reverbMix'].forEach(bindSlider);
+
+function getVal(id) { return parseFloat(document.getElementById(id).value); }
+
+function initAudio() {
+  if (ctx) return;
+  ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Master chain: compressor → reverb/dry → master gain → analyser → destination
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 2048;
+
+  compressor = ctx.createDynamicsCompressor();
+  compressor.threshold.value = -20;
+  compressor.ratio.value = 4;
+
+  masterGain = ctx.createGain();
+  masterGain.gain.value = 0.7;
+
+  // Simple reverb using convolver
+  reverbNode = ctx.createConvolver();
+  reverbGain = ctx.createGain();
+  reverbGain.gain.value = 0.25;
+  dryGain = ctx.createGain();
+  dryGain.gain.value = 0.75;
+
+  // Generate impulse response
+  const sr = ctx.sampleRate;
+  const len = sr * 1.5;
+  const impulse = ctx.createBuffer(2, len, sr);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = impulse.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i/len, 2.5);
+    }
+  }
+  reverbNode.buffer = impulse;
+
+  compressor.connect(dryGain);
+  compressor.connect(reverbNode);
+  reverbNode.connect(reverbGain);
+  dryGain.connect(masterGain);
+  reverbGain.connect(masterGain);
+  masterGain.connect(analyser);
+  analyser.connect(ctx.destination);
+}
+
+function updateParams() {
+  if (!ctx) return;
+  const rv = getVal('reverbMix') / 100;
+  if (reverbGain) reverbGain.gain.value = rv;
+  if (dryGain) dryGain.gain.value = 1 - rv * 0.5;
+  document.getElementById('bpmDisplay').textContent = document.getElementById('bpm').value;
+}
+
+// ── Synth Voices ──
+
+function playSawtooth(freq, time, duration, volume, filterFreq, detune) {
+  // Sawtooth lead with filter
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.value = freq;
+  osc.detune.value = (Math.random() - 0.5) * detune;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = filterFreq;
+  filter.Q.value = 5;
+  // Acid slide: filter sweep
+  filter.frequency.setValueAtTime(filterFreq * 0.3, time);
+  filter.frequency.linearRampToValueAtTime(filterFreq, time + 0.05);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(volume, time + 0.01);
+  gain.gain.linearRampToValueAtTime(volume * 0.7, time + duration * 0.5);
+  gain.gain.linearRampToValueAtTime(0, time + duration);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(compressor);
+
+  osc.start(time);
+  osc.stop(time + duration);
+}
+
+function playSuperSaw(freq, time, duration, volume, filterFreq, detune) {
+  // Super saw: 5 detuned sawtooths
+  const gains = [];
+  const oscs = [];
+  const masterG = ctx.createGain();
+  masterG.gain.setValueAtTime(0, time);
+  masterG.gain.linearRampToValueAtTime(volume, time + 0.02);
+  masterG.gain.linearRampToValueAtTime(volume * 0.6, time + duration * 0.7);
+  masterG.gain.linearRampToValueAtTime(0, time + duration);
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = filterFreq;
+  filter.Q.value = 2;
+
+  for (let i = 0; i < 5; i++) {
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    // Random detuning for chaos
+    osc.detune.value = (i - 2) * detune * 0.4 + (Math.random() - 0.5) * detune;
+    osc.connect(filter);
+    osc.start(time);
+    osc.stop(time + duration);
+    oscs.push(osc);
+  }
+
+  filter.connect(masterG);
+  masterG.connect(compressor);
+}
+
+function playKick(time, punch, decay, volume) {
+  // Trance kick: sine sweep + noise click
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(punch, time);
+  osc.frequency.exponentialRampToValueAtTime(40, time + decay/1000);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(volume, time);
+  gain.gain.exponentialRampToValueAtTime(0.01, time + decay/1000);
+
+  // Click transient
+  const clickOsc = ctx.createOscillator();
+  clickOsc.type = 'square';
+  clickOsc.frequency.value = 200;
+  const clickGain = ctx.createGain();
+  clickGain.gain.setValueAtTime(volume * 0.3, time);
+  clickGain.gain.exponentialRampToValueAtTime(0.01, time + 0.02);
+
+  osc.connect(gain);
+  gain.connect(compressor);
+  clickOsc.connect(clickGain);
+  clickGain.connect(compressor);
+
+  osc.start(time);
+  osc.stop(time + decay/1000 + 0.1);
+  clickOsc.start(time);
+  clickOsc.stop(time + 0.03);
+}
+
+// ── Sequencer ──
+
+function scheduleStep() {
+  const now = ctx.currentTime;
+  const bpm = getVal('bpm');
+  const stepDur = 60 / bpm / 4; // 16th note duration
+
+  // Lead
+  if (userPattern[currentStep] && LEAD_NOTES[currentStep] !== null) {
+    playSawtooth(
+      LEAD_NOTES[currentStep],
+      now, stepDur * 0.9,
+      getVal('leadVol') / 100 * 0.3,
+      getVal('leadFilter'),
+      getVal('leadDetune')
+    );
+  }
+
+  // Bass
+  if (BASS_NOTES[currentStep] !== null) {
+    playSuperSaw(
+      BASS_NOTES[currentStep],
+      now, stepDur * 1.8,
+      getVal('bassVol') / 100 * 0.25,
+      getVal('bassFilter'),
+      getVal('bassDetune')
+    );
+  }
+
+  // Kick (four on the floor)
+  if (KICK_PATTERN[currentStep]) {
+    playKick(
+      now,
+      getVal('kickPunch'),
+      getVal('kickDecay'),
+      getVal('kickVol') / 100 * 0.5
+    );
+  }
+
+  // Update grid highlight
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.toggle('current', i === currentStep);
+  });
+  document.getElementById('stepDisplay').textContent = (currentStep + 1).toString().padStart(2, '0');
+
+  currentStep = (currentStep + 1) % STEPS;
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    stopAll();
+    return;
+  }
+
+  initAudio();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  isPlaying = true;
+  currentStep = 0;
+  document.getElementById('btnPlay').classList.add('active');
+  document.getElementById('btnPlay').textContent = '▮▮ PAUSE';
+  document.getElementById('statusText').textContent = 'TRANSMITTING';
+  document.getElementById('statusText').classList.add('active-text');
+
+  const bpm = getVal('bpm');
+  const stepMs = (60 / bpm / 4) * 1000;
+  scheduleStep();
+  stepInterval = setInterval(() => {
+    const bpm = getVal('bpm');
+    const newMs = (60 / bpm / 4) * 1000;
+    scheduleStep();
+    // Adjust interval if BPM changed
+    if (Math.abs(newMs - stepMs) > 5) {
+      clearInterval(stepInterval);
+      stepInterval = setInterval(scheduleStep, newMs);
+    }
+  }, stepMs);
+
+  drawViz();
+}
+
+function stopAll() {
+  isPlaying = false;
+  if (stepInterval) clearInterval(stepInterval);
+  stepInterval = null;
+  currentStep = 0;
+
+  document.getElementById('btnPlay').classList.remove('active');
+  document.getElementById('btnPlay').textContent = '▶ PLAY';
+  document.getElementById('statusText').textContent = 'STANDBY';
+  document.getElementById('statusText').classList.remove('active-text');
+  document.getElementById('stepDisplay').textContent = '--';
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('current'));
+}
+
+// ── Visualization ──
+
+const canvas = document.getElementById('vizCanvas');
+const canvasCtx = canvas.getContext('2d');
+let animFrame;
+
+function resizeCanvas() {
+  canvas.width = canvas.clientWidth * 2;
+  canvas.height = canvas.clientHeight * 2;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function drawViz() {
+  if (!isPlaying && !analyser) return;
+  animFrame = requestAnimationFrame(drawViz);
+
+  const w = canvas.width;
+  const h = canvas.height;
+  canvasCtx.fillStyle = '#0a0c10';
+  canvasCtx.fillRect(0, 0, w, h);
+
+  if (!analyser) return;
+
+  if (vizMode === 'oscilloscope') drawOscilloscope(w, h);
+  else if (vizMode === 'frequency') drawFrequency(w, h);
+  else if (vizMode === 'wireframe') drawWireframe(w, h);
+}
+
+function drawOscilloscope(w, h) {
+  const bufLen = analyser.frequencyBinCount;
+  const data = new Uint8Array(bufLen);
+  analyser.getByteTimeDomainData(data);
+
+  // Grid
+  canvasCtx.strokeStyle = 'rgba(30,35,48,0.6)';
+  canvasCtx.lineWidth = 1;
+  for (let i = 0; i < 8; i++) {
+    const y = (h / 8) * i;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(0, y);
+    canvasCtx.lineTo(w, y);
+    canvasCtx.stroke();
+  }
+  for (let i = 0; i < 12; i++) {
+    const x = (w / 12) * i;
+    canvasCtx.beginPath();
+    canvasCtx.moveTo(x, 0);
+    canvasCtx.lineTo(x, h);
+    canvasCtx.stroke();
+  }
+
+  // Waveform glow
+  canvasCtx.shadowColor = '#00ff6a';
+  canvasCtx.shadowBlur = 15;
+  canvasCtx.strokeStyle = '#00ff6a';
+  canvasCtx.lineWidth = 2.5;
+  canvasCtx.beginPath();
+
+  const sliceW = w / bufLen;
+  for (let i = 0; i < bufLen; i++) {
+    const v = data[i] / 128.0;
+    const y = v * h / 2;
+    if (i === 0) canvasCtx.moveTo(0, y);
+    else canvasCtx.lineTo(i * sliceW, y);
+  }
+  canvasCtx.stroke();
+  canvasCtx.shadowBlur = 0;
+}
+
+function drawFrequency(w, h) {
+  const bufLen = analyser.frequencyBinCount;
+  const data = new Uint8Array(bufLen);
+  analyser.getByteFrequencyData(data);
+
+  const barCount = 64;
+  const barW = w / barCount;
+  const step = Math.floor(bufLen / barCount);
+
+  for (let i = 0; i < barCount; i++) {
+    const val = data[i * step] / 255;
+    const barH = val * h * 0.9;
+
+    const green = Math.floor(255 * val);
+    canvasCtx.fillStyle = `rgba(0, ${green}, 106, ${0.3 + val * 0.7})`;
+    canvasCtx.shadowColor = '#00ff6a';
+    canvasCtx.shadowBlur = val * 10;
+    canvasCtx.fillRect(i * barW + 1, h - barH, barW - 2, barH);
+  }
+  canvasCtx.shadowBlur = 0;
+}
+
+function drawWireframe(w, h) {
+  const bufLen = analyser.frequencyBinCount;
+  const freqData = new Uint8Array(bufLen);
+  const timeData = new Uint8Array(bufLen);
+  analyser.getByteFrequencyData(freqData);
+  analyser.getByteTimeDomainData(timeData);
+
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = Math.min(w, h) * 0.3;
+  const points = 48;
+
+  // Rotating wireframe sphere influenced by audio
+  const t = Date.now() / 2000;
+
+  canvasCtx.strokeStyle = 'rgba(0,255,106,0.3)';
+  canvasCtx.lineWidth = 1;
+
+  // Draw latitude lines
+  for (let lat = 0; lat < 8; lat++) {
+    const phi = (lat / 7) * Math.PI;
+    canvasCtx.beginPath();
+    for (let i = 0; i <= points; i++) {
+      const theta = (i / points) * Math.PI * 2;
+      const freqIdx = Math.floor((i / points) * 64);
+      const audioMod = 1 + (freqData[freqIdx] / 255) * 0.4;
+
+      const r = radius * audioMod;
+      const x = cx + r * Math.sin(phi) * Math.cos(theta + t);
+      const y = cy + r * Math.cos(phi) * Math.cos(t * 0.3) + r * 0.1 * Math.sin(theta);
+
+      if (i === 0) canvasCtx.moveTo(x, y);
+      else canvasCtx.lineTo(x, y);
+    }
+    canvasCtx.stroke();
+  }
+
+  // Draw longitude lines
+  canvasCtx.strokeStyle = 'rgba(0,229,255,0.2)';
+  for (let lon = 0; lon < 12; lon++) {
+    const theta = (lon / 12) * Math.PI * 2;
+    canvasCtx.beginPath();
+    for (let i = 0; i <= points; i++) {
+      const phi = (i / points) * Math.PI;
+      const freqIdx = Math.floor((lon / 12) * 64);
+      const audioMod = 1 + (freqData[freqIdx] / 255) * 0.4;
+
+      const r = radius * audioMod;
+      const x = cx + r * Math.sin(phi) * Math.cos(theta + t);
+      const y = cy + r * Math.cos(phi) * Math.cos(t * 0.3);
+
+      if (i === 0) canvasCtx.moveTo(x, y);
+      else canvasCtx.lineTo(x, y);
+    }
+    canvasCtx.stroke();
+  }
+
+  // Center glow
+  const grd = canvasCtx.createRadialGradient(cx, cy, 0, cx, cy, radius * 0.3);
+  grd.addColorStop(0, 'rgba(0,255,106,0.15)');
+  grd.addColorStop(1, 'rgba(0,255,106,0)');
+  canvasCtx.fillStyle = grd;
+  canvasCtx.fillRect(0, 0, w, h);
+}
+
+// Start idle visualization
+drawViz();
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+    togglePlay();
+  }
+});
+</script>
+</body>
+</html>

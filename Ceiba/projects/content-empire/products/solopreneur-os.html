@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solopreneur OS - One-Person Business Operating System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --text-2: #999;
+    --accent: #c4a35a;
+    --accent-dim: rgba(196, 163, 90, 0.15);
+    --green: #4a9;
+    --red: #c55;
+    --blue: #5a9cd6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    padding: 80px 0 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  header p {
+    font-size: 18px;
+    color: var(--text-2);
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Sections */
+  section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+
+  .card h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    color: var(--text-2);
+    font-size: 15px;
+  }
+
+  /* Phase Grid */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
+
+  .phase:nth-child(1)::before { background: var(--accent); }
+  .phase:nth-child(2)::before { background: var(--blue); }
+  .phase:nth-child(3)::before { background: var(--green); }
+
+  .phase-number {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 8px;
+  }
+
+  .phase h4 { font-size: 18px; margin-bottom: 8px; }
+  .phase p { color: var(--text-2); font-size: 14px; margin-bottom: 16px; }
+
+  .phase ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .phase li {
+    font-size: 14px;
+    color: var(--text-2);
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .phase li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+  }
+
+  /* Framework Blocks */
+  .framework {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .framework h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .prompt {
+    background: var(--surface-2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin: 12px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .prompt p {
+    font-size: 14px;
+    color: var(--text-2);
+    font-style: italic;
+  }
+
+  .fill-in {
+    display: block;
+    width: 100%;
+    min-height: 60px;
+    background: var(--surface-2);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0 16px;
+    color: var(--text-2);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    resize: vertical;
+  }
+
+  .fill-in::placeholder { color: #555; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+
+  th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-2);
+  }
+
+  tr:hover td { color: var(--text); }
+
+  /* Content Multiplication */
+  .multiply-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .multiply-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .multiply-item strong {
+    display: block;
+    color: var(--text);
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+
+  /* Hook formulas */
+  .hooks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .hook {
+    background: var(--surface-2);
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Playfair Display', serif;
+    color: var(--text);
+    border-left: 2px solid var(--accent-dim);
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 15px;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Footer */
+  footer {
+    padding: 60px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  footer p {
+    color: var(--text-2);
+    font-size: 13px;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 32px; }
+    header { padding: 48px 0 40px; }
+    section { padding: 40px 0; }
+    .multiply-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="badge">Interactive Workbook</div>
+    <h1>Solopreneur OS</h1>
+    <p>The operating system for building a one-person business. Find your niche. Plan your content. Build your brand. All in one document.</p>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- SECTION 1: DOMAIN OF MASTERY -->
+<section>
+  <h2>01. Your Domain of Mastery</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Don't think "niche." Think mastery. Your brand is the intersection of 3 interests. One makes money. One fuels you. One makes you unique.</p>
+
+  <div class="framework">
+    <h4>Interest #1: The Money-Maker</h4>
+    <div class="prompt"><p>What skill or knowledge do you have that people already pay for? What have you seen others monetize online?</p></div>
+    <textarea class="fill-in" placeholder="e.g., AI automation, web design, fitness coaching, financial planning..."></textarea>
+
+    <h4>Interest #2: The Passion</h4>
+    <div class="prompt"><p>What topic makes you lose track of time? What do you consume content about without being paid to?</p></div>
+    <textarea class="fill-in" placeholder="e.g., AI news, crypto markets, psychology, photography..."></textarea>
+
+    <h4>Interest #3: The Differentiator</h4>
+    <div class="prompt"><p>What unusual interest or experience gives you a perspective nobody else has? This can change over time.</p></div>
+    <textarea class="fill-in" placeholder="e.g., ADHD productivity, faith-based entrepreneurship, gaming psychology..."></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Principles of Your Domain</h4>
+    <div class="prompt"><p>What are the 3-5 fundamental truths someone needs to understand about your domain? These become your evergreen content.</p></div>
+    <textarea class="fill-in" placeholder="1. &#10;2. &#10;3. &#10;4. &#10;5. " style="min-height: 120px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Topic Breakdown</h4>
+    <p style="color: var(--text-2); font-size: 14px; margin-bottom: 16px;">Break each interest into topics and sub-topics. Each becomes a content idea.</p>
+    <table>
+      <thead>
+        <tr><th>Interest</th><th>Topic</th><th>Sub-topics (3+)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Money-Maker</td><td contenteditable="true" style="color: var(--text);">___</td><td contenteditable="true" style="color: var(--text);">___</td></tr>
+        <tr><td>Money-Maker</td><td contenteditable="true" style="color: var(--text);">___</td><td contenteditable="true" style="color: var(--text);">___</td></tr>
+        <tr><td>Passion</td><td contenteditable="true" style="color: var(--text);">___</td><td contenteditable="true" style="color: var(--text);">___</td></tr>
+        <tr><td>Passion</td><td contenteditable="true" style="color: var(--text);">___</td><td contenteditable="true" style="color: var(--text);">___</td></tr>
+        <tr><td>Differentiator</td><td contenteditable="true" style="color: var(--text);">___</td><td contenteditable="true" style="color: var(--text);">___</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="framework">
+    <h4>Content Pyramid</h4>
+    <p style="color: var(--text-2); font-size: 14px; margin-bottom: 16px;">Prioritize your content ratio. Authority first, then growth, then authenticity.</p>
+    <table>
+      <thead>
+        <tr><th>Pillar</th><th>Priority</th><th>Content Ratio</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td contenteditable="true" style="color: var(--text);">___</td><td>1st</td><td>50%</td><td>Build authority</td></tr>
+        <tr><td contenteditable="true" style="color: var(--text);">___</td><td>2nd</td><td>30%</td><td>Drive growth</td></tr>
+        <tr><td contenteditable="true" style="color: var(--text);">___</td><td>3rd</td><td>20%</td><td>Show authenticity</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 2: LIFE'S WORK -->
+<section>
+  <h2>02. Life's Work</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Your purpose is the BIG problem you want to solve. You may never fully solve it. That's the point. That's how you build something that lasts.</p>
+
+  <div class="framework">
+    <h4>The BIG Problem</h4>
+    <div class="prompt"><p>What is a significant problem you've faced or solved in your own life? If you could solve it for others at scale, would you?</p></div>
+    <textarea class="fill-in" placeholder="Describe the problem, how it affected you, and why it matters..." style="min-height: 100px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Arsenal of Why's</h4>
+    <p style="color: var(--text-2); font-size: 14px; margin-bottom: 16px;">Your "why" is the story you tell yourself. It should give you energy. List every reason you're doing this.</p>
+    <textarea class="fill-in" placeholder="1. &#10;2. &#10;3. &#10;4. &#10;5. &#10;6. &#10;7. " style="min-height: 140px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Problems You Solve</h4>
+    <table>
+      <thead><tr><th>For Individuals</th><th>For Businesses</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><textarea class="fill-in" placeholder="What problems do everyday people have that your skills can solve?" style="min-height: 80px; margin: 0;"></textarea></td>
+          <td><textarea class="fill-in" placeholder="What problems do businesses have that your skills can solve?" style="min-height: 80px; margin: 0;"></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 3: VISION -->
+<section>
+  <h2>03. Vision</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Vision pulls energy from a future you haven't reached yet. Be specific. Feel the emotion.</p>
+
+  <div class="framework">
+    <h4>1-Year Vision</h4>
+    <div class="prompt"><p>Where are you in 12 months? Be specific about income, audience, products, and daily life.</p></div>
+    <textarea class="fill-in" placeholder="In 12 months, I will..." style="min-height: 100px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>3-Year Vision</h4>
+    <div class="prompt"><p>Where are you in 3 years? Think bigger. What does freedom look like?</p></div>
+    <textarea class="fill-in" placeholder="In 3 years, I will..." style="min-height: 100px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Anti-Vision (What You're Running From)</h4>
+    <div class="prompt"><p>What does your life look like if you do NOTHING? Paint the picture you refuse to accept.</p></div>
+    <textarea class="fill-in" placeholder="If I do nothing, in 5 years I will be..." style="min-height: 100px;"></textarea>
+  </div>
+</section>
+
+<!-- SECTION 4: BRAND EVOLUTION -->
+<section>
+  <h2>04. Brand Evolution</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Your brand evolves in three phases. Know which phase you're in. Don't skip ahead.</p>
+
+  <div class="phase-grid">
+    <div class="phase">
+      <div class="phase-number">Phase 01</div>
+      <h4>Establish Authority</h4>
+      <p>Pick ONE interest. Go deep. Educate daily. Prove you know what you're talking about.</p>
+      <ul>
+        <li>Write a lead magnet (free guide or ebook)</li>
+        <li>Post list-style educational content daily</li>
+        <li>Turn each list into threads, carousels, articles</li>
+        <li>80% authority content, 20% personality</li>
+        <li>Study your mentors. Dissect what works.</li>
+      </ul>
+    </div>
+
+    <div class="phase">
+      <div class="phase-number">Phase 02</div>
+      <h4>Create Your Niche of One</h4>
+      <p>Blend your interests. Show who you really are. Nobody can compete with authenticity.</p>
+      <ul>
+        <li>Start talking about your other interests</li>
+        <li>Connect dots between your pillars in long-form</li>
+        <li>Pull inspiration from content you actually enjoy</li>
+        <li>Build your unique perspective and voice</li>
+        <li>Start networking with creators at your level</li>
+      </ul>
+    </div>
+
+    <div class="phase">
+      <div class="phase-number">Phase 03</div>
+      <h4>Actualize Life's Work</h4>
+      <p>Create your own concepts. Write the book. Build the thing only YOU can build.</p>
+      <ul>
+        <li>Outline the book you'd give your younger self</li>
+        <li>Create your own theories and frameworks</li>
+        <li>Blend your favorite big ideas into something new</li>
+        <li>Position as a thought leader, not just practitioner</li>
+        <li>Build products around your unique philosophy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: CONTENT MULTIPLICATION -->
+<section>
+  <h2>05. Content Multiplication</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">One idea becomes 10 pieces of content. Write once, distribute everywhere.</p>
+
+  <div class="framework">
+    <h4>The Multiplication Formula</h4>
+    <p style="color: var(--text-2); font-size: 14px; margin-bottom: 16px;">Start with ONE long-form piece. Then break it down.</p>
+
+    <div class="multiply-grid">
+      <div class="multiply-item"><strong>1. Newsletter/Article</strong>The full deep-dive. 800-2000 words.</div>
+      <div class="multiply-item"><strong>2. Carousel</strong>5-7 slides. Key insights, visual.</div>
+      <div class="multiply-item"><strong>3. Short Reel/Video</strong>30-60s. One hook, one insight.</div>
+      <div class="multiply-item"><strong>4. Thread</strong>5-10 posts. Step by step.</div>
+      <div class="multiply-item"><strong>5. Quote Graphic</strong>One powerful line. Shareable.</div>
+      <div class="multiply-item"><strong>6. Behind-the-Scenes</strong>Story format. The messy version.</div>
+      <div class="multiply-item"><strong>7. Engagement Post</strong>Ask a question. Start a debate.</div>
+      <div class="multiply-item"><strong>8. Product Angle</strong>Turn the insight into something sellable.</div>
+    </div>
+  </div>
+
+  <div class="framework">
+    <h4>Hook Formulas That Work</h4>
+    <div class="hooks">
+      <div class="hook">[Number] [things] that [benefit] without [effort/cost]</div>
+      <div class="hook">I [did X] in [timeframe]. Here's exactly how.</div>
+      <div class="hook">Stop [common mistake]. Do [better approach] instead.</div>
+      <div class="hook">The [tool/approach] nobody is talking about</div>
+      <div class="hook">[Specific result] with $0 and [time invested]</div>
+      <div class="hook">Why [popular opinion] is wrong about [topic]</div>
+      <div class="hook">[Authority figure] said [quote]. Here's why it matters.</div>
+    </div>
+  </div>
+
+  <div class="framework">
+    <h4>Content Quality Checklist</h4>
+    <p style="color: var(--text-2); font-size: 14px; margin-bottom: 16px;">Before you post, check 2-3 of these.</p>
+    <ul class="checklist">
+      <li><div class="check-box"></div>Captures attention (active voice, numbers, pattern interrupt)</li>
+      <li><div class="check-box"></div>Confident tone with conviction (no "maybe" or "I think")</li>
+      <li><div class="check-box"></div>Unique perspective from your experience or research</li>
+      <li><div class="check-box"></div>Hits a specific pain point or benefit people feel daily</li>
+      <li><div class="check-box"></div>Readable (line breaks, rhythm, visual structure)</li>
+      <li><div class="check-box"></div>Answers "What's in it for me?" for the reader</li>
+      <li><div class="check-box"></div>Educates, entertains, or inspires (ideally two of three)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- SECTION 6: MENTOR STUDY -->
+<section>
+  <h2>06. Tribe of Mentors</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Your brand is a fusion of the best parts of your mentors. Study 3-5 creators you admire.</p>
+
+  <div class="framework">
+    <h4>Mentor #1</h4>
+    <textarea class="fill-in" placeholder="Name:"></textarea>
+    <div class="prompt"><p>What is their tone? What are their brand colors? What vibe does their profile give? What do you admire most?</p></div>
+    <textarea class="fill-in" placeholder="Study notes..." style="min-height: 80px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Mentor #2</h4>
+    <textarea class="fill-in" placeholder="Name:"></textarea>
+    <textarea class="fill-in" placeholder="Study notes..." style="min-height: 80px;"></textarea>
+  </div>
+
+  <div class="framework">
+    <h4>Mentor #3</h4>
+    <textarea class="fill-in" placeholder="Name:"></textarea>
+    <textarea class="fill-in" placeholder="Study notes..." style="min-height: 80px;"></textarea>
+  </div>
+</section>
+
+<!-- SECTION 7: LAUNCH CHECKLIST -->
+<section>
+  <h2>07. Launch Checklist</h2>
+  <p style="color: var(--text-2); margin-bottom: 32px;">Stop planning. Start shipping. Check these off in order.</p>
+
+  <ul class="checklist">
+    <li><div class="check-box"></div>Fill out Domain of Mastery (3 interests, principles, topics)</li>
+    <li><div class="check-box"></div>Write your Life's Work (BIG problem, arsenal of why's)</li>
+    <li><div class="check-box"></div>Craft your Vision and Anti-Vision</li>
+    <li><div class="check-box"></div>Study 3 mentors in detail</li>
+    <li><div class="check-box"></div>Create one social media profile with a clear bio</li>
+    <li><div class="check-box"></div>Write 7 days of content using Content Multiplication</li>
+    <li><div class="check-box"></div>Create a lead magnet (free guide, template, or checklist)</li>
+    <li><div class="check-box"></div>Set up email capture (ConvertKit, Beehiiv, or Gumroad)</li>
+    <li><div class="check-box"></div>Post your first piece of content</li>
+    <li><div class="check-box"></div>Share your first "build in public" update</li>
+    <li><div class="check-box"></div>List your first digital product ($5-20 range)</li>
+    <li><div class="check-box"></div>Engage with 10 creators in your space daily for 30 days</li>
+  </ul>
+</section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); margin-bottom: 8px;">Solopreneur OS</p>
+    <p>Built for builders who refuse to work for someone else.</p>
+    <p style="margin-top: 16px;"><a href="#">Get the full interactive Notion template</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

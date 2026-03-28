@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Content Calendar System — Behike</title>
+  <meta name="description" content="A complete content planning and production system — not just a calendar. 90 days of topic ideas pre-built. $14.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --border: #1D1D1F;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    nav {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    .hero-tagline {
+      font-size: clamp(17px, 2.2vw, 21px);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      border-radius: 980px;
+      padding: 8px 20px;
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero-trust {
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 3.8vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 56px;
+      line-height: 1.6;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .model-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .model-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .model-card:nth-child(2)::before { background: #FF9F0A; }
+    .model-card:nth-child(3)::before { background: var(--cta); }
+    .model-card:nth-child(4)::before { background: #BF5AF2; }
+    .model-number {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .model-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .model-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .model-stat {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 980px;
+    }
+    .model-card:nth-child(2) .model-stat { background: rgba(255, 159, 10, 0.1); color: #FF9F0A; }
+    .model-card:nth-child(3) .model-stat { background: rgba(48, 209, 88, 0.1); color: var(--cta); }
+    .model-card:nth-child(4) .model-stat { background: rgba(191, 90, 242, 0.1); color: #BF5AF2; }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .appendix-banner {
+      margin-top: 20px;
+      background: rgba(10, 132, 255, 0.06);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .appendix-banner .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .appendix-banner p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .testimonial-stars {
+      color: #FF9F0A;
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .testimonial-text {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .author-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .author-info .role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 600px) { .for-grid { grid-template-columns: 1fr; } }
+    .for-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .for-block h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .for-block.is-for h3 { color: var(--cta); }
+    .for-block.not-for h3 { color: var(--muted); }
+    .for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .for-list li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .for-list li span.check { color: var(--cta); font-weight: 700; }
+    .for-list li span.cross { color: #FF453A; font-weight: 700; }
+
+    .price-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 56px 48px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    @media (max-width: 640px) { .price-block { padding: 40px 24px; } }
+    .price-block .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .price-display {
+      font-size: clamp(52px, 8vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-compare {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .price-includes {
+      list-style: none;
+      text-align: left;
+      margin: 0 auto 36px;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .price-includes li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .price-includes li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cta);
+      flex-shrink: 0;
+    }
+    .guarantee-strip {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .guarantee-strip strong { color: var(--text); }
+
+    .final-cta {
+      padding: 120px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 64px 0; }
+      .models-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="#buy" class="nav-cta">Get it — $14.99</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <span class="hero-eyebrow">Digital Product by Behike</span>
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        Most content calendars fail because<br>they plan what to post, not how to produce it.
+      </h1>
+      <p class="hero-tagline reveal reveal-delay-2">
+        A complete content planning and production system. Not just a calendar. Built for creators who want to stay consistent without burning out.
+      </p>
+      <div class="hero-cta-group reveal reveal-delay-3">
+        <a href="#buy" class="btn-primary">
+          Get the System
+          <span style="opacity:0.7; font-weight:400;">$14.99</span>
+        </a>
+        <div class="price-badge">
+          <span>Instant PDF download</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>90-day topic bank included</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>Production workflow inside</span>
+        </div>
+      </div>
+      <p class="hero-trust reveal reveal-delay-4">
+        30-day money-back guarantee. No questions asked.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="container">
+      <p class="section-label reveal">Why calendars fail</p>
+      <h2 class="section-title reveal reveal-delay-1">Planning the posts is easy.<br>Producing them consistently is the real problem.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        A calendar tells you what to post on Monday. It does not tell you how to have it ready by Sunday. That gap is where most content strategies collapse.
+      </p>
+      <div class="problem-grid">
+        <div class="problem-card reveal reveal-delay-1">
+          <div class="icon">&#128197;</div>
+          <h3>The planning illusion</h3>
+          <p>Filling out a content calendar feels like progress. It is not. The calendar only becomes real when production is built into it. Planning without a production workflow is just decoration.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-2">
+          <div class="icon">&#128167;</div>
+          <h3>Burnout through volume</h3>
+          <p>Creating new content for every slot, every week, from scratch is not a system. It is an endurance test you will eventually fail. The missing piece is a repurposing and batching infrastructure.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3">
+          <div class="icon">&#128220;</div>
+          <h3>The blank page problem</h3>
+          <p>Even with a calendar, most creators stall when it is time to actually write. The block is not laziness. It is a missing idea infrastructure. Ninety days of pre-built topics solves this completely.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section class="section" id="components">
+    <div class="container">
+      <p class="section-label reveal">The four components</p>
+      <h2 class="section-title reveal reveal-delay-1">Plan, produce, repurpose, schedule.<br>In that order.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        Each component solves a different failure point. Together they form a system that runs every week without rebuilding from scratch.
+      </p>
+      <div class="models-grid">
+        <div class="model-card reveal reveal-delay-1">
+          <p class="model-number">Component 01</p>
+          <h3>Weekly Content Block</h3>
+          <p>A time-blocked schedule that separates planning days from production days from publishing days. Eliminates the daily decision of what to work on and when.</p>
+          <span class="model-stat">Saves 3-5 hrs/week</span>
+        </div>
+        <div class="model-card reveal reveal-delay-2">
+          <p class="model-number">Component 02</p>
+          <h3>Batch Production Workflow</h3>
+          <p>Produce a week or two weeks of content in a single session. Includes the session structure, the warm-up sequence, and the quality check before scheduling.</p>
+          <span class="model-stat">2x output per hour</span>
+        </div>
+        <div class="model-card reveal reveal-delay-3">
+          <p class="model-number">Component 03</p>
+          <h3>Repurposing Map</h3>
+          <p>A visual system for turning one piece of long-form content into 5 to 10 pieces of short-form content across platforms. One input, multiple outputs.</p>
+          <span class="model-stat">5-10x per piece</span>
+        </div>
+        <div class="model-card reveal reveal-delay-4">
+          <p class="model-number">Component 04</p>
+          <h3>90-Day Topic Bank</h3>
+          <p>Pre-built topic ideas organized by content type, audience pain point, and platform format. The blank page problem disappears on day one.</p>
+          <span class="model-stat">90 days pre-loaded</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section" id="inside">
+    <div class="container">
+      <p class="section-label reveal">What is inside</p>
+      <h2 class="section-title reveal reveal-delay-1">Every piece of the system.<br>Ready to use on day one.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        This is not a workbook you fill in over a weekend. It is an operating system you run every week.
+      </p>
+      <div class="chapters-grid">
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">01</span>
+          <div class="chapter-text">
+            <h4>Weekly Content Block Template</h4>
+            <p>The exact time-block structure for planning, writing, recording, and scheduling across a 5 to 7 day cycle.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">02</span>
+          <div class="chapter-text">
+            <h4>Batch Production Workflow</h4>
+            <p>Step-by-step session guide for producing high-volume content in focused blocks without creative fatigue.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">03</span>
+          <div class="chapter-text">
+            <h4>90-Day Topic Bank</h4>
+            <p>Pre-built ideas organized by niche, content format, and audience intent. Covers 90 full days of posting slots.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">04</span>
+          <div class="chapter-text">
+            <h4>Repurposing Map</h4>
+            <p>Visual guide for turning one long-form piece into short-form content for Instagram, LinkedIn, Twitter, and TikTok.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">05</span>
+          <div class="chapter-text">
+            <h4>Platform Scheduling Guide</h4>
+            <p>Optimal posting frequency, best times by platform, and the scheduling tool comparison for solo creators.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-banner reveal">
+        <span class="label">Bonus</span>
+        <p>Content audit template for evaluating existing posts, and a 30-day consistency tracker to build the production habit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="proof">
+    <div class="container">
+      <p class="section-label reveal">Social proof</p>
+      <h2 class="section-title reveal reveal-delay-1">Creators who stopped starting over<br>every Monday.</h2>
+      <div class="testimonials-grid" style="margin-top: 48px;">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I had a beautiful calendar with color-coded post types and zero posts ready. This system flipped it. Now I spend Sunday afternoon batching the week and I have not missed a day in 11 weeks. The 90-day topic bank alone was worth the price three times over."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">A</div>
+            <div class="author-info">
+              <p class="name">Alexa F.</p>
+              <p class="role">Wellness creator, Instagram</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The repurposing map changed the economics of my content completely. I used to write a newsletter and then separately create tweets, LinkedIn posts, and Instagram carousels. Now each newsletter generates 8 other pieces automatically. Same output, four times the content."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">N</div>
+            <div class="author-info">
+              <p class="name">Nathan O.</p>
+              <p class="role">Newsletter writer, B2B niche</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I have a full-time job and was trying to post daily. Burning out in week three every single time. The weekly content block showed me I only needed two focused production sessions per week to post every day. That one reframe saved my consistency."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">P</div>
+            <div class="author-info">
+              <p class="name">Priya S.</p>
+              <p class="role">Finance educator, part-time creator</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR / NOT FOR -->
+  <section class="section" id="fit">
+    <div class="container">
+      <p class="section-label reveal">Who this is for</p>
+      <h2 class="section-title reveal reveal-delay-1">This is for creators who want to stay consistent<br>without consuming their whole week.</h2>
+      <div class="for-grid" style="margin-top: 48px;">
+        <div class="for-block is-for reveal reveal-delay-1">
+          <h3>This is for you if:</h3>
+          <ul class="for-list">
+            <li><span class="check">+</span> You already post content but inconsistently and reactively</li>
+            <li><span class="check">+</span> You have a calendar but no production system to back it up</li>
+            <li><span class="check">+</span> You want 90 days of topic ideas without starting from a blank page</li>
+            <li><span class="check">+</span> You are posting on 2 to 4 platforms and need a repurposing workflow</li>
+            <li><span class="check">+</span> You want to batch content and free up mental energy during the week</li>
+          </ul>
+        </div>
+        <div class="for-block not-for reveal reveal-delay-2">
+          <h3>This is not for you if:</h3>
+          <ul class="for-list">
+            <li><span class="cross">-</span> You have never posted content and need to learn the basics first</li>
+            <li><span class="cross">-</span> You are looking for an AI tool that writes everything for you</li>
+            <li><span class="cross">-</span> You want a platform-specific growth strategy, not a production system</li>
+            <li><span class="cross">-</span> You are not willing to spend at least 3 hours per week on content</li>
+            <li><span class="cross">-</span> You want community accountability, not a personal framework</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE + GUARANTEE -->
+  <section class="section" id="buy">
+    <div class="container">
+      <div class="price-block reveal">
+        <p class="product-name">The Content Calendar System</p>
+        <div class="price-display">$14.99</div>
+        <p class="price-compare">One-time payment. No subscription. Yours forever.</p>
+        <ul class="price-includes">
+          <li>Weekly content block template</li>
+          <li>Batch production workflow</li>
+          <li>90-day pre-built topic bank</li>
+          <li>Repurposing map for 4 platforms</li>
+          <li>Platform scheduling guide</li>
+          <li>Content audit template</li>
+          <li>30-day consistency tracker</li>
+          <li>Instant download</li>
+        </ul>
+        <a href="#" class="btn-primary" style="width: 100%; justify-content: center; font-size: 18px; padding: 18px 0;">
+          Get Instant Access
+        </a>
+        <div class="guarantee-strip">
+          <strong>30-day money-back guarantee.</strong> If this does not deliver value, email Behike and you get a full refund. No forms, no friction.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2 class="reveal">Consistency is a system problem,<br>not a willpower problem.</h2>
+      <p class="reveal reveal-delay-1">
+        The system gives you the structure, the topics, and the workflow. You provide the voice.
+      </p>
+      <a href="#buy" class="btn-primary reveal reveal-delay-2" style="font-size: 18px; padding: 18px 40px;">
+        Get The Content Calendar System for $14.99
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      &copy; 2026 Behike. All rights reserved.
+      &nbsp;&nbsp;
+      <a href="/privacy.html">Privacy</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/terms.html">Terms</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/refund.html">Refund Policy</a>
+    </p>
+  </footer>
+
+  <!-- INTERSECTION OBSERVER ANIMATIONS -->
+  <script>
+    (function () {
+      const elements = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      elements.forEach(function (el) { observer.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>

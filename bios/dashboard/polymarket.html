@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOS / Polymarket</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#000;--fg:#e0e0e0;--gold:#C9A84C;--dim:#666;--panel:#0a0a0a;--border:#1a1a1a;--green:#00c853;--red:#ff1744}
+body{background:var(--bg);color:var(--fg);font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border)}
+.topbar h1{font-size:16px;font-weight:700;letter-spacing:4px;color:var(--gold)}
+.topbar h1 span{color:var(--dim);font-weight:400;font-size:12px;letter-spacing:1px}
+.meta{font-size:11px;color:var(--dim);display:flex;gap:16px;align-items:center}
+.meta .dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);padding:1px}
+.card{background:var(--panel);padding:16px 20px}
+.card-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:12px;font-weight:600}
+.card-title .badge{background:var(--gold);color:#000;padding:1px 6px;border-radius:3px;font-size:10px;margin-left:6px;letter-spacing:0}
+
+/* Conviction rows */
+.conv{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.conv:last-child{border-bottom:none}
+.conv-name{font-weight:600;text-transform:uppercase;letter-spacing:1px;font-size:13px}
+.conv-score{font-size:20px;font-weight:700}
+.conv-level{font-size:10px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:1px}
+.level-high{background:#00c85333;color:var(--green)}
+.level-medium{background:#C9A84C33;color:var(--gold)}
+.level-low{background:#ff174433;color:var(--red)}
+.conv-bar{flex:1;margin:0 16px;height:4px;background:#1a1a1a;border-radius:2px;position:relative;max-width:200px}
+.conv-fill{height:100%;border-radius:2px;transition:width .6s}
+
+/* Gauge */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:20px 0}
+.gauge-num{font-size:56px;font-weight:700;line-height:1}
+.gauge-label{font-size:13px;margin-top:4px;font-weight:600}
+.gauge-bar{width:100%;height:8px;background:linear-gradient(90deg,var(--red),#ffd600,var(--green));border-radius:4px;margin-top:16px;position:relative}
+.gauge-marker{width:3px;height:16px;background:#fff;position:absolute;top:-4px;border-radius:2px;transition:left .6s}
+
+/* Movers */
+.mover{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.mover:last-child{border-bottom:none}
+.mover-name{font-weight:600;font-size:13px}
+.mover-price{color:var(--dim);font-size:12px}
+.mover-change{font-weight:700;font-size:14px}
+.up{color:var(--green)} .down{color:var(--red)}
+
+/* Trade ideas */
+.trade{padding:10px 0;border-bottom:1px solid var(--border)}
+.trade:last-child{border-bottom:none}
+.trade-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.trade-dir{font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:1px}
+.dir-long{background:#00c85322;color:var(--green)}
+.dir-short{background:#ff174422;color:var(--red)}
+.dir-hold{background:#C9A84C22;color:var(--gold)}
+.trade-reason{font-size:12px;color:var(--dim)}
+
+.full-width{grid-column:1/-1}
+.empty{text-align:center;padding:40px;color:var(--dim);font-style:italic}
+
+@media(max-width:768px){
+  .grid{grid-template-columns:1fr}
+  .topbar{flex-direction:column;gap:8px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>POLYMARKET <span>/ BIOS Trading View</span></h1>
+  <div class="meta">
+    <span><span class="dot"></span> LIVE</span>
+    <span id="ts">--</span>
+    <a href="index.html">MAIN DASHBOARD</a>
+  </div>
+</div>
+
+<div class="grid" id="root">
+  <div class="card"><div class="empty">Loading conviction data...</div></div>
+</div>
+
+<script>
+const GOLD = '#C9A84C', GREEN = '#00c853', RED = '#ff1744';
+const MARKET_TOPICS = ['crypto','stocks','oil','gold','btc','eth','fed','inflation','war'];
+
+function levelClass(l) {
+  return l === 'HIGH' ? 'level-high' : l === 'MEDIUM' ? 'level-medium' : 'level-low';
+}
+
+function barColor(score) {
+  return score >= 70 ? GREEN : score >= 50 ? GOLD : RED;
+}
+
+function direction(conv) {
+  if (conv.score >= 70 && conv.sentiment > 40) return { dir: 'LONG', cls: 'dir-long' };
+  if (conv.score >= 70 && conv.sentiment <= 30) return { dir: 'SHORT', cls: 'dir-short' };
+  if (conv.score >= 60) return { dir: 'WATCH', cls: 'dir-hold' };
+  return { dir: 'HOLD', cls: 'dir-hold' };
+}
+
+function tradeReason(conv) {
+  const d = direction(conv);
+  const src = conv.sources ? conv.sources.length + ' sources' : '';
+  if (d.dir === 'LONG') return `High conviction (${conv.score.toFixed(1)}) + bullish sentiment (${conv.sentiment.toFixed(1)}). ${src}`;
+  if (d.dir === 'SHORT') return `High conviction (${conv.score.toFixed(1)}) + bearish sentiment (${conv.sentiment.toFixed(1)}). ${src}`;
+  if (d.dir === 'WATCH') return `Elevated conviction (${conv.score.toFixed(1)}), sentiment neutral. Monitor for breakout. ${src}`;
+  return `Low conviction (${conv.score.toFixed(1)}). No clear edge yet. ${src}`;
+}
+
+function parseCoinGecko(signals) {
+  return signals
+    .filter(s => s.source === 'coingecko')
+    .map(s => {
+      const m = s.title.match(/^(.+?)\s+\((\w+)\)\s+([\+\-][\d.]+)%\s+\|\s+\$([\d,.]+)/);
+      if (!m) return null;
+      return { name: m[1], ticker: m[2], change: parseFloat(m[3]), price: m[4] };
+    })
+    .filter(Boolean)
+    .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))
+    .slice(0, 5);
+}
+
+function parseFearGreed(signals) {
+  const fg = signals.filter(s => s.source === 'fear_greed_index').sort((a, b) => b.timestamp > a.timestamp ? 1 : -1);
+  if (!fg.length) return null;
+  const m = fg[0].title.match(/(\d+)\s+\((.+?)\)/);
+  return m ? { value: parseInt(m[1]), label: m[2] } : null;
+}
+
+async function load() {
+  try {
+    const [convRes, sigRes] = await Promise.all([
+      fetch('../storage/convictions.json'), fetch('../storage/social_signals.json')
+    ]);
+    const convData = await convRes.json();
+    const signals = await sigRes.json();
+
+    const convictions = convData.convictions.filter(c => MARKET_TOPICS.includes(c.topic));
+    const movers = parseCoinGecko(signals);
+    const fg = parseFearGreed(signals);
+
+    document.getElementById('ts').textContent = new Date(convData.generated_at).toLocaleString();
+
+    let html = '';
+
+    // Conviction scores
+    html += `<div class="card">
+      <div class="card-title">Conviction Scores <span class="badge">${convictions.length} TOPICS</span></div>`;
+    convictions.forEach(c => {
+      html += `<div class="conv">
+        <span class="conv-name">${c.topic}</span>
+        <div class="conv-bar"><div class="conv-fill" style="width:${c.score}%;background:${barColor(c.score)}"></div></div>
+        <span class="conv-score" style="color:${barColor(c.score)}">${c.score.toFixed(1)}</span>
+        <span class="conv-level ${levelClass(c.level)}">${c.level}</span>
+      </div>`;
+    });
+    html += '</div>';
+
+    // Fear & Greed + Movers column
+    html += '<div class="card">';
+    // Fear & Greed gauge
+    html += '<div class="card-title">Fear & Greed Index</div>';
+    if (fg) {
+      const fgColor = fg.value <= 25 ? RED : fg.value <= 50 ? '#ffd600' : fg.value <= 75 ? GOLD : GREEN;
+      html += `<div class="gauge-wrap">
+        <div class="gauge-num" style="color:${fgColor}">${fg.value}</div>
+        <div class="gauge-label" style="color:${fgColor}">${fg.label}</div>
+        <div class="gauge-bar"><div class="gauge-marker" style="left:${fg.value}%"></div></div>
+      </div>`;
+    } else {
+      html += '<div class="empty">No fear/greed data</div>';
+    }
+
+    // Top movers
+    html += '<div class="card-title" style="margin-top:20px">Top 5 Crypto Movers</div>';
+    if (movers.length) {
+      movers.forEach(m => {
+        const cls = m.change >= 0 ? 'up' : 'down';
+        const arrow = m.change >= 0 ? '\u25B2' : '\u25BC';
+        html += `<div class="mover">
+          <div><span class="mover-name">${m.ticker}</span> <span class="mover-price">$${m.price}</span></div>
+          <span class="mover-change ${cls}">${arrow} ${Math.abs(m.change).toFixed(1)}%</span>
+        </div>`;
+      });
+    } else {
+      html += '<div class="empty">No CoinGecko data</div>';
+    }
+    html += '</div>';
+
+    // Trade Ideas (full width)
+    const trades = convictions.filter(c => c.score >= 50);
+    html += `<div class="card full-width">
+      <div class="card-title">Trade Ideas <span class="badge">BIOS GENERATED</span></div>`;
+    if (trades.length) {
+      trades.forEach(c => {
+        const d = direction(c);
+        const polyTopic = c.topic === 'btc' ? 'Bitcoin price' : c.topic === 'eth' ? 'Ethereum price' : c.topic === 'oil' ? 'Oil price' : c.topic === 'gold' ? 'Gold price' : c.topic === 'fed' ? 'Fed rate decision' : c.topic === 'war' ? 'Geopolitical conflict' : c.topic === 'inflation' ? 'Inflation data' : c.topic === 'stocks' ? 'Stock market' : c.topic;
+        html += `<div class="trade">
+          <div class="trade-header">
+            <span style="font-weight:600;text-transform:uppercase;letter-spacing:1px">${polyTopic}</span>
+            <span class="trade-dir ${d.cls}">${d.dir}</span>
+          </div>
+          <div class="trade-reason">${tradeReason(c)}</div>
+          <div style="display:flex;gap:16px;margin-top:4px;font-size:11px;color:var(--dim)">
+            <span>Velocity: ${c.velocity.toFixed(0)}</span>
+            <span>Volume: ${c.volume.toFixed(1)}</span>
+            <span>Diversity: ${c.diversity.toFixed(1)}</span>
+            <span>Signals: ${c.signal_count}</span>
+          </div>
+        </div>`;
+      });
+    } else {
+      html += '<div class="empty">No actionable trades — conviction too low across all topics</div>';
+    }
+    html += '</div>';
+
+    // Position summary (full width)
+    const highConv = convictions.filter(c => c.score >= 70);
+    html += `<div class="card full-width">
+      <div class="card-title">Position Summary</div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;padding:8px 0">
+        <div><span style="color:var(--dim);font-size:11px">TOTAL TOPICS</span><br><span style="font-size:24px;font-weight:700">${convictions.length}</span></div>
+        <div><span style="color:var(--dim);font-size:11px">HIGH CONVICTION</span><br><span style="font-size:24px;font-weight:700;color:${GREEN}">${highConv.length}</span></div>
+        <div><span style="color:var(--dim);font-size:11px">FEAR/GREED</span><br><span style="font-size:24px;font-weight:700;color:${fg ? (fg.value <= 25 ? RED : GOLD) : GOLD}">${fg ? fg.value : '--'}</span></div>
+        <div><span style="color:var(--dim);font-size:11px">TOP MOVER</span><br><span style="font-size:24px;font-weight:700;color:${movers.length && movers[0].change >= 0 ? GREEN : RED}">${movers.length ? movers[0].ticker + ' ' + (movers[0].change >= 0 ? '+' : '') + movers[0].change.toFixed(1) + '%' : '--'}</span></div>
+        <div><span style="color:var(--dim);font-size:11px">SIGNALS</span><br><span style="font-size:24px;font-weight:700">${convData.signal_count}</span></div>
+      </div>
+    </div>`;
+
+    document.getElementById('root').innerHTML = html;
+  } catch (e) {
+    document.getElementById('root').innerHTML = `<div class="card full-width"><div class="empty">Error: ${e.message}</div></div>`;
+  }
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

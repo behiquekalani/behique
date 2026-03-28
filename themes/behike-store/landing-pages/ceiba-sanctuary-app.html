@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba Sanctuary — Your Focus Environment</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000000;
+    --surface: rgba(255,255,255,0.05);
+    --border: rgba(255,255,255,0.08);
+    --border-active: rgba(255,255,255,0.18);
+    --blue: #0A84FF;
+    --green: #30D158;
+    --orange: #FF9F0A;
+    --red: #FF453A;
+    --purple: #BF5AF2;
+    --text: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --text-tertiary: #48484A;
+    --radius: 12px;
+    --radius-pill: 980px;
+    --max-w: 980px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+  }
+
+  .header-inner {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #0A84FF, #30D158);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  /* NAV TABS */
+  nav.desktop-nav {
+    display: flex;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 3px;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .nav-btn.active { background: var(--blue); color: #fff; }
+  .nav-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,0.07); }
+
+  /* MAIN */
+  main {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  @media (max-width: 620px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    nav.desktop-nav { display: none; }
+    .mobile-nav { display: flex !important; }
+    main { padding-bottom: 96px; }
+  }
+
+  /* MOBILE BOTTOM NAV */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+    justify-content: space-around;
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 16px;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-family: inherit;
+  }
+
+  .mobile-nav-btn.active { color: var(--blue); }
+  .mobile-nav-btn .icon { font-size: 20px; line-height: 1; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    border-radius: var(--radius-pill);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 28px;
+    cursor: pointer;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: #3b9bff; }
+  .btn-green { background: var(--green); color: #000; }
+  .btn-green:hover { background: #4be96e; }
+  .btn-orange { background: var(--orange); color: #000; }
+  .btn-ghost {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { border-color: var(--border-active); background: rgba(255,255,255,0.08); }
+  .btn-sm { font-size: 13px; padding: 8px 18px; }
+  .btn-icon { width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 20px; }
+
+  /* INPUTS */
+  textarea, input[type="text"] {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    padding: 14px 16px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus, input[type="text"]:focus { border-color: var(--blue); }
+  textarea::placeholder, input::placeholder { color: var(--text-tertiary); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border-active);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--blue);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+
+  /* SECTION HEADING */
+  .section-heading {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .section-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+  }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  /* SCROLLBARS */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 2px; }
+
+  /* ==================== FOCUS TAB ==================== */
+
+  .pomodoro-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 0 8px;
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+  }
+
+  .timer-ring svg {
+    position: absolute;
+    top: 0; left: 0;
+    transform: rotate(-90deg);
+  }
+
+  .timer-ring-bg { stroke: rgba(255,255,255,0.07); fill: none; stroke-width: 5; }
+
+  .timer-ring-fill {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s;
+  }
+
+  .timer-display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .timer-time {
+    font-size: 50px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+  }
+
+  .timer-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .timer-mode-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .mode-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pill);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .mode-pill.active {
+    background: rgba(10,132,255,0.15);
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  .session-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .session-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    transition: background 0.3s;
+  }
+
+  .session-dot.done { background: var(--green); }
+  .session-dot.current { background: var(--orange); }
+
+  /* SOUND BOARD */
+  .sound-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 400px) { .sound-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .sound-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+
+  .sound-btn.active {
+    background: rgba(10,132,255,0.12);
+    border-color: var(--blue);
+  }
+
+  .sound-btn:hover:not(.active) { border-color: var(--border-active); }
+  .sound-icon { font-size: 26px; line-height: 1; }
+  .sound-name { font-size: 11px; font-weight: 500; color: var(--text-secondary); }
+  .sound-btn.active .sound-name { color: var(--blue); }
+
+  .volume-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .vol-icon { font-size: 16px; color: var(--text-secondary); }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value { font-size: 28px; font-weight: 200; line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); }
+
+  /* ==================== BREATHE TAB ==================== */
+
+  .breathe-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+  }
+
+  .breathe-wrap {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0 24px;
+  }
+
+  .breathe-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .breathe-ring-outer {
+    width: 240px;
+    height: 240px;
+    border: 1px solid rgba(10,132,255,0.12);
+  }
+
+  .breathe-ring-mid {
+    width: 178px;
+    height: 178px;
+    border: 1px solid rgba(10,132,255,0.2);
+  }
+
+  .breathe-circle {
+    width: 116px;
+    height: 116px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(10,132,255,0.55), rgba(10,132,255,0.12));
+    border: 2px solid rgba(10,132,255,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 40px rgba(10,132,255,0.18);
+    z-index: 1;
+    transition: transform 0.15s linear, background 0.5s, box-shadow 0.5s, border-color 0.5s;
+  }
+
+  .breathe-countdown {
+    font-size: 30px;
+    font-weight: 200;
+    color: rgba(255,255,255,0.9);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .breathe-instruction {
+    font-size: 22px;
+    font-weight: 300;
+    min-height: 30px;
+    text-align: center;
+    margin-bottom: 6px;
+    transition: color 0.4s;
+  }
+
+  .breathe-cycle-count {
+    font-size: 42px;
+    font-weight: 100;
+    color: var(--blue);
+    min-height: 50px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .breathe-cycle-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    margin-bottom: 20px;
+    min-height: 18px;
+  }
+
+  .technique-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .technique-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .technique-card.active { border-color: var(--blue); background: rgba(10,132,255,0.08); }
+  .technique-card:hover:not(.active) { border-color: var(--border-active); }
+  .technique-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .technique-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+
+  /* ==================== REFLECT TAB ==================== */
+
+  .intention-date { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+
+  .save-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .saved-badge {
+    font-size: 13px;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .saved-badge.show { opacity: 1; }
+
+  .gratitude-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .gratitude-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+  .gratitude-num { font-size: 11px; font-weight: 700; color: var(--green); min-width: 16px; padding-top: 1px; }
+  .gratitude-text { font-size: 14px; flex: 1; }
+
+  .gratitude-delete {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .gratitude-delete:hover { color: var(--red); }
+
+  .add-row { display: flex; gap: 8px; margin-top: 12px; }
+  .add-row input { flex: 1; }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    padding: 11px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .history-date { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+  .history-text { font-size: 14px; }
+
+  .empty-state { text-align: center; color: var(--text-secondary); font-size: 14px; padding: 28px 0; }
+  .empty-icon { font-size: 32px; display: block; margin-bottom: 8px; }
+
+  /* ==================== TRACK TAB ==================== */
+
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 400px) { .mood-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .mood-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    font-family: inherit;
+  }
+
+  .mood-btn:hover:not(.active) { border-color: var(--border-active); }
+  .mood-btn.active { background: rgba(10,132,255,0.12); border-color: var(--blue); }
+  .mood-emoji { font-size: 30px; line-height: 1; }
+  .mood-label { font-size: 11px; color: var(--text-secondary); text-align: center; }
+
+  .mood-note-row { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .chart-wrap { position: relative; height: 160px; }
+  canvas#moodChart { display: block; }
+
+  .chart-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  .log-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .log-emoji { font-size: 22px; line-height: 1; }
+  .log-info { flex: 1; }
+  .log-time { font-size: 12px; color: var(--text-secondary); }
+  .log-mood-name { font-size: 14px; font-weight: 500; }
+  .log-note { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .log-score { font-size: 20px; font-weight: 200; color: var(--blue); min-width: 20px; text-align: right; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(28,28,30,0.96);
+    border: 1px solid var(--border-active);
+    border-radius: var(--radius-pill);
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--text);
+    opacity: 0;
+    transition: all 0.28s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🌿</div>
+      <span>Ceiba Sanctuary</span>
+    </div>
+    <nav class="desktop-nav">
+      <button class="nav-btn active" onclick="switchTab('focus', this)">Focus</button>
+      <button class="nav-btn" onclick="switchTab('breathe', this)">Breathe</button>
+      <button class="nav-btn" onclick="switchTab('reflect', this)">Reflect</button>
+      <button class="nav-btn" onclick="switchTab('track', this)">Track</button>
+    </nav>
+  </div>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-btn active" onclick="switchTab('focus', this, true)">
+    <span class="icon">⏱</span>Focus
+  </button>
+  <button class="mobile-nav-btn" onclick="switchTab('breathe', this, true)">
+    <span class="icon">🌬</span>Breathe
+  </button>
+  <button class="mobile-nav-btn" onclick="switchTab('reflect', this, true)">
+    <span class="icon">📝</span>Reflect
+  </button>
+  <button class="mobile-nav-btn" onclick="switchTab('track', this, true)">
+    <span class="icon">📊</span>Track
+  </button>
+</nav>
+
+<main>
+
+  <!-- ==================== TAB: FOCUS ==================== -->
+  <div id="tab-focus" class="tab-panel active">
+    <div class="section-heading">Focus Session</div>
+    <div class="section-sub">Build deep work with timed, intentional sessions.</div>
+
+    <div class="grid-2">
+
+      <!-- Pomodoro Timer -->
+      <div class="card">
+        <div class="card-title">Pomodoro Timer</div>
+        <div class="pomodoro-wrap">
+          <div class="timer-ring">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <circle class="timer-ring-bg" cx="110" cy="110" r="100"/>
+              <circle id="timerArc" class="timer-ring-fill"
+                cx="110" cy="110" r="100"
+                stroke="#FF9F0A"
+                stroke-dasharray="628.318"
+                stroke-dashoffset="0"/>
+            </svg>
+            <div class="timer-display">
+              <div class="timer-time" id="timerDisplay">25:00</div>
+              <div class="timer-label" id="timerPhaseLabel">Focus</div>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button class="btn btn-ghost btn-icon" onclick="resetTimer()" title="Reset">↺</button>
+            <button class="btn btn-primary" id="timerToggleBtn" onclick="toggleTimer()" style="min-width:110px;">Start</button>
+            <button class="btn btn-ghost btn-icon" onclick="skipPhase()" title="Skip">⏭</button>
+          </div>
+
+          <div class="timer-mode-row">
+            <button class="mode-pill active" onclick="setTimerMode(25,5,this)">25 / 5</button>
+            <button class="mode-pill" onclick="setTimerMode(50,10,this)">50 / 10</button>
+            <button class="mode-pill" onclick="setTimerMode(90,20,this)">90 / 20</button>
+          </div>
+
+          <div class="session-dots" id="sessionDots">
+            <div class="session-dot current"></div>
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+            <div class="session-dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        <!-- Sound Board -->
+        <div class="card">
+          <div class="card-title">Ambient Sounds</div>
+          <div class="sound-grid">
+            <button class="sound-btn" onclick="toggleSound('rain')" id="snd-rain">
+              <span class="sound-icon">🌧</span>
+              <span class="sound-name">Rain</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('forest')" id="snd-forest">
+              <span class="sound-icon">🌲</span>
+              <span class="sound-name">Forest</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('waves')" id="snd-waves">
+              <span class="sound-icon">🌊</span>
+              <span class="sound-name">Waves</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('fire')" id="snd-fire">
+              <span class="sound-icon">🔥</span>
+              <span class="sound-name">Fire</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('brown')" id="snd-brown">
+              <span class="sound-icon">🟫</span>
+              <span class="sound-name">Brown</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('white')" id="snd-white">
+              <span class="sound-icon">⬜</span>
+              <span class="sound-name">White</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('binaural_focus')" id="snd-binaural_focus">
+              <span class="sound-icon">🧠</span>
+              <span class="sound-name">Focus</span>
+            </button>
+            <button class="sound-btn" onclick="toggleSound('binaural_sleep')" id="snd-binaural_sleep">
+              <span class="sound-icon">💤</span>
+              <span class="sound-name">Sleep</span>
+            </button>
+          </div>
+          <div class="volume-row">
+            <span class="vol-icon">🔈</span>
+            <input type="range" id="masterVolume" min="0" max="100" value="40" oninput="setMasterVolume(this.value)">
+            <span class="vol-icon">🔊</span>
+          </div>
+        </div>
+
+        <!-- Today's Intention preview -->
+        <div class="card" style="margin-top:0;">
+          <div class="card-title">Today's Intention</div>
+          <div id="focusIntentionPreview" style="font-size:14px; color:var(--text-secondary); font-style:italic; line-height:1.5;">
+            No intention set yet.
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="switchTab('reflect', null)">Set Intention →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Focus Stats -->
+    <div class="card">
+      <div class="card-title">Today's Progress</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="statSessions">0</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statMinutes">0</div>
+          <div class="stat-label">Minutes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statStreak">0</div>
+          <div class="stat-label">Day Streak 🔥</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB: BREATHE ==================== -->
+  <div id="tab-breathe" class="tab-panel">
+    <div class="section-heading">Breathe</div>
+    <div class="section-sub">Regulate your nervous system. Reset in under 2 minutes.</div>
+
+    <div class="card">
+      <div class="breathe-center">
+        <div class="breathe-wrap">
+          <div class="breathe-ring breathe-ring-outer" id="breatheOuter"></div>
+          <div class="breathe-ring breathe-ring-mid" id="breatheMid"></div>
+          <div class="breathe-circle" id="breatheCircle">
+            <span class="breathe-countdown" id="breatheCountdown">-</span>
+          </div>
+        </div>
+
+        <div class="breathe-instruction" id="breatheInstruction">Ready</div>
+        <div class="breathe-cycle-count" id="breatheCycleCount"></div>
+        <div class="breathe-cycle-info" id="breatheCycleInfo">Choose a technique below, then begin.</div>
+
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+          <button class="btn btn-primary" id="breatheStartBtn" onclick="toggleBreathe()">Begin</button>
+          <button class="btn btn-ghost" onclick="resetBreathe()">Reset</button>
+        </div>
+
+        <div class="technique-grid">
+          <div class="technique-card active" onclick="selectTechnique('478', this)" id="tech-478">
+            <div class="technique-name">4-7-8</div>
+            <div class="technique-desc">In 4s, hold 7s, out 8s. Fast calm for anxiety.</div>
+          </div>
+          <div class="technique-card" onclick="selectTechnique('box', this)" id="tech-box">
+            <div class="technique-name">Box Breathing</div>
+            <div class="technique-desc">In 4s, hold 4s, out 4s, hold 4s. Navy SEAL focus method.</div>
+          </div>
+          <div class="technique-card" onclick="selectTechnique('diaphragm', this)" id="tech-diaphragm">
+            <div class="technique-name">Deep Belly</div>
+            <div class="technique-desc">In 5s, out 7s. Activates parasympathetic nervous system.</div>
+          </div>
+          <div class="technique-card" onclick="selectTechnique('energize', this)" id="tech-energize">
+            <div class="technique-name">Energize</div>
+            <div class="technique-desc">In 4s, out 2s. Increase alertness before a session.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB: REFLECT ==================== -->
+  <div id="tab-reflect" class="tab-panel">
+    <div class="section-heading">Reflect</div>
+    <div class="section-sub">Ground yourself. Set the tone for your day.</div>
+
+    <div class="grid-2">
+
+      <!-- Daily Intention -->
+      <div class="card">
+        <div class="card-title">Daily Intention</div>
+        <div class="intention-date" id="intentionDate"></div>
+        <textarea id="intentionInput" rows="4" placeholder="What matters today? What am I working toward? What kind of person do I want to be in this next session?"></textarea>
+        <div class="save-row">
+          <span class="saved-badge" id="intentionSaved">Saved</span>
+          <button class="btn btn-primary btn-sm" onclick="saveIntention()">Save</button>
+        </div>
+
+        <div class="divider"></div>
+        <div class="card-title">Past Intentions</div>
+        <div class="history-list" id="intentionHistory">
+          <div class="empty-state"><span class="empty-icon">💭</span>No past intentions yet.</div>
+        </div>
+      </div>
+
+      <!-- Gratitude Journal -->
+      <div class="card">
+        <div class="card-title">Gratitude Journal</div>
+        <div class="intention-date" id="gratitudeDate"></div>
+        <div class="gratitude-entries" id="gratitudeList"></div>
+        <div class="add-row">
+          <input type="text" id="gratitudeInput" placeholder="I am grateful for..."
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addGratitude();}">
+          <button class="btn btn-green btn-sm" onclick="addGratitude()">Add</button>
+        </div>
+
+        <div class="divider"></div>
+        <div class="card-title">This Week</div>
+        <div class="history-list" id="gratitudeHistory">
+          <div class="empty-state"><span class="empty-icon">🙏</span>Nothing logged yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB: TRACK ==================== -->
+  <div id="tab-track" class="tab-panel">
+    <div class="section-heading">Mood Tracker</div>
+    <div class="section-sub">Notice your patterns. Build self-awareness over time.</div>
+
+    <!-- Log Mood -->
+    <div class="card">
+      <div class="card-title">How are you right now?</div>
+      <div class="mood-grid">
+        <button class="mood-btn" onclick="selectMood(1, this)">
+          <span class="mood-emoji">😞</span>
+          <span class="mood-label">Struggling</span>
+        </button>
+        <button class="mood-btn" onclick="selectMood(2, this)">
+          <span class="mood-emoji">😔</span>
+          <span class="mood-label">Low</span>
+        </button>
+        <button class="mood-btn" onclick="selectMood(3, this)">
+          <span class="mood-emoji">😐</span>
+          <span class="mood-label">Neutral</span>
+        </button>
+        <button class="mood-btn" onclick="selectMood(4, this)">
+          <span class="mood-emoji">😊</span>
+          <span class="mood-label">Good</span>
+        </button>
+        <button class="mood-btn" onclick="selectMood(5, this)">
+          <span class="mood-emoji">🤩</span>
+          <span class="mood-label">Excellent</span>
+        </button>
+      </div>
+      <div class="mood-note-row">
+        <input type="text" id="moodNote" placeholder="Optional note...">
+        <button class="btn btn-primary btn-sm" onclick="logMood()" id="logMoodBtn" disabled>Log Mood</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="avgMoodStat">-</div>
+        <div class="stat-label">Avg. Mood</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalLogsStat">0</div>
+        <div class="stat-label">Total Logs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="bestDayStat">-</div>
+        <div class="stat-label">Best Day</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <div class="card-title">Last 14 Days</div>
+      <div class="chart-wrap">
+        <canvas id="moodChart" width="900" height="160"></canvas>
+        <div class="chart-empty" id="chartEmpty">Log your mood to see trends here.</div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div class="card-title" style="margin:0;">Recent Entries</div>
+        <button class="btn btn-ghost btn-sm" onclick="clearMoodLog()"
+          style="font-size:12px; color:var(--text-secondary); padding:6px 14px;">Clear All</button>
+      </div>
+      <div class="log-list" id="moodLog">
+        <div class="empty-state"><span class="empty-icon">📈</span>Start tracking to see your log.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+//  STATE
+// =============================================
+var audioCtx = null;
+var activeSounds = {};
+var masterVol = 0.4;
+var timerInterval = null;
+var timerRunning = false;
+var timerSeconds = 25 * 60;
+var timerTotal = 25 * 60;
+var timerPhase = 'focus';
+var timerFocusMin = 25;
+var timerBreakMin = 5;
+var sessionsCompleted = 0;
+var currentMoodScore = null;
+var breatheRunning = false;
+var breatheStepIdx = 0;
+var breatheCycles = 0;
+var breatheTotalCycles = 4;
+var breatheCountdownInterval = null;
+var breatheStepTimeout = null;
+var selectedTechnique = '478';
+
+var TECHNIQUES = {
+  '478':       [{p:'Inhale',d:4},{p:'Hold',d:7},{p:'Exhale',d:8}],
+  'box':       [{p:'Inhale',d:4},{p:'Hold',d:4},{p:'Exhale',d:4},{p:'Hold',d:4}],
+  'diaphragm': [{p:'Inhale',d:5},{p:'Exhale',d:7}],
+  'energize':  [{p:'Inhale',d:4},{p:'Exhale',d:2}]
+};
+
+var MOOD_EMOJIS = ['','😞','😔','😐','😊','🤩'];
+var MOOD_NAMES  = ['','Struggling','Low','Neutral','Good','Excellent'];
+
+// =============================================
+//  STORAGE HELPERS
+// =============================================
+function ls(k) {
+  try { return JSON.parse(localStorage.getItem('ceiba_' + k)); } catch(e) { return null; }
+}
+function lsSet(k, v) { localStorage.setItem('ceiba_' + k, JSON.stringify(v)); }
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function formatTime(s) {
+  return String(Math.floor(s / 60)).padStart(2,'0') + ':' + String(s % 60).padStart(2,'0');
+}
+
+function fmtDate(iso) {
+  var d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'});
+}
+
+function fmtDateTime(ts) {
+  var d = new Date(ts);
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' ' +
+         d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2400);
+}
+
+// =============================================
+//  TAB NAVIGATION
+// =============================================
+function switchTab(id, btn, mobile) {
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('tab-' + id).classList.add('active');
+
+  var tabs = ['focus','breathe','reflect','track'];
+
+  document.querySelectorAll('.nav-btn').forEach(function(b, i) {
+    b.classList.toggle('active', tabs[i] === id);
+  });
+  document.querySelectorAll('.mobile-nav-btn').forEach(function(b, i) {
+    b.classList.toggle('active', tabs[i] === id);
+  });
+
+  if (id === 'reflect') { loadReflect(); }
+  if (id === 'track')   { renderMoodLog(); renderChart(); renderMoodStats(); }
+  if (id === 'focus')   { updateFocusIntentionPreview(); }
+}
+
+// =============================================
+//  AUDIO ENGINE
+// =============================================
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function buildNoiseBuffer(type) {
+  var ctx = getAudioCtx();
+  var sr = ctx.sampleRate;
+  var len = sr * 3;
+  var buf = ctx.createBuffer(2, len, sr);
+  for (var ch = 0; ch < 2; ch++) {
+    var d = buf.getChannelData(ch);
+    var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    var last = 0;
+    for (var i = 0; i < len; i++) {
+      var w = Math.random() * 2 - 1;
+      if (type === 'white') {
+        d[i] = w;
+      } else if (type === 'brown') {
+        last = (last + 0.02 * w) / 1.02;
+        d[i] = last * 3.5;
+      } else { // pink
+        b0 = 0.99886*b0 + w*0.0555179; b1 = 0.99332*b1 + w*0.0750759;
+        b2 = 0.96900*b2 + w*0.1538520; b3 = 0.86650*b3 + w*0.3104856;
+        b4 = 0.55000*b4 + w*0.5329522; b5 = -0.7616*b5  - w*0.0168980;
+        d[i] = (b0+b1+b2+b3+b4+b5+b6+w*0.5362) * 0.11;
+        b6 = w * 0.115926;
+      }
+    }
+  }
+  return buf;
+}
+
+function connectNoise(type, gainNode) {
+  var ctx = getAudioCtx();
+  var src = ctx.createBufferSource();
+  src.buffer = buildNoiseBuffer(type);
+  src.loop = true;
+  var filt = ctx.createBiquadFilter();
+  if (type === 'brown') { filt.type = 'lowpass'; filt.frequency.value = 500; }
+  else if (type === 'white') { filt.type = 'highpass'; filt.frequency.value = 1800; }
+  else { filt.type = 'allpass'; }
+  src.connect(filt); filt.connect(gainNode);
+  src.start();
+  return src;
+}
+
+function makeLFO(ctx, freq, depth, target) {
+  var lfo = ctx.createOscillator();
+  var lg = ctx.createGain();
+  lfo.frequency.value = freq; lg.gain.value = depth;
+  lfo.connect(lg); lg.connect(target); lfo.start();
+  return lfo;
+}
+
+function startRain(gainNode) {
+  var ctx = getAudioCtx();
+  var src = ctx.createBufferSource();
+  src.buffer = buildNoiseBuffer('pink'); src.loop = true;
+  var f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 3500; f.Q.value = 0.4;
+  var lfo = makeLFO(ctx, 0.25, 600, f.frequency);
+  src.connect(f); f.connect(gainNode); src.start();
+  return { src, lfo };
+}
+
+function startForest(gainNode) {
+  var ctx = getAudioCtx();
+  var src = ctx.createBufferSource();
+  src.buffer = buildNoiseBuffer('pink'); src.loop = true;
+  var f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 700; f.Q.value = 1.5;
+  var lfo = makeLFO(ctx, 0.18, 350, f.frequency);
+  src.connect(f); f.connect(gainNode); src.start();
+  return { src, lfo };
+}
+
+function startWaves(gainNode) {
+  var ctx = getAudioCtx();
+  var src = ctx.createBufferSource();
+  src.buffer = buildNoiseBuffer('brown'); src.loop = true;
+  var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 700;
+  var wg = ctx.createGain(); wg.gain.value = 1;
+  var lfo = makeLFO(ctx, 0.12, 0.6, wg.gain);
+  src.connect(f); f.connect(wg); wg.connect(gainNode); src.start();
+  return { src, lfo };
+}
+
+function startFire(gainNode) {
+  var ctx = getAudioCtx();
+  var src = ctx.createBufferSource();
+  src.buffer = buildNoiseBuffer('brown'); src.loop = true;
+  var f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 180; f.Q.value = 0.8;
+  var lfo = makeLFO(ctx, 2.2, 70, f.frequency);
+  var cg = ctx.createGain(); cg.gain.value = 1;
+  var lfo2 = makeLFO(ctx, 3.1, 0.35, cg.gain);
+  src.connect(f); f.connect(cg); cg.connect(gainNode); src.start();
+  return { src, lfo, lfo2 };
+}
+
+function startBinaural(baseFreq, beatFreq, gainNode) {
+  var ctx = getAudioCtx();
+  var osc1 = ctx.createOscillator(); var osc2 = ctx.createOscillator();
+  osc1.type = 'sine'; osc2.type = 'sine';
+  osc1.frequency.value = baseFreq; osc2.frequency.value = baseFreq + beatFreq;
+  var g1 = ctx.createGain(); var g2 = ctx.createGain();
+  g1.gain.value = 0.28; g2.gain.value = 0.28;
+  var pan1, pan2;
+  try {
+    pan1 = ctx.createStereoPanner(); pan1.pan.value = -1;
+    pan2 = ctx.createStereoPanner(); pan2.pan.value = 1;
+  } catch(e) { pan1 = ctx.createGain(); pan2 = ctx.createGain(); }
+  osc1.connect(g1); g1.connect(pan1); pan1.connect(gainNode);
+  osc2.connect(g2); g2.connect(pan2); pan2.connect(gainNode);
+  // Ambient bed
+  var ns = ctx.createBufferSource(); ns.buffer = buildNoiseBuffer('brown'); ns.loop = true;
+  var nf = ctx.createBiquadFilter(); nf.type = 'lowpass'; nf.frequency.value = 200;
+  var ng = ctx.createGain(); ng.gain.value = 0.03;
+  ns.connect(nf); nf.connect(ng); ng.connect(gainNode); ns.start();
+  osc1.start(); osc2.start();
+  return { osc1, osc2, ns };
+}
+
+var SOUND_BUILDERS = {
+  rain:          function(g) { return startRain(g); },
+  forest:        function(g) { return startForest(g); },
+  waves:         function(g) { return startWaves(g); },
+  fire:          function(g) { return startFire(g); },
+  brown:         function(g) { return { src: connectNoise('brown', g) }; },
+  white:         function(g) { return { src: connectNoise('white', g) }; },
+  binaural_focus: function(g) { return startBinaural(200, 40, g); },
+  binaural_sleep: function(g) { return startBinaural(120, 6,  g); }
+};
+
+function toggleSound(id) {
+  getAudioCtx();
+  var btn = document.getElementById('snd-' + id);
+  if (activeSounds[id]) {
+    var s = activeSounds[id];
+    var ctx = getAudioCtx();
+    s.gainNode.gain.setTargetAtTime(0, ctx.currentTime, 0.3);
+    var toStop = [s.nodes.src, s.nodes.osc1, s.nodes.osc2, s.nodes.ns,
+                  s.nodes.lfo, s.nodes.lfo2];
+    setTimeout(function() {
+      toStop.forEach(function(n) { try { if(n) n.stop(); } catch(e){} });
+      delete activeSounds[id];
+    }, 500);
+    btn.classList.remove('active');
+  } else {
+    var ctx = getAudioCtx();
+    var gn = ctx.createGain(); gn.gain.value = 0;
+    var nodes = SOUND_BUILDERS[id](gn);
+    gn.connect(ctx.destination);
+    gn.gain.setTargetAtTime(masterVol, ctx.currentTime, 0.4);
+    activeSounds[id] = { gainNode: gn, nodes: nodes };
+    btn.classList.add('active');
+  }
+}
+
+function setMasterVolume(val) {
+  masterVol = val / 100;
+  var ctx = getAudioCtx();
+  Object.values(activeSounds).forEach(function(s) {
+    s.gainNode.gain.setTargetAtTime(masterVol, ctx.currentTime, 0.1);
+  });
+}
+
+// =============================================
+//  POMODORO TIMER
+// =============================================
+var CIRC = 628.318;
+
+function updateTimerDisplay() {
+  document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+  var arc = document.getElementById('timerArc');
+  arc.style.strokeDashoffset = CIRC * (1 - timerSeconds / timerTotal);
+  arc.style.stroke = timerPhase === 'focus' ? '#FF9F0A' : '#30D158';
+  document.getElementById('timerPhaseLabel').textContent =
+    timerPhase === 'focus' ? 'Focus' : 'Break';
+}
+
+function toggleTimer() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    document.getElementById('timerToggleBtn').textContent = 'Resume';
+  } else {
+    timerRunning = true;
+    document.getElementById('timerToggleBtn').textContent = 'Pause';
+    timerInterval = setInterval(function() {
+      timerSeconds--;
+      updateTimerDisplay();
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        phaseComplete();
+      }
+    }, 1000);
+  }
+}
+
+function phaseComplete() {
+  playDing();
+  if (timerPhase === 'focus') {
+    sessionsCompleted++;
+    updateSessionDots();
+    logFocusSession();
+    timerPhase = 'break';
+    timerTotal = timerBreakMin * 60;
+    timerSeconds = timerTotal;
+    document.getElementById('timerToggleBtn').textContent = 'Start Break';
+    showToast('Session complete. Take your break.');
+  } else {
+    timerPhase = 'focus';
+    timerTotal = timerFocusMin * 60;
+    timerSeconds = timerTotal;
+    document.getElementById('timerToggleBtn').textContent = 'Start';
+    showToast('Break over. Ready to focus.');
+  }
+  updateTimerDisplay();
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerPhase = 'focus';
+  timerTotal = timerFocusMin * 60;
+  timerSeconds = timerTotal;
+  updateTimerDisplay();
+  document.getElementById('timerToggleBtn').textContent = 'Start';
+}
+
+function skipPhase() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  phaseComplete();
+}
+
+function setTimerMode(focus, brk, btn) {
+  document.querySelectorAll('.mode-pill').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  timerFocusMin = focus; timerBreakMin = brk;
+  resetTimer();
+}
+
+function updateSessionDots() {
+  var dots = document.getElementById('sessionDots').children;
+  var pos = sessionsCompleted % 4;
+  for (var i = 0; i < dots.length; i++) {
+    dots[i].className = 'session-dot';
+    if (i < pos) dots[i].classList.add('done');
+    else if (i === pos) dots[i].classList.add('current');
+  }
+}
+
+function playDing() {
+  try {
+    var ctx = getAudioCtx();
+    var osc = ctx.createOscillator();
+    var env = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 528;
+    env.gain.setValueAtTime(0, ctx.currentTime);
+    env.gain.linearRampToValueAtTime(0.28, ctx.currentTime + 0.01);
+    env.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8);
+    osc.connect(env); env.connect(ctx.destination);
+    osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 1.9);
+  } catch(e) {}
+}
+
+function logFocusSession() {
+  var d = today();
+  var stored = ls('focus_stats') || {date: d, sessions: 0, minutes: 0};
+  if (stored.date !== d) { stored = {date: d, sessions: 0, minutes: 0}; }
+  stored.sessions++; stored.minutes += timerFocusMin;
+  lsSet('focus_stats', stored);
+  updateFocusStats();
+  updateStreak();
+}
+
+function updateFocusStats() {
+  var stored = ls('focus_stats') || {};
+  var isToday = stored.date === today();
+  document.getElementById('statSessions').textContent = isToday ? stored.sessions : 0;
+  document.getElementById('statMinutes').textContent = isToday ? stored.minutes : 0;
+  var streak = ls('streak') || {count: 0, last: ''};
+  document.getElementById('statStreak').textContent = streak.count;
+}
+
+function updateStreak() {
+  var streak = ls('streak') || {count: 0, last: ''};
+  var d = today();
+  if (streak.last === d) return;
+  var yest = new Date(); yest.setDate(yest.getDate() - 1);
+  var yStr = yest.toISOString().split('T')[0];
+  streak.count = (streak.last === yStr || streak.last === '') ? streak.count + 1 : 1;
+  streak.last = d;
+  lsSet('streak', streak);
+}
+
+function updateFocusIntentionPreview() {
+  var intentions = ls('intentions') || {};
+  var val = intentions[today()];
+  var el = document.getElementById('focusIntentionPreview');
+  el.textContent = val ? '"' + val + '"' : 'No intention set yet.';
+  el.style.fontStyle = val ? 'italic' : 'normal';
+  el.style.color = val ? 'var(--text)' : 'var(--text-secondary)';
+}
+
+// =============================================
+//  BREATHING EXERCISE
+// =============================================
+function selectTechnique(id, el) {
+  if (breatheRunning) return;
+  selectedTechnique = id;
+  document.querySelectorAll('.technique-card').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+function toggleBreathe() {
+  if (breatheRunning) { stopBreathe(); }
+  else { startBreathe(); }
+}
+
+function startBreathe() {
+  breatheRunning = true;
+  breatheCycles = 0;
+  breatheStepIdx = 0;
+  document.getElementById('breatheStartBtn').textContent = 'Stop';
+  document.getElementById('breatheInstruction').textContent = 'Starting...';
+  runBreatheStep();
+}
+
+function stopBreathe() {
+  breatheRunning = false;
+  clearTimeout(breatheStepTimeout);
+  clearInterval(breatheCountdownInterval);
+  document.getElementById('breatheStartBtn').textContent = 'Begin';
+  document.getElementById('breatheInstruction').textContent = 'Paused';
+  document.getElementById('breatheCountdown').textContent = '-';
+  document.getElementById('breatheCycleCount').textContent = '';
+  resetCircle();
+}
+
+function resetBreathe() {
+  stopBreathe();
+  breatheCycles = 0;
+  document.getElementById('breatheInstruction').textContent = 'Ready';
+  document.getElementById('breatheCycleInfo').textContent = 'Choose a technique below, then begin.';
+  document.getElementById('breatheCountdown').textContent = '-';
+  document.getElementById('breatheStartBtn').textContent = 'Begin';
+}
+
+function resetCircle() {
+  var c = document.getElementById('breatheCircle');
+  c.style.transition = 'transform 0.5s ease, background 0.5s, box-shadow 0.5s';
+  c.style.transform = 'scale(1)';
+  c.style.background = 'radial-gradient(circle at 35% 35%, rgba(10,132,255,0.55), rgba(10,132,255,0.12))';
+  c.style.boxShadow = '0 0 40px rgba(10,132,255,0.18)';
+  c.style.borderColor = 'rgba(10,132,255,0.45)';
+}
+
+function runBreatheStep() {
+  if (!breatheRunning) return;
+  var steps = TECHNIQUES[selectedTechnique];
+  if (breatheStepIdx >= steps.length) {
+    breatheStepIdx = 0;
+    breatheCycles++;
+    document.getElementById('breatheCycleCount').textContent = breatheCycles;
+    if (breatheCycles >= breatheTotalCycles) {
+      stopBreathe();
+      document.getElementById('breatheInstruction').textContent = 'Well done';
+      document.getElementById('breatheCycleInfo').textContent = breatheCycles + ' cycles complete. You did it.';
+      showToast('Breathing session complete. ' + breatheCycles + ' cycles done.');
+      return;
+    }
+  }
+
+  var step = steps[breatheStepIdx];
+  var dur = step.d;
+  var phase = step.p;
+  var circle = document.getElementById('breatheCircle');
+  var outer = document.getElementById('breatheOuter');
+  var mid = document.getElementById('breatheMid');
+
+  document.getElementById('breatheInstruction').textContent = phase;
+  document.getElementById('breatheCycleInfo').textContent =
+    'Cycle ' + (breatheCycles + 1) + ' of ' + breatheTotalCycles;
+
+  // Animate
+  var easing = (phase === 'Hold') ? 'linear' : 'ease-in-out';
+  circle.style.transition = 'transform ' + dur + 's ' + easing + ', background 0.5s, box-shadow 0.5s, border-color 0.5s';
+  outer.style.transition = 'transform ' + dur + 's ' + easing;
+  mid.style.transition = 'transform ' + dur + 's ' + easing;
+
+  if (phase === 'Inhale') {
+    circle.style.transform = 'scale(1.55)';
+    outer.style.transform = 'scale(1.12)';
+    mid.style.transform = 'scale(1.15)';
+    circle.style.background = 'radial-gradient(circle at 35% 35%, rgba(10,132,255,0.75), rgba(10,132,255,0.25))';
+    circle.style.boxShadow = '0 0 60px rgba(10,132,255,0.35)';
+    circle.style.borderColor = 'rgba(10,132,255,0.7)';
+  } else if (phase === 'Exhale') {
+    circle.style.transform = 'scale(0.72)';
+    outer.style.transform = 'scale(0.95)';
+    mid.style.transform = 'scale(0.88)';
+    circle.style.background = 'radial-gradient(circle at 35% 35%, rgba(48,209,88,0.55), rgba(48,209,88,0.1))';
+    circle.style.boxShadow = '0 0 30px rgba(48,209,88,0.2)';
+    circle.style.borderColor = 'rgba(48,209,88,0.5)';
+  } else {
+    // Hold - no size change, just color
+    circle.style.background = 'radial-gradient(circle at 35% 35%, rgba(255,159,10,0.55), rgba(255,159,10,0.12))';
+    circle.style.boxShadow = '0 0 40px rgba(255,159,10,0.3)';
+    circle.style.borderColor = 'rgba(255,159,10,0.6)';
+  }
+
+  // Countdown
+  var countVal = dur;
+  document.getElementById('breatheCountdown').textContent = countVal;
+  clearInterval(breatheCountdownInterval);
+  breatheCountdownInterval = setInterval(function() {
+    countVal--;
+    if (countVal >= 0) document.getElementById('breatheCountdown').textContent = countVal;
+  }, 1000);
+
+  breatheStepIdx++;
+  breatheStepTimeout = setTimeout(function() {
+    clearInterval(breatheCountdownInterval);
+    runBreatheStep();
+  }, dur * 1000);
+}
+
+// =============================================
+//  REFLECT: INTENTIONS
+// =============================================
+function loadReflect() {
+  var now = new Date();
+  var ds = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('intentionDate').textContent = ds;
+  document.getElementById('gratitudeDate').textContent = ds;
+  var intentions = ls('intentions') || {};
+  document.getElementById('intentionInput').value = intentions[today()] || '';
+  renderIntentionHistory(intentions);
+  renderGratitude();
+}
+
+function saveIntention() {
+  var val = document.getElementById('intentionInput').value.trim();
+  if (!val) return;
+  var intentions = ls('intentions') || {};
+  intentions[today()] = val;
+  lsSet('intentions', intentions);
+  updateFocusIntentionPreview();
+  var badge = document.getElementById('intentionSaved');
+  badge.classList.add('show');
+  setTimeout(function() { badge.classList.remove('show'); }, 2000);
+  showToast('Intention saved.');
+  renderIntentionHistory(intentions);
+}
+
+function renderIntentionHistory(intentions) {
+  var dates = Object.keys(intentions)
+    .filter(function(d) { return d !== today(); })
+    .sort().reverse().slice(0, 8);
+  var c = document.getElementById('intentionHistory');
+  if (!dates.length) {
+    c.innerHTML = '<div class="empty-state"><span class="empty-icon">💭</span>No past intentions yet.</div>';
+    return;
+  }
+  c.innerHTML = dates.map(function(d) {
+    return '<div class="history-item">' +
+      '<div class="history-date">' + fmtDate(d) + '</div>' +
+      '<div class="history-text">' + escHtml(intentions[d]) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// =============================================
+//  REFLECT: GRATITUDE
+// =============================================
+function addGratitude() {
+  var input = document.getElementById('gratitudeInput');
+  var val = input.value.trim();
+  if (!val) return;
+  var all = ls('gratitude') || {};
+  if (!all[today()]) all[today()] = [];
+  if (all[today()].length >= 10) { showToast('Max 10 entries per day.'); return; }
+  all[today()].push(val);
+  lsSet('gratitude', all);
+  input.value = '';
+  renderGratitude();
+  showToast('Gratitude added.');
+}
+
+function removeGratitude(idx) {
+  var all = ls('gratitude') || {};
+  if (!all[today()]) return;
+  all[today()].splice(idx, 1);
+  lsSet('gratitude', all);
+  renderGratitude();
+}
+
+function renderGratitude() {
+  var all = ls('gratitude') || {};
+  var todayList = all[today()] || [];
+  var c = document.getElementById('gratitudeList');
+
+  if (!todayList.length) {
+    c.innerHTML = '<div style="color:var(--text-secondary);font-size:14px;padding:6px 0 0;">Add what you\'re grateful for today...</div>';
+  } else {
+    c.innerHTML = todayList.map(function(entry, i) {
+      return '<div class="gratitude-entry">' +
+        '<span class="gratitude-num">' + (i+1) + '</span>' +
+        '<span class="gratitude-text">' + escHtml(entry) + '</span>' +
+        '<button class="gratitude-delete" onclick="removeGratitude(' + i + ')">×</button>' +
+        '</div>';
+    }).join('');
+  }
+
+  var histDates = Object.keys(all)
+    .filter(function(d) { return d !== today(); })
+    .sort().reverse().slice(0, 5);
+  var hc = document.getElementById('gratitudeHistory');
+  if (!histDates.length) {
+    hc.innerHTML = '<div class="empty-state"><span class="empty-icon">🙏</span>Nothing logged yet.</div>';
+    return;
+  }
+  hc.innerHTML = histDates.map(function(d) {
+    var items = all[d];
+    var preview = items.slice(0,2).map(escHtml).join(' · ');
+    if (items.length > 2) preview += ' +' + (items.length - 2) + ' more';
+    return '<div class="history-item">' +
+      '<div class="history-date">' + fmtDate(d) + ' · ' + items.length + ' entr' + (items.length===1?'y':'ies') + '</div>' +
+      '<div class="history-text">' + preview + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// =============================================
+//  MOOD TRACKER
+// =============================================
+function selectMood(score, btn) {
+  currentMoodScore = score;
+  document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('logMoodBtn').disabled = false;
+}
+
+function logMood() {
+  if (!currentMoodScore) return;
+  var entry = {
+    score: currentMoodScore,
+    note: document.getElementById('moodNote').value.trim(),
+    ts: Date.now(),
+    date: today()
+  };
+  var log = ls('mood_log') || [];
+  log.unshift(entry);
+  if (log.length > 500) log.pop();
+  lsSet('mood_log', log);
+  currentMoodScore = null;
+  document.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('moodNote').value = '';
+  document.getElementById('logMoodBtn').disabled = true;
+  showToast('Mood logged: ' + MOOD_EMOJIS[entry.score] + ' ' + MOOD_NAMES[entry.score]);
+  renderMoodLog(); renderChart(); renderMoodStats();
+}
+
+function renderMoodLog() {
+  var log = ls('mood_log') || [];
+  var c = document.getElementById('moodLog');
+  if (!log.length) {
+    c.innerHTML = '<div class="empty-state"><span class="empty-icon">📈</span>Start tracking to see your log.</div>';
+    return;
+  }
+  c.innerHTML = log.slice(0, 30).map(function(e) {
+    return '<div class="log-item">' +
+      '<span class="log-emoji">' + MOOD_EMOJIS[e.score] + '</span>' +
+      '<div class="log-info">' +
+        '<div class="log-time">' + fmtDateTime(e.ts) + '</div>' +
+        '<div class="log-mood-name">' + MOOD_NAMES[e.score] + '</div>' +
+        (e.note ? '<div class="log-note">' + escHtml(e.note) + '</div>' : '') +
+      '</div>' +
+      '<span class="log-score">' + e.score + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function renderMoodStats() {
+  var log = ls('mood_log') || [];
+  document.getElementById('totalLogsStat').textContent = log.length;
+  if (!log.length) return;
+  var avg = (log.reduce(function(a,e) { return a + e.score; }, 0) / log.length).toFixed(1);
+  document.getElementById('avgMoodStat').textContent = avg;
+  var byDay = {};
+  log.forEach(function(e) {
+    if (!byDay[e.date]) byDay[e.date] = [];
+    byDay[e.date].push(e.score);
+  });
+  var bestDate = '', bestScore = 0;
+  Object.keys(byDay).forEach(function(d) {
+    var avg2 = byDay[d].reduce(function(a,s) { return a+s; }, 0) / byDay[d].length;
+    if (avg2 > bestScore) { bestScore = avg2; bestDate = d; }
+  });
+  if (bestDate) {
+    var bd = new Date(bestDate + 'T12:00:00');
+    document.getElementById('bestDayStat').textContent =
+      bd.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  }
+}
+
+function clearMoodLog() {
+  if (!confirm('Clear all mood entries? This cannot be undone.')) return;
+  lsSet('mood_log', []);
+  renderMoodLog(); renderChart(); renderMoodStats();
+  showToast('Mood log cleared.');
+}
+
+function renderChart() {
+  var canvas = document.getElementById('moodChart');
+  var ctx2 = canvas.getContext('2d');
+  var log = ls('mood_log') || [];
+  var emptyEl = document.getElementById('chartEmpty');
+
+  var days = [];
+  for (var i = 13; i >= 0; i--) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+
+  var dayAverages = days.map(function(d) {
+    var entries = log.filter(function(e) { return e.date === d; });
+    if (!entries.length) return null;
+    return entries.reduce(function(a,e) { return a + e.score; }, 0) / entries.length;
+  });
+
+  var hasData = dayAverages.some(function(v) { return v !== null; });
+  emptyEl.style.display = hasData ? 'none' : 'flex';
+  if (!hasData) return;
+
+  var dpr = window.devicePixelRatio || 1;
+  var rect = canvas.parentElement.getBoundingClientRect();
+  var W = rect.width;
+  var H = 160;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx2.scale(dpr, dpr);
+
+  var pad = {t:16, r:16, b:28, l:30};
+  var cW = W - pad.l - pad.r;
+  var cH = H - pad.t - pad.b;
+
+  ctx2.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx2.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx2.lineWidth = 1;
+  for (var g = 1; g <= 5; g++) {
+    var gy = pad.t + cH - (g/5)*cH;
+    ctx2.beginPath(); ctx2.moveTo(pad.l, gy); ctx2.lineTo(W - pad.r, gy); ctx2.stroke();
+  }
+
+  // Y labels
+  ctx2.fillStyle = 'rgba(142,142,147,0.7)';
+  ctx2.font = '10px system-ui, -apple-system, sans-serif';
+  ctx2.textAlign = 'right';
+  for (var g2 = 1; g2 <= 5; g2++) {
+    var gy2 = pad.t + cH - (g2/5)*cH;
+    ctx2.fillText(g2, pad.l - 5, gy2 + 4);
+  }
+
+  // X labels
+  ctx2.textAlign = 'center';
+  [0, 6, 13].forEach(function(i) {
+    var dl = new Date(days[i] + 'T12:00:00');
+    var lbl = dl.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+    ctx2.fillText(lbl, pad.l + (i/13)*cW, H - 4);
+  });
+
+  function xPos(i) { return pad.l + (i/13)*cW; }
+  function yPos(v) { return pad.t + cH - ((v-1)/4)*cH; }
+
+  // Gradient fill
+  var grad = ctx2.createLinearGradient(0, pad.t, 0, pad.t + cH);
+  grad.addColorStop(0, 'rgba(10,132,255,0.22)');
+  grad.addColorStop(1, 'rgba(10,132,255,0)');
+
+  var firstIdx = dayAverages.findIndex(function(v) { return v !== null; });
+  var lastIdx = -1;
+  for (var i = dayAverages.length - 1; i >= 0; i--) { if (dayAverages[i] !== null) { lastIdx = i; break; } }
+
+  if (firstIdx >= 0 && lastIdx >= 0) {
+    ctx2.beginPath();
+    var started = false;
+    dayAverages.forEach(function(v, i) {
+      if (v === null) { started = false; return; }
+      if (!started) { ctx2.moveTo(xPos(i), yPos(v)); started = true; }
+      else ctx2.lineTo(xPos(i), yPos(v));
+    });
+    ctx2.lineTo(xPos(lastIdx), pad.t + cH);
+    ctx2.lineTo(xPos(firstIdx), pad.t + cH);
+    ctx2.closePath();
+    ctx2.fillStyle = grad;
+    ctx2.fill();
+  }
+
+  // Line
+  ctx2.beginPath();
+  var lineStarted = false;
+  dayAverages.forEach(function(v, i) {
+    if (v === null) { lineStarted = false; return; }
+    if (!lineStarted) { ctx2.moveTo(xPos(i), yPos(v)); lineStarted = true; }
+    else ctx2.lineTo(xPos(i), yPos(v));
+  });
+  ctx2.strokeStyle = '#0A84FF';
+  ctx2.lineWidth = 2;
+  ctx2.lineJoin = 'round';
+  ctx2.lineCap = 'round';
+  ctx2.stroke();
+
+  // Dots
+  dayAverages.forEach(function(v, i) {
+    if (v === null) return;
+    ctx2.beginPath();
+    ctx2.arc(xPos(i), yPos(v), 3.5, 0, Math.PI * 2);
+    ctx2.fillStyle = (i === 13) ? '#30D158' : '#0A84FF';
+    ctx2.fill();
+    // Glow on today
+    if (i === 13) {
+      ctx2.beginPath();
+      ctx2.arc(xPos(i), yPos(v), 6, 0, Math.PI * 2);
+      ctx2.fillStyle = 'rgba(48,209,88,0.2)';
+      ctx2.fill();
+    }
+  });
+}
+
+// =============================================
+//  UTILS
+// =============================================
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// =============================================
+//  INIT
+// =============================================
+function init() {
+  updateTimerDisplay();
+  updateFocusStats();
+  updateFocusIntentionPreview();
+  renderMoodStats();
+
+  // Today's date labels
+  var ds = new Date().toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('intentionDate').textContent = ds;
+  document.getElementById('gratitudeDate').textContent = ds;
+
+  // Auto-save intention on blur
+  document.getElementById('intentionInput').addEventListener('blur', function() {
+    var val = this.value.trim();
+    if (!val) return;
+    var intentions = ls('intentions') || {};
+    if (intentions[today()] !== val) {
+      intentions[today()] = val;
+      lsSet('intentions', intentions);
+      updateFocusIntentionPreview();
+    }
+  });
+
+  // Resize chart
+  window.addEventListener('resize', function() {
+    if (document.getElementById('tab-track').classList.contains('active')) {
+      renderChart();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

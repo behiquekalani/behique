@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur Value Ladder — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --muted: #86868B;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+    }
+    .hero h1 span {
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+    .btn-cta:hover { opacity: 0.88; }
+    .hero-guarantee {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .thesis .container {
+      max-width: 720px;
+    }
+    .thesis p {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #D1D1D6;
+    }
+    .thesis p + p {
+      margin-top: 24px;
+    }
+    .thesis strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* FOUR RUNGS */
+    .rungs {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      margin-bottom: 48px;
+    }
+    .rungs-track {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .rung-item {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    @media (max-width: 600px) {
+      .rung-item { grid-template-columns: 1fr; }
+    }
+    .rung-left {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .rung-tier {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .rung-price {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .rung-right {
+      padding: 28px 32px;
+    }
+    .rung-right h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .rung-right p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* WHAT YOU GET */
+    .what-you-get {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+    }
+    .what-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+    }
+    .what-number {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+    }
+    .what-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .what-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* SECTION PREVIEWS */
+    .previews {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .preview-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .preview-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+    .preview-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      padding-top: 3px;
+    }
+    .preview-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .preview-content p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* PRODUCT DETAILS */
+    .product-details {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .details-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    @media (max-width: 600px) {
+      .details-row { grid-template-columns: 1fr; }
+    }
+    .detail-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+    }
+    .detail-label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .detail-value {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .bottom-cta h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .bottom-cta p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .price-display {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+    }
+    .price-display span {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--muted);
+      vertical-align: super;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <span class="nav-price">Digital Guide</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">Solopreneur Series</div>
+      <h1>The Solopreneur<br><span>Value Ladder</span></h1>
+      <p class="hero-sub">Design the offer sequence that turns strangers into long-term buyers. No sales team. No complicated funnels. A structure that compounds over time.</p>
+      <div class="hero-cta-group">
+        <a href="https://behike.gumroad.com/l/solopreneurs-value-ladder-construction" class="btn-cta">Get the Guide &mdash; $22.99</a>
+        <span class="hero-guarantee">Instant PDF download. Yours forever.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="container">
+      <p>Most solopreneurs sell products. Fewer build businesses. The difference between the two is almost entirely structural, and the structure is called the value ladder.</p>
+      <p>A value ladder is not a marketing tactic. It is the architecture of your business. It determines how customers enter your ecosystem, what they buy at each stage, how much trust you need to earn at each transition, and where your revenue actually comes from.</p>
+      <p><strong>Without it, you are running a series of isolated transactions. With it, you are running a compounding system where each sale increases the probability of the next one.</strong></p>
+    </div>
+  </section>
+
+  <!-- FOUR RUNGS -->
+  <section class="rungs">
+    <div class="container">
+      <div class="section-label">The Architecture</div>
+      <h2 class="section-title">Four rungs. One coherent system.</h2>
+      <div class="rungs-track">
+        <div class="rung-item">
+          <div class="rung-left">
+            <div class="rung-tier">Rung 1</div>
+            <div class="rung-price">Free</div>
+          </div>
+          <div class="rung-right">
+            <h3>The Qualifier</h3>
+            <p>Not a list-builder. A filter. Your free offer should attract exactly the people who have the problem your paid offers solve, and no one else.</p>
+          </div>
+        </div>
+        <div class="rung-item">
+          <div class="rung-left">
+            <div class="rung-tier">Rung 2</div>
+            <div class="rung-price">$7 - $49</div>
+          </div>
+          <div class="rung-right">
+            <h3>The Entry Transaction</h3>
+            <p>Converts a subscriber into a buyer. Changes the relationship. Someone who paid you $15 is exponentially more likely to pay you $197 than someone who never purchased.</p>
+          </div>
+        </div>
+        <div class="rung-item">
+          <div class="rung-left">
+            <div class="rung-tier">Rung 3</div>
+            <div class="rung-price">$97 - $497</div>
+          </div>
+          <div class="rung-right">
+            <h3>The Transformation Offer</h3>
+            <p>Where most solopreneur businesses generate primary income. The design principle: transformation over information. A defined starting state to a defined outcome state.</p>
+          </div>
+        </div>
+        <div class="rung-item">
+          <div class="rung-left">
+            <div class="rung-tier">Rung 4</div>
+            <div class="rung-price">$500+</div>
+          </div>
+          <div class="rung-right">
+            <h3>The Premium Relationship</h3>
+            <p>Price signals commitment. The most specific offer commands the highest premium. Built from patterns in your best customers, not from guessing what would be valuable.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="what-you-get">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2 class="section-title">Nine chapters. Complete coverage.</h2>
+      <div class="what-grid">
+        <div class="what-card">
+          <div class="what-number">01</div>
+          <h3>What a Value Ladder Actually Is</h3>
+          <p>A precise definition, not a loose one. The three components that distinguish a real value ladder from a collection of products with a shared brand.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">02</div>
+          <h3>The Four Rungs</h3>
+          <p>The role, logic, and typical price range of each position. Understanding the purpose of each rung before deciding which ones to prioritize.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">03</div>
+          <h3>Designing the Free Layer</h3>
+          <p>Formats that qualify buyers. What does not work and why. The specificity test that separates lead magnets that attract buyers from ones that attract anyone.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">04</div>
+          <h3>Low-Ticket Product Criteria</h3>
+          <p>Three requirements every entry-level product must meet. Standalone value, impulse pricing, and entry point positioning. All three, not just one.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">05</div>
+          <h3>Mid-Ticket Offer Design</h3>
+          <p>Four components that turn an information product into a transformation product. Outcome statement, learning path, implementation resources, progress assessment.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">06</div>
+          <h3>High-Ticket Positioning</h3>
+          <p>Why price signals commitment. Why specificity commands premium. When to build the high-ticket offer and what it should never be.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">07</div>
+          <h3>The Natural Upgrade Path</h3>
+          <p>Engineered at the product level, not the marketing level. How to make the next step visible and relevant without pushing buyers toward it.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">08</div>
+          <h3>Value Ladder Stress Test</h3>
+          <p>Five checks: coherence, gap, completion, buyer persona, and friction. Run these before treating your ladder as ready to scale.</p>
+        </div>
+        <div class="what-card">
+          <div class="what-number">09</div>
+          <h3>90-Day Build Sequence</h3>
+          <p>A working ladder without having all products ready on day one. The exact sequence: design first, free layer, low-ticket launch, mid-ticket outline. In that order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section class="previews">
+    <div class="container">
+      <div class="section-label">Section Previews</div>
+      <h2 class="section-title">What you'll actually read.</h2>
+      <ul class="preview-list">
+        <li class="preview-item">
+          <span class="preview-num">Part 1</span>
+          <div class="preview-content">
+            <h3>What a Value Ladder Actually Is</h3>
+            <p>A value ladder is a sequence of offers at increasing price points where each offer delivers complete value at its level while naturally creating appetite for the next level up. "Complete value at its level" is the most commonly violated principle in value ladder construction. This section explains why that violation destroys rather than builds loyalty.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 3</span>
+          <div class="preview-content">
+            <h3>Designing the Free Layer That Qualifies Buyers</h3>
+            <p>The free layer is not for building a list. The primary function is to qualify who enters your ecosystem. A piece of free content that appeals to everyone attracts a low-quality audience. This section gives you the specificity test and the formats that work, including the one that does not.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 5</span>
+          <div class="preview-content">
+            <h3>Mid-Ticket Offer Design</h3>
+            <p>The distinction between information products and transformation products changes everything about how you construct the offer. "Everything You Need to Know About Instagram Growth" is an information product. "Instagram Growth from 0 to 1,000 Followers in 60 Days" is a transformation product. This section breaks down the four components that make the difference.</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 8</span>
+          <div class="preview-content">
+            <h3>Value Ladder Stress Test</h3>
+            <p>Five checks before scaling. Coherence: can you draw a straight line from free to high-ticket? Gap: is any jump too large for a buyer to cross without hesitation? Completion: is every product genuinely complete as a standalone purchase? Buyer persona: is the same person progressing? Friction: is the next offer visible at the point of completion?</p>
+          </div>
+        </li>
+        <li class="preview-item">
+          <span class="preview-num">Part 9</span>
+          <div class="preview-content">
+            <h3>Building Your Ladder in 90 Days</h3>
+            <p>Days 1-14: design the ladder before building anything. Days 15-30: build and launch the free offer. Days 31-60: build and launch the low-ticket product. Days 61-90: design the mid-ticket offer based on real buyer feedback. The high-ticket offer is not a 90-day project. This section explains why, and what it actually is.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PRODUCT DETAILS -->
+  <section class="product-details">
+    <div class="container">
+      <div class="section-label">Product Details</div>
+      <h2 class="section-title">What you're getting.</h2>
+      <div class="details-row">
+        <div class="detail-item">
+          <div class="detail-label">Format</div>
+          <div class="detail-value">PDF Guide</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Length</div>
+          <div class="detail-value">~2,500 words, 9 chapters</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Access</div>
+          <div class="detail-value">Instant download</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Price</div>
+          <div class="detail-value">$22.99 one-time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Most solopreneurs sell products.<br>Build a business instead.</h2>
+      <p>The architecture that turns isolated transactions into a compounding system.</p>
+      <div class="price-display"><span>$</span>22.99</div>
+      <a href="https://behike.gumroad.com/l/solopreneurs-value-ladder-construction" class="btn-cta">Get the Guide Now</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026. All rights reserved.</p>
+      <p>Digital product. No refunds after download.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

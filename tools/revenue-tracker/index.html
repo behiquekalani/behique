@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenue Tracker - Behike</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#666;--accent:#0066ff;--success:#00c853;--warn:#ff9800;--danger:#ff4444;--gold:#c9a84c}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:20px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+header h1{font-size:1.4em;font-weight:700;letter-spacing:-0.5px}
+header h1 span{color:var(--success)}
+.header-right{display:flex;gap:8px;align-items:center}
+.btn-sm{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.8em;cursor:pointer;font-family:inherit}
+.btn-sm.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+/* Top stats */
+.top-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+@media(max-width:700px){.top-stats{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.stat-card .label{font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.stat-card .value{font-size:2em;font-weight:800;margin-top:4px}
+.stat-card .change{font-size:.75em;margin-top:4px}
+.stat-card .change.up{color:var(--success)}
+.stat-card .change.down{color:var(--danger)}
+.stat-card.revenue .value{color:var(--success)}
+.stat-card.target .value{color:var(--gold)}
+
+/* Chart */
+.chart-panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
+.chart-panel h3{font-size:.8em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.chart-container{height:180px;display:flex;align-items:flex-end;gap:4px;padding:0 4px}
+.chart-bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .3s;cursor:pointer;position:relative}
+.chart-bar:hover{opacity:.8}
+.chart-bar:hover::after{content:attr(data-val);position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:.65em;color:var(--text);white-space:nowrap;background:var(--bg);padding:2px 6px;border-radius:4px}
+.chart-bar.gumroad{background:var(--accent)}
+.chart-bar.service{background:var(--gold)}
+.chart-bar.other{background:var(--success)}
+.chart-label{font-size:.6em;color:var(--muted);margin-top:4px}
+
+.chart-legend{display:flex;gap:16px;margin-top:12px;font-size:.75em}
+.chart-legend .item{display:flex;align-items:center;gap:6px}
+.chart-legend .dot{width:8px;height:8px;border-radius:2px}
+
+/* Two columns */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+
+/* Product table */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.panel h3{font-size:.8em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.product-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.85em}
+.product-row:last-child{border:none}
+.product-row .name{flex:1}
+.product-row .price{color:var(--muted);margin:0 10px}
+.product-row .sales{font-weight:600;min-width:40px;text-align:right}
+.product-row .revenue{color:var(--success);font-weight:600;min-width:60px;text-align:right}
+
+/* Goals */
+.goal{margin-bottom:12px}
+.goal .goal-header{display:flex;justify-content:space-between;font-size:.85em;margin-bottom:4px}
+.goal .goal-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.goal .goal-fill{height:100%;border-radius:4px;transition:width .5s}
+.goal .goal-fill.green{background:var(--success)}
+.goal .goal-fill.blue{background:var(--accent)}
+.goal .goal-fill.gold{background:var(--gold)}
+
+/* Add sale form */
+.add-form{margin-top:12px}
+.add-form .row{display:flex;gap:6px;margin-bottom:6px}
+.add-form input,.add-form select{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8em;font-family:inherit}
+.add-form button{padding:8px 16px;background:var(--success);color:#000;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-size:.8em}
+
+footer{text-align:center;padding:20px 0;color:var(--muted);font-size:.75em}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Revenue <span>Tracker</span></h1>
+  <div class="header-right">
+    <button class="btn-sm outline" onclick="exportData()">Export CSV</button>
+    <button class="btn-sm" onclick="toggleAddForm()">+ Add Sale</button>
+  </div>
+</header>
+
+<div class="top-stats">
+  <div class="stat-card revenue"><div class="label">Total Revenue</div><div class="value" id="totalRev">$0</div><div class="change up" id="revChange">Start listing to see revenue</div></div>
+  <div class="stat-card target"><div class="label">Monthly Target</div><div class="value">$10K</div><div class="change" id="targetPct">0% reached</div></div>
+  <div class="stat-card"><div class="label">Products Sold</div><div class="value" id="totalSold">0</div><div class="change" id="soldChange">-</div></div>
+  <div class="stat-card"><div class="label">Avg Order Value</div><div class="value" id="avgOrder">$0</div><div class="change" id="aovChange">-</div></div>
+</div>
+
+<div class="chart-panel">
+  <h3>Revenue by Day (Last 30 Days)</h3>
+  <div class="chart-container" id="chart"></div>
+  <div class="chart-legend">
+    <div class="item"><div class="dot" style="background:var(--accent)"></div>Gumroad</div>
+    <div class="item"><div class="dot" style="background:var(--gold)"></div>Services</div>
+    <div class="item"><div class="dot" style="background:var(--success)"></div>Other</div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="panel">
+    <h3>Products Performance</h3>
+    <div id="productTable"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Revenue Goals</h3>
+    <div class="goal">
+      <div class="goal-header"><span>March 2026</span><span id="marchGoal">$0 / $1,000</span></div>
+      <div class="goal-bar"><div class="goal-fill green" id="marchBar" style="width:0%"></div></div>
+    </div>
+    <div class="goal">
+      <div class="goal-header"><span>Q2 2026 Target</span><span id="q2Goal">$0 / $10,000</span></div>
+      <div class="goal-bar"><div class="goal-fill blue" id="q2Bar" style="width:0%"></div></div>
+    </div>
+    <div class="goal">
+      <div class="goal-header"><span>Year Target</span><span id="yearGoal">$0 / $100,000</span></div>
+      <div class="goal-bar"><div class="goal-fill gold" id="yearBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="add-form" id="addForm" style="display:none">
+      <h3 style="margin-top:16px">Log a Sale</h3>
+      <div class="row">
+        <select id="saleProduct">
+          <option value="AI Employee Guide">AI Employee Guide ($19.99)</option>
+          <option value="Cash Flow Dashboard">Cash Flow Dashboard ($14.99)</option>
+          <option value="Prompt Cheat Sheet">Prompt Cheat Sheet ($9.99)</option>
+          <option value="AI Security Guide">AI Security Guide ($14.99)</option>
+          <option value="Budget Template">Budget Template ($9.99)</option>
+          <option value="Meditation App">Meditation App ($4.99)</option>
+          <option value="Ecommerce Playbook">Ecommerce Playbook ($14.99)</option>
+          <option value="ChordGenie">ChordGenie ($29.99)</option>
+          <option value="BeatSmith">BeatSmith ($29.99)</option>
+          <option value="Music Bundle">Music Suite Bundle ($99.99)</option>
+          <option value="Theme Bundle">Theme Collection ($149)</option>
+          <option value="Service: Quick Win">Service: Quick Win ($497)</option>
+          <option value="Service: Suite">Service: Business Suite ($1,997)</option>
+          <option value="Custom">Custom amount</option>
+        </select>
+      </div>
+      <div class="row">
+        <input type="number" id="saleAmount" placeholder="Amount ($)">
+        <select id="saleSource"><option value="gumroad">Gumroad</option><option value="service">Service</option><option value="other">Other</option></select>
+      </div>
+      <div class="row">
+        <input type="date" id="saleDate">
+        <button onclick="addSale()">Log Sale</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Data stored locally. Export CSV to back up.</footer>
+</div>
+
+<script>
+const PRICES={'AI Employee Guide':19.99,'Cash Flow Dashboard':14.99,'Prompt Cheat Sheet':9.99,'AI Security Guide':14.99,'Budget Template':9.99,'Meditation App':4.99,'Ecommerce Playbook':14.99,'ChordGenie':29.99,'BeatSmith':29.99,'Music Bundle':99.99,'Theme Bundle':149,'Service: Quick Win':497,'Service: Suite':1997};
+
+let sales=JSON.parse(localStorage.getItem('behike_sales')||'[]');
+document.getElementById('saleDate').value=new Date().toISOString().split('T')[0];
+
+function save(){localStorage.setItem('behike_sales',JSON.stringify(sales))}
+
+function addSale(){
+  const product=document.getElementById('saleProduct').value;
+  const amount=parseFloat(document.getElementById('saleAmount').value)||PRICES[product]||0;
+  const source=document.getElementById('saleSource').value;
+  const date=document.getElementById('saleDate').value;
+  if(amount>0&&date){
+    sales.push({product,amount,source,date,id:Date.now()});
+    save();render();
+    document.getElementById('saleAmount').value='';
+  }
+}
+
+function toggleAddForm(){
+  const f=document.getElementById('addForm');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+
+// Auto-fill amount when product changes
+document.getElementById('saleProduct').onchange=function(){
+  const p=this.value;
+  if(PRICES[p])document.getElementById('saleAmount').value=PRICES[p];
+  else document.getElementById('saleAmount').value='';
+};
+
+function render(){
+  const total=sales.reduce((s,x)=>s+x.amount,0);
+  const thisMonth=sales.filter(s=>s.date.startsWith('2026-03')).reduce((s,x)=>s+x.amount,0);
+
+  document.getElementById('totalRev').textContent=`$${total.toLocaleString('en-US',{minimumFractionDigits:2})}`;
+  document.getElementById('totalSold').textContent=sales.length;
+  document.getElementById('avgOrder').textContent=sales.length>0?`$${(total/sales.length).toFixed(2)}`:'$0';
+  document.getElementById('targetPct').textContent=`${(thisMonth/10000*100).toFixed(1)}% reached`;
+
+  // Chart
+  const chart=document.getElementById('chart');
+  chart.innerHTML='';
+  const last30=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const daySales=sales.filter(s=>s.date===ds);
+    const gumroad=daySales.filter(s=>s.source==='gumroad').reduce((s,x)=>s+x.amount,0);
+    const service=daySales.filter(s=>s.source==='service').reduce((s,x)=>s+x.amount,0);
+    const other=daySales.filter(s=>s.source==='other').reduce((s,x)=>s+x.amount,0);
+    last30.push({date:ds,gumroad,service,other,total:gumroad+service+other,label:d.getDate()});
+  }
+
+  const maxDay=Math.max(1,...last30.map(d=>d.total));
+  last30.forEach(d=>{
+    const group=document.createElement('div');
+    group.className='chart-bar-group';
+    if(d.gumroad>0)group.innerHTML+=`<div class="chart-bar gumroad" style="height:${d.gumroad/maxDay*160}px" data-val="$${d.gumroad}"></div>`;
+    if(d.service>0)group.innerHTML+=`<div class="chart-bar service" style="height:${d.service/maxDay*160}px" data-val="$${d.service}"></div>`;
+    if(d.other>0)group.innerHTML+=`<div class="chart-bar other" style="height:${d.other/maxDay*160}px" data-val="$${d.other}"></div>`;
+    if(d.total===0)group.innerHTML+=`<div class="chart-bar" style="height:2px;background:var(--border)"></div>`;
+    group.innerHTML+=`<span class="chart-label">${d.label}</span>`;
+    chart.appendChild(group);
+  });
+
+  // Products
+  const productCounts={};
+  sales.forEach(s=>{
+    if(!productCounts[s.product])productCounts[s.product]={count:0,revenue:0};
+    productCounts[s.product].count++;
+    productCounts[s.product].revenue+=s.amount;
+  });
+
+  const pt=document.getElementById('productTable');
+  const products=Object.entries(PRICES);
+  pt.innerHTML=products.map(([name,price])=>{
+    const data=productCounts[name]||{count:0,revenue:0};
+    return `<div class="product-row"><span class="name">${name}</span><span class="price">$${price}</span><span class="sales">${data.count}</span><span class="revenue">$${data.revenue.toFixed(2)}</span></div>`;
+  }).join('');
+
+  // Goals
+  document.getElementById('marchGoal').textContent=`$${thisMonth.toFixed(0)} / $1,000`;
+  document.getElementById('marchBar').style.width=`${Math.min(100,thisMonth/1000*100)}%`;
+  document.getElementById('q2Goal').textContent=`$${total.toFixed(0)} / $10,000`;
+  document.getElementById('q2Bar').style.width=`${Math.min(100,total/10000*100)}%`;
+  document.getElementById('yearGoal').textContent=`$${total.toFixed(0)} / $100,000`;
+  document.getElementById('yearBar').style.width=`${Math.min(100,total/100000*100)}%`;
+}
+
+function exportData(){
+  if(sales.length===0){alert('No sales to export.');return}
+  let csv='Date,Product,Amount,Source\n';
+  sales.forEach(s=>csv+=`${s.date},${s.product},${s.amount},${s.source}\n`);
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='behike-sales.csv';a.click();
+}
+
+render();
+</script>
+</body>
+</html>

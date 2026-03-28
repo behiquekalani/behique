@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solopreneur's Automation Stack — Behike</title>
+  <meta name="description" content="Automate the repetitive work of a one-person business. Build workflows that run without you and reclaim hours every week." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a244;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #141414;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 14px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(17px, 2.5vw, 21px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: left;
+      line-height: 1.4;
+    }
+    .cta-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .cta-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* STAT BAR */
+    .stat-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 24px;
+      text-align: center;
+      margin: -16px 0 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .stat-bar.visible { opacity: 1; transform: translateY(0); }
+    .stat-item .stat-num {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-item .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .lead {
+      font-size: 19px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 48px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* WINS */
+    .wins-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .win-item {
+      display: flex;
+      gap: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .win-item.visible { opacity: 1; transform: translateX(0); }
+    .win-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .win-body h4 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .win-body p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .win-body .win-roi {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cta);
+      background: rgba(48, 209, 88, 0.1);
+      border: 1px solid rgba(48, 209, 88, 0.2);
+      border-radius: 8px;
+      padding: 2px 10px;
+    }
+
+    /* CHAPTERS */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .chapter-item {
+      display: flex;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .chapter-item.visible { opacity: 1; transform: translateY(0); }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-body h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .chapter-body p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 15px;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .for-list li.visible { opacity: 1; transform: translateY(0); }
+    .check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(48, 209, 88, 0.15);
+      border: 1px solid rgba(48, 209, 88, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 11px;
+      color: var(--cta);
+    }
+
+    /* QUOTE */
+    .quote-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 36px 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .quote-block.visible { opacity: 1; transform: translateY(0); }
+    .quote-block blockquote {
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      font-style: normal;
+      margin-bottom: 16px;
+    }
+    .quote-source { font-size: 14px; color: var(--text-muted); }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .final-cta h2 { margin-bottom: 16px; }
+    .final-cta .lead { margin: 0 auto 40px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p { font-size: 14px; color: var(--text-muted); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 60px 0 50px; }
+      section { padding: 56px 0; }
+      .price { font-size: 36px; }
+      .quote-block { padding: 24px; }
+      .quote-block blockquote { font-size: 18px; }
+      .stat-bar { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-logo">Behike</a>
+      <a href="#get" class="nav-cta">Get It — $22.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Business Operations</div>
+      <h1>Solopreneur's<br><span>Automation Stack</span></h1>
+      <p class="hero-sub">Automate the repetitive work of a one-person business. Build workflows that run without you and reclaim hours every week.</p>
+      <div class="price-block">
+        <div class="price">$22.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <a href="#get" class="cta-primary">Get Instant Access</a>
+      <p class="hero-meta">10 chapters. 5000+ words. Tool recommendations included.</p>
+    </div>
+  </section>
+
+  <!-- STAT BAR -->
+  <section style="padding: 48px 0; border-top: none;">
+    <div class="container">
+      <div class="stat-bar">
+        <div class="stat-item">
+          <span class="stat-num">58 hrs</span>
+          <span class="stat-label">Saved/year from scheduling automation alone</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">6</span>
+          <span class="stat-label">Highest-leverage automation wins covered</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">4</span>
+          <span class="stat-label">Core workflows that run your business backbone</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">30+</span>
+          <span class="stat-label">Tool recommendations across every category</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Processing work expands to fill all available time</h2>
+      <p class="lead">Email, scheduling, invoicing, posting, onboarding. None of it requires your judgment. All of it demands your time.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>You are always "on"</h3>
+          <p>Scheduling meetings, sending invoices, following up on leads. The business depends on you doing things it should do automatically.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Clients wait longer than they should</h3>
+          <p>Manual onboarding and follow-up means delays. First impressions take a hit when your processes are not systematized.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Revenue leaks from manual billing</h3>
+          <p>Late invoices, forgotten follow-ups, and inconsistent payment collection cost real money, not just time.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Over-automation breaks things</h3>
+          <p>Add too many tools and you spend more time maintaining the system than it saves. Fragility is the automation tax most creators pay.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section>
+    <div class="container">
+      <div class="quote-block">
+        <blockquote>"The goal is not to have many automations. The goal is to have the minimum number of automations that together free you from enough processing work to justify their maintenance overhead."</blockquote>
+        <p class="quote-source">From the guide</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHEST LEVERAGE WINS -->
+  <section id="wins">
+    <div class="container">
+      <div class="section-label">The Six Wins</div>
+      <h2>The highest-leverage automations, in order</h2>
+      <p class="lead">Not every automation has equal return. These six produce the most time back, with the least setup complexity.</p>
+      <div class="wins-list">
+        <div class="win-item">
+          <div class="win-icon">&#9993;</div>
+          <div class="win-body">
+            <h4>Email Triage and Response Templates</h4>
+            <p>Filters + canned responses cut inbox processing time by 40% with zero new tools. Already inside your email client.</p>
+            <span class="win-roi">Build time: 30 min</span>
+          </div>
+        </div>
+        <div class="win-item">
+          <div class="win-icon">&#128197;</div>
+          <div class="win-body">
+            <h4>Scheduling Automation</h4>
+            <p>A single Calendly or TidyCal link eliminates 20 minutes of back-and-forth per meeting. 58 hours saved per year at 10 meetings per month.</p>
+            <span class="win-roi">Build time: 1 hr</span>
+          </div>
+        </div>
+        <div class="win-item">
+          <div class="win-icon">&#128178;</div>
+          <div class="win-body">
+            <h4>Payment and Invoicing Automation</h4>
+            <p>Automatic billing, reminders, and receipts. Never think about chasing a payment or formatting an invoice again.</p>
+            <span class="win-roi">Build time: 2 hrs</span>
+          </div>
+        </div>
+        <div class="win-item">
+          <div class="win-icon">&#128228;</div>
+          <div class="win-body">
+            <h4>Content Distribution Automation</h4>
+            <p>Write once, schedule to multiple platforms. Content distribution drops from a daily interruption to a weekly 90-minute block.</p>
+            <span class="win-roi">Saves 2-4 hrs/week</span>
+          </div>
+        </div>
+        <div class="win-item">
+          <div class="win-icon">&#128100;</div>
+          <div class="win-body">
+            <h4>Lead Capture and Follow-Up Automation</h4>
+            <p>Every new lead gets acknowledged, nurtured, and followed up automatically. No one falls through the cracks while you are working.</p>
+            <span class="win-roi">Build time: 3 hrs</span>
+          </div>
+        </div>
+        <div class="win-item">
+          <div class="win-icon">&#128202;</div>
+          <div class="win-body">
+            <h4>Reporting and Analytics Consolidation</h4>
+            <p>One dashboard pulls your key metrics automatically. Stop logging into five platforms every week to check numbers.</p>
+            <span class="win-roi">Saves 30 min/week</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="chapters">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>10 chapters. Complete coverage.</h2>
+      <p class="lead">From the mindset to the tools to the ROI math. Every part of building a solo automation stack that actually holds up.</p>
+      <div class="chapters-grid">
+        <div class="chapter-item">
+          <div class="chapter-num">01</div>
+          <div class="chapter-body">
+            <h4>The Automation Mindset for Solopreneurs</h4>
+            <p>Why solo constraints require a different philosophy than team automation, and the three categories of work you need to map first.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">02</div>
+          <div class="chapter-body">
+            <h4>The Six Highest-Leverage Wins</h4>
+            <p>The automations that produce the most time back, in priority order, with expected setup time and time-saved estimates for each.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">03</div>
+          <div class="chapter-body">
+            <h4>Tool Recommendations by Category</h4>
+            <p>Honest comparison of options for email, scheduling, payments, content distribution, CRM, and workflow automation.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">04</div>
+          <div class="chapter-body">
+            <h4>Building Workflows That Run Without You</h4>
+            <p>The design principles for autonomous workflows, the four core solopreneur workflows, and how to build for resilience.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">05</div>
+          <div class="chapter-body">
+            <h4>Email Automation in Depth</h4>
+            <p>The four-layer email architecture, how to build your first nurture sequence, and the re-engagement automation that keeps your list healthy.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">06</div>
+          <div class="chapter-body">
+            <h4>Social Media Automation Without Losing Authenticity</h4>
+            <p>What to automate (distribution), what not to automate (engagement), and the batch creation system that eliminates daily social media work.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">07</div>
+          <div class="chapter-body">
+            <h4>Admin and Client Management Automation</h4>
+            <p>Contract and proposal automation, client onboarding workflows, and project management integration.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">08</div>
+          <div class="chapter-body">
+            <h4>The Automation ROI Calculation</h4>
+            <p>The exact formula for calculating whether an automation is worth building, with worked examples and the hidden maintenance cost factor.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">09</div>
+          <div class="chapter-body">
+            <h4>Avoiding Over-Automation and Fragility</h4>
+            <p>Signs you have over-automated, the simplification audit process, the manual fallback principle, and the tool concentration strategy.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">10</div>
+          <div class="chapter-body">
+            <h4>The Automation Payoff</h4>
+            <p>The correct implementation sequence, what to build first versus later, and how your stack should evolve as your business scales.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="who">
+    <div class="container">
+      <div class="section-label">Who It's For</div>
+      <h2>For solopreneurs who want to stop running the machine manually</h2>
+      <p class="lead">This guide is practical, not theoretical. It is for people who are actively running a business and need to free up their time.</p>
+      <ul class="for-list">
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Freelancers and consultants spending too much time on admin and not enough on client work</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Digital product creators who want their delivery and customer communication to run automatically</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Content creators with a growing audience who need to systematize distribution without sacrificing authenticity</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Coaches and service providers who manually onboard every client and want to change that</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Solopreneurs who tried automation before, built something fragile, and want to do it correctly this time</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Anyone building a one-person business who wants to ensure their processes scale before they are forced to</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="get" class="final-cta">
+    <div class="container">
+      <div class="section-label">Get Started Today</div>
+      <h2>Build the automation stack once. Benefit from it for years.</h2>
+      <p class="lead">The processing work is not going away. Automating it is a one-time investment that compounds indefinitely.</p>
+      <div class="price-block" style="margin-bottom: 32px;">
+        <div class="price">$22.99</div>
+        <div class="price-note">One-time payment.<br>PDF delivered instantly.</div>
+      </div>
+      <a href="https://behikeai.gumroad.com/l/solopreneurs-automation-stack" class="cta-primary">Get Solopreneur's Automation Stack</a>
+      <p style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">Instant download. No subscription. Yours to keep.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="/">behikeai.com</a> &mdash; &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const group = el.parentElement.children;
+          let delay = 0;
+          Array.from(group).forEach((sib, idx) => {
+            if (sib === el) delay = idx * 80;
+          });
+          setTimeout(() => el.classList.add('visible'), delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.problem-card, .win-item, .chapter-item, .for-list li, .quote-block, .stat-bar').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

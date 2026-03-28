@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Freelance Client Machine — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --surface: #0d0d0d;
+      --surface2: #141414;
+      --border: #1f1f1f;
+      --text: #f0f0f0;
+      --text-muted: #888;
+      --accent: #0A84FF;
+      --accent-dim: rgba(10,132,255,0.12);
+      --green: #30D158;
+      --green-dim: rgba(48,209,88,0.12);
+      --max: 980px;
+      --radius: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* SECTIONS */
+    section { padding: 80px 24px; }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 24px 90px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(10,132,255,0.25);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      max-width: 760px;
+      margin: 0 auto 20px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px);
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 800;
+      padding: 16px 40px;
+      border-radius: 10px;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .hero-guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* PROBLEM */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-bottom: 48px;
+      line-height: 1.55;
+    }
+
+    .pain-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .pain-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+    }
+
+    .pain-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .pain-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .pain-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* FEATURES */
+    .features-bg {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius);
+      background: var(--accent-dim);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-number {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* SYSTEM FLOW */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      justify-content: center;
+      align-items: center;
+      margin-top: 48px;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 180px;
+      padding: 24px 12px;
+    }
+
+    .flow-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+
+    .flow-step h4 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 6px;
+    }
+
+    .flow-step p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .flow-arrow {
+      font-size: 22px;
+      color: var(--accent);
+      margin: 0 4px;
+      align-self: center;
+    }
+
+    @media (max-width: 640px) {
+      .flow-arrow { transform: rotate(90deg); }
+      .flow { flex-direction: column; }
+    }
+
+    /* PERSONAS */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+    }
+
+    .persona-tag {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+    }
+
+    .persona-card h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .persona-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* SAMPLE POST */
+    .sample-bg {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-card {
+      max-width: 560px;
+      margin: 0 auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .post-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .post-meta-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .post-meta-handle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .post-body {
+      padding: 20px;
+    }
+
+    .post-body p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .post-structure {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+
+    .post-structure-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .post-structure-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .post-structure-item:last-child { margin-bottom: 0; }
+
+    .post-structure-dot {
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .post-structure-text {
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .post-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 20px;
+    }
+
+    .post-stat {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .post-stat span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* PRICING */
+    .pricing-card {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 44px 40px;
+      text-align: center;
+    }
+
+    .price-tag {
+      font-size: clamp(42px, 6vw, 56px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .price-tag sup {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0;
+      vertical-align: top;
+      margin-top: 10px;
+    }
+
+    .price-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .includes-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+
+    .includes-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .includes-list li:last-child { border-bottom: none; }
+
+    .check {
+      color: var(--green);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .btn-buy {
+      display: block;
+      width: 100%;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 800;
+      padding: 18px;
+      border-radius: 10px;
+      text-align: center;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 14px;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-buy:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .pricing-note {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* FAQ */
+    .faq-list {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      padding: 20px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      letter-spacing: -0.2px;
+    }
+
+    .faq-question:hover { color: var(--accent); }
+
+    .faq-chevron {
+      color: var(--accent);
+      font-size: 18px;
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+    .faq-answer {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 200px;
+      padding-bottom: 20px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: #555;
+    }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* DIVIDER */
+    .divider {
+      width: 48px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">Behike</a>
+      <a href="https://behike.gumroad.com/l/freelance-client-machine" target="_blank" class="nav-cta">
+        Get it &mdash; $24.99
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <div class="badge">Works on LinkedIn + Instagram</div>
+        <h1>Land <span>High-Paying Clients</span> Without Cold Emailing Strangers.</h1>
+        <p class="hero-sub">A complete system for freelancers, consultants, and agency owners who want to attract clients through content and close them through conversation.</p>
+        <div class="hero-cta-group">
+          <a href="https://behike.gumroad.com/l/freelance-client-machine" target="_blank" class="btn-primary">
+            Get The Freelance Client Machine &mdash; $24.99
+          </a>
+          <span class="hero-guarantee">Instant download. No subscription.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE PROBLEM -->
+  <section>
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">The Problem</p>
+        <h2 class="section-title">Most freelancers have a skill.<br>They do not have a client pipeline.</h2>
+        <p class="section-sub">Cold outreach gets ignored. A portfolio that sits unread converts nobody. And without a referral system, income is unpredictable by design.</p>
+      </div>
+      <div class="pain-grid">
+        <div class="pain-card reveal">
+          <div class="pain-icon">&#128228;</div>
+          <h3>Cold Outreach Gets Ghosted</h3>
+          <p>Sending connection requests and cold DMs to strangers is a low-conversion game that takes enormous time and produces inconsistent results. Most freelancers give up after 50 ignored messages.</p>
+        </div>
+        <div class="pain-card reveal">
+          <div class="pain-icon">&#128193;</div>
+          <h3>The Portfolio Does Not Convert</h3>
+          <p>A list of past projects shows what you did. It does not show the prospect why that matters for them. The gap between "here is my work" and "here is what you will get" is where most deals die.</p>
+        </div>
+        <div class="pain-card reveal">
+          <div class="pain-icon">&#128260;</div>
+          <h3>No Referral System</h3>
+          <p>Happy clients exist but they are not sending anyone. Without a system for asking, the language to use, and a way to stay top of mind, referrals stay accidental instead of becoming a reliable channel.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="features-bg">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">What's Inside</p>
+        <h2 class="section-title">Five systems that work together.</h2>
+        <p class="section-sub">Each module solves one part of the client acquisition problem. Together, they replace cold outreach with a self-sustaining pipeline.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <p class="feature-number">01</p>
+          <h3>The Positioning Statement</h3>
+          <p>A one-sentence framework that tells the right person immediately whether you are for them. Covers your niche, their problem, and the outcome you produce. Goes in your bio, your first DM, and every intro call.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-number">02</p>
+          <h3>The Proof Stack</h3>
+          <p>How to build and present case studies even if you have one project. Converts portfolio work into persuasive before-and-afters that do selling without you in the room.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-number">03</p>
+          <h3>Content That Attracts</h3>
+          <p>A 30-day content framework for LinkedIn and Instagram. Each week targets a different stage of buyer awareness. Structured to produce inbound leads, not just engagement.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-number">04</p>
+          <h3>The Discovery Call Framework</h3>
+          <p>A five-part call structure that produces a yes or no on the call. Covers how to diagnose, recommend, handle objections, and close without pressure. Includes word-for-word scripts.</p>
+        </div>
+        <div class="feature-card reveal">
+          <p class="feature-number">05</p>
+          <h3>The Referral System</h3>
+          <p>A 30-minute-per-month system for turning happy clients into a steady referral channel. Includes the ask script, partner identification template, and reward structures that work without cash commissions.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE SYSTEM -->
+  <section>
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">The System</p>
+        <h2 class="section-title">Four steps. One pipeline.</h2>
+        <p class="section-sub">The Freelance Client Machine is built around a linear flow. Each step feeds the next. You do not skip to Convert without running Position and Attract first.</p>
+      </div>
+      <div class="flow">
+        <div class="flow-step reveal">
+          <div class="flow-circle">&#127919;</div>
+          <h4>Position</h4>
+          <p>Define who you help and what you produce for them.</p>
+        </div>
+        <div class="flow-arrow reveal">&#10140;</div>
+        <div class="flow-step reveal">
+          <div class="flow-circle">&#128202;</div>
+          <h4>Attract</h4>
+          <p>Use content to bring the right people to you.</p>
+        </div>
+        <div class="flow-arrow reveal">&#10140;</div>
+        <div class="flow-step reveal">
+          <div class="flow-circle">&#129309;</div>
+          <h4>Convert</h4>
+          <p>Close on the discovery call using a structured framework.</p>
+        </div>
+        <div class="flow-arrow reveal">&#10140;</div>
+        <div class="flow-step reveal">
+          <div class="flow-circle">&#128257;</div>
+          <h4>Retain</h4>
+          <p>Build referral infrastructure that keeps clients sending leads.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="features-bg">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Who It's For</p>
+        <h2 class="section-title">Built for people who sell their expertise.</h2>
+        <p class="section-sub">Not for beginners looking for shortcuts. For people who already have a skill set and need a system to reliably connect it to paying clients.</p>
+      </div>
+      <div class="persona-grid">
+        <div class="persona-card reveal">
+          <span class="persona-tag">Freelancers</span>
+          <h3>You have the skills. You do not have the pipeline.</h3>
+          <p>You are good at what you do. The work is solid when you get it. But the gap between projects is too wide and the income is too inconsistent. This is the system that closes that gap without cold outreach.</p>
+        </div>
+        <div class="persona-card reveal">
+          <span class="persona-tag">Consultants</span>
+          <h3>You rely on referrals but have never made them systematic.</h3>
+          <p>Most of your best clients came from someone who knew you. But those referrals are random and unpredictable. This gives you the structure to turn that organic momentum into a managed channel.</p>
+        </div>
+        <div class="persona-card reveal">
+          <span class="persona-tag">Agency Owners</span>
+          <h3>You are ready to move past founder-led sales.</h3>
+          <p>Everything currently depends on you closing every deal. The content and referral systems in this guide start building pipeline that does not require you to be the one doing every discovery call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SAMPLE POST -->
+  <section class="sample-bg">
+    <div class="container">
+      <div class="reveal" style="text-align:center; margin-bottom: 40px;">
+        <p class="section-label">Inside the Guide</p>
+        <h2 class="section-title">A client-attracting LinkedIn post, broken down.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Here is the structure every high-converting post in the guide follows.</p>
+      </div>
+      <div class="post-card reveal">
+        <div class="post-header">
+          <div class="post-avatar">B</div>
+          <div>
+            <div class="post-meta-name">Behike</div>
+            <div class="post-meta-handle">@behikeai &bull; LinkedIn</div>
+          </div>
+        </div>
+        <div class="post-body">
+          <p>I helped a SaaS consultant go from 0 inbound leads to 3 qualified conversations per week. No cold DMs. No paid ads. Just a repositioned LinkedIn profile and 3 posts per week for 30 days.</p>
+          <p>Here is the exact structure we used:</p>
+          <div class="post-structure">
+            <div class="post-structure-label">Post Anatomy</div>
+            <div class="post-structure-item">
+              <span class="post-structure-dot">01</span>
+              <span class="post-structure-text"><strong>Hook line</strong> &mdash; A declarative statement of the result, not the process.</span>
+            </div>
+            <div class="post-structure-item">
+              <span class="post-structure-dot">02</span>
+              <span class="post-structure-text"><strong>Situation</strong> &mdash; The before state in one sentence. Specific, not vague.</span>
+            </div>
+            <div class="post-structure-item">
+              <span class="post-structure-dot">03</span>
+              <span class="post-structure-text"><strong>Insight</strong> &mdash; The thing you did that others do not. Your actual intellectual contribution.</span>
+            </div>
+            <div class="post-structure-item">
+              <span class="post-structure-dot">04</span>
+              <span class="post-structure-text"><strong>Result</strong> &mdash; Measurable outcome. Numbers when possible. Timeline always.</span>
+            </div>
+            <div class="post-structure-item">
+              <span class="post-structure-dot">05</span>
+              <span class="post-structure-text"><strong>CTA</strong> &mdash; One specific ask for one specific person. Not "follow for more."</span>
+            </div>
+          </div>
+        </div>
+        <div class="post-footer">
+          <span class="post-stat"><span>347</span> likes</span>
+          <span class="post-stat"><span>62</span> comments</span>
+          <span class="post-stat"><span>28</span> shares</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section>
+    <div class="container">
+      <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+        <p class="section-label">Pricing</p>
+        <h2 class="section-title">One payment. Everything included.</h2>
+      </div>
+      <div class="pricing-card reveal">
+        <div class="price-tag"><sup>$</sup>24.99</div>
+        <div class="price-label">One-time payment. Instant download.</div>
+        <ul class="includes-list">
+          <li><span class="check">&#10003;</span> Positioning Statement framework and templates</li>
+          <li><span class="check">&#10003;</span> Proof Stack builder with case study structure</li>
+          <li><span class="check">&#10003;</span> 30-day LinkedIn and Instagram content plan</li>
+          <li><span class="check">&#10003;</span> Discovery Call framework with word-for-word scripts</li>
+          <li><span class="check">&#10003;</span> Referral System with ask scripts and partner templates</li>
+          <li><span class="check">&#10003;</span> Sample LinkedIn post structures with annotations</li>
+          <li><span class="check">&#10003;</span> Pricing framework: hourly to value-based transition guide</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/freelance-client-machine" target="_blank" class="btn-buy">
+          Get Instant Access &mdash; $24.99
+        </a>
+        <p class="pricing-note">Delivered via Gumroad. PDF format. Works on any device.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="features-bg">
+    <div class="container">
+      <div class="reveal" style="text-align:center; margin-bottom: 48px;">
+        <p class="section-label">FAQ</p>
+        <h2 class="section-title">Questions.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            Is this for beginners or experienced freelancers?
+            <span class="faq-chevron">&#8964;</span>
+          </button>
+          <div class="faq-answer">
+            It is designed for freelancers who have done at least one paid project and know what service they want to sell. The content and positioning systems work best when you have at least one result to reference. If you are just starting, the positioning and discovery call sections are still highly applicable.
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            What platforms does the content system work on?
+            <span class="faq-chevron">&#8964;</span>
+          </button>
+          <div class="faq-answer">
+            The 30-day content framework is built specifically for LinkedIn and Instagram, where B2B service buyers are most active. The principles apply to any text-based platform, but the post structures and formats are optimized for those two.
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            How is this different from other freelance guides?
+            <span class="faq-chevron">&#8964;</span>
+          </button>
+          <div class="faq-answer">
+            Most freelance guides focus on one part of the problem, usually cold outreach or portfolio building. This guide addresses the full pipeline: positioning, content, closing, and referrals. Each module feeds the next. The discovery call scripts alone are worth the price for most people.
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" aria-expanded="false">
+            What format is the guide delivered in?
+            <span class="faq-chevron">&#8964;</span>
+          </button>
+          <div class="faq-answer">
+            PDF format, delivered instantly via Gumroad after purchase. You can read it on any device, annotate it, or print it. No account required, no subscription, no login. One payment, permanent access.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Behike</div>
+      <div class="footer-links">
+        <a href="https://behike.shop" target="_blank">behike.shop</a>
+        <a href="https://instagram.com/behikeai" target="_blank">@behikeai</a>
+        <a href="https://behike.gumroad.com" target="_blank">Gumroad Store</a>
+      </div>
+      <p class="footer-copy">&copy; 2026 Behike. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for reveal animations
+    (function () {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.reveal').forEach((el, i) => {
+        el.style.transitionDelay = (i % 4) * 60 + 'ms';
+        observer.observe(el);
+      });
+    })();
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach((btn) => {
+      btn.addEventListener('click', function () {
+        const item = this.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+
+        // Close all
+        document.querySelectorAll('.faq-item').forEach((i) => {
+          i.classList.remove('open');
+          i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+
+        // Toggle clicked
+        if (!isOpen) {
+          item.classList.add('open');
+          this.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

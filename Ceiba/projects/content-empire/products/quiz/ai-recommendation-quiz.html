@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What AI Tool Do You Need? | Behike</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--border:#222;
+    --text:#fff;--text2:#999;--accent:#0066ff;--accent-hover:#0055dd;
+    --radius:12px;--transition:0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    line-height:1.6;overflow-x:hidden;
+  }
+
+  /* Progress bar */
+  .progress-wrap{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    background:var(--surface);border-bottom:1px solid var(--border);
+    padding:0;height:3px;
+  }
+  .progress-bar{
+    height:100%;background:var(--accent);
+    transition:width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width:0%;
+  }
+
+  /* Container */
+  .container{
+    max-width:640px;width:100%;padding:80px 24px 60px;
+    min-height:100vh;display:flex;flex-direction:column;
+    justify-content:center;
+  }
+
+  /* Brand */
+  .brand{
+    text-align:center;margin-bottom:48px;opacity:0;
+    animation:fadeUp 0.6s ease forwards;
+  }
+  .brand-mark{
+    font-size:0.75rem;letter-spacing:0.2em;text-transform:uppercase;
+    color:var(--text2);margin-bottom:8px;
+  }
+  .brand h1{
+    font-size:2rem;font-weight:700;letter-spacing:-0.02em;
+    line-height:1.2;
+  }
+  .brand p{
+    color:var(--text2);font-size:0.95rem;margin-top:12px;
+    max-width:400px;margin-left:auto;margin-right:auto;
+  }
+
+  /* Screen wrapper */
+  .screen{
+    display:none;opacity:0;transform:translateY(20px);
+  }
+  .screen.active{
+    display:block;
+    animation:fadeUp 0.5s ease forwards;
+  }
+
+  /* Question */
+  .question-number{
+    font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:12px;
+  }
+  .question-text{
+    font-size:1.5rem;font-weight:600;letter-spacing:-0.01em;
+    margin-bottom:32px;line-height:1.3;
+  }
+
+  /* Options */
+  .options{display:flex;flex-direction:column;gap:12px}
+  .option{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:18px 20px;cursor:pointer;
+    transition:var(--transition);position:relative;overflow:hidden;
+    font-size:0.95rem;color:var(--text);
+  }
+  .option::before{
+    content:'';position:absolute;inset:0;
+    background:var(--accent);opacity:0;transition:opacity 0.3s ease;
+  }
+  .option:hover{
+    border-color:#333;transform:translateY(-1px);
+    box-shadow:0 4px 20px rgba(0,102,255,0.08);
+  }
+  .option:hover::before{opacity:0.05}
+  .option.selected{
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent);
+  }
+  .option.selected::before{opacity:0.08}
+  .option-label{position:relative;z-index:1;display:flex;align-items:center;gap:12px}
+  .option-icon{
+    width:32px;height:32px;border-radius:8px;
+    background:var(--surface2);display:flex;align-items:center;
+    justify-content:center;font-size:0.8rem;color:var(--text2);
+    flex-shrink:0;border:1px solid var(--border);
+    transition:var(--transition);
+  }
+  .option.selected .option-icon{
+    background:var(--accent);color:#fff;border-color:var(--accent);
+  }
+  .option-content{flex:1}
+  .option-title{font-weight:500;line-height:1.3}
+
+  /* Email capture */
+  .email-screen{text-align:center}
+  .email-screen h2{
+    font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;
+    margin-bottom:8px;
+  }
+  .email-screen p{
+    color:var(--text2);font-size:0.95rem;margin-bottom:36px;
+    max-width:380px;margin-left:auto;margin-right:auto;
+  }
+  .form-group{
+    display:flex;flex-direction:column;gap:12px;
+    max-width:380px;margin:0 auto;
+  }
+  .form-input{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:16px 18px;
+    font-size:0.95rem;color:var(--text);outline:none;
+    transition:var(--transition);font-family:inherit;
+  }
+  .form-input::placeholder{color:#555}
+  .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,102,255,0.15)}
+  .btn{
+    background:var(--accent);color:#fff;border:none;
+    border-radius:var(--radius);padding:16px 32px;
+    font-size:1rem;font-weight:600;cursor:pointer;
+    transition:var(--transition);font-family:inherit;
+    margin-top:8px;
+  }
+  .btn:hover{background:var(--accent-hover);transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .form-note{
+    font-size:0.75rem;color:#444;margin-top:16px;
+    text-align:center;
+  }
+
+  /* Results */
+  .results-screen{text-align:center}
+  .results-label{
+    font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:16px;
+  }
+  .results-screen h2{
+    font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;
+    margin-bottom:8px;
+  }
+  .results-intro{
+    color:var(--text2);font-size:0.95rem;margin-bottom:40px;
+  }
+
+  /* Product card */
+  .product-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:32px 28px;text-align:left;
+    margin-bottom:20px;position:relative;overflow:hidden;
+  }
+  .product-card.primary{border-color:var(--accent)}
+  .product-card.primary::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:var(--accent);
+  }
+  .card-badge{
+    display:inline-block;font-size:0.7rem;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--accent);
+    background:rgba(0,102,255,0.1);padding:4px 10px;
+    border-radius:6px;margin-bottom:16px;font-weight:600;
+  }
+  .card-badge.secondary{color:var(--text2);background:var(--surface2)}
+  .product-name{
+    font-size:1.25rem;font-weight:700;margin-bottom:8px;
+    letter-spacing:-0.01em;
+  }
+  .product-why{
+    color:var(--text2);font-size:0.9rem;line-height:1.6;
+    margin-bottom:20px;
+  }
+  .product-price{
+    font-size:1.5rem;font-weight:700;margin-bottom:20px;
+  }
+  .product-price .was{
+    font-size:0.85rem;color:#555;text-decoration:line-through;
+    font-weight:400;margin-left:8px;
+  }
+  .product-cta{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--accent);color:#fff;border:none;
+    border-radius:var(--radius);padding:14px 28px;
+    font-size:0.95rem;font-weight:600;cursor:pointer;
+    transition:var(--transition);text-decoration:none;
+    font-family:inherit;
+  }
+  .product-cta:hover{background:var(--accent-hover);transform:translateY(-1px)}
+  .product-cta svg{width:16px;height:16px}
+
+  /* Bundle */
+  .bundle-section{
+    margin-top:40px;padding-top:32px;
+    border-top:1px solid var(--border);text-align:center;
+  }
+  .bundle-section h3{
+    font-size:1.1rem;font-weight:600;margin-bottom:8px;
+  }
+  .bundle-section p{
+    color:var(--text2);font-size:0.9rem;margin-bottom:20px;
+  }
+  .btn-outline{
+    display:inline-flex;align-items:center;gap:8px;
+    background:transparent;color:var(--accent);
+    border:1px solid var(--accent);border-radius:var(--radius);
+    padding:14px 28px;font-size:0.95rem;font-weight:600;
+    cursor:pointer;transition:var(--transition);
+    text-decoration:none;font-family:inherit;
+  }
+  .btn-outline:hover{background:rgba(0,102,255,0.08)}
+
+  /* Retake */
+  .retake-link{
+    display:inline-block;margin-top:32px;
+    font-size:0.85rem;color:#555;cursor:pointer;
+    transition:var(--transition);text-decoration:underline;
+    text-underline-offset:3px;background:none;border:none;
+    font-family:inherit;
+  }
+  .retake-link:hover{color:var(--text2)}
+
+  /* Start screen */
+  .start-screen{text-align:center}
+  .start-screen h2{
+    font-size:2.25rem;font-weight:700;letter-spacing:-0.03em;
+    line-height:1.15;margin-bottom:16px;
+  }
+  .start-screen p{
+    color:var(--text2);font-size:1rem;margin-bottom:40px;
+    max-width:420px;margin-left:auto;margin-right:auto;
+    line-height:1.6;
+  }
+  .start-features{
+    display:flex;flex-direction:column;gap:12px;
+    max-width:320px;margin:0 auto 36px;text-align:left;
+  }
+  .start-feature{
+    display:flex;align-items:center;gap:12px;
+    font-size:0.9rem;color:var(--text2);
+  }
+  .start-feature-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);flex-shrink:0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(20px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @keyframes fadeIn{
+    from{opacity:0}to{opacity:1}
+  }
+
+  /* Mobile */
+  @media(max-width:480px){
+    .container{padding:60px 16px 40px}
+    .brand h1{font-size:1.5rem}
+    .question-text{font-size:1.25rem}
+    .start-screen h2{font-size:1.75rem}
+    .product-card{padding:24px 20px}
+    .results-screen h2{font-size:1.5rem}
+    .email-screen h2{font-size:1.5rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="container">
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="startScreen">
+    <div class="brand">
+      <div class="brand-mark">Behike</div>
+    </div>
+    <div class="start-screen">
+      <h2>What AI Tool<br>Do You Actually Need?</h2>
+      <p>Answer 7 quick questions. Get a personalized recommendation based on where you are right now, not where some guru thinks you should be.</p>
+      <div class="start-features">
+        <div class="start-feature">
+          <div class="start-feature-dot"></div>
+          <span>Takes under 2 minutes</span>
+        </div>
+        <div class="start-feature">
+          <div class="start-feature-dot"></div>
+          <span>Personalized to your level</span>
+        </div>
+        <div class="start-feature">
+          <div class="start-feature-dot"></div>
+          <span>Free and paid options</span>
+        </div>
+      </div>
+      <button class="btn" onclick="startQuiz()" style="min-width:200px">Start the Quiz</button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREENS -->
+  <div class="screen" id="q0">
+    <div class="question-number">Question 1 of 7</div>
+    <div class="question-text">What best describes you?</div>
+    <div class="options">
+      <div class="option" onclick="answer(0,'student')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Student learning new skills</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(0,'hustler')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">Side hustler building something</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(0,'business')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Business owner scaling up</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(0,'developer')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">Developer or tech professional</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q1">
+    <div class="question-number">Question 2 of 7</div>
+    <div class="question-text">What is your biggest time waster?</div>
+    <div class="options">
+      <div class="option" onclick="answer(1,'communication')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Email and messages</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(1,'content')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">Content creation</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(1,'data')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Data entry and organization</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(1,'research')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">Research and information gathering</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q2">
+    <div class="question-number">Question 3 of 7</div>
+    <div class="question-text">How comfortable are you with AI?</div>
+    <div class="options">
+      <div class="option" onclick="answer(2,'never')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Never used it</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(2,'chatgpt')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">Used ChatGPT a few times</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(2,'automations')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Built automations with AI</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(2,'daily')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">I code with AI daily</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q3">
+    <div class="question-number">Question 4 of 7</div>
+    <div class="question-text">What would you automate first?</div>
+    <div class="options">
+      <div class="option" onclick="answer(3,'customers')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Customer communication</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(3,'social')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">Content and social media</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(3,'finance')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Financial tracking</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(3,'everything')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">Everything possible</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q4">
+    <div class="question-number">Question 5 of 7</div>
+    <div class="question-text">How much time do you spend on repetitive tasks?</div>
+    <div class="options">
+      <div class="option" onclick="answer(4,'low')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">1 to 2 hours a day</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(4,'medium')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">3 to 5 hours a day</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(4,'high')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Most of my day</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(4,'lost')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">I have lost count</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q5">
+    <div class="question-number">Question 6 of 7</div>
+    <div class="question-text">What is your budget for tools?</div>
+    <div class="options">
+      <div class="option" onclick="answer(5,'free')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Free only</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(5,'low')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">Under $20</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(5,'mid')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Under $100</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(5,'any')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">Whatever works</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="q6">
+    <div class="question-number">Question 7 of 7</div>
+    <div class="question-text">What concerns you most about AI?</div>
+    <div class="options">
+      <div class="option" onclick="answer(6,'privacy')">
+        <div class="option-label">
+          <div class="option-icon">A</div>
+          <div class="option-content"><div class="option-title">Data privacy</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(6,'replacement')">
+        <div class="option-label">
+          <div class="option-icon">B</div>
+          <div class="option-content"><div class="option-title">It replacing me</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(6,'mistakes')">
+        <div class="option-label">
+          <div class="option-icon">C</div>
+          <div class="option-content"><div class="option-title">Making mistakes</div></div>
+        </div>
+      </div>
+      <div class="option" onclick="answer(6,'money')">
+        <div class="option-label">
+          <div class="option-icon">D</div>
+          <div class="option-content"><div class="option-title">Wasting money on it</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL CAPTURE -->
+  <div class="screen" id="emailScreen">
+    <div class="email-screen">
+      <h2>Your results are ready.</h2>
+      <p>Enter your info below to see your personalized AI recommendation.</p>
+      <div class="form-group">
+        <input type="text" class="form-input" id="userName" placeholder="First name" autocomplete="given-name">
+        <input type="email" class="form-input" id="userEmail" placeholder="Email address" autocomplete="email">
+        <button class="btn" id="revealBtn" onclick="revealResults()" disabled>See My Results</button>
+      </div>
+      <div class="form-note">No spam. Unsubscribe anytime.</div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-screen">
+      <div class="results-label">Your Recommendation</div>
+      <h2 id="resultsHeading">Based on your answers, here is your perfect AI starting point.</h2>
+      <p class="results-intro" id="resultsIntro"></p>
+
+      <div class="product-card primary" id="primaryCard">
+        <div class="card-badge">Best match for you</div>
+        <div class="product-name" id="primaryName"></div>
+        <div class="product-why" id="primaryWhy"></div>
+        <div class="product-price" id="primaryPrice"></div>
+        <a class="product-cta" id="primaryLink" href="#" target="_blank">
+          Get It Now
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+
+      <div class="product-card" id="secondaryCard">
+        <div class="card-badge secondary">Also consider</div>
+        <div class="product-name" id="secondaryName"></div>
+        <div class="product-why" id="secondaryWhy"></div>
+        <div class="product-price" id="secondaryPrice"></div>
+        <a class="product-cta" id="secondaryLink" href="#" target="_blank" style="background:transparent;border:1px solid var(--accent);color:var(--accent)">
+          Learn More
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+
+      <div class="bundle-section">
+        <h3>Want the full toolkit?</h3>
+        <p>Get every Behike product in one bundle at a steep discount.</p>
+        <a class="btn-outline" href="https://behike.gumroad.com" target="_blank">
+          View the Empire Bundle
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </a>
+      </div>
+
+      <button class="retake-link" onclick="retakeQuiz()">Retake the quiz</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const TOTAL_QUESTIONS = 7;
+  const STORAGE_KEY = 'behike_quiz_complete';
+
+  const answers = [];
+  let currentQ = -1; // -1 = start screen
+
+  const progressBar = document.getElementById('progressBar');
+  const nameInput = document.getElementById('userName');
+  const emailInput = document.getElementById('userEmail');
+  const revealBtn = document.getElementById('revealBtn');
+
+  // Check localStorage for previous completion
+  if(localStorage.getItem(STORAGE_KEY)){
+    // Still allow the quiz but could show a note
+  }
+
+  // Email form validation
+  function validateForm(){
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const valid = name.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    revealBtn.disabled = !valid;
+  }
+  nameInput.addEventListener('input', validateForm);
+  emailInput.addEventListener('input', validateForm);
+
+  // Navigation
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+    });
+    const target = document.getElementById(id);
+    if(target){
+      // Small delay for re-trigger animation
+      requestAnimationFrame(() => {
+        target.classList.add('active');
+      });
+    }
+  }
+
+  function updateProgress(){
+    const pct = currentQ < 0 ? 0 : ((currentQ + 1) / TOTAL_QUESTIONS) * 100;
+    progressBar.style.width = Math.min(pct, 100) + '%';
+  }
+
+  // Start
+  window.startQuiz = function(){
+    currentQ = 0;
+    showScreen('q0');
+    updateProgress();
+  };
+
+  // Answer
+  window.answer = function(qIndex, value){
+    // Visual feedback
+    const options = document.querySelectorAll('#q' + qIndex + ' .option');
+    options.forEach(o => o.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    answers[qIndex] = value;
+
+    // Auto-advance after brief pause
+    setTimeout(() => {
+      if(qIndex < TOTAL_QUESTIONS - 1){
+        currentQ = qIndex + 1;
+        showScreen('q' + currentQ);
+        updateProgress();
+      } else {
+        // Show email capture
+        progressBar.style.width = '100%';
+        showScreen('emailScreen');
+      }
+    }, 400);
+  };
+
+  // Results
+  window.revealResults = function(){
+    if(revealBtn.disabled) return;
+
+    // Store lead data (in production, send to API)
+    const lead = {
+      name: nameInput.value.trim(),
+      email: emailInput.value.trim(),
+      answers: [...answers],
+      timestamp: new Date().toISOString()
+    };
+    console.log('Lead captured:', lead);
+
+    // Save to localStorage
+    try {
+      const leads = JSON.parse(localStorage.getItem('behike_quiz_leads') || '[]');
+      leads.push(lead);
+      localStorage.setItem('behike_quiz_leads', JSON.stringify(leads));
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } catch(e){}
+
+    // Calculate recommendation
+    const rec = calculateRecommendation();
+    renderResults(rec);
+    showScreen('resultsScreen');
+  };
+
+  // Scoring
+  function calculateRecommendation(){
+    const scores = {
+      beginner: 0,
+      content: 0,
+      business: 0,
+      security: 0,
+      developer: 0,
+      budget: 0
+    };
+
+    // Q0: Role
+    const role = answers[0];
+    if(role === 'student') { scores.beginner += 3; }
+    if(role === 'hustler') { scores.content += 2; scores.business += 1; }
+    if(role === 'business') { scores.business += 3; }
+    if(role === 'developer') { scores.developer += 3; }
+
+    // Q1: Time waster
+    const waste = answers[1];
+    if(waste === 'communication') { scores.business += 2; }
+    if(waste === 'content') { scores.content += 3; }
+    if(waste === 'data') { scores.business += 2; scores.developer += 1; }
+    if(waste === 'research') { scores.beginner += 1; scores.developer += 1; }
+
+    // Q2: Comfort
+    const comfort = answers[2];
+    if(comfort === 'never') { scores.beginner += 3; }
+    if(comfort === 'chatgpt') { scores.beginner += 1; scores.content += 1; }
+    if(comfort === 'automations') { scores.business += 2; scores.content += 1; }
+    if(comfort === 'daily') { scores.developer += 3; }
+
+    // Q3: Automate first
+    const auto = answers[3];
+    if(auto === 'customers') { scores.business += 2; }
+    if(auto === 'social') { scores.content += 3; }
+    if(auto === 'finance') { scores.business += 1; scores.beginner += 1; }
+    if(auto === 'everything') { scores.business += 2; scores.developer += 1; }
+
+    // Q4: Time on repetitive
+    const time = answers[4];
+    if(time === 'low') { scores.beginner += 1; }
+    if(time === 'medium') { scores.content += 1; }
+    if(time === 'high') { scores.business += 2; }
+    if(time === 'lost') { scores.business += 3; }
+
+    // Q5: Budget
+    const budget = answers[5];
+    if(budget === 'free') { scores.budget += 3; scores.beginner += 1; }
+    if(budget === 'low') { scores.budget += 1; }
+    if(budget === 'mid') { scores.business += 1; }
+    if(budget === 'any') { scores.business += 1; scores.developer += 1; }
+
+    // Q6: Concern
+    const concern = answers[6];
+    if(concern === 'privacy') { scores.security += 3; }
+    if(concern === 'replacement') { scores.beginner += 1; scores.security += 1; }
+    if(concern === 'mistakes') { scores.security += 1; scores.beginner += 1; }
+    if(concern === 'money') { scores.budget += 2; }
+
+    // Find top category
+    const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+    let primary = sorted[0][0];
+    let secondary = sorted[1][0];
+
+    // Budget override: if budget is top, use second as primary category but recommend free products
+    const isBudgetConscious = scores.budget >= 3;
+
+    return getProducts(primary, secondary, isBudgetConscious);
+  }
+
+  function getProducts(primary, secondary, isBudgetConscious){
+    const products = {
+      beginner: {
+        primary: {
+          name: '5 AI Tools That Will Change Your Workflow',
+          why: 'You are just getting started with AI. This free guide breaks down the five essential tools you need, with step-by-step setup instructions. No fluff, no jargon. Just the tools that actually matter.',
+          price: 'Free',
+          priceRaw: 0,
+          link: 'https://behike.gumroad.com/l/5-ai-tools'
+        },
+        secondary: {
+          name: 'The AI Budget Template',
+          why: 'Track what you spend on AI tools and figure out what is actually worth keeping. Built for people who want to be smart about their investment.',
+          price: '$9.99',
+          priceRaw: 9.99,
+          link: 'https://behike.gumroad.com/l/ai-budget-template'
+        }
+      },
+      content: {
+        primary: {
+          name: 'The Prompt Engineering Cheat Sheet',
+          why: 'You spend too much time creating content manually. This cheat sheet gives you battle-tested prompts for every content format, from social posts to newsletters. Copy, paste, customize, publish.',
+          price: '$9.99',
+          priceRaw: 9.99,
+          link: 'https://behike.gumroad.com/l/prompt-cheat-sheet'
+        },
+        secondary: {
+          name: 'The Content Waterfall System',
+          why: 'Turn one piece of content into ten. This system maps out the exact workflow for repurposing content across every platform without burning out.',
+          price: '$14.99',
+          priceRaw: 14.99,
+          link: 'https://behike.gumroad.com/l/content-waterfall'
+        }
+      },
+      business: {
+        primary: {
+          name: 'The AI Employee Guide',
+          why: 'You are losing hours every day to work that a machine could handle. This guide shows you how to build AI agents that handle customer service, data entry, scheduling, and more. It is like hiring a full-time employee for less than $20.',
+          price: '$19.99',
+          priceRaw: 19.99,
+          link: 'https://behike.gumroad.com/l/ai-employee-guide'
+        },
+        secondary: {
+          name: 'AI Agent Installation Service',
+          why: 'Want it done for you? We build and deploy custom AI agents for your business. No technical skills required on your end.',
+          price: 'From $199',
+          priceRaw: 199,
+          link: 'https://behike.gumroad.com/l/ai-agent-install'
+        }
+      },
+      security: {
+        primary: {
+          name: 'The AI Safety Checklist',
+          why: 'Your concern about data privacy is smart, not paranoid. This free checklist shows you exactly how to use AI tools without exposing sensitive data. Covers every major platform.',
+          price: 'Free',
+          priceRaw: 0,
+          link: 'https://behike.gumroad.com/l/ai-safety-checklist'
+        },
+        secondary: {
+          name: 'The AI Security Guide',
+          why: 'Go deeper on protecting your data, your business, and your reputation. Covers enterprise-level practices in plain language.',
+          price: '$14.99',
+          priceRaw: 14.99,
+          link: 'https://behike.gumroad.com/l/ai-security-guide'
+        }
+      },
+      developer: {
+        primary: {
+          name: 'The AI Employee Guide',
+          why: 'You already code with AI. This guide takes you further. Learn how to architect full AI agent systems that run autonomously, handle complex workflows, and scale without breaking.',
+          price: '$19.99',
+          priceRaw: 19.99,
+          link: 'https://behike.gumroad.com/l/ai-employee-guide'
+        },
+        secondary: {
+          name: 'The Prompt Engineering Cheat Sheet',
+          why: 'Even experienced developers write mediocre prompts. This cheat sheet gives you the patterns that consistently produce better output from any model.',
+          price: '$9.99',
+          priceRaw: 9.99,
+          link: 'https://behike.gumroad.com/l/prompt-cheat-sheet'
+        }
+      },
+      budget: {
+        primary: {
+          name: '5 AI Tools That Will Change Your Workflow',
+          why: 'Every tool in this guide is free. No subscriptions, no hidden costs. Just five powerful tools that you can start using today.',
+          price: 'Free',
+          priceRaw: 0,
+          link: 'https://behike.gumroad.com/l/5-ai-tools'
+        },
+        secondary: {
+          name: 'The AI Safety Checklist',
+          why: 'Also free. Make sure the tools you use are not costing you in other ways. Protect your data from day one.',
+          price: 'Free',
+          priceRaw: 0,
+          link: 'https://behike.gumroad.com/l/ai-safety-checklist'
+        }
+      }
+    };
+
+    const rec = products[primary] || products.beginner;
+
+    // If budget conscious and primary product costs money, swap
+    if(isBudgetConscious && rec.primary.priceRaw > 0){
+      return products.budget;
+    }
+
+    return rec;
+  }
+
+  function renderResults(rec){
+    const name = nameInput.value.trim().split(' ')[0];
+    document.getElementById('resultsHeading').textContent =
+      name + ', here is your perfect AI starting point.';
+
+    document.getElementById('primaryName').textContent = rec.primary.name;
+    document.getElementById('primaryWhy').textContent = rec.primary.why;
+    document.getElementById('primaryPrice').innerHTML =
+      rec.primary.priceRaw === 0
+        ? '<span style="color:var(--accent)">Free</span>'
+        : rec.primary.price;
+    document.getElementById('primaryLink').href = rec.primary.link;
+
+    document.getElementById('secondaryName').textContent = rec.secondary.name;
+    document.getElementById('secondaryWhy').textContent = rec.secondary.why;
+    document.getElementById('secondaryPrice').innerHTML =
+      rec.secondary.priceRaw === 0
+        ? '<span style="color:var(--accent)">Free</span>'
+        : rec.secondary.price;
+    document.getElementById('secondaryLink').href = rec.secondary.link;
+  }
+
+  // Retake
+  window.retakeQuiz = function(){
+    localStorage.removeItem(STORAGE_KEY);
+    answers.length = 0;
+    currentQ = -1;
+    progressBar.style.width = '0%';
+    nameInput.value = '';
+    emailInput.value = '';
+    revealBtn.disabled = true;
+    // Reset all selected options
+    document.querySelectorAll('.option.selected').forEach(o => o.classList.remove('selected'));
+    showScreen('startScreen');
+  };
+
+})();
+</script>
+
+</body>
+</html>

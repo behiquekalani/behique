@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Automation Audit — How Automated Is Your Business?</title>
+<meta name="description" content="8 questions. 3 minutes. Find out exactly how much time you're losing to manual work and what to automate first.">
+<style>
+  :root {
+    --black: #000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --surface3: #3a3a3c;
+    --blue: #0a84ff;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff453a;
+    --purple: #bf5af2;
+    --text: #f5f5f7;
+    --secondary: #8e8e93;
+    --tertiary: #48484a;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-size: 16px; font-weight: 700; }
+  .nav-logo span { color: var(--blue); }
+  .nav-back { font-size: 14px; color: var(--secondary); text-decoration: none; }
+  .nav-back:hover { color: var(--text); }
+
+  /* QUIZ CONTAINER */
+  .quiz-wrap {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  /* INTRO */
+  #introScreen {}
+  .intro-badge {
+    display: inline-block;
+    background: rgba(10,132,255,0.15);
+    color: var(--blue);
+    border: 1px solid rgba(10,132,255,0.3);
+    padding: 6px 16px; border-radius: 980px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+  .intro-title {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .intro-title span { color: var(--blue); }
+  .intro-desc {
+    font-size: 17px; color: var(--secondary); line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .intro-meta {
+    font-size: 14px; color: var(--tertiary); margin-bottom: 40px;
+  }
+  .intro-meta strong { color: var(--secondary); }
+  .start-btn {
+    background: var(--blue); color: #fff;
+    padding: 18px 40px; border-radius: 980px;
+    font-size: 17px; font-weight: 700; border: none;
+    cursor: pointer; font-family: inherit; transition: opacity 0.2s;
+  }
+  .start-btn:hover { opacity: 0.85; }
+
+  /* PROGRESS */
+  .progress-bar-wrap {
+    margin-bottom: 40px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--secondary); margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 4px; background: var(--surface3);
+    border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--blue);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  /* QUESTION */
+  #questionScreen { display: none; }
+  .q-num {
+    font-size: 13px; font-weight: 600; color: var(--blue);
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 22px; font-weight: 700; line-height: 1.3;
+    margin-bottom: 32px; letter-spacing: -0.3px;
+  }
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option-btn {
+    background: var(--surface);
+    border: 2px solid var(--surface3);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.4;
+    transition: all 0.15s;
+    display: flex; align-items: flex-start; gap: 14px;
+  }
+  .option-btn:hover { border-color: var(--blue); background: rgba(10,132,255,0.05); }
+  .option-btn.selected { border-color: var(--blue); background: rgba(10,132,255,0.1); }
+  .option-letter {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface2); color: var(--secondary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .option-btn.selected .option-letter { background: var(--blue); color: #fff; }
+  .option-text {}
+  .option-sub { font-size: 13px; color: var(--secondary); margin-top: 3px; display: block; }
+  .next-btn {
+    margin-top: 32px;
+    background: var(--blue); color: #fff;
+    padding: 16px 40px; border-radius: 980px;
+    font-size: 16px; font-weight: 700; border: none;
+    cursor: pointer; font-family: inherit;
+    opacity: 0.3; pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .next-btn.enabled { opacity: 1; pointer-events: all; }
+
+  /* RESULTS */
+  #resultsScreen { display: none; }
+  .results-header { text-align: center; margin-bottom: 40px; }
+  .score-ring {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    margin: 0 auto 24px;
+    font-size: 36px; font-weight: 800;
+  }
+  .score-ring .score-label { font-size: 12px; color: var(--secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .results-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .results-sub { font-size: 16px; color: var(--secondary); line-height: 1.5; }
+
+  /* SCORE LEVELS */
+  .score-ring.low { background: rgba(48,209,88,0.1); border: 3px solid var(--green); color: var(--green); }
+  .score-ring.medium { background: rgba(255,159,10,0.1); border: 3px solid var(--orange); color: var(--orange); }
+  .score-ring.high { background: rgba(255,69,58,0.1); border: 3px solid var(--red); color: var(--red); }
+
+  /* FINDINGS */
+  .findings { margin-bottom: 32px; }
+  .finding-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 12px;
+    border: 1px solid var(--surface3);
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .finding-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .finding-content {}
+  .finding-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .finding-desc { font-size: 14px; color: var(--secondary); line-height: 1.5; }
+
+  /* RECOMMENDATIONS */
+  .recs-title { font-size: 20px; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.3px; }
+  .rec-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 12px;
+    border-left: 3px solid var(--blue);
+  }
+  .rec-card.priority { border-left-color: var(--red); }
+  .rec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--blue); margin-bottom: 8px; }
+  .rec-card.priority .rec-label { color: var(--red); }
+  .rec-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .rec-card p { font-size: 14px; color: var(--secondary); line-height: 1.5; }
+  .rec-cta {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 20px;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 980px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* EMAIL CAPTURE */
+  .capture-section {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 32px;
+    text-align: center;
+    border: 1px solid var(--surface3);
+    margin-top: 32px;
+  }
+  .capture-section h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .capture-section p { font-size: 14px; color: var(--secondary); margin-bottom: 24px; line-height: 1.5; }
+  .capture-form { display: flex; gap: 10px; max-width: 400px; margin: 0 auto; }
+  .capture-form input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--surface3);
+    border-radius: 980px;
+    padding: 12px 20px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .capture-form input:focus { border-color: var(--blue); }
+  .capture-form input::placeholder { color: var(--tertiary); }
+  .capture-submit {
+    background: var(--blue); color: #fff;
+    padding: 12px 24px; border-radius: 980px;
+    font-size: 15px; font-weight: 700; border: none;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+  }
+  .capture-note { font-size: 12px; color: var(--tertiary); margin-top: 12px; }
+  .capture-confirm { display: none; color: var(--green); font-size: 15px; font-weight: 600; margin-top: 16px; }
+
+  /* RETAKE */
+  .retake-btn {
+    background: transparent;
+    border: 1px solid var(--surface3);
+    color: var(--secondary);
+    padding: 12px 28px;
+    border-radius: 980px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 16px;
+    display: block;
+    margin-left: auto; margin-right: auto;
+    transition: all 0.2s;
+  }
+  .retake-btn:hover { border-color: var(--text); color: var(--text); }
+
+  @media (max-width: 500px) {
+    .capture-form { flex-direction: column; }
+    .capture-submit { width: 100%; }
+    .q-text { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><span>Behike</span> Automation Audit</div>
+  <a href="index.html" class="nav-back">Back to Store</a>
+</nav>
+
+<div class="quiz-wrap">
+
+  <!-- INTRO -->
+  <div id="introScreen">
+    <div class="intro-badge">Free Audit Tool</div>
+    <h1 class="intro-title">How <span>automated</span> is your business?</h1>
+    <p class="intro-desc">Most small business owners spend 3-5 hours a day on tasks that AI could handle in minutes. This audit identifies exactly where you are losing time.</p>
+    <p class="intro-meta"><strong>8 questions.</strong> 3 minutes. You'll get a score plus specific recommendations.</p>
+    <button class="start-btn" onclick="startQuiz()">Start the Audit</button>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="questionScreen">
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span id="qLabel">Question 1 of 8</span>
+        <span id="pctLabel">12%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:12%"></div>
+      </div>
+    </div>
+    <div class="q-num" id="qNum">Question 1</div>
+    <div class="q-text" id="qText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="resultsScreen">
+    <div class="results-header">
+      <div class="score-ring" id="scoreRing">
+        <span id="scoreValue">0</span>
+        <span class="score-label">Score</span>
+      </div>
+      <div class="results-title" id="resultsTitle"></div>
+      <div class="results-sub" id="resultsSub"></div>
+    </div>
+    <div class="findings" id="findingsContainer"></div>
+    <div class="recs-title">What to do next.</div>
+    <div id="recsContainer"></div>
+    <div class="capture-section">
+      <h3>Get the full action plan.</h3>
+      <p>I'll send you a personalized automation roadmap based on your score. Plus the Business Automation Audit PDF (free).</p>
+      <div class="capture-form">
+        <input type="email" id="emailInput" placeholder="your@email.com">
+        <button class="capture-submit" onclick="submitEmail()">Send it</button>
+      </div>
+      <p class="capture-note">No spam. One email with your action plan.</p>
+      <div class="capture-confirm" id="captureConfirm">Sent. Check your inbox.</div>
+    </div>
+    <button class="retake-btn" onclick="retake()">Retake the audit</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "How do you currently handle customer or client inquiries?",
+    options: [
+      { text: "I respond to every message manually", sub: "Email, DMs, or phone, one by one", score: 3 },
+      { text: "I have templates but still send manually", sub: "Copy-paste responses", score: 2 },
+      { text: "Some responses are automated, some are manual", sub: "Basic auto-replies or FAQ bots", score: 1 },
+      { text: "Most inquiries are handled automatically", sub: "AI or automation handles the first response", score: 0 },
+    ]
+  },
+  {
+    text: "How do you create content for your business?",
+    options: [
+      { text: "I write everything from scratch every time", sub: "No AI, no templates", score: 3 },
+      { text: "I use AI occasionally but still spend hours editing", sub: "ChatGPT or similar, inconsistent process", score: 2 },
+      { text: "I have a system that produces drafts I edit quickly", sub: "30-60 minutes per piece", score: 1 },
+      { text: "Content creation is mostly automated", sub: "I approve and post, rarely write from scratch", score: 0 },
+    ]
+  },
+  {
+    text: "How do you handle scheduling, reminders, and follow-ups?",
+    options: [
+      { text: "I track it all in my head or on paper", sub: "Manual reminders, easy to miss things", score: 3 },
+      { text: "I use a calendar but set every reminder manually", sub: "Google Calendar, paper planner", score: 2 },
+      { text: "Some follow-ups are automated", sub: "Basic email sequences or Calendly", score: 1 },
+      { text: "My scheduling and follow-up runs on its own", sub: "CRM, automation tools handle most of it", score: 0 },
+    ]
+  },
+  {
+    text: "How do you do research for your business?",
+    options: [
+      { text: "Manual searches, reading articles one by one", sub: "Google, YouTube, no system", score: 3 },
+      { text: "I use AI for some research but still compile manually", sub: "ChatGPT summaries but manual organization", score: 2 },
+      { text: "I have tools that pull and organize information for me", sub: "RSS feeds, news aggregators, basic dashboards", score: 1 },
+      { text: "Research is automated and delivered to me", sub: "Custom pipelines or dashboards surface what I need", score: 0 },
+    ]
+  },
+  {
+    text: "How do you manage your finances and track spending?",
+    options: [
+      { text: "I check bank statements manually and keep notes", sub: "No dedicated tool", score: 3 },
+      { text: "I use a spreadsheet I update by hand", sub: "Google Sheets, Excel", score: 2 },
+      { text: "I use software but still enter data manually", sub: "QuickBooks, Wave, similar", score: 1 },
+      { text: "My finances update automatically", sub: "Connected accounts, automated categorization", score: 0 },
+    ]
+  },
+  {
+    text: "How do you identify new products, services, or opportunities?",
+    options: [
+      { text: "Gut feeling and manual browsing", sub: "No systematic process", score: 3 },
+      { text: "I watch competitors and industry news manually", sub: "Regular manual checks", score: 2 },
+      { text: "I use a few tools but the process isn't connected", sub: "Google Trends, manual research", score: 1 },
+      { text: "I have an automated research pipeline", sub: "Systems surface opportunities to me", score: 0 },
+    ]
+  },
+  {
+    text: "How much of your daily work is repetitive?",
+    options: [
+      { text: "Most of what I do is the same tasks, repeated", sub: "More than 4 hours a day of repetitive work", score: 3 },
+      { text: "About half is repetitive", sub: "2-4 hours of tasks I do every day", score: 2 },
+      { text: "A few hours a day", sub: "1-2 hours of repetitive tasks", score: 1 },
+      { text: "Very little is repetitive", sub: "Most tasks are high-value and non-repeatable", score: 0 },
+    ]
+  },
+  {
+    text: "Have you tried to implement AI or automation before?",
+    options: [
+      { text: "No, I haven't tried anything yet", sub: "Curious but haven't started", score: 3 },
+      { text: "I tried but couldn't get it to work consistently", sub: "Technical issues or it didn't fit my workflow", score: 2 },
+      { text: "I have some automation but it feels disconnected", sub: "Different tools, nothing flows together", score: 1 },
+      { text: "Yes, I have a working automation system", sub: "It runs and saves me real time", score: 0 },
+    ]
+  }
+];
+
+const levels = {
+  low: {
+    label: "Well Automated",
+    color: "low",
+    title: "Your business is mostly automated.",
+    sub: "You have built good systems. The opportunity now is to connect them better and add the pieces that are still manual.",
+    findings: [
+      { icon: "✅", title: "Strong foundation", desc: "You have automation tools in place. The next step is integration, not addition." },
+      { icon: "🔗", title: "Connection gaps", desc: "Most businesses at this level have automation in multiple places that don't talk to each other. A unified workflow can 2x the impact of what you already have." }
+    ],
+    recs: [
+      { priority: false, label: "Optimize", title: "Build a unified workflow", desc: "Connect your existing automation tools into a single pipeline. n8n or Make.com can bridge the gaps.", cta: null },
+      { priority: false, label: "Resource", title: "Business Automation Audit PDF", desc: "The free audit guide walks through how to map and optimize an existing automation stack.", cta: { text: "Download Free", url: "https://behikeai.gumroad.com/l/business-automation-audit" } }
+    ]
+  },
+  medium: {
+    label: "Partially Automated",
+    color: "medium",
+    title: "You have automation gaps that are costing you time.",
+    sub: "You have started but you are doing a significant amount of manual work that AI could handle. The right few tools would get you several hours back per week.",
+    findings: [
+      { icon: "⏱", title: "Time cost", desc: "Based on your answers, you are likely spending 10-20 extra hours per week on tasks that automation could handle." },
+      { icon: "📋", title: "Low-hanging fruit", desc: "Content creation, customer follow-up, and research are the three areas most businesses at this level automate first. Each one is under 2 hours to set up." }
+    ],
+    recs: [
+      { priority: true, label: "Do First", title: "Automate your content creation", desc: "A content pipeline that sources topics, drafts content in your voice, and schedules posts saves 5-10 hours per week for most business owners.", cta: { text: "Social Media Pipeline Guide ($9.99)", url: "social-media-pipeline.html" } },
+      { priority: false, label: "Next", title: "Connect your existing tools", desc: "n8n or Make.com can link the tools you already have. One workflow can eliminate dozens of manual steps.", cta: { text: "AI Employee Guide ($19.99)", url: "ai-employee-guide.html" } },
+      { priority: false, label: "Service Option", title: "AI Workflow Install ($997)", desc: "I build a custom automation workflow for your specific business in one week. You get the system, documentation, and 14 days of support.", cta: { text: "Book a Discovery Call", url: "ai-agent-installer.html" } }
+    ]
+  },
+  high: {
+    label: "Manual Operations",
+    color: "high",
+    title: "Your business is running almost entirely on manual work.",
+    sub: "This is not a criticism. Most businesses start this way. But the cost is real. You are losing hours every day to tasks that AI can handle.",
+    findings: [
+      { icon: "🔴", title: "High manual load", desc: "You are doing 3-5 hours a day of work that automation could handle. That is 15-25 hours per week, every week." },
+      { icon: "💡", title: "Quick wins available", desc: "Three tools, properly configured, could cut your manual work in half within 30 days. You don't need to automate everything at once." }
+    ],
+    recs: [
+      { priority: true, label: "Start Here", title: "The $0 AI Stack", desc: "Before buying anything, there are 5 free AI tools that handle the most common manual tasks. The AI Employee Guide covers all of them.", cta: { text: "AI Employee Guide ($19.99)", url: "ai-employee-guide.html" } },
+      { priority: true, label: "Fast Track", title: "Guided AI Setup ($497)", desc: "I set up 3 AI tools for your business on a 90-minute video call. No technical knowledge required. This is the fastest path from manual to automated.", cta: { text: "Book Starter Setup", url: "ai-agent-installer.html" } },
+      { priority: false, label: "Free Resource", title: "Business Automation Audit PDF", desc: "A step-by-step guide to identifying your highest-leverage automation opportunities. Free download.", cta: { text: "Download Free", url: "https://behikeai.gumroad.com/l/business-automation-audit" } }
+    ]
+  }
+};
+
+let currentQ = 0;
+let answers = [];
+let selectedOption = null;
+
+function startQuiz() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('questionScreen').style.display = 'block';
+  loadQuestion(0);
+}
+
+function loadQuestion(idx) {
+  const q = questions[idx];
+  selectedOption = null;
+  currentQ = idx;
+
+  const pct = Math.round(((idx) / questions.length) * 100) || 12;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('qLabel').textContent = `Question ${idx + 1} of ${questions.length}`;
+  document.getElementById('pctLabel').textContent = pct + '%';
+  document.getElementById('qNum').textContent = `Question ${idx + 1}`;
+  document.getElementById('qText').textContent = q.text;
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.onclick = () => selectOption(i, btn);
+    btn.innerHTML = `
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">
+        ${opt.text}
+        <span class="option-sub">${opt.sub}</span>
+      </div>
+    `;
+    container.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.classList.remove('enabled');
+  nextBtn.textContent = idx === questions.length - 1 ? 'See Results' : 'Next';
+}
+
+function selectOption(idx, btn) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedOption = idx;
+  document.getElementById('nextBtn').classList.add('enabled');
+}
+
+function nextQuestion() {
+  if (selectedOption === null) return;
+  answers.push(questions[currentQ].options[selectedOption].score);
+
+  if (currentQ < questions.length - 1) {
+    loadQuestion(currentQ + 1);
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  document.getElementById('questionScreen').style.display = 'none';
+  document.getElementById('resultsScreen').style.display = 'block';
+
+  const total = answers.reduce((a, b) => a + b, 0);
+  const maxScore = questions.length * 3;
+  const pct = Math.round((total / maxScore) * 100);
+
+  let level;
+  if (pct <= 25) level = levels.low;
+  else if (pct <= 60) level = levels.medium;
+  else level = levels.high;
+
+  // Score ring
+  const ring = document.getElementById('scoreRing');
+  ring.className = 'score-ring ' + level.color;
+  document.getElementById('scoreValue').textContent = pct + '%';
+
+  document.getElementById('resultsTitle').textContent = level.title;
+  document.getElementById('resultsSub').textContent = level.sub;
+
+  // Findings
+  const fc = document.getElementById('findingsContainer');
+  fc.innerHTML = '';
+  level.findings.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'finding-card';
+    card.innerHTML = `<div class="finding-icon">${f.icon}</div><div class="finding-content"><div class="finding-title">${f.title}</div><div class="finding-desc">${f.desc}</div></div>`;
+    fc.appendChild(card);
+  });
+
+  // Recs
+  const rc = document.getElementById('recsContainer');
+  rc.innerHTML = '';
+  level.recs.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'rec-card' + (r.priority ? ' priority' : '');
+    const ctaHtml = r.cta ? `<a href="${r.cta.url}" class="rec-cta">${r.cta.text}</a>` : '';
+    card.innerHTML = `<div class="rec-label">${r.label}</div><h3>${r.title}</h3><p>${r.desc}</p>${ctaHtml}`;
+    rc.appendChild(card);
+  });
+
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('pctLabel').textContent = '100%';
+}
+
+function submitEmail() {
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = '#ff453a';
+    return;
+  }
+  document.getElementById('emailInput').style.borderColor = '';
+  // In production: POST to email service
+  document.querySelector('.capture-form').style.display = 'none';
+  document.getElementById('captureConfirm').style.display = 'block';
+}
+
+function retake() {
+  answers = [];
+  selectedOption = null;
+  currentQ = 0;
+  document.getElementById('resultsScreen').style.display = 'none';
+  document.getElementById('introScreen').style.display = 'block';
+  document.getElementById('progressFill').style.width = '12%';
+}
+</script>
+</body>
+</html>

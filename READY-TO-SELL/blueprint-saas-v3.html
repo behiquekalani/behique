@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Micro-SaaS Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #000;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Micro-SaaS Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">From zero to $10K MRR. One product, one founder, one system.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, map your entire SaaS business on paper before writing a single line of code.</p>
+  </div>
+  <!-- MODULE 01: PROBLEM VALIDATION -->
+  <div class="module">
+    <div class="module-number">01 -- Problem Validation</div>
+    <h2 class="module-title">Problem Validation</h2>
+    <div class="label">Problem Statement</div>
+    <div class="fill-line"></div>
+    <div class="fill-line" style="margin-bottom: 32px;"></div>
+    <div class="label">Who has this problem?</div>
+    <div class="fill-line" style="margin-bottom: 32px;"></div>
+    <hr class="section-divider">
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Existing Solutions</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Why They Fall Short</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Validation Checklist</div>
+    <ul class="checklist">
+      <li>Talked to 5+ potential users about the problem</li>
+      <li>Found 3+ communities where users complain about this</li>
+      <li>Confirmed willingness to pay (price range: ________)</li>
+      <li>Identified at least 1 competitor with paying customers</li>
+      <li>Problem is recurring (not one-time)</li>
+    </ul>
+  </div>
+  <!-- MODULE 02: MVP BUILD -->
+  <div class="module">
+    <div class="module-number">02 -- MVP Build</div>
+    <h2 class="module-title">4-Week MVP Sprint</h2>
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <h4>Week 1</h4>
+        <div class="label">Core Feature</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <ul class="checklist">
+          <li>Auth / login</li>
+          <li>Core workflow</li>
+          <li>Database schema</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <h4>Week 2</h4>
+        <div class="label">Feature Complete</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <ul class="checklist">
+          <li>Primary UI</li>
+          <li>API endpoints</li>
+          <li>Error handling</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <h4>Week 3</h4>
+        <div class="label">Polish + Payments</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <ul class="checklist">
+          <li>Stripe integration</li>
+          <li>Onboarding flow</li>
+          <li>Landing page</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <h4>Week 4</h4>
+        <div class="label">Launch Prep</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <ul class="checklist">
+          <li>Beta testers</li>
+          <li>Bug fixes</li>
+          <li>Launch copy</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">MVP Scope Guard</div>
+    <p style="font-size: 14px; color: var(--gray); margin-bottom: 16px;">If a feature is not in the list above, it does not ship in the MVP. Write the "nice to haves" here so you stop thinking about them:</p>
+    <div class="fill-line"></div>
+    <div class="fill-line"></div>
+    <div class="fill-line"></div>
+  </div>
+  <!-- MODULE 03: PRICING -->
+  <div class="module">
+    <div class="module-number">03 -- Pricing</div>
+    <h2 class="module-title">Pricing Tiers</h2>
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Free Tier</div>
+        <h4>$0/mo</h4>
+        <hr class="section-divider">
+        <div class="label">Included Features</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Usage Limits</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card" style="border-color: var(--cyan);">
+        <div class="label" style="color: var(--cyan);">Pro Tier</div>
+        <h4>$____/mo</h4>
+        <hr class="section-divider">
+        <div class="label">Included Features</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Usage Limits</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Team Tier</div>
+        <h4>$____/mo</h4>
+        <hr class="section-divider">
+        <div class="label">Included Features</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Seats Included</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Pricing Psychology</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Anchor Price (annual)</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Free-to-Pro Conversion Target</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+  <!-- MODULE 04: CUSTOMER ACQUISITION -->
+  <div class="module">
+    <div class="module-number">04 -- Customer Acquisition</div>
+    <h2 class="module-title">Customer Acquisition</h2>
+    <div class="label">Acquisition Funnel</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Awareness</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Landing Page</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Free Trial</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Activation</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Paid Conversion</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Retention</div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Channel Strategy</div>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Primary Channel</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Why This Channel</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Secondary Channel</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Why This Channel</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <div class="label">Launch Channels</div>
+    <div class="pills">
+      <span class="pill">Product Hunt</span>
+      <span class="pill">Hacker News</span>
+      <span class="pill">Reddit</span>
+      <span class="pill">Twitter/X</span>
+      <span class="pill">Indie Hackers</span>
+      <span class="pill">Cold Email</span>
+      <span class="pill">SEO/Blog</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+  <!-- MODULE 05: KEY METRICS -->
+  <div class="module">
+    <div class="module-number">05 -- Key Metrics</div>
+    <h2 class="module-title">Key Metrics Dashboard</h2>
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">MRR</div>
+        <div class="kpi-value">$____</div>
+        <div class="kpi-desc">Monthly Recurring Revenue. The number that matters most.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Churn Rate</div>
+        <div class="kpi-value">____%</div>
+        <div class="kpi-desc">Monthly customer churn. Target: under 5%.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">LTV</div>
+        <div class="kpi-value">$____</div>
+        <div class="kpi-desc">Lifetime Value per customer. LTV should be 3x+ CAC.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">CAC</div>
+        <div class="kpi-value">$____</div>
+        <div class="kpi-desc">Cost to Acquire a Customer. Lower is better.</div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="grid-2">
+      <div>
+        <div class="label">LTV:CAC Ratio</div>
+        <div class="fill-line"></div>
+        <p style="font-size: 13px; color: var(--gray);">Healthy SaaS = 3:1 or higher</p>
+      </div>
+      <div>
+        <div class="label">Payback Period (months)</div>
+        <div class="fill-line"></div>
+        <p style="font-size: 13px; color: var(--gray);">How long to recoup CAC. Target: under 6 months.</p>
+      </div>
+    </div>
+  </div>
+  <!-- MODULE 06: TECH STACK -->
+  <div class="module">
+    <div class="module-number">06 -- Tech Stack</div>
+    <h2 class="module-title">Tech Stack</h2>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Frontend</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Hosting</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Backend / API</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Hosting</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="inner-card">
+        <div class="label">Database</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Auth Provider</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Payments</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Monthly Infra Cost Estimate</div>
+    <table class="clean">
+      <tr><th>Service</th><th>Cost</th><th>Notes</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+  <!-- MODULE 07: SUPPORT TIERS -->
+  <div class="module">
+    <div class="module-number">07 -- Support</div>
+    <h2 class="module-title">Support Tiers</h2>
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Free Users</div>
+        <h4>Self-Serve</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Documentation / FAQ</li>
+          <li>Community forum</li>
+          <li>Email (48h SLA)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Pro Users</div>
+        <h4>Priority</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Email (24h SLA)</li>
+          <li>Chat support</li>
+          <li>Bug priority queue</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Team Users</div>
+        <h4>Dedicated</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Slack channel</li>
+          <li>Onboarding call</li>
+          <li>Custom integrations</li>
+        </ul>
+      </div>
+    </div>
+    <div class="label">Support Tools</div>
+    <div class="pills">
+      <span class="pill">Crisp</span>
+      <span class="pill">Intercom</span>
+      <span class="pill">Help Scout</span>
+      <span class="pill">Notion Docs</span>
+      <span class="pill">Loom Videos</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+  <!-- MODULE 08: GROWTH PATH -->
+  <div class="module">
+    <div class="module-number">08 -- Growth Path</div>
+    <h2 class="module-title">$0 to $10K MRR</h2>
+    <div class="grid-4">
+      <div class="phase-card">
+        <div class="phase-header">Phase 1</div>
+        <div class="phase-range">$0 <span>MRR</span></div>
+        <ul class="checklist">
+          <li>Ship MVP</li>
+          <li>Get 10 free users</li>
+          <li>Collect feedback daily</li>
+          <li>Fix critical bugs</li>
+        </ul>
+        <div class="revenue-target">Target<strong>First 10 users</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Phase 2</div>
+        <div class="phase-range">$500 <span>MRR</span></div>
+        <ul class="checklist">
+          <li>Launch on Product Hunt</li>
+          <li>Start content marketing</li>
+          <li>Convert free to paid</li>
+          <li>Add 2nd pricing tier</li>
+        </ul>
+        <div class="revenue-target">Target<strong>50 paying customers</strong></div>
+      </div>
+      <div class="phase-card target">
+        <div class="phase-header">Phase 3</div>
+        <div class="phase-range">$3K <span>MRR</span></div>
+        <ul class="checklist">
+          <li>SEO + organic growth</li>
+          <li>Referral program</li>
+          <li>Reduce churn to &lt;5%</li>
+          <li>Hire first contractor</li>
+        </ul>
+        <div class="revenue-target">Target<strong>200 paying customers</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Phase 4</div>
+        <div class="phase-range">$10K <span>MRR</span></div>
+        <ul class="checklist">
+          <li>Team plan upsells</li>
+          <li>API / integrations</li>
+          <li>Annual plan discounts</li>
+          <li>Consider funding or stay bootstrapped</li>
+        </ul>
+        <div class="revenue-target">Target<strong>Full-time founder income</strong></div>
+      </div>
+    </div>
+  </div>
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>MICRO-SAAS BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+</div>
+</body>
+</html>

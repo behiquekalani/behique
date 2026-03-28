@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Creator's Idea-to-Product Pipeline — Behike</title>
+  <meta name="description" content="A repeatable system for turning content ideas into sellable digital products. Capture, filter, build, and ship without overthinking. $20.99.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+    .fade-up.delay-5 { transition-delay: 0.5s; }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(10, 132, 255, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 760px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow::before {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .hero-price strong {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-right: 4px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* PROBLEM */
+    #problem {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 700px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      max-width: 640px;
+    }
+
+    .section-body p + p {
+      margin-top: 20px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 56px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .problem-card .icon {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* SOLUTION */
+    #solution {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .solution-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+      margin-top: 56px;
+    }
+
+    @media (max-width: 700px) {
+      .solution-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .stage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .stage-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .stage-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .stage-item h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .stage-item p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .callout-box {
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.08), rgba(10, 132, 255, 0.03));
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 20px;
+      padding: 36px;
+    }
+
+    .callout-box h3 {
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    .callout-box ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .callout-box ul li {
+      font-size: 15px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+
+    .callout-box ul li::before {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cta);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    /* TOC */
+    #toc {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .toc-part {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .toc-part-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .toc-part h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .toc-part ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toc-part ul li {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.4;
+    }
+
+    .toc-part ul li::before {
+      content: "/";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      opacity: 0.6;
+    }
+
+    /* CTA FINAL */
+    #cta-final {
+      padding: 120px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    #cta-final .section-title {
+      margin: 0 auto 20px;
+      text-align: center;
+    }
+
+    #cta-final .section-body {
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+
+    .price-block {
+      margin-bottom: 32px;
+    }
+
+    .price-block .price-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .price-block .price-amount {
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    .price-block .price-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow fade-up">Behike Digital Products</div>
+        <h1 class="hero-title fade-up delay-1">
+          The Creator's<br><span>Idea-to-Product</span><br>Pipeline
+        </h1>
+        <p class="hero-sub fade-up delay-2">
+          Most creators have more unfinished ideas than published products. This is a systems problem, not a talent problem. This guide builds the repeatable pipeline that takes an idea from raw capture to published product.
+        </p>
+        <div class="hero-price fade-up delay-3">
+          <strong>$20.99</strong> one-time. Instant PDF download.
+        </div>
+        <a href="#" class="btn-primary fade-up delay-3">Get the Pipeline</a>
+        <p class="hero-meta fade-up delay-4">22 chapters. 5 parts. One complete system.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label fade-up">The Real Problem</p>
+      <h2 class="section-title fade-up delay-1">Your ideas are not the bottleneck. Your system is.</h2>
+      <div class="section-body fade-up delay-2">
+        <p>You have the folder. The 47 half-written guides. The voice memos that were never transcribed. The thread that got 200 likes and you thought "I should turn this into something." You never did.</p>
+        <p>This is not a motivation failure. Every creator has more ideas than they can build. The ones who ship consistently are not more inspired -- they have a process that moves ideas through a defined sequence. That process is what this guide gives you.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-up">
+          <div class="icon">01</div>
+          <h3>No capture system</h3>
+          <p>Ideas live in 7 different places. Most die before they're reviewed. You're losing your best work to fragmentation.</p>
+        </div>
+        <div class="problem-card fade-up delay-1">
+          <div class="icon">02</div>
+          <h3>No filter</h3>
+          <p>Everything feels equally worth building. So nothing gets prioritized. The indecision is expensive.</p>
+        </div>
+        <div class="problem-card fade-up delay-2">
+          <div class="icon">03</div>
+          <h3>Scope creep</h3>
+          <p>You start building and the outline keeps expanding. Three months in, it's still not done. You got buried.</p>
+        </div>
+        <div class="problem-card fade-up delay-3">
+          <div class="icon">04</div>
+          <h3>Perfectionism at launch</h3>
+          <p>The product is done. You know it is. But you keep finding reasons to delay. The perfectionism tax is real.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="container">
+      <p class="section-label fade-up">The System</p>
+      <h2 class="section-title fade-up delay-1">Four stages. One pipeline. Runs on every idea.</h2>
+      <div class="solution-grid">
+        <div class="stage-list">
+          <div class="stage-item fade-up">
+            <div class="stage-num">01</div>
+            <div>
+              <h4>Capture</h4>
+              <p>Build a single intake point with low friction. Weekly review cadence. The format for capturing ideas that retains context six weeks later.</p>
+            </div>
+          </div>
+          <div class="stage-item fade-up delay-1">
+            <div class="stage-num">02</div>
+            <div>
+              <h4>Filter</h4>
+              <p>Four filter questions that score every idea. The audience signal check. How to kill ideas without guilt and what to do with the ones you archive.</p>
+            </div>
+          </div>
+          <div class="stage-item fade-up delay-2">
+            <div class="stage-num">03</div>
+            <div>
+              <h4>Build</h4>
+              <p>Define scope before writing a word. The outline method that produces products, not just topic lists. Draft fast, edit slow. The 80% rule.</p>
+            </div>
+          </div>
+          <div class="stage-item fade-up delay-3">
+            <div class="stage-num">04</div>
+            <div>
+              <h4>Ship</h4>
+              <p>A five-question readiness test that replaces feelings with criteria. The exact publishing sequence. The pricing framework. Post-launch feedback loop.</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout-box fade-up delay-2">
+          <h3>What you can do when the pipeline is built</h3>
+          <ul>
+            <li>Capture ideas without evaluating them in the moment</li>
+            <li>Score any idea in under five minutes and know whether to build it</li>
+            <li>Define scope clearly enough that the outline doesn't move</li>
+            <li>Write a complete draft without stopping to edit</li>
+            <li>Know definitively when a product is done, not when it feels done</li>
+            <li>Publish your first product and set up the feedback loop for V1.1</li>
+            <li>Build a product catalog with a monthly cadence</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC PREVIEW -->
+  <section id="toc">
+    <div class="container">
+      <p class="section-label fade-up">What's Inside</p>
+      <h2 class="section-title fade-up delay-1">22 chapters across 5 parts.</h2>
+      <p class="section-body fade-up delay-2">Every chapter does something. No filler. No restating what you just read. Each section changes what you understand or gives you a skill you can apply today.</p>
+      <div class="toc-grid">
+        <div class="toc-part fade-up">
+          <p class="toc-part-label">Part One</p>
+          <h3>Capture</h3>
+          <ul>
+            <li>The idea collection problem</li>
+            <li>Single intake point</li>
+            <li>Idea types worth capturing</li>
+            <li>The idea file format</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-1">
+          <p class="toc-part-label">Part Two</p>
+          <h3>Filter</h3>
+          <ul>
+            <li>Why most creators build the wrong things</li>
+            <li>The four filter questions</li>
+            <li>The audience signal filter</li>
+            <li>Killing ideas without guilt</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-2">
+          <p class="toc-part-label">Part Three</p>
+          <h3>Build</h3>
+          <ul>
+            <li>The minimum viable product problem</li>
+            <li>Scope before you write a word</li>
+            <li>The outline method that actually works</li>
+            <li>The writing process for products</li>
+            <li>Format decisions, length and depth</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-3">
+          <p class="toc-part-label">Part Four</p>
+          <h3>Ship</h3>
+          <ul>
+            <li>The perfectionism tax</li>
+            <li>The readiness test</li>
+            <li>The pricing decision</li>
+            <li>Draft to published: the sequence</li>
+            <li>Post-launch feedback loop</li>
+            <li>Building the product catalog</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta-final">
+    <div class="container">
+      <p class="section-label fade-up">Get It Now</p>
+      <h2 class="section-title fade-up delay-1">Your ideas deserve a system, not a graveyard.</h2>
+      <p class="section-body fade-up delay-2">One purchase. Instant download. A pipeline you can run on every idea you'll ever have.</p>
+      <div class="price-block fade-up delay-3">
+        <p class="price-label">One-time price</p>
+        <div class="price-amount">$20.99</div>
+        <p class="price-sub">PDF download. No subscription. Yours permanently.</p>
+      </div>
+      <a href="#" class="btn-primary fade-up delay-4">Get the Pipeline — $20.99</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="/index.html">behike.com</a> &mdash; Built by Kalani Andre Gomez Padin</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

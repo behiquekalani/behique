@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>Cash Flow Dashboard | Behike</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1a1a1a;
+    --surface-3: #222;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --text-2: #999;
+    --text-3: #666;
+    --accent: #c4a35a;
+    --accent-dim: rgba(196, 163, 90, 0.15);
+    --green: #4a9;
+    --green-dim: rgba(68, 170, 153, 0.15);
+    --red: #c55;
+    --red-dim: rgba(204, 85, 85, 0.15);
+    --blue: #5a9cd6;
+    --blue-dim: rgba(90, 156, 214, 0.15);
+    --orange: #d4943a;
+    --orange-dim: rgba(212, 148, 58, 0.15);
+    --purple: #9a7cd6;
+    --purple-dim: rgba(154, 124, 214, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+
+  /* Header */
+  header {
+    padding: 48px 0 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+
+  header p {
+    font-size: 15px;
+    color: var(--text-2);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 14px 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    background: none;
+    font-family: inherit;
+  }
+
+  .tab:hover { color: var(--text); background: var(--surface-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .panel { display: none; padding: 32px 0; }
+  .panel.active { display: block; }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+  }
+
+  /* Summary cards */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .summary-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+
+  .summary-card .value {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .summary-card .sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  .val-income { color: var(--green); }
+  .val-expense { color: var(--red); }
+  .val-flow { color: var(--accent); }
+  .val-flow.negative { color: var(--red); }
+  .val-net { color: var(--blue); }
+  .val-net.negative { color: var(--red); }
+
+  /* Entry table */
+  .entry-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .entry-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .entry-table th {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entry-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  .entry-table tr:last-child td { border-bottom: none; }
+
+  .entry-table input[type="text"] {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .entry-table input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .entry-table .amount-input { width: 120px; text-align: right; }
+
+  .entry-table select {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+  }
+
+  .entry-table select:focus { outline: none; border-color: var(--accent); }
+
+  .recurring-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .recurring-yes { background: var(--blue-dim); color: var(--blue); }
+  .recurring-no { background: var(--surface-3); color: var(--text-3); }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .delete-btn:hover { color: var(--red); background: var(--red-dim); }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover { background: #d4b36a; color: #000; }
+
+  .btn-danger { border-color: var(--red); color: var(--red); background: transparent; }
+  .btn-danger:hover { background: var(--red-dim); }
+
+  .actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+
+  /* Charts */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .chart-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  /* Bar chart */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 200px;
+    padding-top: 20px;
+    position: relative;
+  }
+
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    position: relative;
+  }
+
+  .bar-wrapper {
+    width: 100%;
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+    align-items: flex-end;
+    flex: 1;
+  }
+
+  .bar {
+    width: 14px;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.5s ease;
+    min-height: 2px;
+    position: relative;
+  }
+
+  .bar-income { background: var(--green); }
+  .bar-expense { background: var(--red); opacity: 0.8; }
+
+  .bar-label {
+    font-size: 10px;
+    color: var(--text-3);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .bar-value {
+    font-size: 9px;
+    color: var(--text-2);
+    text-align: center;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bar-zero-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--text-2);
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  /* Pie chart (CSS only) */
+  .pie-chart-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .pie-chart {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .pie-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: var(--surface);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .pie-center .pie-total {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .pie-center .pie-label {
+    font-size: 9px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pie-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .pie-legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .pie-legend-pct {
+    color: var(--text-2);
+    font-size: 11px;
+    margin-left: auto;
+    padding-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Net Worth */
+  .nw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .nw-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .nw-total-card {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .nw-total-card .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-2);
+    margin-bottom: 4px;
+  }
+
+  .nw-total-card .value {
+    font-size: 36px;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .nw-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .nw-item:last-child { border-bottom: none; }
+
+  .nw-item-total {
+    font-weight: 600;
+    border-top: 2px solid var(--border);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  /* Projection table */
+  .proj-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .proj-table th {
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .proj-table th:first-child { text-align: left; }
+
+  .proj-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .proj-table td:first-child { text-align: left; font-weight: 500; }
+
+  .proj-positive { color: var(--green); }
+  .proj-negative { color: var(--red); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface-2);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* Footer */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-3);
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    h1 { font-size: 28px; }
+    .container { padding: 0 16px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .nw-grid { grid-template-columns: 1fr; }
+    .entry-table .hide-mobile { display: none; }
+    .tabs { overflow-x: auto; }
+    .tab { white-space: nowrap; padding: 12px 10px; font-size: 12px; }
+    .pie-chart-wrapper { flex-direction: column; }
+    .nw-total-card .value { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <span class="badge">Behike Tools</span>
+    <h1>Cash Flow Dashboard</h1>
+    <p>See your money moving. Income, expenses, projections, net worth. All in one place.</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('cashflow')">Cash Flow</button>
+  <button class="tab" onclick="switchTab('charts')">Charts</button>
+  <button class="tab" onclick="switchTab('projection')">6-Month Projection</button>
+  <button class="tab" onclick="switchTab('networth')">Net Worth</button>
+</div>
+
+<div class="container">
+
+  <!-- CASH FLOW PANEL -->
+  <div id="panel-cashflow" class="panel active">
+
+    <div class="summary-grid" id="summaryCards"></div>
+
+    <!-- Income section -->
+    <div class="entry-section">
+      <div class="entry-header">
+        <h3 style="margin-bottom:0">Income Streams</h3>
+        <button class="btn btn-sm" onclick="addIncome()">+ Add Income</button>
+      </div>
+      <table class="entry-table">
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Amount</th>
+            <th>Frequency</th>
+            <th class="hide-mobile">Type</th>
+            <th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody id="incomeBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Expense section -->
+    <div class="entry-section">
+      <div class="entry-header">
+        <h3 style="margin-bottom:0">Expenses</h3>
+        <button class="btn btn-sm" onclick="addExpense()">+ Add Expense</button>
+      </div>
+      <table class="entry-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th class="hide-mobile">Type</th>
+            <th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody id="expenseBody"></tbody>
+      </table>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="exportCashflowCSV()">Export CSV</button>
+      <button class="btn btn-danger" onclick="clearAll()">Clear All Data</button>
+    </div>
+  </div>
+
+  <!-- CHARTS PANEL -->
+  <div id="panel-charts" class="panel">
+    <h2>Visual Breakdown</h2>
+
+    <div class="chart-grid">
+      <div class="chart-container">
+        <h3>Monthly Cash Flow (6 Months)</h3>
+        <div class="bar-chart" id="barChart"></div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--green)"></span> Income</span>
+          <span><span class="legend-dot" style="background:var(--red)"></span> Expenses</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>Expense Breakdown</h3>
+        <div class="pie-chart-wrapper" id="pieChartWrapper">
+          <div class="pie-chart" id="pieChart">
+            <div class="pie-center">
+              <span class="pie-total" id="pieTotal">$0</span>
+              <span class="pie-label">Total</span>
+            </div>
+          </div>
+          <div class="pie-legend" id="pieLegend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTION PANEL -->
+  <div id="panel-projection" class="panel">
+    <h2>6-Month Projection</h2>
+    <p style="color:var(--text-2);margin-bottom:24px;font-size:14px;">
+      Based on your recurring income and expenses. One-time items are only counted in the current month.
+    </p>
+
+    <div class="summary-grid" style="grid-template-columns: repeat(3,1fr); margin-bottom:24px;" id="projSummary"></div>
+
+    <table class="proj-table" id="projTable"></table>
+  </div>
+
+  <!-- NET WORTH PANEL -->
+  <div id="panel-networth" class="panel">
+    <h2>Net Worth Tracker</h2>
+
+    <div class="nw-total-card">
+      <div class="label">Net Worth</div>
+      <div class="value" id="netWorthValue" style="color:var(--green)">$0.00</div>
+    </div>
+
+    <div class="nw-grid">
+      <div class="nw-section">
+        <div class="entry-header">
+          <h3 style="margin-bottom:0">Assets</h3>
+          <button class="btn btn-sm" onclick="addAsset()">+ Add</button>
+        </div>
+        <div id="assetsList"></div>
+      </div>
+      <div class="nw-section">
+        <div class="entry-header">
+          <h3 style="margin-bottom:0">Liabilities</h3>
+          <button class="btn btn-sm" onclick="addLiability()">+ Add</button>
+        </div>
+        <div id="liabilitiesList"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="exportNetWorthCSV()">Export Net Worth CSV</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>Cash Flow Dashboard by <a href="#">Behike</a>. All data stored locally in your browser.</p>
+    <p style="margin-top:4px;">Copyright 2026 Behike. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const STORAGE_KEY = 'behike_cashflow_v1';
+const EXPENSE_CATEGORIES = [
+  'Housing', 'Food', 'Transport', 'Utilities', 'Insurance',
+  'Entertainment', 'Health', 'Education', 'Subscriptions',
+  'Debt Payments', 'Shopping', 'Other'
+];
+
+const PIE_COLORS = [
+  '#5a9cd6', '#4a9', '#d4943a', '#c4a35a', '#9a7cd6',
+  '#c55', '#5ac', '#d6a35a', '#7a8cd6', '#6b9',
+  '#d65a5a', '#999'
+];
+
+let data = loadData();
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return {
+    income: [],
+    expenses: [],
+    assets: [],
+    liabilities: []
+  };
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ============================================================
+// FORMATTING
+// ============================================================
+
+function fmt(num) {
+  const n = parseFloat(num) || 0;
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+function fmtShort(num) {
+  const n = parseFloat(num) || 0;
+  if (Math.abs(n) >= 1000) {
+    const sign = n < 0 ? '-' : '';
+    return sign + '$' + (Math.abs(n) / 1000).toFixed(1) + 'k';
+  }
+  return fmt(n);
+}
+
+function parseCurrency(str) {
+  if (typeof str === 'number') return str;
+  const cleaned = String(str).replace(/[^0-9.\-]/g, '');
+  return parseFloat(cleaned) || 0;
+}
+
+function round2(n) { return Math.round(n * 100) / 100; }
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function getMonthName(offset) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+}
+
+function getMonthNameFull(offset) {
+  const d = new Date();
+  d.setMonth(d.getMonth() + offset);
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+
+let toastTimeout;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+
+const TAB_NAMES = ['cashflow', 'charts', 'projection', 'networth'];
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', TAB_NAMES[i] === tabId);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === `panel-${tabId}`);
+  });
+  if (tabId === 'charts') renderCharts();
+  if (tabId === 'projection') renderProjection();
+  if (tabId === 'networth') renderNetWorth();
+}
+
+// ============================================================
+// CALCULATIONS
+// ============================================================
+
+function getMonthlyIncome() {
+  let total = 0;
+  data.income.forEach(item => {
+    total += toMonthly(parseCurrency(item.amount), item.frequency);
+  });
+  return round2(total);
+}
+
+function getMonthlyExpenses() {
+  let total = 0;
+  data.expenses.forEach(item => {
+    total += toMonthly(parseCurrency(item.amount), item.recurring);
+  });
+  return round2(total);
+}
+
+function getRecurringIncome() {
+  let total = 0;
+  data.income.forEach(item => {
+    if (item.frequency !== 'one-time') {
+      total += toMonthly(parseCurrency(item.amount), item.frequency);
+    }
+  });
+  return round2(total);
+}
+
+function getRecurringExpenses() {
+  let total = 0;
+  data.expenses.forEach(item => {
+    if (item.recurring !== 'one-time') {
+      total += toMonthly(parseCurrency(item.amount), item.recurring);
+    }
+  });
+  return round2(total);
+}
+
+function toMonthly(amount, frequency) {
+  switch (frequency) {
+    case 'weekly': return amount * 4.333;
+    case 'biweekly': return amount * 2.167;
+    case 'monthly': return amount;
+    case 'quarterly': return amount / 3;
+    case 'yearly': return amount / 12;
+    case 'one-time': return amount;
+    default: return amount;
+  }
+}
+
+function getCashFlow() {
+  return round2(getMonthlyIncome() - getMonthlyExpenses());
+}
+
+function getExpensesByCategory() {
+  const cats = {};
+  data.expenses.forEach(item => {
+    const cat = item.category || 'Other';
+    const monthly = toMonthly(parseCurrency(item.amount), item.recurring);
+    cats[cat] = (cats[cat] || 0) + monthly;
+  });
+  return cats;
+}
+
+// ============================================================
+// CASH FLOW PANEL
+// ============================================================
+
+function renderCashflow() {
+  renderSummary();
+  renderIncomeTable();
+  renderExpenseTable();
+}
+
+function renderSummary() {
+  const income = getMonthlyIncome();
+  const expenses = getMonthlyExpenses();
+  const flow = income - expenses;
+
+  const container = document.getElementById('summaryCards');
+  container.innerHTML = `
+    <div class="summary-card">
+      <div class="label">Monthly Income</div>
+      <div class="value val-income">${fmt(income)}</div>
+      <div class="sub">${data.income.length} source${data.income.length !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Monthly Expenses</div>
+      <div class="value val-expense">${fmt(expenses)}</div>
+      <div class="sub">${data.expenses.length} item${data.expenses.length !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Monthly Cash Flow</div>
+      <div class="value val-flow ${flow < 0 ? 'negative' : ''}">${fmt(flow)}</div>
+      <div class="sub">${flow >= 0 ? 'Positive' : 'Negative'} flow</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Annual Projection</div>
+      <div class="value val-flow ${flow < 0 ? 'negative' : ''}">${fmt(flow * 12)}</div>
+      <div class="sub">Based on current month</div>
+    </div>
+  `;
+}
+
+function renderIncomeTable() {
+  const tbody = document.getElementById('incomeBody');
+  tbody.innerHTML = '';
+
+  if (data.income.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:20px;">No income sources yet. Click "+ Add Income" to start.</td></tr>';
+    return;
+  }
+
+  data.income.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escapeHtml(item.name || '')}" placeholder="e.g. Salary" onblur="updateIncome(${idx},'name',this.value)"></td>
+      <td><input type="text" class="amount-input" value="${item.amount ? fmt(item.amount) : ''}" placeholder="$0.00"
+        onfocus="this.value=parseCurrency(this.value)||''"
+        onblur="updateIncome(${idx},'amount',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''"></td>
+      <td>
+        <select onchange="updateIncome(${idx},'frequency',this.value)">
+          <option value="monthly" ${item.frequency==='monthly'?'selected':''}>Monthly</option>
+          <option value="weekly" ${item.frequency==='weekly'?'selected':''}>Weekly</option>
+          <option value="biweekly" ${item.frequency==='biweekly'?'selected':''}>Biweekly</option>
+          <option value="quarterly" ${item.frequency==='quarterly'?'selected':''}>Quarterly</option>
+          <option value="yearly" ${item.frequency==='yearly'?'selected':''}>Yearly</option>
+          <option value="one-time" ${item.frequency==='one-time'?'selected':''}>One-time</option>
+        </select>
+      </td>
+      <td class="hide-mobile">
+        <span class="recurring-badge ${item.frequency !== 'one-time' ? 'recurring-yes' : 'recurring-no'}">
+          ${item.frequency !== 'one-time' ? 'Recurring' : 'One-time'}
+        </span>
+      </td>
+      <td><button class="delete-btn" onclick="removeIncome(${idx})" title="Remove">&times;</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderExpenseTable() {
+  const tbody = document.getElementById('expenseBody');
+  tbody.innerHTML = '';
+
+  if (data.expenses.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:20px;">No expenses yet. Click "+ Add Expense" to start.</td></tr>';
+    return;
+  }
+
+  data.expenses.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    let catOptions = EXPENSE_CATEGORIES.map(c =>
+      `<option value="${c}" ${item.category === c ? 'selected' : ''}>${c}</option>`
+    ).join('');
+
+    tr.innerHTML = `
+      <td><input type="text" value="${escapeHtml(item.name || '')}" placeholder="e.g. Rent" onblur="updateExpense(${idx},'name',this.value)"></td>
+      <td><input type="text" class="amount-input" value="${item.amount ? fmt(item.amount) : ''}" placeholder="$0.00"
+        onfocus="this.value=parseCurrency(this.value)||''"
+        onblur="updateExpense(${idx},'amount',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''"></td>
+      <td>
+        <select onchange="updateExpense(${idx},'category',this.value)">
+          ${catOptions}
+        </select>
+      </td>
+      <td class="hide-mobile">
+        <select onchange="updateExpense(${idx},'recurring',this.value)" style="width:auto;">
+          <option value="monthly" ${item.recurring==='monthly'?'selected':''}>Monthly</option>
+          <option value="weekly" ${item.recurring==='weekly'?'selected':''}>Weekly</option>
+          <option value="biweekly" ${item.recurring==='biweekly'?'selected':''}>Biweekly</option>
+          <option value="quarterly" ${item.recurring==='quarterly'?'selected':''}>Quarterly</option>
+          <option value="yearly" ${item.recurring==='yearly'?'selected':''}>Yearly</option>
+          <option value="one-time" ${item.recurring==='one-time'?'selected':''}>One-time</option>
+        </select>
+      </td>
+      <td><button class="delete-btn" onclick="removeExpense(${idx})" title="Remove">&times;</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Income CRUD
+function addIncome() {
+  data.income.push({ id: genId(), name: '', amount: 0, frequency: 'monthly' });
+  saveData();
+  renderCashflow();
+}
+
+function updateIncome(idx, field, value) {
+  if (field === 'amount') value = round2(parseCurrency(value));
+  data.income[idx][field] = value;
+  saveData();
+  renderCashflow();
+}
+
+function removeIncome(idx) {
+  data.income.splice(idx, 1);
+  saveData();
+  renderCashflow();
+  showToast('Income removed');
+}
+
+// Expense CRUD
+function addExpense() {
+  data.expenses.push({ id: genId(), name: '', amount: 0, category: 'Other', recurring: 'monthly' });
+  saveData();
+  renderCashflow();
+}
+
+function updateExpense(idx, field, value) {
+  if (field === 'amount') value = round2(parseCurrency(value));
+  data.expenses[idx][field] = value;
+  saveData();
+  renderCashflow();
+}
+
+function removeExpense(idx) {
+  data.expenses.splice(idx, 1);
+  saveData();
+  renderCashflow();
+  showToast('Expense removed');
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+
+function renderCharts() {
+  renderBarChart();
+  renderPieChart();
+}
+
+function renderBarChart() {
+  const container = document.getElementById('barChart');
+  container.innerHTML = '';
+
+  const recIncome = getRecurringIncome();
+  const recExpense = getRecurringExpenses();
+  const oneTimeIncome = getMonthlyIncome() - recIncome;
+  const oneTimeExpense = getMonthlyExpenses() - recExpense;
+
+  // 6 months of projected data
+  const months = [];
+  for (let i = 0; i < 6; i++) {
+    const inc = recIncome + (i === 0 ? oneTimeIncome : 0);
+    const exp = recExpense + (i === 0 ? oneTimeExpense : 0);
+    months.push({ label: getMonthName(i), income: inc, expense: exp });
+  }
+
+  const maxVal = Math.max(...months.map(m => Math.max(m.income, m.expense)), 1);
+
+  months.forEach(m => {
+    const group = document.createElement('div');
+    group.className = 'bar-group';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'bar-wrapper';
+
+    const incBar = document.createElement('div');
+    incBar.className = 'bar bar-income';
+    incBar.style.height = (m.income / maxVal * 160) + 'px';
+    incBar.title = 'Income: ' + fmt(m.income);
+
+    const expBar = document.createElement('div');
+    expBar.className = 'bar bar-expense';
+    expBar.style.height = (m.expense / maxVal * 160) + 'px';
+    expBar.title = 'Expenses: ' + fmt(m.expense);
+
+    wrapper.appendChild(incBar);
+    wrapper.appendChild(expBar);
+
+    const label = document.createElement('div');
+    label.className = 'bar-label';
+    label.textContent = m.label;
+
+    const value = document.createElement('div');
+    value.className = 'bar-value';
+    const net = m.income - m.expense;
+    value.textContent = fmtShort(net);
+    value.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+
+    group.appendChild(wrapper);
+    group.appendChild(label);
+    group.appendChild(value);
+    container.appendChild(group);
+  });
+}
+
+function renderPieChart() {
+  const cats = getExpensesByCategory();
+  const entries = Object.entries(cats).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+
+  document.getElementById('pieTotal').textContent = fmtShort(total);
+
+  const pieEl = document.getElementById('pieChart');
+  const legendEl = document.getElementById('pieLegend');
+
+  if (entries.length === 0) {
+    pieEl.style.background = 'var(--surface-3)';
+    legendEl.innerHTML = '<div style="color:var(--text-3);font-size:12px;">No expenses to display</div>';
+    return;
+  }
+
+  // Build conic gradient
+  let gradientParts = [];
+  let cumPct = 0;
+
+  entries.forEach(([cat, val], i) => {
+    const pct = (val / total) * 100;
+    const color = PIE_COLORS[i % PIE_COLORS.length];
+    gradientParts.push(`${color} ${cumPct}% ${cumPct + pct}%`);
+    cumPct += pct;
+  });
+
+  pieEl.style.background = `conic-gradient(${gradientParts.join(', ')})`;
+
+  // Legend
+  legendEl.innerHTML = '';
+  entries.forEach(([cat, val], i) => {
+    const pct = ((val / total) * 100).toFixed(1);
+    const color = PIE_COLORS[i % PIE_COLORS.length];
+    const item = document.createElement('div');
+    item.className = 'pie-legend-item';
+    item.innerHTML = `
+      <span class="pie-legend-color" style="background:${color}"></span>
+      <span>${cat}</span>
+      <span class="pie-legend-pct">${pct}%</span>
+    `;
+    legendEl.appendChild(item);
+  });
+}
+
+// ============================================================
+// PROJECTION
+// ============================================================
+
+function renderProjection() {
+  const recIncome = getRecurringIncome();
+  const recExpense = getRecurringExpenses();
+  const oneTimeIncome = getMonthlyIncome() - recIncome;
+  const oneTimeExpense = getMonthlyExpenses() - recExpense;
+  const recFlow = recIncome - recExpense;
+
+  // Summary
+  const projSummary = document.getElementById('projSummary');
+  projSummary.innerHTML = `
+    <div class="summary-card">
+      <div class="label">Recurring Income</div>
+      <div class="value val-income">${fmt(recIncome)}</div>
+      <div class="sub">per month</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Recurring Expenses</div>
+      <div class="value val-expense">${fmt(recExpense)}</div>
+      <div class="sub">per month</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">Recurring Cash Flow</div>
+      <div class="value val-flow ${recFlow < 0 ? 'negative' : ''}">${fmt(recFlow)}</div>
+      <div class="sub">${recFlow >= 0 ? 'Building savings' : 'Deficit'}</div>
+    </div>
+  `;
+
+  // Table
+  const table = document.getElementById('projTable');
+  let html = `
+    <thead><tr>
+      <th>Month</th>
+      <th>Income</th>
+      <th>Expenses</th>
+      <th>Cash Flow</th>
+      <th>Cumulative</th>
+    </tr></thead><tbody>
+  `;
+
+  let cumulative = 0;
+  for (let i = 0; i < 6; i++) {
+    const inc = recIncome + (i === 0 ? oneTimeIncome : 0);
+    const exp = recExpense + (i === 0 ? oneTimeExpense : 0);
+    const flow = inc - exp;
+    cumulative += flow;
+
+    const flowCls = flow >= 0 ? 'proj-positive' : 'proj-negative';
+    const cumCls = cumulative >= 0 ? 'proj-positive' : 'proj-negative';
+
+    html += `<tr>
+      <td>${getMonthNameFull(i)}</td>
+      <td style="color:var(--green)">${fmt(inc)}</td>
+      <td style="color:var(--red)">${fmt(exp)}</td>
+      <td class="${flowCls}">${fmt(flow)}</td>
+      <td class="${cumCls}">${fmt(cumulative)}</td>
+    </tr>`;
+  }
+
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+// ============================================================
+// NET WORTH
+// ============================================================
+
+function renderNetWorth() {
+  renderAssets();
+  renderLiabilities();
+  updateNetWorthTotal();
+}
+
+function renderAssets() {
+  const container = document.getElementById('assetsList');
+  container.innerHTML = '';
+
+  if (data.assets.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:16px 0;">No assets yet.</div>';
+    updateNetWorthTotal();
+    return;
+  }
+
+  let total = 0;
+  data.assets.forEach((item, idx) => {
+    const val = parseCurrency(item.value);
+    total += val;
+    const div = document.createElement('div');
+    div.className = 'nw-item';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Asset name"
+          style="background:transparent;border:none;color:var(--text);font-size:14px;font-family:inherit;padding:0;flex:1;"
+          onblur="updateAsset(${idx},'name',this.value)">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" value="${val ? fmt(val) : ''}" placeholder="$0"
+          style="background:transparent;border:none;color:var(--green);font-size:14px;font-family:inherit;text-align:right;width:120px;padding:0;"
+          onfocus="this.value=parseCurrency(this.value)||''"
+          onblur="updateAsset(${idx},'value',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''">
+        <button class="delete-btn" onclick="removeAsset(${idx})">&times;</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  const totalDiv = document.createElement('div');
+  totalDiv.className = 'nw-item nw-item-total';
+  totalDiv.innerHTML = `<span>Total Assets</span><span style="color:var(--green)">${fmt(total)}</span>`;
+  container.appendChild(totalDiv);
+}
+
+function renderLiabilities() {
+  const container = document.getElementById('liabilitiesList');
+  container.innerHTML = '';
+
+  if (data.liabilities.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:16px 0;">No liabilities yet.</div>';
+    updateNetWorthTotal();
+    return;
+  }
+
+  let total = 0;
+  data.liabilities.forEach((item, idx) => {
+    const val = parseCurrency(item.value);
+    total += val;
+    const div = document.createElement('div');
+    div.className = 'nw-item';
+    div.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <input type="text" value="${escapeHtml(item.name || '')}" placeholder="Liability name"
+          style="background:transparent;border:none;color:var(--text);font-size:14px;font-family:inherit;padding:0;flex:1;"
+          onblur="updateLiability(${idx},'name',this.value)">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="text" value="${val ? fmt(val) : ''}" placeholder="$0"
+          style="background:transparent;border:none;color:var(--red);font-size:14px;font-family:inherit;text-align:right;width:120px;padding:0;"
+          onfocus="this.value=parseCurrency(this.value)||''"
+          onblur="updateLiability(${idx},'value',parseCurrency(this.value));this.value=parseCurrency(this.value)?fmt(parseCurrency(this.value)):''">
+        <button class="delete-btn" onclick="removeLiability(${idx})">&times;</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  const totalDiv = document.createElement('div');
+  totalDiv.className = 'nw-item nw-item-total';
+  totalDiv.innerHTML = `<span>Total Liabilities</span><span style="color:var(--red)">${fmt(total)}</span>`;
+  container.appendChild(totalDiv);
+}
+
+function updateNetWorthTotal() {
+  let assets = 0, liabilities = 0;
+  data.assets.forEach(a => assets += parseCurrency(a.value));
+  data.liabilities.forEach(l => liabilities += parseCurrency(l.value));
+  const net = assets - liabilities;
+
+  const el = document.getElementById('netWorthValue');
+  el.textContent = fmt(net);
+  el.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+// Asset CRUD
+function addAsset() {
+  data.assets.push({ id: genId(), name: '', value: 0 });
+  saveData();
+  renderNetWorth();
+}
+
+function updateAsset(idx, field, value) {
+  if (field === 'value') value = round2(parseCurrency(value));
+  data.assets[idx][field] = value;
+  saveData();
+  renderAssets();
+  updateNetWorthTotal();
+}
+
+function removeAsset(idx) {
+  data.assets.splice(idx, 1);
+  saveData();
+  renderNetWorth();
+  showToast('Asset removed');
+}
+
+// Liability CRUD
+function addLiability() {
+  data.liabilities.push({ id: genId(), name: '', value: 0 });
+  saveData();
+  renderNetWorth();
+}
+
+function updateLiability(idx, field, value) {
+  if (field === 'value') value = round2(parseCurrency(value));
+  data.liabilities[idx][field] = value;
+  saveData();
+  renderLiabilities();
+  updateNetWorthTotal();
+}
+
+function removeLiability(idx) {
+  data.liabilities.splice(idx, 1);
+  saveData();
+  renderNetWorth();
+  showToast('Liability removed');
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+
+function exportCashflowCSV() {
+  let csv = 'Type,Name,Amount,Category/Frequency,Recurring\n';
+
+  data.income.forEach(item => {
+    csv += `"Income","${(item.name||'').replace(/"/g,'""')}",${parseCurrency(item.amount).toFixed(2)},"${item.frequency}","${item.frequency !== 'one-time' ? 'Yes' : 'No'}"\n`;
+  });
+
+  data.expenses.forEach(item => {
+    csv += `"Expense","${(item.name||'').replace(/"/g,'""')}",${parseCurrency(item.amount).toFixed(2)},"${item.category || 'Other'}","${item.recurring !== 'one-time' ? 'Yes' : 'No'}"\n`;
+  });
+
+  csv += `\n"","Monthly Income",${getMonthlyIncome().toFixed(2)},"",""\n`;
+  csv += `"","Monthly Expenses",${getMonthlyExpenses().toFixed(2)},"",""\n`;
+  csv += `"","Monthly Cash Flow",${getCashFlow().toFixed(2)},"",""\n`;
+
+  downloadCSV(csv, 'cash-flow-' + new Date().toISOString().slice(0, 10) + '.csv');
+  showToast('CSV exported');
+}
+
+function exportNetWorthCSV() {
+  let csv = 'Type,Name,Value\n';
+
+  let assetsTotal = 0, liabTotal = 0;
+
+  data.assets.forEach(item => {
+    const val = parseCurrency(item.value);
+    assetsTotal += val;
+    csv += `"Asset","${(item.name||'').replace(/"/g,'""')}",${val.toFixed(2)}\n`;
+  });
+
+  data.liabilities.forEach(item => {
+    const val = parseCurrency(item.value);
+    liabTotal += val;
+    csv += `"Liability","${(item.name||'').replace(/"/g,'""')}",${val.toFixed(2)}\n`;
+  });
+
+  csv += `\n"","Total Assets",${assetsTotal.toFixed(2)}\n`;
+  csv += `"","Total Liabilities",${liabTotal.toFixed(2)}\n`;
+  csv += `"","Net Worth",${(assetsTotal - liabTotal).toFixed(2)}\n`;
+
+  downloadCSV(csv, 'net-worth-' + new Date().toISOString().slice(0, 10) + '.csv');
+  showToast('Net worth CSV exported');
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// CLEAR
+// ============================================================
+
+function clearAll() {
+  if (!confirm('This will delete ALL your cash flow data. Are you sure?')) return;
+  data = { income: [], expenses: [], assets: [], liabilities: [] };
+  saveData();
+  renderCashflow();
+  showToast('All data cleared');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+renderCashflow();
+
+</script>
+</body>
+</html>

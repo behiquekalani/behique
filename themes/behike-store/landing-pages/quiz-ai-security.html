@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="How exposed is your AI setup? 7 questions. 2 minutes. Real risk assessment from Behike.">
+<title>AI Security Risk Quiz — How Exposed Is Your Setup? | Behike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060609;
+  --surface: #0f0f18;
+  --surface2: #181824;
+  --border: rgba(255,255,255,0.07);
+  --text: #e8e8f2;
+  --muted: rgba(232,232,242,0.5);
+  --accent: #FF453A;
+  --accent2: #FF8C42;
+  --orange: #FF8C42;
+  --green: #6af79a;
+  --success: #6af79a;
+  --radius: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── NAV ──────────────────────────────────────────────────────────── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,9,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-logo span {
+  color: var(--accent);
+}
+
+.nav-back {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.nav-back:hover { color: var(--text); }
+
+/* ── ANIMATIONS ────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,69,58,0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,69,58,0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(-24px); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+/* ── LAYOUT ────────────────────────────────────────────────────────── */
+.quiz-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 60px 24px 100px;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SCREENS ───────────────────────────────────────────────────────── */
+.screen {
+  display: none;
+  animation: fadeUp 0.5s ease both;
+  flex: 1;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── INTRO SCREEN ──────────────────────────────────────────────────── */
+.intro-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.intro-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulseRed 2s ease infinite;
+}
+
+.intro h1 {
+  font-size: clamp(36px, 6vw, 58px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.intro h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.intro-sub {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+}
+
+.intro-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.intro-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.intro-feature-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.btn-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: white;
+  padding: 16px 36px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  animation: pulseRed 2.5s ease infinite;
+  align-self: flex-start;
+}
+
+.btn-start:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn-start svg {
+  transition: transform 0.2s;
+}
+
+.btn-start:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── PROGRESS BAR ──────────────────────────────────────────────────── */
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+.progress-label span {
+  color: var(--text);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 3px;
+  background: var(--surface2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 99px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── QUESTION SCREEN ───────────────────────────────────────────────── */
+.question-wrap {
+  animation: slideIn 0.4s ease both;
+}
+
+.question-wrap.leaving {
+  animation: slideOut 0.3s ease both;
+}
+
+.q-number {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+}
+
+.q-text {
+  font-size: clamp(20px, 3.5vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+  margin-bottom: 32px;
+  color: var(--text);
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.18s ease;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.option-btn:hover {
+  border-color: rgba(255,69,58,0.35);
+  background: rgba(255,69,58,0.04);
+  transform: translateX(3px);
+}
+
+.option-btn.selected {
+  border-color: var(--accent);
+  background: rgba(255,69,58,0.08);
+}
+
+.option-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.18s;
+}
+
+.option-btn:hover .option-letter,
+.option-btn.selected .option-letter {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ── EMAIL SCREEN ──────────────────────────────────────────────────── */
+.email-screen-inner {
+  max-width: 520px;
+}
+
+.email-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  margin-bottom: 20px;
+}
+
+.email-screen h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+
+.email-screen p {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.65;
+}
+
+.score-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  letter-spacing: 0.3px;
+}
+
+.score-badge-inline.high {
+  background: rgba(255,69,58,0.12);
+  border: 1px solid rgba(255,69,58,0.3);
+  color: var(--accent);
+}
+
+.score-badge-inline.medium {
+  background: rgba(255,140,66,0.12);
+  border: 1px solid rgba(255,140,66,0.3);
+  color: var(--orange);
+}
+
+.score-badge-inline.low {
+  background: rgba(106,247,154,0.1);
+  border: 1px solid rgba(106,247,154,0.25);
+  color: var(--green);
+}
+
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+}
+
+.email-input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--text);
+  font-family: inherit;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.email-input::placeholder { color: var(--muted); }
+
+.email-input:focus {
+  border-color: rgba(255,69,58,0.5);
+}
+
+.btn-submit {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-submit:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.skip-link {
+  font-size: 13px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  padding: 4px 0;
+  transition: color 0.2s;
+  text-align: left;
+}
+
+.skip-link:hover { color: var(--text); }
+
+.email-success {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: rgba(106,247,154,0.08);
+  border: 1px solid rgba(106,247,154,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--green);
+  font-weight: 500;
+}
+
+.email-success.visible {
+  display: flex;
+  animation: scaleIn 0.3s ease both;
+}
+
+/* ── RESULTS SCREEN ────────────────────────────────────────────────── */
+.result-header {
+  margin-bottom: 40px;
+}
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 24px;
+}
+
+.risk-badge.high {
+  background: rgba(255,69,58,0.12);
+  border: 1px solid rgba(255,69,58,0.35);
+  color: var(--accent);
+}
+
+.risk-badge.medium {
+  background: rgba(255,140,66,0.12);
+  border: 1px solid rgba(255,140,66,0.35);
+  color: var(--orange);
+}
+
+.risk-badge.low {
+  background: rgba(106,247,154,0.1);
+  border: 1px solid rgba(106,247,154,0.25);
+  color: var(--green);
+}
+
+.risk-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.result-header h2 {
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.result-header h2.high { color: var(--accent); }
+.result-header h2.medium { color: var(--orange); }
+.result-header h2.low { color: var(--green); }
+
+.result-desc {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* Risk breakdown */
+.risk-breakdown {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.risk-breakdown-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+
+.risk-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.risk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.risk-item-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.risk-item-dot.red   { background: var(--accent); }
+.risk-item-dot.orange { background: var(--orange); }
+.risk-item-dot.green  { background: var(--green); }
+
+/* Product CTA block */
+.product-cta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.product-cta.high::before,
+.product-cta.medium::before { opacity: 1; }
+
+.product-cta.low::before {
+  background: linear-gradient(90deg, var(--green), #34c77a);
+  opacity: 1;
+}
+
+.product-cta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+.product-cta h3 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+}
+
+.product-cta p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 22px;
+}
+
+.btn-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: white;
+  padding: 13px 26px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-cta-primary:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn-cta-primary.green-cta {
+  background: var(--green);
+  color: #060609;
+}
+
+.product-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.price-tag {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Score summary bar */
+.score-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface2);
+  border-radius: 10px;
+  margin-bottom: 32px;
+  font-size: 13px;
+}
+
+.score-summary-num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.score-summary-num.high { color: var(--accent); }
+.score-summary-num.medium { color: var(--orange); }
+.score-summary-num.low { color: var(--green); }
+
+.score-summary-detail {
+  flex: 1;
+}
+
+.score-summary-label {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.score-summary-range {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Retake */
+.retake-link {
+  font-size: 13px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.retake-link:hover { color: var(--text); }
+
+/* ── FOOTER ────────────────────────────────────────────────────────── */
+.quiz-footer {
+  margin-top: auto;
+  padding-top: 48px;
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  nav { padding: 0 20px; }
+
+  .quiz-wrap { padding: 40px 20px 80px; }
+
+  .intro h1 { letter-spacing: -1.5px; }
+
+  .btn-start { width: 100%; justify-content: center; }
+
+  .option-btn { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Beh<span>ike</span></a>
+  <a href="ai-security-guide.html" class="nav-back">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    AI Security Guide
+  </a>
+</nav>
+
+<div class="quiz-wrap">
+
+  <!-- ── INTRO SCREEN ─────────────────────────────────────────── -->
+  <div class="screen active" id="screen-intro">
+    <div class="intro">
+      <div class="intro-eyebrow">Free Risk Assessment</div>
+      <h1>How exposed is your<br><span>AI setup?</span></h1>
+      <p class="intro-sub">7 questions. 2 minutes. Real risk assessment based on how you actually use AI tools.</p>
+      <div class="intro-features">
+        <div class="intro-feature">
+          <div class="intro-feature-dot"></div>
+          Covers API key exposure, data leakage, and agent hijacking
+        </div>
+        <div class="intro-feature">
+          <div class="intro-feature-dot"></div>
+          Personalized breakdown of your specific vulnerabilities
+        </div>
+        <div class="intro-feature">
+          <div class="intro-feature-dot"></div>
+          Exact product recommendation based on your risk profile
+        </div>
+      </div>
+      <button class="btn-start" onclick="startQuiz()">
+        Take the Quiz
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8H13M13 8L8.5 3.5M13 8L8.5 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="quiz-footer">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="2" y="5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M5 5V3.5a3 3 0 016 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Your answers are never stored or sent anywhere.
+    </div>
+  </div>
+
+  <!-- ── QUESTION SCREEN ──────────────────────────────────────── -->
+  <div class="screen" id="screen-questions">
+    <div class="progress-header">
+      <div class="progress-label">Question <span id="q-current">1</span> of <span>7</span></div>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+
+    <div id="question-container">
+      <!-- Injected by JS -->
+    </div>
+
+    <div class="quiz-footer" style="margin-top: auto;">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="2" y="5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M5 5V3.5a3 3 0 016 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Answers are processed locally in your browser.
+    </div>
+  </div>
+
+  <!-- ── EMAIL CAPTURE SCREEN ─────────────────────────────────── -->
+  <div class="screen" id="screen-email">
+    <div class="email-screen-inner">
+      <div class="email-eyebrow">Almost there</div>
+      <h2>Get your full<br>risk breakdown</h2>
+      <div class="score-badge-inline" id="email-score-badge">HIGH RISK</div>
+      <p id="email-screen-desc">Enter your email to get a detailed breakdown of your risk areas and personalized recommendations.</p>
+
+      <div class="email-form" id="email-form-wrap">
+        <input
+          type="email"
+          class="email-input"
+          id="email-input"
+          placeholder="your@email.com"
+          autocomplete="email"
+        />
+        <button class="btn-submit" onclick="submitEmail()">
+          Send My Report
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8H14M14 8L9 3M14 8L9 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="skip-link" onclick="showResults()">Skip, just show my results</button>
+      </div>
+
+      <div class="email-success" id="email-success">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8L6.5 11.5L13 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Got it. Showing your full results now.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESULTS SCREEN ───────────────────────────────────────── -->
+  <div class="screen" id="screen-results">
+    <div class="result-header">
+      <div class="risk-badge" id="result-badge">
+        <div class="risk-badge-dot"></div>
+        <span id="result-badge-text">HIGH RISK</span>
+      </div>
+      <h2 id="result-headline" class="high">Your AI setup has serious vulnerabilities.</h2>
+      <p class="result-desc" id="result-desc">Loading...</p>
+    </div>
+
+    <div class="score-summary" id="score-summary-bar">
+      <div class="score-summary-num" id="score-num">18</div>
+      <div class="score-summary-detail">
+        <div class="score-summary-label" id="score-label">High Risk</div>
+        <div class="score-summary-range" id="score-range">17-21 points</div>
+      </div>
+    </div>
+
+    <div class="risk-breakdown" id="risk-breakdown-block">
+      <div class="risk-breakdown-title">What your answers flagged</div>
+      <div class="risk-items" id="risk-items-list">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <div class="product-cta" id="product-cta-block">
+      <div class="product-cta-label" id="cta-label">Recommended for you</div>
+      <h3 id="cta-title">AI Agent Security Guide</h3>
+      <p id="cta-desc">Loading...</p>
+      <a href="#" id="cta-btn" class="btn-cta-primary" target="_blank" rel="noopener">
+        <span id="cta-btn-text">Get the Guide</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 7H12M12 7L7.5 2.5M12 7L7.5 11.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="product-price" id="product-price-note">
+        <span class="price-tag" id="price-tag">$14.99</span>
+        <span>one-time, instant download</span>
+      </div>
+    </div>
+
+    <button class="retake-link" onclick="retakeQuiz()">Retake the quiz</button>
+
+    <div class="quiz-footer">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="2" y="5" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M5 5V3.5a3 3 0 016 0V5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Behike. AI tools for builders who take security seriously.
+    </div>
+  </div>
+
+</div><!-- /quiz-wrap -->
+
+<script>
+// ── QUIZ DATA ──────────────────────────────────────────────────────
+// Scoring: HIGH = 3, MEDIUM = 2, LOW = 1
+const QUESTIONS = [
+  {
+    text: "How do you store your AI API keys?",
+    options: [
+      { text: "In a .env file that's committed to my git repo", risk: "HIGH" },
+      { text: "In a .env file that's gitignored", risk: "MEDIUM" },
+      { text: "In a secrets manager or environment variable", risk: "LOW" },
+      { text: "I don't use API keys", risk: "LOW" },
+    ]
+  },
+  {
+    text: "When you use AI with your business data, what do you share?",
+    options: [
+      { text: "Full documents including client names and financials", risk: "HIGH" },
+      { text: "Summaries with some names removed", risk: "MEDIUM" },
+      { text: "Only anonymized or mock data", risk: "LOW" },
+      { text: "I don't use AI with business data", risk: "LOW" },
+    ]
+  },
+  {
+    text: "Do you use public AI chat tools (ChatGPT, Claude) for client work?",
+    options: [
+      { text: "Yes, regularly — including sensitive project details", risk: "HIGH" },
+      { text: "Sometimes. I try to be careful about what I share", risk: "MEDIUM" },
+      { text: "No, I use private or local models only", risk: "LOW" },
+      { text: "I don't do client work", risk: "LOW" },
+    ]
+  },
+  {
+    text: "Have you ever received an unexpected AI response that seemed to follow external instructions?",
+    options: [
+      { text: "Yes, and I didn't think much of it at the time", risk: "HIGH" },
+      { text: "Maybe — I'm not sure what prompt injection even means", risk: "MEDIUM" },
+      { text: "I know what prompt injection is and I test for it", risk: "LOW" },
+      { text: "No, I haven't noticed anything like that", risk: "MEDIUM" },
+    ]
+  },
+  {
+    text: "Who has access to your AI agent accounts and API keys?",
+    options: [
+      { text: "I've shared them with team members via Slack or email", risk: "HIGH" },
+      { text: "Just me, but they're stored in a shared doc somewhere", risk: "MEDIUM" },
+      { text: "Just me, stored securely in a dedicated tool", risk: "LOW" },
+      { text: "I don't have AI agent accounts yet", risk: "LOW" },
+    ]
+  },
+  {
+    text: "When did you last audit what data your AI tools can access?",
+    options: [
+      { text: "Never", risk: "HIGH" },
+      { text: "When I first set them up, but not since", risk: "MEDIUM" },
+      { text: "Within the last 30 days", risk: "LOW" },
+      { text: "I audit on a regular schedule (quarterly or more)", risk: "LOW" },
+    ]
+  },
+  {
+    text: "If an AI agent made an action you didn't authorize — sent an email, posted something — how quickly would you know?",
+    options: [
+      { text: "I might not notice for days or longer", risk: "HIGH" },
+      { text: "Probably within a day, maybe", risk: "MEDIUM" },
+      { text: "Within minutes — I have monitoring set up", risk: "LOW" },
+      { text: "My agents can't take autonomous actions", risk: "LOW" },
+    ]
+  }
+];
+
+const SCORE_MAP = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+
+const RESULTS = {
+  LOW: {
+    badge: "low",
+    badgeText: "LOW RISK",
+    headline: "Your setup is solid.",
+    headlineClass: "low",
+    desc: "You're doing the right things. A few gaps likely remain, but your fundamentals are sound. Most attackers will look for easier targets.",
+    ctaLabel: "Free resource for you",
+    ctaTitle: "AI Safety Checklist",
+    ctaDesc: "Grab the free AI Safety Checklist to close the last few gaps and make sure nothing slipped through.",
+    ctaHref: "https://behikeai.gumroad.com/l/ai-safety-checklist",
+    ctaBtnText: "Get the Free Checklist",
+    ctaBtnClass: "green-cta",
+    priceTag: "Free",
+    priceNote: "instant download",
+    scoreLabel: "Low Risk",
+    scoreRange: "7-11 points",
+  },
+  MEDIUM: {
+    badge: "medium",
+    badgeText: "MEDIUM RISK",
+    headline: "Some real exposure here.",
+    headlineClass: "medium",
+    desc: "You have good instincts, but there are 2-3 areas where one mistake could cost you a client or expose sensitive data. The gap between where you are and where you need to be is closable in a weekend.",
+    ctaLabel: "Recommended for your risk level",
+    ctaTitle: "AI Agent Security Guide",
+    ctaDesc: "The AI Security Guide ($14.99) covers exactly what your answers flagged — API key hygiene, data handling, prompt injection defense, and agent monitoring.",
+    ctaHref: "https://behikeai.gumroad.com/l/ai-security-guide",
+    ctaBtnText: "Get the Guide — $14.99",
+    ctaBtnClass: "",
+    priceTag: "$14.99",
+    priceNote: "one-time, instant download",
+    scoreLabel: "Medium Risk",
+    scoreRange: "12-16 points",
+  },
+  HIGH: {
+    badge: "high",
+    badgeText: "HIGH RISK",
+    headline: "Your AI setup has serious vulnerabilities.",
+    headlineClass: "high",
+    desc: "Based on your answers, you have at least 3 high-severity exposures that a moderately motivated attacker could exploit. This is not hypothetical — these are documented attack vectors with real case studies.",
+    ctaLabel: "Fix this this week",
+    ctaTitle: "AI Agent Security Guide",
+    ctaDesc: "The AI Security Guide ($14.99) is specific to your risk profile. It covers the exact vulnerabilities your answers flagged — with step-by-step remediation for each one.",
+    ctaHref: "https://behikeai.gumroad.com/l/ai-security-guide",
+    ctaBtnText: "Fix It Now — $14.99",
+    ctaBtnClass: "",
+    priceTag: "$14.99",
+    priceNote: "one-time, instant download",
+    scoreLabel: "High Risk",
+    scoreRange: "17-21 points",
+  }
+};
+
+// ── STATE ──────────────────────────────────────────────────────────
+let currentQuestion = 0;
+let answers = []; // array of { risk: "HIGH"|"MEDIUM"|"LOW" }
+
+// ── SCREENS ────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── START ──────────────────────────────────────────────────────────
+function startQuiz() {
+  currentQuestion = 0;
+  answers = [];
+  showScreen('screen-questions');
+  renderQuestion();
+}
+
+// ── RENDER QUESTION ────────────────────────────────────────────────
+function renderQuestion(direction) {
+  const q = QUESTIONS[currentQuestion];
+  const letters = ['A', 'B', 'C', 'D'];
+
+  const container = document.getElementById('question-container');
+
+  // If there's an existing question, animate it out first
+  const existing = container.querySelector('.question-wrap');
+  if (existing && direction) {
+    existing.classList.add('leaving');
+    setTimeout(() => {
+      container.innerHTML = buildQuestionHTML(q, letters);
+    }, 280);
+  } else {
+    container.innerHTML = buildQuestionHTML(q, letters);
+  }
+
+  // Update progress
+  const pct = (currentQuestion / QUESTIONS.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-current').textContent = currentQuestion + 1;
+}
+
+function buildQuestionHTML(q, letters) {
+  const optionsHTML = q.options.map((opt, i) => `
+    <button class="option-btn" onclick="selectAnswer(${i}, '${opt.risk}')">
+      <div class="option-letter">${letters[i]}</div>
+      <div>${escapeHtml(opt.text)}</div>
+    </button>
+  `).join('');
+
+  return `
+    <div class="question-wrap">
+      <div class="q-number">Question ${currentQuestion + 1} of ${QUESTIONS.length}</div>
+      <div class="q-text">${escapeHtml(q.text)}</div>
+      <div class="options-list">
+        ${optionsHTML}
+      </div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+// ── SELECT ANSWER ──────────────────────────────────────────────────
+function selectAnswer(optionIndex, risk) {
+  // Visual feedback
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.classList.remove('selected'));
+  buttons[optionIndex].classList.add('selected');
+
+  // Brief pause so user sees selection, then advance
+  setTimeout(() => {
+    answers.push({ risk, questionIndex: currentQuestion, optionIndex });
+
+    currentQuestion++;
+
+    if (currentQuestion < QUESTIONS.length) {
+      renderQuestion('forward');
+    } else {
+      // Quiz complete
+      const totalScore = calculateScore();
+      const riskLevel = getRiskLevel(totalScore);
+      setupEmailScreen(riskLevel, totalScore);
+      showScreen('screen-email');
+    }
+  }, 320);
+}
+
+// ── SCORING ────────────────────────────────────────────────────────
+function calculateScore() {
+  return answers.reduce((sum, a) => sum + SCORE_MAP[a.risk], 0);
+}
+
+function getRiskLevel(score) {
+  if (score <= 11) return 'LOW';
+  if (score <= 16) return 'MEDIUM';
+  return 'HIGH';
+}
+
+// ── EMAIL SCREEN SETUP ─────────────────────────────────────────────
+function setupEmailScreen(riskLevel, score) {
+  const result = RESULTS[riskLevel];
+
+  const badge = document.getElementById('email-score-badge');
+  badge.textContent = result.badgeText;
+  badge.className = 'score-badge-inline ' + result.badge;
+
+  const desc = document.getElementById('email-screen-desc');
+  if (riskLevel === 'HIGH') {
+    desc.textContent = 'Enter your email to get a detailed breakdown of all your high-severity exposures.';
+  } else if (riskLevel === 'MEDIUM') {
+    desc.textContent = 'Enter your email to get the specific areas your answers flagged and how to fix them.';
+  } else {
+    desc.textContent = 'Enter your email to get a summary of the few remaining gaps in your setup.';
+  }
+}
+
+// ── EMAIL SUBMIT ───────────────────────────────────────────────────
+function submitEmail() {
+  const input = document.getElementById('email-input');
+  const email = input.value.trim();
+
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = 'rgba(255,69,58,0.6)';
+    input.focus();
+    setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    return;
+  }
+
+  // Show success state
+  document.getElementById('email-form-wrap').style.display = 'none';
+  const success = document.getElementById('email-success');
+  success.classList.add('visible');
+
+  // Navigate to results after brief moment
+  setTimeout(() => {
+    showResults();
+  }, 1200);
+}
+
+// ── SHOW RESULTS ───────────────────────────────────────────────────
+function showResults() {
+  const totalScore = calculateScore();
+  const riskLevel = getRiskLevel(totalScore);
+  const result = RESULTS[riskLevel];
+
+  // Badge
+  const badge = document.getElementById('result-badge');
+  badge.className = 'risk-badge ' + result.badge;
+  document.getElementById('result-badge-text').textContent = result.badgeText;
+
+  // Headline
+  const headline = document.getElementById('result-headline');
+  headline.textContent = result.headline;
+  headline.className = result.headlineClass;
+
+  // Description
+  document.getElementById('result-desc').textContent = result.desc;
+
+  // Score summary
+  const scoreNum = document.getElementById('score-num');
+  scoreNum.textContent = totalScore;
+  scoreNum.className = 'score-summary-num ' + result.badge;
+  document.getElementById('score-label').textContent = result.scoreLabel;
+  document.getElementById('score-range').textContent = result.scoreRange;
+
+  // Risk items breakdown
+  buildRiskBreakdown(riskLevel);
+
+  // Product CTA
+  const ctaBlock = document.getElementById('product-cta-block');
+  ctaBlock.className = 'product-cta ' + result.badge;
+  document.getElementById('cta-label').textContent = result.ctaLabel;
+  document.getElementById('cta-title').textContent = result.ctaTitle;
+  document.getElementById('cta-desc').textContent = result.ctaDesc;
+
+  const ctaBtn = document.getElementById('cta-btn');
+  ctaBtn.href = result.ctaHref;
+  ctaBtn.className = 'btn-cta-primary ' + (result.ctaBtnClass || '');
+  document.getElementById('cta-btn-text').textContent = result.ctaBtnText;
+
+  document.getElementById('price-tag').textContent = result.priceTag;
+  document.getElementById('product-price-note').querySelector('span:last-child').textContent = result.priceNote;
+
+  showScreen('screen-results');
+}
+
+// ── RISK BREAKDOWN ──────────────────────────────────────────────────
+const RISK_EXPLANATIONS = [
+  {
+    HIGH: "API key in git repo — any repo scan bot can find and abuse this.",
+    MEDIUM: "Gitignored .env is good, but local machine exposure remains a risk.",
+    LOW: "API key storage is solid.",
+  },
+  {
+    HIGH: "Sharing real client data with cloud AI means it may be used for model training.",
+    MEDIUM: "Partial anonymization still leaves identifiable patterns in many cases.",
+    LOW: "Clean data handling — no client exposure risk here.",
+  },
+  {
+    HIGH: "Sending sensitive client details to public AI tools violates most service agreements.",
+    MEDIUM: "Inconsistent caution creates unpredictable exposure windows.",
+    LOW: "No client data leakage risk from public AI tools.",
+  },
+  {
+    HIGH: "Unrecognized prompt injection is an active attack vector — you've likely been targeted.",
+    MEDIUM: "Not knowing what prompt injection means means you can't defend against it.",
+    LOW: "Active prompt injection awareness significantly reduces this risk.",
+  },
+  {
+    HIGH: "API keys shared over Slack or email are trivially leaked in any account compromise.",
+    MEDIUM: "Keys in shared docs are accessible to anyone with doc access, past and present.",
+    LOW: "Key access is properly isolated.",
+  },
+  {
+    HIGH: "Never auditing access means you likely have forgotten integrations with live permissions.",
+    MEDIUM: "Set-and-forget access grows riskier over time as your stack changes.",
+    LOW: "Regular access audits are one of the highest-value security habits.",
+  },
+  {
+    HIGH: "No monitoring for agent actions means unauthorized behavior could cause real damage before you notice.",
+    MEDIUM: "24-hour detection window gives attackers significant undetected operating time.",
+    LOW: "Fast detection is one of the most effective risk mitigations available.",
+  }
+];
+
+function buildRiskBreakdown(riskLevel) {
+  const list = document.getElementById('risk-items-list');
+
+  const items = answers.map((answer, i) => {
+    const explanation = RISK_EXPLANATIONS[answer.questionIndex][answer.risk];
+    let dotClass = 'green';
+    if (answer.risk === 'HIGH') dotClass = 'red';
+    if (answer.risk === 'MEDIUM') dotClass = 'orange';
+
+    return `
+      <div class="risk-item">
+        <div class="risk-item-dot ${dotClass}"></div>
+        <div>${escapeHtml(explanation)}</div>
+      </div>
+    `;
+  }).join('');
+
+  list.innerHTML = items;
+}
+
+// ── RETAKE ─────────────────────────────────────────────────────────
+function retakeQuiz() {
+  currentQuestion = 0;
+  answers = [];
+  // Reset email form
+  document.getElementById('email-input').value = '';
+  document.getElementById('email-form-wrap').style.display = '';
+  document.getElementById('email-success').classList.remove('visible');
+  showScreen('screen-intro');
+}
+
+// ── PROGRESS BAR ANIMATION ON LOAD ─────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // nothing to do on initial load, quiz handles its own state
+});
+</script>
+
+</body>
+</html>

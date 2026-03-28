@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ghost Writer Engine — Behike</title>
+  <meta name="description" content="A prompt library and voice system that makes AI write exactly like you. Create a week of content in under 2 hours." />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #000000;
+      --accent: #0A84FF;
+      --green: #30D158;
+      --text: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --radius-card: 12px;
+      --radius-pill: 980px;
+      --max-width: 980px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* FADE-IN ANIMATION */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-cta {
+      background: var(--green);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.85;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 28px;
+      letter-spacing: 0.3px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 62px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      max-width: 760px;
+      margin: 0 auto 20px;
+    }
+
+    .hero h1 .highlight {
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: clamp(17px, 2.5vw, 20px);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .hero-sub {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM BLOCK */
+    .problem {
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .problem-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+    }
+
+    .problem-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .problem-card p {
+      margin-top: 8px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside-header {
+      margin-bottom: 48px;
+    }
+
+    .inside-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .inside-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      transition: border-color 0.2s ease;
+    }
+
+    .inside-item:hover {
+      border-color: rgba(10, 132, 255, 0.25);
+    }
+
+    .inside-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      background: rgba(10, 132, 255, 0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .inside-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .inside-content p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* HOW IT WORKS */
+    .how {
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(10, 132, 255, 0.15);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    .step-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .step-card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .step-time {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+      background: rgba(10, 132, 255, 0.08);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+    }
+
+    .stars {
+      color: #FFD60A;
+      font-size: 15px;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+
+    .testimonial-card blockquote {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      font-style: normal;
+      margin-bottom: 20px;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .author-info .name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .author-info .handle {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* PRICING */
+    .pricing {
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .pricing-inner {
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(48, 209, 88, 0.25);
+      border-radius: 20px;
+      padding: 52px 40px;
+      max-width: 520px;
+      margin: 48px auto 0;
+    }
+
+    .pricing-tag {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    .pricing-price {
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-price sup {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0;
+      vertical-align: super;
+    }
+
+    .pricing-note {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .pricing-list {
+      list-style: none;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .pricing-list li {
+      font-size: 15px;
+      color: var(--text);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pricing-list li:last-child {
+      border-bottom: none;
+    }
+
+    .check {
+      color: var(--green);
+      font-size: 16px;
+      font-weight: 700;
+      min-width: 18px;
+    }
+
+    .btn-pricing {
+      display: block;
+      width: 100%;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 18px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-pricing:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* FAQ */
+    .faq-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .faq-list {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .faq-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      padding: 22px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--font);
+      transition: color 0.2s ease;
+    }
+
+    .faq-question:hover {
+      color: var(--accent);
+    }
+
+    .faq-chevron {
+      color: var(--text-secondary);
+      font-size: 20px;
+      transition: transform 0.25s ease;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+    }
+
+    .faq-answer p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      padding: 0 24px 22px;
+      line-height: 1.65;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      max-width: 600px;
+      margin: 0 auto 16px;
+      line-height: 1.15;
+    }
+
+    .final-cta p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 32px 0;
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .footer-left {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .footer-left a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+
+    .footer-left a:hover {
+      color: var(--text);
+    }
+
+    .footer-right {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .footer-right a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-right a:hover {
+      opacity: 0.8;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 720px) {
+      .problem-grid,
+      .steps-grid,
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 64px 0 56px;
+      }
+
+      section {
+        padding: 60px 0;
+      }
+
+      .pricing-card {
+        padding: 36px 24px;
+      }
+
+      .pricing-price {
+        font-size: 52px;
+      }
+
+      footer .container {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      nav .nav-cta {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="https://behike.shop" class="nav-logo">behi<span>ke</span></a>
+      <a href="#pricing" class="nav-cta">Get it for $29.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="fade-in">
+        <div class="hero-badge">Ghost Writer Engine</div>
+        <h1>Your Voice. Every Platform.<br>Without Writing <span class="highlight">Every Word.</span></h1>
+        <p>The Ghost Writer Engine gives you a prompt library and voice system that makes AI write exactly like you.</p>
+        <a href="#pricing" class="btn-primary">Get the Ghost Writer Engine &mdash; $29.99</a>
+        <p class="hero-sub">One-time purchase. Instant download. Works with Claude and ChatGPT.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="problem-header fade-in">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">Most people know what to say.<br>They just can't keep up.</h2>
+        <p class="section-sub">Posting consistently requires a system. Most creators don't have one, so they burn out or go silent.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#9203;</div>
+          <h3>You know what to say but writing takes forever</h3>
+          <p>A post that should take 10 minutes turns into a 2-hour block. You end up publishing nothing.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#128483;</div>
+          <h3>AI content sounds generic and not like you</h3>
+          <p>You ask ChatGPT to write a post and it comes back polished, hollow, and completely off-brand.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#128202;</div>
+          <h3>You're posting once a week instead of every day</h3>
+          <p>Algorithms reward volume. You know it. But without a system, showing up consistently is hard to sustain.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="inside">
+    <div class="container">
+      <div class="inside-header fade-in">
+        <div class="section-label">What You Get</div>
+        <h2 class="section-title">Everything you need to<br>sound like yourself at scale.</h2>
+        <p class="section-sub">Five components, built to work together. Each one solves a different piece of the content problem.</p>
+      </div>
+      <div class="inside-list">
+        <div class="inside-item fade-in">
+          <div class="inside-icon">&#127897;</div>
+          <div class="inside-content">
+            <h3>Voice Capture System</h3>
+            <p>A 20-step interview process that extracts your writing DNA. Tone, rhythm, vocabulary, perspective. Everything AI needs to stop sounding like a robot and start sounding like you.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-icon">&#128218;</div>
+          <div class="inside-content">
+            <h3>Master Prompt Library</h3>
+            <p>50+ battle-tested prompts for Twitter threads, Instagram captions, LinkedIn posts, newsletters, and video scripts. Each one is built to plug in your voice profile and generate content that converts.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-icon">&#128193;</div>
+          <div class="inside-content">
+            <h3>Platform Templates</h3>
+            <p>Pre-built content structures for every major channel. No more staring at a blank post. You start with a skeleton that already knows what format works on each platform.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-icon">&#127912;</div>
+          <div class="inside-content">
+            <h3>Style Guide Builder</h3>
+            <p>A reusable reference document you paste into any AI tool to lock in your tone. Works across sessions, across platforms, across months. Your style stays consistent even when you're busy.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-icon">&#9851;</div>
+          <div class="inside-content">
+            <h3>Repurposing Engine</h3>
+            <p>Turn one idea into six content formats in under 10 minutes. Thread, caption, newsletter intro, short-form video hook, LinkedIn post, and quote card. One input. Full week of output.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="container">
+      <div class="how-header fade-in">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three steps. Then you're in production.</h2>
+        <p class="section-sub">You do the setup once. After that, content creation is just pulling from the system.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card fade-in">
+          <div class="step-number">1</div>
+          <h3>Complete the Voice Interview</h3>
+          <p>Work through the 20-question capture process. Answer honestly. The output becomes your AI's operating manual for writing like you.</p>
+          <span class="step-time">45 minutes, one time</span>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">2</div>
+          <h3>Load Your Prompts into Claude or ChatGPT</h3>
+          <p>Paste your voice profile into the prompt library. Every prompt now carries your style, your references, your cadence.</p>
+          <span class="step-time">15 minutes to set up</span>
+        </div>
+        <div class="step-card fade-in">
+          <div class="step-number">3</div>
+          <h3>Generate a Week of Content</h3>
+          <p>Pick one idea, run it through the Repurposing Engine, and ship. Repeat every week. No burnout, no blank-page paralysis.</p>
+          <span class="step-time">Under 2 hours per week</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="testimonials-header fade-in">
+        <div class="section-label">From the Community</div>
+        <h2 class="section-title">People who stopped writing<br>and started shipping.</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>
+            "I was posting maybe twice a week and hating every draft. The Voice Interview was uncomfortable in a good way, it made me articulate things I never put into words. Now Claude drafts and I edit. My output went from 2 posts to 12 per week."
+          </blockquote>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: #0A84FF;">M</div>
+            <div class="author-info">
+              <div class="name">Marcus Aldridge</div>
+              <div class="handle">Freelance brand strategist</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>
+            "The Style Guide Builder was the thing I didn't know I needed. I used to start every AI session from scratch and the tone was always off. Now I paste the guide and the first draft is already 80% there. That 20% edit takes 5 minutes."
+          </blockquote>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: #30D158;">S</div>
+            <div class="author-info">
+              <div class="name">Sofia Renata</div>
+              <div class="handle">Course creator, 11K followers</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>
+            "The Repurposing Engine alone is worth $30. I do one podcast episode, run it through the engine, and I have content for Instagram, LinkedIn, a newsletter, and three threads. I've been consistent for 6 weeks straight, which is a personal record."
+          </blockquote>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: #FF9F0A;">D</div>
+            <div class="author-info">
+              <div class="name">Daniel Vo</div>
+              <div class="handle">Solopreneur, operations consultant</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="pricing-inner fade-in">
+        <div class="section-label">Pricing</div>
+        <h2 class="section-title">One price. No subscriptions.</h2>
+        <p class="section-sub">You own this. It works with the AI tools you already use. Nothing to install, nothing to renew.</p>
+        <div class="pricing-card">
+          <div class="pricing-tag">Ghost Writer Engine</div>
+          <div class="pricing-price"><sup>$</sup>29.99</div>
+          <div class="pricing-note">One-time payment. Instant digital download.</div>
+          <ul class="pricing-list">
+            <li><span class="check">&#10003;</span> Voice Capture System (20-step interview)</li>
+            <li><span class="check">&#10003;</span> Master Prompt Library (50+ prompts)</li>
+            <li><span class="check">&#10003;</span> Platform Templates for every major channel</li>
+            <li><span class="check">&#10003;</span> Style Guide Builder</li>
+            <li><span class="check">&#10003;</span> Repurposing Engine (1 idea to 6 formats)</li>
+            <li><span class="check">&#10003;</span> Works with Claude and ChatGPT</li>
+            <li><span class="check">&#10003;</span> Lifetime access, free updates</li>
+          </ul>
+          <a href="#" class="btn-pricing">Get the Ghost Writer Engine</a>
+          <p class="pricing-guarantee">Secure checkout via Gumroad. PDF and prompt files delivered instantly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container">
+      <div class="faq-header fade-in">
+        <div class="section-label">FAQ</div>
+        <h2 class="section-title">Common questions.</h2>
+      </div>
+      <div class="faq-list">
+
+        <div class="faq-item fade-in">
+          <button class="faq-question" aria-expanded="false">
+            Do I need a paid AI subscription to use this?
+            <span class="faq-chevron">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>The free tier on ChatGPT works, but a paid plan gives you better output quality and longer context windows. Claude's free tier also works. If you're already using either tool regularly, you have everything you need. The system is built to work within standard usage limits.</p>
+          </div>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-question" aria-expanded="false">
+            How long does the Voice Interview take?
+            <span class="faq-chevron">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Budget 45 minutes for your first pass. Some people take longer because the questions are intentionally deep. You're not filling out a form, you're documenting how you actually think and write. You do it once, then the output works for you indefinitely.</p>
+          </div>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-question" aria-expanded="false">
+            What kind of content does this work for?
+            <span class="faq-chevron">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Twitter and X threads, Instagram captions, LinkedIn posts, newsletters, YouTube scripts, short-form video hooks, and blog outlines. The prompt library covers all of these with platform-specific structures. If you create content for any major channel, there's a template built for it.</p>
+          </div>
+        </div>
+
+        <div class="faq-item fade-in">
+          <button class="faq-question" aria-expanded="false">
+            Is this a course or a tool?
+            <span class="faq-chevron">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>It's a system. You get a guide that walks you through the setup, plus the actual prompt library and templates you use daily. There's no video content to sit through. You read the setup guide once, do the Voice Interview, and then the rest is just using the prompts to produce content.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <div class="fade-in">
+        <h2>Start posting in your voice, every day.</h2>
+        <p>One afternoon of setup. Consistent content output every week after that. Your ideas deserve an audience.</p>
+        <a href="#pricing" class="btn-primary">Get the Ghost Writer Engine &mdash; $29.99</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <a href="https://behike.shop">behike.shop</a>
+        &nbsp;&middot;&nbsp;
+        &copy; 2026 Behike. All rights reserved.
+      </div>
+      <div class="footer-right">
+        <a href="https://instagram.com/behikeai" target="_blank" rel="noopener">@behikeai</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade-in
+    const observer = new IntersectionObserver(
+      function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll('.fade-in').forEach(function(el) {
+      observer.observe(el);
+    });
+
+    // Stagger children in grids
+    document.querySelectorAll('.problem-grid, .steps-grid, .testimonials-grid').forEach(function(grid) {
+      var children = grid.querySelectorAll('.fade-in');
+      children.forEach(function(child, i) {
+        child.style.transitionDelay = (i * 0.1) + 's';
+      });
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var item = btn.closest('.faq-item');
+        var isOpen = item.classList.contains('open');
+
+        // Close all open items
+        document.querySelectorAll('.faq-item.open').forEach(function(openItem) {
+          openItem.classList.remove('open');
+          openItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+
+        // Open this one if it was closed
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

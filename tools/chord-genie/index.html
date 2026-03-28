@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChordGenie - AI Chord Progression Generator</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0a0a; --surface: #141414; --border: #222; --text: #fff;
+  --muted: #888; --accent: #0066ff; --success: #00c853; --gold: #c9a84c;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+/* Header */
+header { text-align: center; padding: 40px 0 30px; }
+header h1 { font-size: 2.2em; font-weight: 700; letter-spacing: -1px; }
+header h1 span { color: var(--accent); }
+header p { color: var(--muted); margin-top: 8px; font-size: 1.05em; }
+
+/* Controls */
+.controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 30px 0; }
+@media (max-width: 600px) { .controls { grid-template-columns: 1fr; } }
+
+.control-group { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.control-group label { display: block; font-size: 0.85em; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.control-group select { width: 100%; padding: 10px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 1em; cursor: pointer; appearance: none; }
+.control-group select:focus { outline: none; border-color: var(--accent); }
+
+/* Generate button */
+.generate-btn { display: block; width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: all 0.2s; margin: 20px 0; letter-spacing: 0.5px; }
+.generate-btn:hover { background: #0052cc; transform: translateY(-1px); }
+.generate-btn:active { transform: translateY(0); }
+.generate-btn.surprise { background: var(--gold); }
+.generate-btn.surprise:hover { background: #b8943f; }
+.btn-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .btn-row { grid-template-columns: 1fr; } }
+
+/* Results */
+.results { margin-top: 20px; }
+.progression-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; transition: all 0.3s; cursor: pointer; position: relative; }
+.progression-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,102,255,0.15); }
+.progression-card.playing { border-color: var(--success); box-shadow: 0 4px 20px rgba(0,200,83,0.2); }
+.prog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.prog-number { font-size: 0.8em; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.prog-genre { font-size: 0.75em; color: var(--accent); background: rgba(0,102,255,0.1); padding: 3px 10px; border-radius: 20px; }
+.prog-chords { font-size: 1.8em; font-weight: 700; letter-spacing: 2px; margin: 8px 0; }
+.prog-chords span { display: inline-block; padding: 4px 12px; margin: 2px; background: rgba(255,255,255,0.05); border-radius: 6px; }
+.prog-description { color: var(--muted); font-size: 0.9em; margin-top: 8px; }
+.prog-actions { display: flex; gap: 10px; margin-top: 16px; }
+.prog-actions button { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; font-size: 0.85em; transition: all 0.2s; }
+.prog-actions button:hover { background: var(--accent); border-color: var(--accent); }
+.prog-actions button.play-btn { background: var(--success); border-color: var(--success); color: #000; font-weight: 600; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state .icon { font-size: 3em; margin-bottom: 16px; }
+.empty-state p { font-size: 1.1em; }
+
+/* Footer */
+footer { text-align: center; padding: 40px 0 20px; color: var(--muted); font-size: 0.85em; }
+footer a { color: var(--accent); text-decoration: none; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.progression-card { animation: fadeIn 0.3s ease-out; }
+.progression-card:nth-child(2) { animation-delay: 0.05s; }
+.progression-card:nth-child(3) { animation-delay: 0.1s; }
+.progression-card:nth-child(4) { animation-delay: 0.15s; }
+.progression-card:nth-child(5) { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Chord<span>Genie</span></h1>
+    <p>AI-powered chord progressions for any genre, mood, and key.</p>
+  </header>
+
+  <div class="controls">
+    <div class="control-group">
+      <label>Genre</label>
+      <select id="genre">
+        <option value="pop">Pop</option>
+        <option value="hiphop">Hip-Hop / Trap</option>
+        <option value="rnb">R&B / Soul</option>
+        <option value="lofi">Lo-Fi</option>
+        <option value="edm">EDM / Dance</option>
+        <option value="jazz">Jazz</option>
+        <option value="rock">Rock</option>
+        <option value="classical">Classical</option>
+        <option value="reggaeton">Reggaeton</option>
+        <option value="ambient">Ambient</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Mood</label>
+      <select id="mood">
+        <option value="happy">Happy / Uplifting</option>
+        <option value="sad">Sad / Melancholic</option>
+        <option value="dark">Dark / Intense</option>
+        <option value="chill">Chill / Relaxed</option>
+        <option value="epic">Epic / Powerful</option>
+        <option value="romantic">Romantic / Smooth</option>
+        <option value="mysterious">Mysterious / Dreamy</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Key</label>
+      <select id="key">
+        <option value="C">C Major</option>
+        <option value="Cm">C Minor</option>
+        <option value="D">D Major</option>
+        <option value="Dm">D Minor</option>
+        <option value="E">E Major</option>
+        <option value="Em">E Minor</option>
+        <option value="F">F Major</option>
+        <option value="Fm">F Minor</option>
+        <option value="G">G Major</option>
+        <option value="Gm">G Minor</option>
+        <option value="A">A Major</option>
+        <option value="Am" selected>A Minor</option>
+        <option value="Bb">Bb Major</option>
+        <option value="Bbm">Bb Minor</option>
+        <option value="B">B Major</option>
+        <option value="Bm">B Minor</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="generate-btn" onclick="generate()">Generate Progressions</button>
+    <button class="generate-btn surprise" onclick="surprise()">Surprise Me</button>
+  </div>
+
+  <div class="results" id="results">
+    <div class="empty-state">
+      <div class="icon">🎹</div>
+      <p>Select a genre, mood, and key. Then hit generate.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Built by <a href="#">Behike</a>. Free to use. Export as MIDI coming soon.</p>
+  </footer>
+</div>
+
+<script>
+// Music theory database
+const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const MAJOR_SCALE = [0,2,4,5,7,9,11];
+const MINOR_SCALE = [0,2,3,5,7,8,10];
+
+// Chord quality by scale degree (major key)
+const MAJOR_QUALITIES = ['','m','m','','','m','dim'];
+// Chord quality by scale degree (minor key)
+const MINOR_QUALITIES = ['m','dim','','m','m','',''];
+
+// Genre-specific progression patterns (scale degrees, 1-indexed)
+const PROGRESSIONS = {
+  pop: {
+    happy: [[1,5,6,4],[1,4,5,5],[1,4,6,5],[4,1,5,6],[1,5,4,5],[1,6,4,5]],
+    sad: [[6,4,1,5],[1,6,4,5],[6,5,4,1],[2,5,1,6],[4,5,6,1]],
+    dark: [[1,6,3,7],[6,7,1,5],[4,5,6,6],[1,7,6,5]],
+    chill: [[1,5,6,4],[4,5,6,1],[1,4,5,4],[2,5,1,4]],
+    epic: [[1,5,6,4],[6,4,1,5],[1,3,4,5],[4,1,5,6]],
+    romantic: [[1,6,4,5],[2,5,1,4],[1,4,2,5],[6,4,1,5]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[4,3,6,5],[1,3,4,7]]
+  },
+  hiphop: {
+    happy: [[1,4,5,4],[1,5,6,4],[4,1,5,5],[1,4,1,5]],
+    sad: [[6,5,4,1],[1,6,7,5],[6,4,1,5],[4,5,6,7]],
+    dark: [[1,7,6,6],[6,6,5,5],[1,1,7,6],[4,4,1,1]],
+    chill: [[1,6,4,5],[2,5,1,6],[6,5,4,1],[1,4,6,5]],
+    epic: [[1,5,6,4],[6,4,1,5],[1,3,6,5],[4,5,1,5]],
+    romantic: [[1,6,4,5],[2,5,1,6],[6,4,1,5],[1,4,5,6]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[1,3,6,7],[4,7,1,5]]
+  },
+  rnb: {
+    happy: [[1,4,5,4],[2,5,1,4],[1,6,2,5],[4,5,1,1]],
+    sad: [[6,4,1,5],[2,5,1,6],[1,6,4,5],[6,2,5,1]],
+    dark: [[1,7,6,5],[6,7,1,5],[4,5,6,7],[1,3,6,5]],
+    chill: [[2,5,1,6],[1,4,2,5],[6,2,5,1],[1,6,2,5]],
+    epic: [[1,4,5,6],[6,5,4,1],[1,3,4,5],[2,5,1,4]],
+    romantic: [[2,5,1,6],[1,6,2,5],[4,5,1,6],[1,4,2,5]],
+    mysterious: [[2,5,1,7],[6,7,1,3],[1,3,6,2],[4,7,2,5]]
+  },
+  lofi: {
+    happy: [[2,5,1,4],[1,4,2,5],[6,2,5,1],[1,6,2,5]],
+    sad: [[2,5,1,6],[6,2,5,1],[1,6,2,5],[4,5,6,2]],
+    dark: [[6,2,5,1],[1,7,6,2],[4,7,6,5],[2,5,6,7]],
+    chill: [[2,5,1,6],[1,6,2,5],[6,2,5,1],[4,2,5,1]],
+    epic: [[1,4,5,6],[2,5,1,4],[6,2,5,1],[1,3,6,5]],
+    romantic: [[2,5,1,6],[6,2,5,1],[1,6,2,5],[4,5,1,6]],
+    mysterious: [[2,5,1,7],[6,7,2,5],[1,7,6,2],[4,7,2,5]]
+  },
+  edm: {
+    happy: [[1,5,6,4],[6,4,1,5],[1,4,5,5],[4,1,5,6]],
+    sad: [[6,4,1,5],[1,6,4,5],[6,5,4,1],[1,6,7,5]],
+    dark: [[1,1,6,6],[6,6,4,4],[1,7,6,5],[6,7,1,1]],
+    chill: [[1,6,4,5],[6,4,1,5],[1,5,6,4],[4,6,1,5]],
+    epic: [[1,5,6,4],[6,4,1,5],[1,3,4,5],[1,5,4,6]],
+    romantic: [[1,6,4,5],[6,4,1,5],[1,4,6,5],[2,5,1,6]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[1,3,7,6],[4,7,1,5]]
+  },
+  jazz: {
+    happy: [[2,5,1,6],[1,6,2,5],[3,6,2,5],[1,4,3,6]],
+    sad: [[2,5,1,6],[6,2,5,1],[1,6,2,5],[4,7,3,6]],
+    dark: [[1,7,3,6],[6,2,5,1],[4,7,3,6],[2,5,6,7]],
+    chill: [[2,5,1,6],[1,6,2,5],[3,6,2,5],[1,4,2,5]],
+    epic: [[2,5,1,4],[1,4,2,5],[6,2,5,1],[3,6,2,5]],
+    romantic: [[2,5,1,6],[3,6,2,5],[1,6,2,5],[4,7,3,6]],
+    mysterious: [[2,5,1,7],[6,7,3,6],[4,7,2,5],[1,7,3,6]]
+  },
+  rock: {
+    happy: [[1,4,5,5],[1,5,4,4],[1,4,1,5],[4,5,1,1]],
+    sad: [[1,6,4,5],[6,4,1,5],[1,5,6,4],[4,1,5,6]],
+    dark: [[1,7,6,5],[1,5,7,4],[6,7,1,5],[1,3,7,4]],
+    chill: [[1,4,5,4],[1,5,6,4],[6,4,1,5],[1,4,6,5]],
+    epic: [[1,5,6,4],[6,4,1,5],[1,3,4,5],[1,5,4,6]],
+    romantic: [[1,5,6,4],[6,4,1,5],[1,4,5,6],[2,5,1,4]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[1,3,4,7],[4,7,6,5]]
+  },
+  classical: {
+    happy: [[1,4,5,1],[1,5,6,4],[1,4,2,5],[4,1,5,1]],
+    sad: [[1,4,5,6],[6,4,5,1],[1,6,4,5],[2,5,1,6]],
+    dark: [[1,6,4,5],[6,5,4,1],[1,7,6,5],[4,5,6,1]],
+    chill: [[1,4,5,1],[1,6,4,5],[2,5,1,4],[1,4,2,5]],
+    epic: [[1,5,6,4],[1,4,5,1],[6,4,1,5],[1,3,4,5]],
+    romantic: [[1,6,4,5],[2,5,1,6],[1,4,2,5],[6,2,5,1]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[4,7,3,6],[1,3,4,7]]
+  },
+  reggaeton: {
+    happy: [[1,5,6,4],[1,4,5,5],[4,1,5,6],[1,6,4,5]],
+    sad: [[6,4,1,5],[1,6,4,5],[6,5,4,1],[4,5,6,1]],
+    dark: [[1,7,6,6],[6,6,5,5],[1,1,7,6],[6,7,1,5]],
+    chill: [[1,6,4,5],[6,4,1,5],[1,5,6,4],[4,6,5,1]],
+    epic: [[1,5,6,4],[6,4,1,5],[1,3,4,5],[4,5,6,1]],
+    romantic: [[1,6,4,5],[6,4,1,5],[2,5,1,6],[1,4,5,6]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[4,7,1,5],[1,3,6,7]]
+  },
+  ambient: {
+    happy: [[1,4,5,4],[1,5,4,1],[4,1,5,1],[1,4,1,5]],
+    sad: [[1,6,4,5],[6,4,1,5],[1,5,6,4],[4,6,1,5]],
+    dark: [[1,7,6,5],[6,7,1,5],[1,3,7,6],[4,7,6,5]],
+    chill: [[1,4,5,4],[1,6,4,5],[4,1,6,5],[1,5,4,6]],
+    epic: [[1,5,6,4],[1,4,5,6],[6,4,1,5],[1,3,4,5]],
+    romantic: [[1,6,4,5],[1,4,6,5],[6,4,1,5],[2,5,1,6]],
+    mysterious: [[1,7,6,5],[6,7,1,3],[4,7,6,5],[1,3,7,4]]
+  }
+};
+
+const DESCRIPTIONS = {
+  pop: { happy: "Bright and catchy. Great for hooks.", sad: "Emotional and relatable.", dark: "Edgy pop with tension.", chill: "Laid-back pop groove.", epic: "Anthemic, stadium-ready.", romantic: "Smooth and heartfelt.", mysterious: "Ethereal and intriguing." },
+  hiphop: { happy: "Bounce and energy.", sad: "Introspective trap.", dark: "Menacing low-end energy.", chill: "Smooth, laid-back flow.", epic: "Hard-hitting, confident.", romantic: "Smooth R&B influenced.", mysterious: "Atmospheric and moody." },
+  lofi: { happy: "Warm, nostalgic vibes.", sad: "Rainy day feelings.", dark: "Late night contemplation.", chill: "Study and focus energy.", epic: "Cinematic lo-fi.", romantic: "Coffee shop warmth.", mysterious: "Hazy, dream-like." },
+  jazz: { happy: "Swing and sophistication.", sad: "Blue notes and longing.", dark: "Smoky club atmosphere.", chill: "Cool jazz relaxation.", epic: "Big band energy.", romantic: "Candlelight dinner.", mysterious: "Modal exploration." },
+  edm: { happy: "Festival main stage.", sad: "Emotional progressive.", dark: "Underground techno.", chill: "Deep house groove.", epic: "Massive drop setup.", romantic: "Tropical house.", mysterious: "Ambient electronica." },
+  rnb: { happy: "Feel-good groove.", sad: "Heartbreak ballad.", dark: "Moody alternative R&B.", chill: "Smooth evening vibes.", epic: "Powerful vocal showcase.", romantic: "Slow jam territory.", mysterious: "Neo-soul exploration." },
+  rock: { happy: "Power pop energy.", sad: "Acoustic ballad.", dark: "Heavy, distorted.", chill: "Indie rock flow.", epic: "Arena rock anthem.", romantic: "Classic ballad.", mysterious: "Post-rock atmosphere." },
+  classical: { happy: "Bright, major key joy.", sad: "Adagio, deep emotion.", dark: "Minor key drama.", chill: "Pastoral, peaceful.", epic: "Orchestral grandeur.", romantic: "Sweeping melody.", mysterious: "Impressionist colors." },
+  reggaeton: { happy: "Party energy, dembow.", sad: "Romantic reggaeton.", dark: "Urban, intense beat.", chill: "Beach vibes.", epic: "Main stage festival.", romantic: "Slow, sensual groove.", mysterious: "Dark Latin energy." },
+  ambient: { happy: "Floating, bright pads.", sad: "Melancholic textures.", dark: "Deep, cavernous space.", chill: "Meditative calm.", epic: "Vast, cinematic.", romantic: "Warm, enveloping.", mysterious: "Otherworldly drifting." }
+};
+
+function getRoot(keyStr) {
+  const isMinor = keyStr.endsWith('m');
+  const root = isMinor ? keyStr.slice(0, -1) : keyStr;
+  return { note: root, isMinor, rootIdx: NOTES.indexOf(root) };
+}
+
+function degreeToChord(degree, rootIdx, isMinor) {
+  const scale = isMinor ? MINOR_SCALE : MAJOR_SCALE;
+  const qualities = isMinor ? MINOR_QUALITIES : MAJOR_QUALITIES;
+  const idx = degree - 1;
+  const noteIdx = (rootIdx + scale[idx]) % 12;
+  const quality = qualities[idx];
+  return NOTES[noteIdx] + quality;
+}
+
+function generate() {
+  const genre = document.getElementById('genre').value;
+  const mood = document.getElementById('mood').value;
+  const keyStr = document.getElementById('key').value;
+  const { rootIdx, isMinor } = getRoot(keyStr);
+
+  const patterns = PROGRESSIONS[genre]?.[mood] || PROGRESSIONS.pop.happy;
+  const genreDescs = DESCRIPTIONS[genre]?.[mood] || "Solid progression for your track.";
+
+  // Shuffle and pick 5-6
+  const shuffled = [...patterns].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, Math.min(6, shuffled.length));
+
+  // Add 1-2 variations by modifying existing patterns
+  while (selected.length < 6 && patterns.length > 0) {
+    const base = patterns[Math.floor(Math.random() * patterns.length)];
+    const variation = [...base];
+    const swapIdx = Math.floor(Math.random() * 4);
+    variation[swapIdx] = ((variation[swapIdx] + 1) % 7) + 1;
+    selected.push(variation);
+  }
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = '';
+
+  selected.forEach((prog, i) => {
+    const chords = prog.map(d => degreeToChord(d, rootIdx, isMinor));
+    const numerals = prog.map(d => {
+      const roman = ['I','II','III','IV','V','VI','VII'][d-1];
+      const q = isMinor ? MINOR_QUALITIES[d-1] : MAJOR_QUALITIES[d-1];
+      return q === 'm' ? roman.toLowerCase() : (q === 'dim' ? roman.toLowerCase() + 'o' : roman);
+    });
+
+    const card = document.createElement('div');
+    card.className = 'progression-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.innerHTML = `
+      <div class="prog-header">
+        <span class="prog-number">Progression ${i + 1}</span>
+        <span class="prog-genre">${numerals.join(' - ')}</span>
+      </div>
+      <div class="prog-chords">${chords.map(c => `<span>${c}</span>`).join(' ')}</div>
+      <div class="prog-description">${genreDescs} ${['Try this with a slow tempo.','Works great at 120+ BPM.','Let the chords breathe.','Add some swing to this one.','Layer with arpeggios.','Perfect for a vocal melody.'][i] || ''}</div>
+      <div class="prog-actions">
+        <button class="play-btn" onclick="event.stopPropagation(); playChords(${JSON.stringify(chords)}, this)">Play</button>
+        <button onclick="event.stopPropagation(); copyChords('${chords.join(' - ')}')">Copy</button>
+      </div>
+    `;
+    resultsEl.appendChild(card);
+  });
+}
+
+function surprise() {
+  const genres = document.getElementById('genre').options;
+  const moods = document.getElementById('mood').options;
+  const keys = document.getElementById('key').options;
+  document.getElementById('genre').selectedIndex = Math.floor(Math.random() * genres.length);
+  document.getElementById('mood').selectedIndex = Math.floor(Math.random() * moods.length);
+  document.getElementById('key').selectedIndex = Math.floor(Math.random() * keys.length);
+  generate();
+}
+
+// Web Audio API for chord playback
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+const NOTE_FREQS = {
+  'C': 261.63, 'C#': 277.18, 'D': 293.66, 'D#': 311.13,
+  'E': 329.63, 'F': 349.23, 'F#': 369.99, 'G': 392.00,
+  'G#': 415.30, 'A': 440.00, 'A#': 466.16, 'B': 493.88
+};
+
+function chordToFreqs(chordName) {
+  let root, quality;
+  if (chordName.length > 1 && chordName[1] === '#') {
+    root = chordName.substring(0, 2);
+    quality = chordName.substring(2);
+  } else {
+    root = chordName[0];
+    quality = chordName.substring(1);
+  }
+  const rootFreq = NOTE_FREQS[root] || 440;
+  if (quality === 'm') return [rootFreq, rootFreq * Math.pow(2, 3/12), rootFreq * Math.pow(2, 7/12)];
+  if (quality === 'dim') return [rootFreq, rootFreq * Math.pow(2, 3/12), rootFreq * Math.pow(2, 6/12)];
+  return [rootFreq, rootFreq * Math.pow(2, 4/12), rootFreq * Math.pow(2, 7/12)];
+}
+
+function playChords(chords, btn) {
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
+  const duration = 0.8;
+  const gap = 0.05;
+  btn.textContent = 'Playing...';
+  btn.closest('.progression-card').classList.add('playing');
+
+  chords.forEach((chord, i) => {
+    const freqs = chordToFreqs(chord);
+    const start = now + i * (duration + gap);
+    freqs.forEach(freq => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.12, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + duration);
+    });
+  });
+
+  setTimeout(() => {
+    btn.textContent = 'Play';
+    btn.closest('.progression-card').classList.remove('playing');
+  }, chords.length * (duration + gap) * 1000 + 200);
+}
+
+function copyChords(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.createElement('div');
+    toast.textContent = 'Copied to clipboard';
+    toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#00c853;color:#000;padding:10px 20px;border-radius:8px;font-weight:600;z-index:999;animation:fadeIn 0.3s;';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  });
+}
+
+// Generate on load
+generate();
+</script>
+</body>
+</html>

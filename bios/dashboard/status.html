@@ -1,0 +1,166 @@
+<!-- Serve: cd ~/behique/bios && python3 -m http.server 8092 --bind 0.0.0.0 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOS - System Status</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#000;--fg:#e0e0e0;--dim:#555;--border:#1a1a1a;--green:#00c853;--red:#ff1744;--yellow:#ffd600;--panel:#0a0a0a}
+body{background:var(--bg);color:var(--fg);font-family:"SF Mono","Fira Code","Cascadia Code",monospace;font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--dim);text-decoration:none} a:hover{color:var(--yellow)}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border)}
+.brand{font-size:16px;font-weight:700;letter-spacing:4px;color:#fff}
+.brand span{color:var(--dim);font-weight:400;font-size:11px;letter-spacing:2px;margin-left:12px;text-transform:uppercase}
+.back{font-size:11px;text-transform:uppercase;letter-spacing:2px}
+.banner{padding:20px 24px;text-align:center;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.banner.ok{color:var(--green);background:#00c85308} .banner.partial{color:var(--yellow);background:#ffd60008} .banner.major{color:var(--red);background:#ff174408}
+.meta{display:flex;justify-content:space-between;padding:12px 24px;font-size:11px;color:var(--dim);border-bottom:1px solid var(--border)}
+.uptime-bar{height:3px;background:var(--border);margin:0 24px;border-radius:2px}
+.uptime-fill{height:100%;border-radius:2px;background:var(--green);transition:width .5s}
+.groups{padding:12px 24px 24px;display:flex;flex-direction:column;gap:16px;max-width:900px;margin:0 auto;width:100%}
+.group-title{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--dim);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.service{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--panel);border:1px solid var(--border);border-radius:4px;margin-bottom:4px}
+.service-left{display:flex;align-items:center;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot.up{background:var(--green);box-shadow:0 0 8px var(--green)} .dot.degraded{background:var(--yellow);box-shadow:0 0 8px var(--yellow)}
+.dot.down{background:var(--red);box-shadow:0 0 8px var(--red)} .dot.unknown{background:var(--dim)}
+.svc-name{font-size:12px;color:var(--fg)} .svc-meta{font-size:10px;color:var(--dim);text-align:right;white-space:nowrap}
+.footer{padding:16px 24px;text-align:center;font-size:10px;color:var(--dim);border-top:1px solid var(--border);margin-top:auto}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">BIOS<span>System Status</span></div>
+  <a class="back" href="index.html">Dashboard</a>
+</div>
+<div id="banner" class="banner ok">Checking systems...</div>
+<div class="meta">
+  <span id="last-check">Last check: --</span>
+  <span id="uptime-pct">24h uptime: --</span>
+</div>
+<div class="uptime-bar"><div id="uptime-fill" class="uptime-fill" style="width:0%"></div></div>
+<div class="groups" id="groups"></div>
+<div class="footer">Auto-refreshes every 60s. Status cached in localStorage.</div>
+<script>
+const SVC = {
+  "Websites": [
+    { id:"behike-co", name:"behike.co", check:"ping", url:"https://behike.co" },
+    { id:"behike-store", name:"behike.store", check:"ping", url:"https://behike.store" },
+    { id:"gumroad", name:"behike.gumroad.com", check:"ping", url:"https://behike.gumroad.com" }
+  ],
+  "BIOS Services": [
+    { id:"bios-dash", name:"Dashboard", check:"port", port:8092, path:"/dashboard/index.html" },
+    { id:"bios-vr", name:"VR Room", check:"port", port:8092, path:"/dashboard/warroom.html" },
+    { id:"bios-ctrl", name:"Control Panel", check:"port", port:8092, path:"/dashboard/control-panel.html" },
+    { id:"bios-notif", name:"Notifications", check:"port", port:8092, path:"/dashboard/notifications.html" }
+  ],
+  "Pipelines": [
+    { id:"pipe-news", name:"News Pipeline", check:"json", file:"/dashboard/data/signals.json", staleMin:60 },
+    { id:"pipe-social", name:"Social Pipeline", check:"json", file:"/dashboard/data/insights.json", staleMin:120 },
+    { id:"pipe-pr", name:"PR Pipeline", check:"json", file:"/dashboard/data/signals.json", staleMin:60 },
+    { id:"pipe-convict", name:"Conviction Engine", check:"json", file:"/dashboard/data/polymarket.json", staleMin:180 },
+    { id:"pipe-content", name:"Content Wiring", check:"json", file:"/dashboard/data/config.json", staleMin:1440 }
+  ],
+  "Fleet": [
+    { id:"fleet-ceiba", name:"Ceiba (M4)", check:"port", port:8092, path:"/" },
+    { id:"fleet-cobo", name:"Cobo (GTX)", check:"port", port:9876, host:"bridge.merchoo.shop" },
+    { id:"fleet-naboria", name:"Naboria", check:"port", port:8093, path:"/" }
+  ],
+  "Sales": [
+    { id:"sales-webhook", name:"Webhook Server", check:"port", port:8095, path:"/" },
+    { id:"sales-analytics", name:"Analytics", check:"port", port:8096, path:"/" },
+    { id:"sales-affiliate", name:"Affiliate", check:"port", port:8097, path:"/" },
+    { id:"sales-coupon", name:"Coupon Engine", check:"port", port:8098, path:"/" },
+    { id:"sales-reviews", name:"Reviews", check:"port", port:8099, path:"/" }
+  ]
+};
+const HKEY = "bios_status_history";
+const allFlat = Object.values(SVC).flat();
+function loadHist() { try { return JSON.parse(localStorage.getItem(HKEY)) || {}; } catch { return {}; } }
+function saveResult(id, s) {
+  const h = loadHist(); if (!h[id]) h[id] = [];
+  h[id].push({ ts: Date.now(), s });
+  const cut = Date.now() - 86400000;
+  h[id] = h[id].filter(e => e.ts > cut);
+  localStorage.setItem(HKEY, JSON.stringify(h));
+}
+function calcUptime() {
+  const h = loadHist(); let tot = 0, up = 0;
+  for (const id in h) for (const e of h[id]) { tot++; if (e.s === "up") up++; else if (e.s === "degraded") up += 0.5; }
+  return tot === 0 ? 100 : Math.round((up / tot) * 1000) / 10;
+}
+async function probe(url, timeout) {
+  const ctrl = new AbortController();
+  const tm = setTimeout(() => ctrl.abort(), timeout);
+  try {
+    const t0 = performance.now();
+    await fetch(url, { mode: "no-cors", signal: ctrl.signal, cache: "no-store" });
+    clearTimeout(tm); return performance.now() - t0;
+  } catch { clearTimeout(tm); return -1; }
+}
+async function checkSvc(svc) {
+  if (svc.check === "ping") {
+    const ms = await probe(svc.url, 8000);
+    return ms < 0 ? "down" : ms > 5000 ? "degraded" : "up";
+  }
+  if (svc.check === "port") {
+    const host = svc.host || "localhost";
+    const ms = await probe(`http://${host}:${svc.port}${svc.path || "/"}`, 5000);
+    return ms < 0 ? "down" : ms > 3000 ? "degraded" : "up";
+  }
+  if (svc.check === "json") {
+    try {
+      const r = await fetch(svc.file, { cache: "no-store" });
+      if (!r.ok) return "down";
+      const lm = r.headers.get("Last-Modified");
+      if (!lm) return "up";
+      return (Date.now() - new Date(lm).getTime()) / 60000 > svc.staleMin ? "degraded" : "up";
+    } catch { return "down"; }
+  }
+  return "unknown";
+}
+function label(s) { return s === "up" ? "Operational" : s === "degraded" ? "Degraded" : s === "down" ? "Down" : "Unknown"; }
+function render() {
+  const g = document.getElementById("groups"); g.innerHTML = "";
+  for (const [group, svcs] of Object.entries(SVC)) {
+    let h = `<div><div class="group-title">${group}</div>`;
+    for (const s of svcs)
+      h += `<div class="service" id="svc-${s.id}"><div class="service-left"><div class="dot unknown"></div><span class="svc-name">${s.name}</span></div><div class="svc-meta">Checking...</div></div>`;
+    g.innerHTML += h + "</div>";
+  }
+}
+function updSvc(id, s) {
+  const el = document.getElementById(`svc-${id}`); if (!el) return;
+  el.querySelector(".dot").className = `dot ${s}`;
+  el.querySelector(".svc-meta").textContent = label(s);
+}
+function updBanner(res) {
+  const b = document.getElementById("banner");
+  const d = res.filter(r => r === "down").length, dg = res.filter(r => r === "degraded").length;
+  if (d >= 3) { b.className = "banner major"; b.textContent = "Major Outage"; }
+  else if (d > 0 || dg > 0) { b.className = "banner partial"; b.textContent = "Partial Outage"; }
+  else { b.className = "banner ok"; b.textContent = "All Systems Operational"; }
+}
+function updUptime() {
+  const p = calcUptime();
+  document.getElementById("uptime-pct").textContent = `24h uptime: ${p}%`;
+  const f = document.getElementById("uptime-fill");
+  f.style.width = `${p}%`;
+  f.style.background = p >= 99 ? "var(--green)" : p >= 90 ? "var(--yellow)" : "var(--red)";
+}
+async function run() {
+  const res = [];
+  for (const s of allFlat) {
+    checkSvc(s).then(st => {
+      saveResult(s.id, st); updSvc(s.id, st); res.push(st);
+      if (res.length === allFlat.length) { updBanner(res); updUptime(); }
+    });
+  }
+  document.getElementById("last-check").textContent = `Last check: ${new Date().toLocaleTimeString()}`;
+}
+render(); run(); setInterval(run, 60000);
+</script>
+</body>
+</html>

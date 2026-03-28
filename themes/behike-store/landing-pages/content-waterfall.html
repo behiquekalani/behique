@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Content Waterfall System — Behike</title>
+  <meta name="description" content="One piece of content. Ten platforms. One system. Turn a single long-form piece into a full week of content across 5+ channels.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0d0d0d;
+      --surface2: #141414;
+      --border: #222222;
+      --text: #ffffff;
+      --muted: #888888;
+      --accent: #0A84FF;
+      --green: #30D158;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ---- NAV ---- */
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .nav-cta {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      padding: 8px 22px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    /* ---- HERO ---- */
+
+    .hero {
+      padding: 140px 24px 100px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 7vw, 68px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .hero h1 .accent {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.2vw, 20px);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      padding: 16px 40px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ---- DIVIDER ---- */
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ---- SECTION COMMON ---- */
+
+    .section {
+      padding: 88px 24px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    /* ---- PROBLEM ---- */
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .pain-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+    }
+
+    .pain-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .pain-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .pain-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ---- HOW IT WORKS ---- */
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      position: relative;
+    }
+
+    .step-number {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--accent);
+      opacity: 0.25;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .step-title {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .step-arrow {
+      display: none;
+    }
+
+    /* ---- INCLUDED ---- */
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .feature-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .feature-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 7px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ---- WHO IT'S FOR ---- */
+
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+    }
+
+    .persona-tag {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 980px;
+      margin-bottom: 16px;
+    }
+
+    .persona-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+
+    .persona-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ---- TERMINAL BLOCK ---- */
+
+    .terminal-section {
+      padding: 88px 24px;
+    }
+
+    .terminal-inner {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .terminal-wrap {
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .terminal-header {
+      background: #1a1a1a;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .terminal-dot.red { background: #FF5F56; }
+    .terminal-dot.yellow { background: #FFBD2E; }
+    .terminal-dot.green { background: #27C93F; }
+
+    .terminal-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: 8px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .terminal-body {
+      padding: 28px 28px 32px;
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .t-source {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .t-arrow {
+      color: #444;
+    }
+
+    .t-label {
+      color: var(--green);
+    }
+
+    .t-output {
+      color: #ccc;
+    }
+
+    .t-dim {
+      color: #555;
+    }
+
+    .t-line {
+      display: block;
+      padding: 1px 0;
+    }
+
+    .t-indent {
+      padding-left: 24px;
+    }
+
+    /* ---- PRICING ---- */
+
+    .pricing-section {
+      padding: 88px 24px;
+    }
+
+    .pricing-inner {
+      max-width: 520px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 40px 36px;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .pricing-badge {
+      display: inline-block;
+      background: rgba(48, 209, 88, 0.1);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 980px;
+      margin-bottom: 20px;
+    }
+
+    .pricing-price {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .pricing-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .pricing-includes {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .pricing-includes li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pricing-includes li:last-child {
+      border-bottom: none;
+    }
+
+    .check-icon {
+      color: var(--green);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .pricing-cta {
+      display: block;
+      background: var(--green);
+      color: #000;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .pricing-cta:hover {
+      opacity: 0.88;
+      transform: scale(1.01);
+    }
+
+    .pricing-note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ---- FAQ ---- */
+
+    .faq-section {
+      padding: 88px 24px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .faq-list {
+      margin-top: 48px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: left;
+      padding: 22px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .faq-question:hover {
+      color: var(--accent);
+    }
+
+    .faq-icon {
+      font-size: 22px;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: transform 0.25s;
+      font-weight: 300;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      display: none;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      padding-bottom: 22px;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* ---- FOOTER ---- */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .footer-brand {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* ---- REVEAL ---- */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- MOBILE ---- */
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+
+      .hero { padding: 120px 20px 80px; }
+
+      .problem-grid,
+      .steps-grid,
+      .persona-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 32px 20px;
+      }
+
+      .footer-left {
+        align-items: center;
+      }
+
+      .terminal-body {
+        font-size: 12px;
+        padding: 20px;
+      }
+
+      .pricing-card {
+        padding: 28px 24px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-meta {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <a href="https://behike.gumroad.com/l/content-waterfall" class="nav-cta">Get it &mdash; $19.99</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>One piece of content.<br><span class="accent">Ten platforms.</span><br>One system.</h1>
+    <p class="hero-sub">The Content Waterfall turns a single long-form piece into a full week of content across 5 or more channels. Write once. Distribute everywhere. Stop starting from scratch every day.</p>
+    <a href="https://behike.gumroad.com/l/content-waterfall" class="btn-primary">Get the system &mdash; $19.99</a>
+    <div class="hero-meta">
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF guide + templates
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Instant download
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        One session per week
+      </span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Problem -->
+  <section class="section reveal" id="problem">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">You're recreating from scratch every day.</h2>
+    <p class="section-sub">Most creators treat every platform as a separate content project. That is the problem.</p>
+
+    <div class="problem-grid">
+      <div class="pain-card">
+        <div class="pain-icon">&#128565;</div>
+        <div class="pain-title">Daily blank page syndrome</div>
+        <p class="pain-desc">You sit down to post and start from scratch every single time. The same ideas, the same research, the same effort. Over and over. It is not a creativity problem. It is a systems problem.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">&#128339;</div>
+        <div class="pain-title">Hours spent, one post published</div>
+        <p class="pain-desc">You spent two hours on a newsletter that five people read. The same thinking could have become a Twitter thread, an Instagram carousel, a TikTok script, and a LinkedIn post. It did not, because you had no system.</p>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">&#128683;</div>
+        <div class="pain-title">Burnout before the audience builds</div>
+        <p class="pain-desc">Most creators quit before the compounding starts. Not because they lack ideas. Because the daily creation grind is unsustainable without a distribution system behind it. The Waterfall is that system.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- How It Works -->
+  <section class="section reveal" id="how">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three steps. One weekly session.</h2>
+    <p class="section-sub">The system runs in one focused session per week. Here is exactly how it works.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">01</div>
+        <div class="step-title">Create Once</div>
+        <p class="step-desc">Write one anchor piece. Newsletter, blog post, or long-form video script. This is the intellectual foundation. You do the deep thinking here. Every platform pulls from this single source.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">02</div>
+        <div class="step-title">Cascade Down</div>
+        <p class="step-desc">Run the anchor piece through the Waterfall templates. Each template restructures your core idea for a specific platform format. Same insight, different container. No new research required.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">03</div>
+        <div class="step-title">Distribute Everywhere</div>
+        <p class="step-desc">Schedule all outputs in the same session you created them. Twitter thread. Instagram carousel. Newsletter. TikTok script. LinkedIn post. Pinterest pin. All from one piece. All in one afternoon.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- What's Included -->
+  <section class="section reveal" id="includes">
+    <div class="section-label">What's Included</div>
+    <h2 class="section-title">Four systems. No filler.</h2>
+    <p class="section-sub">Every component has a clear function. Nothing in this product exists to bulk up the page count.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#127970;</div>
+        <div>
+          <div class="feature-title">The Waterfall Framework</div>
+          <p class="feature-desc">The core methodology. How to identify what belongs in the anchor piece, how to structure it for maximum downstream adaptability, and the decision framework for which platforms to prioritize.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128203;</div>
+        <div>
+          <div class="feature-title">Platform Templates</div>
+          <p class="feature-desc">One template per platform. Each template specifies structure, length, hook placement, and CTA requirements. You fill in your content. The format logic is already built in.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128197;</div>
+        <div>
+          <div class="feature-title">Scheduling System</div>
+          <p class="feature-desc">A weekly cadence for when to write, when to adapt, and when to schedule. Built to fit into one focused session per week, not spread across five fragmented days.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128161;</div>
+        <div>
+          <div class="feature-title">Prompt Library</div>
+          <p class="feature-desc">Ready-to-use AI prompts for each platform adaptation. Paste your anchor piece, run the prompt, get a formatted draft. Editing time cut by 60 to 80 percent per piece.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Who It's For -->
+  <section class="section reveal" id="who">
+    <div class="section-label">Who This Is For</div>
+    <h2 class="section-title">Built for three types of creators.</h2>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-tag">Solopreneur</div>
+        <div class="persona-title">You are building a business and cannot afford to spend five hours a day on content</div>
+        <p class="persona-desc">The Waterfall gives you consistent, multi-platform presence on a schedule that fits around your actual work. One session per week. Everything gets posted.</p>
+      </div>
+      <div class="persona-card">
+        <div class="persona-tag">Coach / Educator</div>
+        <div class="persona-title">You have deep expertise and want more people to find it without rebuilding content daily</div>
+        <p class="persona-desc">Your ideas deserve more than one platform. The Waterfall makes sure every good idea you produce reaches every audience that would benefit from it.</p>
+      </div>
+      <div class="persona-card">
+        <div class="persona-tag">Creator</div>
+        <div class="persona-title">You have ever written something good and only posted it once</div>
+        <p class="persona-desc">That newsletter you spent three hours on deserved a Twitter thread, a carousel, and a TikTok. The Waterfall makes sure that never happens again.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Sample Output Terminal Block -->
+  <div class="terminal-section reveal">
+    <div class="terminal-inner">
+      <div class="section-label">Sample Output</div>
+      <h2 class="section-title" style="margin-bottom:8px;">What one idea becomes.</h2>
+      <p class="section-sub">This is a real-world output map. One YouTube video. Everything below.</p>
+
+      <div class="terminal-wrap">
+        <div class="terminal-header">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green"></span>
+          <span class="terminal-title">content-waterfall.sh &mdash; weekly_output</span>
+        </div>
+        <div class="terminal-body">
+          <span class="t-line"><span class="t-source">INPUT</span> <span class="t-dim">&#8594;</span> <span class="t-output">1 YouTube video (8-12 min, anchor piece)</span></span>
+          <span class="t-line t-dim">&nbsp;</span>
+          <span class="t-line"><span class="t-label">CASCADE OUTPUT</span> <span class="t-dim">&#8594;</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[01]</span> <span class="t-output">Instagram carousel</span> <span class="t-dim">(5-7 slides, key visual argument)</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[02]</span> <span class="t-output">Twitter / X thread</span> <span class="t-dim">(8-12 tweets, hook + punchy breakdown)</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[03]</span> <span class="t-output">Email newsletter</span> <span class="t-dim">(400-600 words, personal tone, full depth)</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[04]</span> <span class="t-output">TikTok script</span> <span class="t-dim">(60-90 sec, hook in first 3 sec)</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[05]</span> <span class="t-output">LinkedIn post</span> <span class="t-dim">(professional framing, 200-250 words)</span></span>
+          <span class="t-line t-indent"><span class="t-dim">&#9492;&#9472;</span> <span class="t-label">[06]</span> <span class="t-output">Pinterest pin</span> <span class="t-dim">(title + description + board tag)</span></span>
+          <span class="t-line t-dim">&nbsp;</span>
+          <span class="t-line"><span class="t-label">TOTAL</span> <span class="t-dim">&#8594;</span> <span class="t-output">6 pieces of content. 1 creation session. 1 anchor piece.</span></span>
+          <span class="t-line"><span class="t-label">TIME</span>  <span class="t-dim">&#8594;</span> <span class="t-output">2-3 hours. Not 2-3 days.</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Pricing -->
+  <div class="pricing-section reveal" id="get">
+    <div class="pricing-inner">
+      <div class="section-label" style="text-align:center;">Pricing</div>
+      <h2 class="section-title" style="text-align:center; margin-bottom:0;">One price. Everything included.</h2>
+
+      <div class="pricing-card">
+        <div class="pricing-badge">Full System</div>
+        <div class="pricing-price">$19.99</div>
+        <p class="pricing-desc">One-time payment. Instant download. Yours forever.</p>
+
+        <ul class="pricing-includes">
+          <li><span class="check-icon">&#10003;</span> The Content Waterfall Framework (PDF)</li>
+          <li><span class="check-icon">&#10003;</span> Platform templates for 6 channels</li>
+          <li><span class="check-icon">&#10003;</span> Weekly scheduling system</li>
+          <li><span class="check-icon">&#10003;</span> AI prompt library (copy-paste ready)</li>
+          <li><span class="check-icon">&#10003;</span> 3-format minimum rule for low-energy weeks</li>
+          <li><span class="check-icon">&#10003;</span> Quality checklist for each piece</li>
+        </ul>
+
+        <a href="https://behike.gumroad.com/l/content-waterfall" class="pricing-cta">Get the Content Waterfall &mdash; $19.99</a>
+        <p class="pricing-note">Delivered via Gumroad. Works on any device. No subscription.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FAQ -->
+  <div class="faq-section reveal" id="faq">
+    <div class="section-label" style="text-align:center;">FAQ</div>
+    <h2 class="section-title" style="text-align:center;">Common questions.</h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Do I need to post on all six platforms?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          No. The Waterfall gives you the output for all six. You choose which ones to publish. Most people start with two or three and expand as they build their rhythm. The 3-format minimum rule inside the guide tells you exactly which three to prioritize when your time is limited.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          Do I need AI tools to use the Waterfall?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          No. The framework and templates work without AI. The prompt library is included for people who want to speed up the adaptation step using ChatGPT or Claude. If you do not use AI tools, you follow the structural templates manually. Both approaches work.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          How is this different from a content calendar template?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          A content calendar tells you when to post. The Waterfall tells you what to create and how to adapt it. It is a production system, not a scheduling tool. The goal is to eliminate the blank page problem by giving every piece of content a clear source and a clear path to distribution.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" aria-expanded="false">
+          What if I only have one platform right now?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          The Waterfall still applies. Even if you only publish on one platform, the anchor piece methodology makes you a better creator on that platform. The depth you build into the anchor piece raises the quality of everything you publish, regardless of how many channels you use. And when you are ready to expand, the system is already in place.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">
+      <span class="footer-brand">Behike</span>
+      <span class="footer-copy">&#169; 2026 Behike. All rights reserved.</span>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Products</a>
+      <a href="https://behike.gumroad.com">Store</a>
+      <a href="https://instagram.com/behikeai">@behikeai</a>
+      <a href="mailto:hello@behike.shop">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.07 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+
+        // Close all
+        document.querySelectorAll('.faq-item').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        });
+
+        // Open clicked if it was not already open
+        if (!isOpen) {
+          item.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

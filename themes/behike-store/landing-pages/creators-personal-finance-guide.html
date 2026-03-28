@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Personal Finance Guide | Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1d1d1f;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0A84FF;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-cta {
+      background: #30D158;
+      color: #000;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      color: #0A84FF;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 62px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: #F5F5F7;
+    }
+    .hero h1 span {
+      color: #0A84FF;
+    }
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: #86868b;
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-price-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .price {
+      font-size: 48px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -1px;
+    }
+    .price-note {
+      font-size: 14px;
+      color: #86868b;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #30D158;
+      color: #000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-disclaimer {
+      font-size: 12px;
+      color: #48484a;
+      margin-top: 20px;
+    }
+
+    /* SECTION SHARED */
+    section {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    p {
+      font-size: 17px;
+      color: #ababab;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: #1d1d1f;
+    }
+
+    /* PROBLEM */
+    .problem {
+      background: #000;
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: #0d0d0d;
+      border: 1px solid #1d1d1f;
+      border-radius: 16px;
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #F5F5F7;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: #86868b;
+      margin: 0;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside {
+      background: #050505;
+    }
+    .chapters-list {
+      margin-top: 48px;
+      display: grid;
+      gap: 2px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 28px;
+      background: #0d0d0d;
+      border: 1px solid #1d1d1f;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .chapter-item + .chapter-item { margin-top: 8px; }
+    .chapter-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0A84FF;
+      min-width: 32px;
+      padding-top: 2px;
+      letter-spacing: 0.5px;
+    }
+    .chapter-text h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+    }
+    .chapter-text p {
+      font-size: 14px;
+      color: #86868b;
+      margin: 0;
+    }
+
+    /* WHO IT'S FOR */
+    .who {
+      background: #000;
+    }
+    .who-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .who-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      background: #0d0d0d;
+      border: 1px solid #1d1d1f;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .who-item.visible { opacity: 1; transform: translateY(0); }
+    .who-dot {
+      width: 8px;
+      height: 8px;
+      background: #30D158;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .who-item span {
+      font-size: 16px;
+      color: #F5F5F7;
+    }
+
+    /* STATS STRIP */
+    .stats {
+      background: #050505;
+      padding: 60px 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      text-align: center;
+    }
+    .stat-block {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .stat-block.visible { opacity: 1; transform: translateY(0); }
+    .stat-num {
+      font-size: 44px;
+      font-weight: 700;
+      color: #0A84FF;
+      letter-spacing: -1px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #86868b;
+      margin-top: 8px;
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      background: #000;
+      text-align: center;
+      padding: 100px 0;
+    }
+    .bottom-cta h2 {
+      margin-bottom: 16px;
+    }
+    .bottom-cta p {
+      font-size: 18px;
+      color: #86868b;
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+    .bottom-disclaimer {
+      font-size: 12px;
+      color: #48484a;
+      margin-top: 24px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1d1d1f;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #48484a;
+      margin: 0;
+    }
+    footer a { color: #0A84FF; text-decoration: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .hero { padding: 60px 0 60px; }
+      section { padding: 60px 0; }
+      .chapter-item { padding: 18px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <a href="https://behike.gumroad.com" class="nav-cta">Get the Guide</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tag">Digital Guide</div>
+      <h1>The Creator's<br><span>Personal Finance Guide</span></h1>
+      <p class="hero-subtitle">A complete financial operating system for creators with variable income. Taxes, savings, investing, and the path to independence, built for your actual situation.</p>
+      <div class="hero-price-block">
+        <div class="price">$21.99</div>
+        <div class="price-note">One-time purchase. Instant PDF download.</div>
+      </div>
+      <a href="https://behike.gumroad.com/l/creators-personal-finance-guide" class="cta-btn">Get Instant Access</a>
+      <p class="hero-disclaimer">Educational content. Not professional financial advice.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-block">
+          <div class="stat-num">9</div>
+          <div class="stat-label">Chapters of practical systems</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-num">5K+</div>
+          <div class="stat-label">Words of actionable content</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Framework built for irregular income</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Standard finance advice<br>was written for someone else.</h2>
+      <p>Every personal finance book assumes you know what you will earn next month. Max out your 401k. Build a three-month emergency fund. Set a monthly budget. These instructions require predictability you do not have.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>Variable Income</h3>
+          <p>A launch month followed by three slow months is not failure. It is a different financial reality that needs a different management system.</p>
+        </div>
+        <div class="problem-card">
+          <h3>No Tax Withholding</h3>
+          <p>No one is setting aside your quarterly taxes. The first April as a creator can be devastating if you did not build the reserve system beforehand.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Blurred Finances</h3>
+          <p>When personal and business money mix, you cannot see your real profit, you lose deductions, and you have no idea what your business actually costs to run.</p>
+        </div>
+        <div class="problem-card">
+          <h3>No Emergency Floor</h3>
+          <p>A three-month emergency fund does not account for the recognition lag on creator income decline. By the time you know it is serious, months have already passed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="inside">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>A complete financial system,<br>chapter by chapter.</h2>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <div class="chapter-num">INTRO</div>
+          <div class="chapter-text">
+            <h4>The Creator's Financial Reality</h4>
+            <p>Why standard financial advice fails you and what makes your situation structurally different.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 1</div>
+          <div class="chapter-text">
+            <h4>Understanding the Creator's Financial Reality</h4>
+            <p>The four ways creator income differs and what each one requires from your financial system.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 2</div>
+          <div class="chapter-text">
+            <h4>Separating Personal and Business Finances</h4>
+            <p>The minimum viable separation that makes taxes simpler, profit visible, and deductions defensible.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 3</div>
+          <div class="chapter-text">
+            <h4>Paying Yourself as a Solopreneur</h4>
+            <p>How to pay yourself a consistent salary from an inconsistent business. Includes the owner's draw mechanics and how to handle launch revenue.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 4</div>
+          <div class="chapter-text">
+            <h4>Tax Basics for Digital Product Sellers</h4>
+            <p>Self-employment tax, quarterly estimated payments, the tax reserve account, and how to handle deductions without audit risk.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 5</div>
+          <div class="chapter-text">
+            <h4>Building an Emergency Fund on Irregular Income</h4>
+            <p>The two-fund system, why creators need a larger buffer than employees, and the mechanics of building it when income is unpredictable.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 6</div>
+          <div class="chapter-text">
+            <h4>Investing When You Don't Have a Steady Paycheck</h4>
+            <p>Tax-advantaged accounts for the self-employed, the percentage-based contribution approach, and what to do with windfall income.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 7</div>
+          <div class="chapter-text">
+            <h4>Managing Debt as a Creator</h4>
+            <p>The modified debt avalanche for variable income, student loan strategy, and how to evaluate business debt.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 8</div>
+          <div class="chapter-text">
+            <h4>The Creator's Path to Financial Independence</h4>
+            <p>The hybrid FI model for creators. Why you have structural advantages on this path that employees do not.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">CH 9</div>
+          <div class="chapter-text">
+            <h4>The Monthly Financial Review</h4>
+            <p>What to review, what to decide, and how to make this a 30-minute ritual that keeps the whole system working.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHO IT'S FOR -->
+  <section class="who">
+    <div class="container">
+      <div class="section-label">Who This Is For</div>
+      <h2>Built for creators who take<br>their finances seriously.</h2>
+      <div class="who-list">
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Digital product sellers earning their first $20K to $100K per year</span>
+        </div>
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Freelancers and solopreneurs transitioning from employment to self-employment</span>
+        </div>
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Course creators and coaches who have variable, launch-dependent income</span>
+        </div>
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Creators who have been operating with mixed personal and business finances</span>
+        </div>
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Anyone who has been surprised by a tax bill and wants a system to prevent it</span>
+        </div>
+        <div class="who-item">
+          <div class="who-dot"></div>
+          <span>Solopreneurs who want to start investing but do not know how to start without a steady paycheck</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <div class="section-label">Get Started</div>
+      <h2>Stop operating reactively.<br>Build the system.</h2>
+      <p>One framework, built for your actual situation. No boilerplate. No advice that requires a salary you do not have.</p>
+      <div class="price" style="margin-bottom: 32px;">$21.99</div>
+      <a href="https://behike.gumroad.com/l/creators-personal-finance-guide" class="cta-btn">Get Instant Access</a>
+      <p class="bottom-disclaimer">This guide is educational content and does not constitute professional financial, tax, or legal advice. Consult a qualified professional for guidance specific to your situation.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="https://behikeai.com">behikeai.com</a> &mdash; Educational content, not professional financial advice.</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, entry.target.dataset.delay || 0);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.problem-card, .chapter-item, .who-item, .stat-block').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

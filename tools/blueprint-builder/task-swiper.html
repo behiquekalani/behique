@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Task Swiper - Business Blueprint</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #060c10;
+    --bg-card: #0a1420;
+    --text: #e0eef5;
+    --text-secondary: #7ab0d4;
+    --text-muted: #456580;
+    --border: #102a3a;
+    --accent: #06b6d4;
+    --accent-glow: rgba(6, 182, 212, 0.15);
+    --success: #22d3ee;
+    --done: #10b981;
+    --skip: #f59e0b;
+    --font: -apple-system, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    touch-action: pan-y;
+}
+
+/* ---- HEADER ---- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-brand {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.header-progress {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-family: var(--mono);
+}
+
+/* ---- PROGRESS BAR ---- */
+.progress-bar {
+    height: 2px;
+    background: var(--border);
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    width: 0%;
+}
+
+/* ---- CARD CONTAINER ---- */
+.card-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    overflow: hidden;
+}
+
+.app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* ---- TASK CARD ---- */
+.task-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    position: absolute;
+    cursor: grab;
+    user-select: none;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+    will-change: transform;
+}
+
+.task-card:active { cursor: grabbing; }
+
+.task-card.swiping-right {
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+    border-color: var(--done);
+}
+
+.task-card.swiping-left {
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
+    border-color: var(--skip);
+}
+
+.task-card.exit-right {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateX(150%) rotate(15deg) !important;
+    opacity: 0;
+}
+
+.task-card.exit-left {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateX(-150%) rotate(-15deg) !important;
+    opacity: 0;
+}
+
+.card-phase {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: var(--mono);
+    margin-bottom: 0.75rem;
+}
+
+.card-number {
+    font-size: 3rem;
+    font-weight: 200;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.card-description {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.card-tag {
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 3px;
+}
+
+.card-tag-priority {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ---- SWIPE INDICATORS ---- */
+.swipe-indicator {
+    position: absolute;
+    top: 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.swipe-done {
+    right: 1.5rem;
+    color: var(--done);
+    border: 2px solid var(--done);
+}
+
+.swipe-skip {
+    left: 1.5rem;
+    color: var(--skip);
+    border: 2px solid var(--skip);
+}
+
+.task-card.swiping-right .swipe-done { opacity: 1; }
+.task-card.swiping-left .swipe-skip { opacity: 1; }
+
+/* ---- BOTTOM CONTROLS ---- */
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.control-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+}
+
+.control-btn-done {
+    width: 64px;
+    height: 64px;
+    border-color: var(--done);
+    color: var(--done);
+}
+
+.control-btn-done:hover {
+    border-color: var(--done);
+    color: var(--done);
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.control-btn-skip {
+    border-color: var(--skip);
+    color: var(--skip);
+}
+
+.control-btn-skip:hover {
+    border-color: var(--skip);
+    color: var(--skip);
+    background: rgba(245, 158, 11, 0.15);
+}
+
+/* ---- COMPLETION SCREEN ---- */
+.completion {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    flex: 1;
+}
+
+.completion.active { display: flex; }
+.card-container.hidden { display: none; }
+.controls.hidden { display: none; }
+
+.completion-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.completion-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+}
+
+.completion-stats {
+    display: flex;
+    gap: 2rem;
+    margin: 1.5rem 0;
+}
+
+.completion-stat {
+    text-align: center;
+}
+
+.completion-stat-value {
+    font-size: 2rem;
+    font-weight: 200;
+    color: var(--accent);
+    font-family: var(--mono);
+}
+
+.completion-stat-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.restart-btn {
+    margin-top: 2rem;
+    padding: 0.75rem 2rem;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.restart-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+}
+
+/* ---- CATEGORY FILTER ---- */
+.filter-bar {
+    display: flex;
+    gap: 0;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--border);
+}
+
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    font-family: var(--font);
+    transition: all 0.2s;
+}
+
+.filter-btn:hover { color: var(--text-secondary); }
+.filter-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+    .task-card { padding: 1.5rem; }
+    .card-number { font-size: 2.5rem; }
+    .controls { gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+    <header class="header">
+        <span class="header-brand">Task Swiper</span>
+        <span class="header-progress" id="progressText">0 / 0</span>
+    </header>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="filter-bar" id="filterBar"></div>
+
+    <div class="card-container" id="cardContainer"></div>
+
+    <div class="completion" id="completion">
+        <div class="completion-icon">&#9889;</div>
+        <div class="completion-title">Session Complete</div>
+        <div class="completion-stats">
+            <div class="completion-stat">
+                <div class="completion-stat-value" id="statDone">0</div>
+                <div class="completion-stat-label">Completed</div>
+            </div>
+            <div class="completion-stat">
+                <div class="completion-stat-value" id="statSkipped">0</div>
+                <div class="completion-stat-label">Skipped</div>
+            </div>
+            <div class="completion-stat">
+                <div class="completion-stat-value" id="statTotal">0</div>
+                <div class="completion-stat-label">Total</div>
+            </div>
+        </div>
+        <button class="restart-btn" onclick="restart()">Start New Session</button>
+    </div>
+
+    <div class="controls" id="controls">
+        <button class="control-btn control-btn-skip" onclick="skipTask()" title="Skip (swipe left)">&#10226;</button>
+        <button class="control-btn control-btn-done" onclick="completeTask()" title="Done (swipe right)">&#10003;</button>
+        <button class="control-btn" onclick="undoLast()" title="Undo last">&#8634;</button>
+    </div>
+</div>
+
+<script>
+// ---- TASK DATA ----
+// Default tasks from the Business Blueprint phases
+var DEFAULT_TASKS = [
+    // Phase 1: Foundation
+    {phase: "PHASE 01", category: "foundation", title: "Set up development environment", description: "Install and configure your core tools: IDE, terminal, version control. This is your workshop.", tags: ["setup", "priority"], priority: true},
+    {phase: "PHASE 01", category: "foundation", title: "Create project repository", description: "Initialize your main project repository with proper structure, README, and initial commit.", tags: ["setup"], priority: false},
+    {phase: "PHASE 01", category: "foundation", title: "Configure AI assistant", description: "Set up your AI coding assistant with project context, memory files, and custom instructions.", tags: ["ai", "priority"], priority: true},
+    {phase: "PHASE 01", category: "foundation", title: "Define your value ladder", description: "Map out your product/service tiers from free lead magnets to premium offerings.", tags: ["strategy", "priority"], priority: true},
+    {phase: "PHASE 01", category: "foundation", title: "Create first lead magnet", description: "Build a free resource that solves a specific problem for your target audience.", tags: ["content", "priority"], priority: true},
+    {phase: "PHASE 01", category: "foundation", title: "Set up analytics tracking", description: "Install basic analytics to measure traffic, conversions, and user behavior from day one.", tags: ["ops"], priority: false},
+    {phase: "PHASE 01", category: "foundation", title: "Build landing page", description: "Create a simple, focused landing page for your first product or lead magnet.", tags: ["content", "priority"], priority: true},
+    {phase: "PHASE 01", category: "foundation", title: "Set up payment processing", description: "Connect Gumroad, Stripe, or your preferred payment platform. Test with a $0 product.", tags: ["ops"], priority: false},
+
+    // Phase 2: Scale
+    {phase: "PHASE 02", category: "scale", title: "Launch content calendar", description: "Plan and schedule your first 2 weeks of content across all platforms.", tags: ["content", "priority"], priority: true},
+    {phase: "PHASE 02", category: "scale", title: "Automate content repurposing", description: "Set up workflows to turn one piece of content into 3-5 formats automatically.", tags: ["automation"], priority: false},
+    {phase: "PHASE 02", category: "scale", title: "Build email sequence", description: "Create a 5-email welcome sequence that nurtures leads toward your paid product.", tags: ["sales", "priority"], priority: true},
+    {phase: "PHASE 02", category: "scale", title: "Set up CRM pipeline", description: "Organize your leads and customers into stages. Track where everyone is in your funnel.", tags: ["ops"], priority: false},
+    {phase: "PHASE 02", category: "scale", title: "Create case study", description: "Document your own results or first customer results as social proof.", tags: ["content"], priority: false},
+    {phase: "PHASE 02", category: "scale", title: "Launch second product", description: "Based on Phase 1 data, build and launch your second product on the value ladder.", tags: ["product", "priority"], priority: true},
+    {phase: "PHASE 02", category: "scale", title: "Deploy AI agents for operations", description: "Set up automated agents to handle customer support, content scheduling, or data entry.", tags: ["ai", "automation"], priority: false},
+
+    // Phase 3: Autonomy
+    {phase: "PHASE 03", category: "autonomy", title: "Build standard operating procedures", description: "Document every repeatable process so the business can run without your constant attention.", tags: ["ops", "priority"], priority: true},
+    {phase: "PHASE 03", category: "autonomy", title: "Set up monitoring dashboard", description: "Create a single view of all key metrics: revenue, traffic, conversion rates, customer health.", tags: ["ops"], priority: false},
+    {phase: "PHASE 03", category: "autonomy", title: "Automate financial tracking", description: "Set up automated invoicing, expense tracking, and monthly P&L reports.", tags: ["finance"], priority: false},
+    {phase: "PHASE 03", category: "autonomy", title: "Build referral system", description: "Create incentives for customers to bring new customers. The best marketing is word of mouth.", tags: ["sales", "priority"], priority: true},
+    {phase: "PHASE 03", category: "autonomy", title: "Package and sell the system", description: "Take everything you built and package it as a product others can buy.", tags: ["product", "priority"], priority: true},
+];
+
+// ---- STATE ----
+var tasks = [];
+var currentIndex = 0;
+var completed = [];
+var skipped = [];
+var undoStack = [];
+var activeFilter = 'all';
+
+// ---- INIT ----
+function init() {
+    // Load custom tasks from localStorage or use defaults
+    try {
+        var saved = localStorage.getItem('ts-custom-tasks');
+        if (saved) tasks = JSON.parse(saved);
+        else tasks = DEFAULT_TASKS.slice();
+    } catch(e) {
+        tasks = DEFAULT_TASKS.slice();
+    }
+
+    // Load session state
+    try {
+        var state = localStorage.getItem('ts-session');
+        if (state) {
+            var s = JSON.parse(state);
+            completed = s.completed || [];
+            skipped = s.skipped || [];
+            currentIndex = s.currentIndex || 0;
+        }
+    } catch(e) {}
+
+    buildFilters();
+    applyFilter(activeFilter);
+    renderCard();
+    updateProgress();
+}
+
+function buildFilters() {
+    var categories = ['all'];
+    tasks.forEach(function(t) {
+        if (categories.indexOf(t.category) === -1) categories.push(t.category);
+    });
+
+    var bar = document.getElementById('filterBar');
+    bar.innerHTML = '';
+    categories.forEach(function(cat) {
+        var btn = document.createElement('button');
+        btn.className = 'filter-btn' + (cat === activeFilter ? ' active' : '');
+        btn.textContent = cat;
+        btn.onclick = function() { applyFilter(cat); };
+        bar.appendChild(btn);
+    });
+}
+
+function applyFilter(category) {
+    activeFilter = category;
+    // Update filter buttons
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.textContent === category);
+    });
+
+    if (category === 'all') {
+        tasks = DEFAULT_TASKS.slice();
+    } else {
+        tasks = DEFAULT_TASKS.filter(function(t) { return t.category === category; });
+    }
+
+    // Remove already completed/skipped
+    var doneSet = {};
+    completed.forEach(function(t) { doneSet[t] = true; });
+    skipped.forEach(function(t) { doneSet[t] = true; });
+
+    currentIndex = 0;
+    // Find first non-done task
+    while (currentIndex < tasks.length && doneSet[tasks[currentIndex].title]) {
+        currentIndex++;
+    }
+
+    renderCard();
+    updateProgress();
+}
+
+function saveSession() {
+    try {
+        localStorage.setItem('ts-session', JSON.stringify({
+            completed: completed,
+            skipped: skipped,
+            currentIndex: currentIndex
+        }));
+    } catch(e) {}
+}
+
+function renderCard() {
+    var container = document.getElementById('cardContainer');
+
+    // Find next non-done task
+    var doneSet = {};
+    completed.forEach(function(t) { doneSet[t] = true; });
+    skipped.forEach(function(t) { doneSet[t] = true; });
+
+    while (currentIndex < tasks.length && doneSet[tasks[currentIndex].title]) {
+        currentIndex++;
+    }
+
+    if (currentIndex >= tasks.length) {
+        showCompletion();
+        return;
+    }
+
+    var task = tasks[currentIndex];
+    var tagsHtml = '';
+    (task.tags || []).forEach(function(tag) {
+        var cls = tag === 'priority' ? 'card-tag card-tag-priority' : 'card-tag';
+        tagsHtml += '<span class="' + cls + '">' + tag + '</span>';
+    });
+
+    container.innerHTML = '<div class="task-card" id="activeCard">' +
+        '<div class="swipe-indicator swipe-done">DONE</div>' +
+        '<div class="swipe-indicator swipe-skip">SKIP</div>' +
+        '<div class="card-phase">' + task.phase + '</div>' +
+        '<div class="card-number">' + String(currentIndex + 1).padStart(2, '0') + '</div>' +
+        '<div class="card-title">' + task.title + '</div>' +
+        '<div class="card-description">' + task.description + '</div>' +
+        '<div class="card-tags">' + tagsHtml + '</div>' +
+    '</div>';
+
+    setupSwipe(document.getElementById('activeCard'));
+}
+
+function updateProgress() {
+    var total = tasks.length;
+    var done = 0;
+    var doneSet = {};
+    completed.forEach(function(t) { doneSet[t] = true; });
+    skipped.forEach(function(t) { doneSet[t] = true; });
+    tasks.forEach(function(t) { if (doneSet[t.title]) done++; });
+
+    document.getElementById('progressText').textContent = done + ' / ' + total;
+    document.getElementById('progressFill').style.width = (total > 0 ? (done / total * 100) : 0) + '%';
+}
+
+// ---- SWIPE LOGIC ----
+function setupSwipe(card) {
+    var startX = 0, startY = 0, currentX = 0, isDragging = false;
+    var threshold = 100;
+
+    function onStart(e) {
+        isDragging = true;
+        var point = e.touches ? e.touches[0] : e;
+        startX = point.clientX;
+        startY = point.clientY;
+        card.style.transition = 'none';
+    }
+
+    function onMove(e) {
+        if (!isDragging) return;
+        var point = e.touches ? e.touches[0] : e;
+        currentX = point.clientX - startX;
+        var rotation = currentX * 0.08;
+        card.style.transform = 'translateX(' + currentX + 'px) rotate(' + rotation + 'deg)';
+
+        card.classList.toggle('swiping-right', currentX > 40);
+        card.classList.toggle('swiping-left', currentX < -40);
+    }
+
+    function onEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (currentX > threshold) {
+            card.classList.add('exit-right');
+            setTimeout(function() { completeTask(); }, 300);
+        } else if (currentX < -threshold) {
+            card.classList.add('exit-left');
+            setTimeout(function() { skipTask(); }, 300);
+        } else {
+            card.style.transition = 'transform 0.3s ease';
+            card.style.transform = '';
+            card.classList.remove('swiping-right', 'swiping-left');
+        }
+    }
+
+    card.addEventListener('mousedown', onStart);
+    card.addEventListener('touchstart', onStart, {passive: true});
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, {passive: true});
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+}
+
+// ---- ACTIONS ----
+function completeTask() {
+    if (currentIndex >= tasks.length) return;
+    var task = tasks[currentIndex];
+    completed.push(task.title);
+    undoStack.push({action: 'complete', title: task.title, index: currentIndex});
+    currentIndex++;
+    saveSession();
+    renderCard();
+    updateProgress();
+}
+
+function skipTask() {
+    if (currentIndex >= tasks.length) return;
+    var task = tasks[currentIndex];
+    skipped.push(task.title);
+    undoStack.push({action: 'skip', title: task.title, index: currentIndex});
+    currentIndex++;
+    saveSession();
+    renderCard();
+    updateProgress();
+}
+
+function undoLast() {
+    if (undoStack.length === 0) return;
+    var last = undoStack.pop();
+    if (last.action === 'complete') {
+        completed = completed.filter(function(t) { return t !== last.title; });
+    } else {
+        skipped = skipped.filter(function(t) { return t !== last.title; });
+    }
+    currentIndex = last.index;
+    saveSession();
+    renderCard();
+    updateProgress();
+}
+
+function showCompletion() {
+    document.getElementById('cardContainer').classList.add('hidden');
+    document.getElementById('controls').classList.add('hidden');
+    var comp = document.getElementById('completion');
+    comp.classList.add('active');
+    document.getElementById('statDone').textContent = completed.length;
+    document.getElementById('statSkipped').textContent = skipped.length;
+    document.getElementById('statTotal').textContent = tasks.length;
+}
+
+function restart() {
+    completed = [];
+    skipped = [];
+    currentIndex = 0;
+    undoStack = [];
+    activeFilter = 'all';
+    try { localStorage.removeItem('ts-session'); } catch(e) {}
+
+    document.getElementById('completion').classList.remove('active');
+    document.getElementById('cardContainer').classList.remove('hidden');
+    document.getElementById('controls').classList.remove('hidden');
+
+    buildFilters();
+    renderCard();
+    updateProgress();
+}
+
+// ---- KEYBOARD SHORTCUTS ----
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'd') completeTask();
+    else if (e.key === 'ArrowLeft' || e.key === 's') skipTask();
+    else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) undoLast();
+});
+
+// ---- START ----
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ceiba Sanctuary</title>
+<meta name="description" content="A complete digital wellness environment. Breathing, ambient sound, focus tools, and circadian light in one tab.">
+<meta name="robots" content="noai, noimageai">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060a10;--surface:#0c1018;--card:#111822;--border:#1a2535;
+  --text:#c0c8d8;--dim:#5a6a7a;--accent:#00f0ff;
+  --inhale:#00f0ff;--hold:#b44dff;--exhale:#00ff88;--rest:#ffc832;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+
+/* Layout */
+.sanctuary{display:flex;height:100vh;height:100dvh}
+.main-area{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sidebar{width:320px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:transform .3s}
+.sidebar.collapsed{transform:translateX(320px);width:0;border:none}
+
+/* Canvas background */
+canvas#bg-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+
+/* Breathing circle */
+.breath-zone{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:24px}
+.breath-ring{width:200px;height:200px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;transition:all 1s ease-in-out;position:relative}
+.breath-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(0,240,255,0.15);transition:all 1s}
+.breath-ring.inhale{width:260px;height:260px;border-color:var(--inhale);box-shadow:0 0 60px rgba(0,240,255,0.15)}
+.breath-ring.hold-in{border-color:var(--hold);box-shadow:0 0 40px rgba(180,77,255,0.15)}
+.breath-ring.exhale{width:160px;height:160px;border-color:var(--exhale);box-shadow:0 0 40px rgba(0,255,136,0.1)}
+.breath-ring.hold-out{border-color:var(--rest);box-shadow:0 0 30px rgba(255,200,50,0.1)}
+.breath-label{font-size:18px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;transition:color 1s}
+.breath-timer{font-size:48px;font-weight:200;letter-spacing:-0.02em;color:var(--accent);transition:color 1s}
+.breath-instruction{font-size:13px;color:var(--dim);letter-spacing:0.1em}
+
+/* Session info */
+.session-bar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:linear-gradient(var(--bg),transparent)}
+.session-time{font-size:12px;color:var(--dim);letter-spacing:0.1em;font-variant-numeric:tabular-nums}
+.session-streak{font-size:11px;color:var(--dim)}
+.toggle-sidebar{width:36px;height:36px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--dim);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.toggle-sidebar:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Sidebar sections */
+.sb-section{padding:20px;border-bottom:1px solid var(--border)}
+.sb-section h3{font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--dim);font-weight:600;margin-bottom:16px}
+.sb-label{font-size:12px;color:var(--dim);margin-bottom:6px}
+
+/* Breathing patterns */
+.pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pattern-btn{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;text-align:center;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.pattern-btn:hover{border-color:var(--accent)}
+.pattern-btn.active{border-color:var(--accent);background:rgba(0,240,255,0.08)}
+.pattern-btn .p-name{font-weight:500;margin-bottom:2px}
+.pattern-btn .p-timing{font-size:10px;color:var(--dim)}
+
+/* Sound controls */
+.sound-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.sound-row label{font-size:12px;color:var(--text);flex:1}
+.sound-slider{-webkit-appearance:none;width:100px;height:4px;background:var(--border);border-radius:2px;outline:none}
+.sound-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+.sound-toggle{width:32px;height:18px;background:var(--border);border-radius:9px;position:relative;cursor:pointer;transition:background .2s}
+.sound-toggle.on{background:var(--accent)}
+.sound-toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .2s}
+.sound-toggle.on::after{transform:translateX(14px)}
+
+/* Circadian */
+.circ-bar{height:8px;border-radius:4px;background:linear-gradient(90deg,#1a1040 0%,#ff8844 25%,#ffffcc 50%,#ff8844 75%,#1a1040 100%);margin-bottom:8px;position:relative}
+.circ-marker{position:absolute;top:-4px;width:16px;height:16px;border:2px solid var(--accent);border-radius:50%;background:var(--bg);transform:translateX(-50%)}
+.circ-temp{font-size:12px;color:var(--dim);text-align:center}
+
+/* Focus timer */
+.focus-display{text-align:center;margin-bottom:12px}
+.focus-time{font-size:36px;font-weight:200;color:var(--text);letter-spacing:0.05em;font-variant-numeric:tabular-nums}
+.focus-label{font-size:11px;color:var(--dim);margin-top:4px}
+.focus-btns{display:flex;gap:8px;justify-content:center}
+.focus-btn{padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text);font-size:11px;cursor:pointer;font-family:var(--font);transition:all .2s}
+.focus-btn:hover{border-color:var(--accent);color:var(--accent)}
+.focus-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+/* Presets */
+.preset-row{display:flex;gap:6px;flex-wrap:wrap}
+.preset{padding:6px 12px;border:1px solid var(--border);border-radius:16px;font-size:11px;color:var(--dim);cursor:pointer;background:transparent;font-family:var(--font);transition:all .2s}
+.preset:hover{border-color:var(--accent);color:var(--accent)}
+.preset.active{background:rgba(0,240,255,0.1);border-color:var(--accent);color:var(--accent)}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mini-stat{background:var(--card);border-radius:8px;padding:12px;text-align:center}
+.mini-stat .val{font-size:20px;font-weight:300;color:var(--accent)}
+.mini-stat .lbl{font-size:10px;color:var(--dim);margin-top:2px}
+
+/* Play/pause overlay */
+.play-overlay{position:absolute;z-index:5;bottom:32px;display:flex;gap:12px;align-items:center}
+.play-btn{width:56px;height:56px;border-radius:50%;border:2px solid var(--accent);background:rgba(0,240,255,0.05);color:var(--accent);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px)}
+.play-btn:hover{background:rgba(0,240,255,0.15)}
+.mode-label{font-size:12px;color:var(--dim);letter-spacing:0.1em}
+
+/* Circadian filter overlay */
+#circ-filter{position:fixed;inset:0;pointer-events:none;z-index:50;transition:background 2s;mix-blend-mode:multiply}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{position:fixed;right:0;top:0;bottom:0;z-index:100;width:300px;transform:translateX(300px)}
+  .sidebar.open{transform:translateX(0)}
+}
+</style>
+</head>
+<body>
+
+<div class="sanctuary">
+  <!-- Main breathing area -->
+  <div class="main-area">
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="session-bar">
+      <div>
+        <div class="session-time" id="session-clock">00:00</div>
+        <div class="session-streak" id="streak-display"></div>
+      </div>
+      <button class="toggle-sidebar" id="sb-toggle" title="Settings">&#9776;</button>
+    </div>
+
+    <div class="breath-zone">
+      <div class="breath-ring" id="breath-ring">
+        <div style="text-align:center">
+          <div class="breath-timer" id="breath-timer">4</div>
+          <div class="breath-label" id="breath-label">INHALE</div>
+        </div>
+      </div>
+      <div class="breath-instruction" id="breath-instruction">Press play to begin</div>
+    </div>
+
+    <div class="play-overlay">
+      <button class="play-btn" id="play-btn" title="Play/Pause">&#9654;</button>
+      <div class="mode-label" id="mode-label">Ready</div>
+    </div>
+  </div>
+
+  <!-- Sidebar controls -->
+  <div class="sidebar" id="sidebar">
+    <!-- Breathing -->
+    <div class="sb-section">
+      <h3>Breathing Pattern</h3>
+      <div class="pattern-grid" id="patterns">
+        <button class="pattern-btn active" data-pattern="box">
+          <div class="p-name">Box</div>
+          <div class="p-timing">4-4-4-4</div>
+        </button>
+        <button class="pattern-btn" data-pattern="relax">
+          <div class="p-name">4-7-8</div>
+          <div class="p-timing">Relax</div>
+        </button>
+        <button class="pattern-btn" data-pattern="energize">
+          <div class="p-name">Energize</div>
+          <div class="p-timing">2-1-4-0</div>
+        </button>
+        <button class="pattern-btn" data-pattern="calm">
+          <div class="p-name">Calm</div>
+          <div class="p-timing">6-0-6-0</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Ambient Sound -->
+    <div class="sb-section">
+      <h3>Ambient Sound</h3>
+      <div class="sound-row"><label>Rain</label><input type="range" class="sound-slider" id="snd-rain" min="0" max="100" value="40"><div class="sound-toggle on" data-snd="rain"></div></div>
+      <div class="sound-row"><label>Ocean</label><input type="range" class="sound-slider" id="snd-ocean" min="0" max="100" value="0"><div class="sound-toggle" data-snd="ocean"></div></div>
+      <div class="sound-row"><label>Forest</label><input type="range" class="sound-slider" id="snd-forest" min="0" max="100" value="0"><div class="sound-toggle" data-snd="forest"></div></div>
+      <div class="sound-row"><label>Wind</label><input type="range" class="sound-slider" id="snd-wind" min="0" max="100" value="0"><div class="sound-toggle" data-snd="wind"></div></div>
+      <div class="sound-row"><label>Binaural (40Hz)</label><input type="range" class="sound-slider" id="snd-binaural" min="0" max="100" value="0"><div class="sound-toggle" data-snd="binaural"></div></div>
+    </div>
+
+    <!-- Circadian -->
+    <div class="sb-section">
+      <h3>Circadian Light</h3>
+      <div class="circ-bar"><div class="circ-marker" id="circ-marker" style="left:50%"></div></div>
+      <div class="circ-temp" id="circ-label">Neutral</div>
+      <div style="margin-top:12px">
+        <div class="sb-label">Color temperature</div>
+        <input type="range" class="sound-slider" id="circ-slider" min="0" max="100" value="50" style="width:100%">
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--dim);cursor:pointer">
+        <input type="checkbox" id="circ-auto" checked> Auto (follow time of day)
+      </label>
+    </div>
+
+    <!-- Focus Timer -->
+    <div class="sb-section">
+      <h3>Focus Timer</h3>
+      <div class="focus-display">
+        <div class="focus-time" id="focus-time">25:00</div>
+        <div class="focus-label" id="focus-label">Pomodoro</div>
+      </div>
+      <div class="focus-btns">
+        <button class="focus-btn" data-min="15">15m</button>
+        <button class="focus-btn active" data-min="25">25m</button>
+        <button class="focus-btn" data-min="45">45m</button>
+        <button class="focus-btn" data-min="60">60m</button>
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="sb-section">
+      <h3>Presets</h3>
+      <div class="preset-row">
+        <button class="preset active" data-preset="focus">Deep Focus</button>
+        <button class="preset" data-preset="sleep">Sleep</button>
+        <button class="preset" data-preset="energy">Energy</button>
+        <button class="preset" data-preset="anxiety">Calm</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="sb-section">
+      <h3>Today</h3>
+      <div class="stat-grid">
+        <div class="mini-stat"><div class="val" id="stat-breaths">0</div><div class="lbl">Breaths</div></div>
+        <div class="mini-stat"><div class="val" id="stat-minutes">0</div><div class="lbl">Minutes</div></div>
+        <div class="mini-stat"><div class="val" id="stat-sessions">0</div><div class="lbl">Sessions</div></div>
+        <div class="mini-stat"><div class="val" id="stat-streak">0</div><div class="lbl">Day Streak</div></div>
+      </div>
+    </div>
+
+    <div style="padding:20px;text-align:center;font-size:10px;color:var(--dim);letter-spacing:0.1em">
+      CEIBA SANCTUARY<br>behike.co
+    </div>
+  </div>
+</div>
+
+<!-- Circadian filter -->
+<div id="circ-filter"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* === AUDIO ENGINE === */
+var audioCtx = null;
+var sounds = {};
+var masterGain = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.5;
+  masterGain.connect(audioCtx.destination);
+
+  /* Brown noise (rain-like) */
+  sounds.rain = createNoise('brown', 0.4);
+  /* White noise filtered (ocean) */
+  sounds.ocean = createFilteredNoise(200, 0);
+  /* Pink noise (forest) */
+  sounds.forest = createNoise('pink', 0);
+  /* Filtered wind */
+  sounds.wind = createFilteredNoise(80, 0);
+  /* Binaural beat (40Hz focus) */
+  sounds.binaural = createBinaural(200, 240, 0);
+}
+
+function createNoise(type, vol) {
+  var bufferSize = audioCtx.sampleRate * 2;
+  var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  var data = buffer.getChannelData(0);
+  var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for (var i = 0; i < bufferSize; i++) {
+    var white = Math.random() * 2 - 1;
+    if (type === 'pink') {
+      b0=0.99886*b0+white*0.0555179;b1=0.99332*b1+white*0.0750759;
+      b2=0.969*b2+white*0.153852;b3=0.8665*b3+white*0.3104856;
+      b4=0.55*b4+white*0.5329522;b5=-0.7616*b5-white*0.016898;
+      data[i]=(b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;b6=white*0.115926;
+    } else { /* brown */
+      data[i] = (b0 + (0.02 * white)) / 1.02; b0 = data[i]; data[i] *= 3.5;
+    }
+  }
+  var source = audioCtx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  var gain = audioCtx.createGain(); gain.gain.value = vol;
+  source.connect(gain); gain.connect(masterGain); source.start();
+  return { gain: gain };
+}
+
+function createFilteredNoise(freq, vol) {
+  var bufferSize = audioCtx.sampleRate * 2;
+  var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  var data = buffer.getChannelData(0);
+  for (var i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  var source = audioCtx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  var filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = freq;
+  var gain = audioCtx.createGain(); gain.gain.value = vol;
+  source.connect(filter); filter.connect(gain); gain.connect(masterGain); source.start();
+  return { gain: gain, filter: filter };
+}
+
+function createBinaural(freqL, freqR, vol) {
+  var oscL = audioCtx.createOscillator();
+  var oscR = audioCtx.createOscillator();
+  var merger = audioCtx.createChannelMerger(2);
+  var gain = audioCtx.createGain(); gain.gain.value = vol;
+  oscL.frequency.value = freqL; oscR.frequency.value = freqR;
+  oscL.type = 'sine'; oscR.type = 'sine';
+  var gainL = audioCtx.createGain(); gainL.gain.value = 0.3;
+  var gainR = audioCtx.createGain(); gainR.gain.value = 0.3;
+  oscL.connect(gainL); oscR.connect(gainR);
+  gainL.connect(merger, 0, 0); gainR.connect(merger, 0, 1);
+  merger.connect(gain); gain.connect(masterGain);
+  oscL.start(); oscR.start();
+  return { gain: gain };
+}
+
+/* === BREATHING ENGINE === */
+var PATTERNS = {
+  box:      { inhale:4, holdIn:4, exhale:4, holdOut:4 },
+  relax:    { inhale:4, holdIn:7, exhale:8, holdOut:0 },
+  energize: { inhale:2, holdIn:1, exhale:4, holdOut:0 },
+  calm:     { inhale:6, holdIn:0, exhale:6, holdOut:0 }
+};
+var currentPattern = 'box';
+var breathPhase = 'inhale';
+var breathCount = 0;
+var phaseTimer = 0;
+var breathRunning = false;
+var sessionStart = null;
+var totalBreaths = 0;
+
+var ring = document.getElementById('breath-ring');
+var timerEl = document.getElementById('breath-timer');
+var labelEl = document.getElementById('breath-label');
+var instrEl = document.getElementById('breath-instruction');
+var playBtn = document.getElementById('play-btn');
+var modeLabel = document.getElementById('mode-label');
+
+function getPhaseTime() {
+  var p = PATTERNS[currentPattern];
+  switch(breathPhase) {
+    case 'inhale': return p.inhale;
+    case 'hold-in': return p.holdIn;
+    case 'exhale': return p.exhale;
+    case 'hold-out': return p.holdOut;
+    default: return 4;
+  }
+}
+
+function nextPhase() {
+  var p = PATTERNS[currentPattern];
+  switch(breathPhase) {
+    case 'inhale':
+      breathPhase = p.holdIn > 0 ? 'hold-in' : 'exhale'; break;
+    case 'hold-in':
+      breathPhase = 'exhale'; break;
+    case 'exhale':
+      breathPhase = p.holdOut > 0 ? 'hold-out' : 'inhale';
+      totalBreaths++; break;
+    case 'hold-out':
+      breathPhase = 'inhale'; break;
+  }
+  phaseTimer = getPhaseTime();
+  updateBreathUI();
+}
+
+var PHASE_LABELS = {'inhale':'INHALE','hold-in':'HOLD','exhale':'EXHALE','hold-out':'REST'};
+var PHASE_COLORS = {'inhale':'#00f0ff','hold-in':'#b44dff','exhale':'#00ff88','hold-out':'#ffc832'};
+
+function updateBreathUI() {
+  ring.className = 'breath-ring ' + breathPhase;
+  labelEl.textContent = PHASE_LABELS[breathPhase];
+  labelEl.style.color = PHASE_COLORS[breathPhase];
+  timerEl.textContent = phaseTimer;
+  timerEl.style.color = PHASE_COLORS[breathPhase];
+  document.getElementById('stat-breaths').textContent = totalBreaths;
+}
+
+var breathInterval = null;
+function startBreathing() {
+  if (breathRunning) return;
+  initAudio();
+  breathRunning = true;
+  sessionStart = sessionStart || Date.now();
+  breathPhase = 'inhale';
+  phaseTimer = PATTERNS[currentPattern].inhale;
+  updateBreathUI();
+  instrEl.textContent = '';
+  playBtn.innerHTML = '&#10074;&#10074;';
+  modeLabel.textContent = 'Breathing';
+  breathInterval = setInterval(function() {
+    phaseTimer--;
+    if (phaseTimer <= 0) nextPhase();
+    else { timerEl.textContent = phaseTimer; }
+  }, 1000);
+}
+
+function stopBreathing() {
+  breathRunning = false;
+  clearInterval(breathInterval);
+  playBtn.innerHTML = '&#9654;';
+  modeLabel.textContent = 'Paused';
+  instrEl.textContent = 'Press play to continue';
+}
+
+playBtn.addEventListener('click', function() {
+  if (breathRunning) stopBreathing(); else startBreathing();
+});
+
+/* Pattern selection */
+document.getElementById('patterns').addEventListener('click', function(e) {
+  var btn = e.target.closest('.pattern-btn');
+  if (!btn) return;
+  document.querySelectorAll('.pattern-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  currentPattern = btn.dataset.pattern;
+  if (breathRunning) { stopBreathing(); startBreathing(); }
+});
+
+/* === SOUND CONTROLS === */
+document.querySelectorAll('.sound-toggle').forEach(function(t) {
+  t.addEventListener('click', function() {
+    t.classList.toggle('on');
+    var snd = t.dataset.snd;
+    var slider = document.getElementById('snd-' + snd);
+    if (sounds[snd]) {
+      sounds[snd].gain.gain.setTargetAtTime(
+        t.classList.contains('on') ? slider.value / 100 * 0.5 : 0,
+        audioCtx.currentTime, 0.3
+      );
+    }
+  });
+});
+
+document.querySelectorAll('.sound-slider').forEach(function(s) {
+  s.addEventListener('input', function() {
+    var snd = s.id.replace('snd-', '');
+    if (sounds[snd]) {
+      var toggle = document.querySelector('[data-snd="' + snd + '"]');
+      if (toggle && toggle.classList.contains('on')) {
+        sounds[snd].gain.gain.setTargetAtTime(s.value / 100 * 0.5, audioCtx.currentTime, 0.1);
+      }
+    }
+  });
+});
+
+/* === CIRCADIAN FILTER === */
+var circFilter = document.getElementById('circ-filter');
+var circSlider = document.getElementById('circ-slider');
+var circMarker = document.getElementById('circ-marker');
+var circLabel = document.getElementById('circ-label');
+var circAuto = document.getElementById('circ-auto');
+
+function updateCircadian(val) {
+  circMarker.style.left = val + '%';
+  if (val < 25) {
+    circFilter.style.background = 'rgba(10,5,30,' + (0.3 - val/100) + ')';
+    circLabel.textContent = 'Night (warm, dim)';
+  } else if (val < 50) {
+    circFilter.style.background = 'rgba(255,136,68,' + (0.08) + ')';
+    circLabel.textContent = 'Morning (warm)';
+  } else if (val < 75) {
+    circFilter.style.background = 'transparent';
+    circLabel.textContent = 'Daylight (neutral)';
+  } else {
+    circFilter.style.background = 'rgba(100,140,255,' + ((val-75)/100 * 0.15) + ')';
+    circLabel.textContent = 'Cool (alert)';
+  }
+}
+
+function autoCircadian() {
+  if (!circAuto.checked) return;
+  var h = new Date().getHours();
+  var val;
+  if (h < 6) val = 10;
+  else if (h < 9) val = 30;
+  else if (h < 17) val = 60;
+  else if (h < 20) val = 40;
+  else val = 15;
+  circSlider.value = val;
+  updateCircadian(val);
+}
+
+circSlider.addEventListener('input', function() {
+  circAuto.checked = false;
+  updateCircadian(parseInt(circSlider.value));
+});
+autoCircadian();
+setInterval(autoCircadian, 60000);
+
+/* === FOCUS TIMER === */
+var focusMinutes = 25;
+var focusSeconds = 0;
+var focusRunning = false;
+var focusInterval = null;
+var focusEl = document.getElementById('focus-time');
+var focusLabelEl = document.getElementById('focus-label');
+
+function formatFocusTime() {
+  var m = Math.floor(focusSeconds / 60);
+  var s = focusSeconds % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+document.querySelectorAll('.focus-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.focus-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    focusMinutes = parseInt(btn.dataset.min);
+    focusSeconds = focusMinutes * 60;
+    focusEl.textContent = formatFocusTime();
+    focusLabelEl.textContent = focusMinutes + 'min focus';
+    clearInterval(focusInterval);
+    focusRunning = false;
+  });
+});
+
+/* Focus timer starts/stops with breathing */
+function startFocusTimer() {
+  if (focusRunning) return;
+  focusRunning = true;
+  focusSeconds = focusMinutes * 60;
+  focusInterval = setInterval(function() {
+    focusSeconds--;
+    focusEl.textContent = formatFocusTime();
+    if (focusSeconds <= 0) {
+      clearInterval(focusInterval);
+      focusRunning = false;
+      focusLabelEl.textContent = 'Complete!';
+      /* Gentle chime */
+      if (audioCtx) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        o.frequency.value = 528; o.type = 'sine'; g.gain.value = 0.1;
+        o.start(); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2); o.stop(audioCtx.currentTime + 2);
+      }
+    }
+  }, 1000);
+}
+
+/* === PRESETS === */
+document.querySelectorAll('.preset').forEach(function(p) {
+  p.addEventListener('click', function() {
+    document.querySelectorAll('.preset').forEach(function(b) { b.classList.remove('active'); });
+    p.classList.add('active');
+    var preset = p.dataset.preset;
+    switch(preset) {
+      case 'focus':
+        setPattern('box'); setSounds({rain:40,ocean:0,forest:0,wind:0,binaural:30}); break;
+      case 'sleep':
+        setPattern('relax'); setSounds({rain:60,ocean:30,forest:0,wind:0,binaural:0}); break;
+      case 'energy':
+        setPattern('energize'); setSounds({rain:0,ocean:0,forest:20,wind:0,binaural:50}); break;
+      case 'anxiety':
+        setPattern('calm'); setSounds({rain:30,ocean:40,forest:0,wind:20,binaural:0}); break;
+    }
+  });
+});
+
+function setPattern(name) {
+  currentPattern = name;
+  document.querySelectorAll('.pattern-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.pattern === name);
+  });
+}
+
+function setSounds(levels) {
+  Object.keys(levels).forEach(function(snd) {
+    var slider = document.getElementById('snd-' + snd);
+    var toggle = document.querySelector('[data-snd="' + snd + '"]');
+    if (slider) slider.value = levels[snd];
+    if (toggle) {
+      if (levels[snd] > 0) toggle.classList.add('on'); else toggle.classList.remove('on');
+    }
+    if (sounds[snd] && audioCtx) {
+      sounds[snd].gain.gain.setTargetAtTime(levels[snd] / 100 * 0.5, audioCtx.currentTime, 0.3);
+    }
+  });
+}
+
+/* === SESSION CLOCK === */
+setInterval(function() {
+  if (!sessionStart) return;
+  var elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+  var m = Math.floor(elapsed / 60);
+  var s = elapsed % 60;
+  document.getElementById('session-clock').textContent =
+    (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  document.getElementById('stat-minutes').textContent = m;
+}, 1000);
+
+/* === SIDEBAR TOGGLE === */
+var sidebar = document.getElementById('sidebar');
+document.getElementById('sb-toggle').addEventListener('click', function() {
+  sidebar.classList.toggle('collapsed');
+  sidebar.classList.toggle('open');
+});
+
+/* === PARTICLE BACKGROUND === */
+var canvas = document.getElementById('bg-canvas');
+var ctx = canvas.getContext('2d');
+var particles = [];
+var PARTICLE_COUNT = 80;
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+for (var i = 0; i < PARTICLE_COUNT; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    size: Math.random() * 2 + 0.5,
+    opacity: Math.random() * 0.3 + 0.05
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var color = PHASE_COLORS[breathPhase] || '#00f0ff';
+  particles.forEach(function(p) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = p.opacity;
+    ctx.fill();
+  });
+  /* Connection lines */
+  ctx.globalAlpha = 0.03;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 0.5;
+  for (var a = 0; a < particles.length; a++) {
+    for (var b = a + 1; b < particles.length; b++) {
+      var dx = particles[a].x - particles[b].x;
+      var dy = particles[a].y - particles[b].y;
+      if (dx*dx + dy*dy < 15000) {
+        ctx.beginPath();
+        ctx.moveTo(particles[a].x, particles[a].y);
+        ctx.lineTo(particles[b].x, particles[b].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+/* === PERSISTENCE === */
+function saveStats() {
+  try {
+    var today = new Date().toISOString().slice(0,10);
+    var data = JSON.parse(localStorage.getItem('sanctuary-stats') || '{}');
+    if (data.date !== today) { data = { date: today, breaths: 0, minutes: 0, sessions: 0 }; }
+    data.breaths = totalBreaths;
+    data.minutes = sessionStart ? Math.floor((Date.now() - sessionStart) / 60000) : 0;
+    localStorage.setItem('sanctuary-stats', JSON.stringify(data));
+
+    var streak = parseInt(localStorage.getItem('sanctuary-streak') || '0');
+    var lastDay = localStorage.getItem('sanctuary-last-day');
+    if (lastDay !== today && data.minutes >= 1) {
+      var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+      streak = (lastDay === yesterday) ? streak + 1 : 1;
+      localStorage.setItem('sanctuary-streak', streak);
+      localStorage.setItem('sanctuary-last-day', today);
+    }
+    document.getElementById('stat-streak').textContent = streak;
+    document.getElementById('stat-sessions').textContent = data.sessions || 0;
+  } catch(e) {}
+}
+setInterval(saveStats, 10000);
+
+/* Load stats */
+try {
+  var saved = JSON.parse(localStorage.getItem('sanctuary-stats') || '{}');
+  var today = new Date().toISOString().slice(0,10);
+  if (saved.date === today) {
+    totalBreaths = saved.breaths || 0;
+    document.getElementById('stat-breaths').textContent = totalBreaths;
+    document.getElementById('stat-minutes').textContent = saved.minutes || 0;
+    document.getElementById('stat-sessions').textContent = saved.sessions || 0;
+  }
+  document.getElementById('stat-streak').textContent = localStorage.getItem('sanctuary-streak') || '0';
+} catch(e) {}
+
+/* Start focus timer when breathing starts */
+var origStart = startBreathing;
+startBreathing = function() { origStart(); startFocusTimer(); };
+
+})();
+</script>
+</body>
+</html>

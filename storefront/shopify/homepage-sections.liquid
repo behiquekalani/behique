@@ -1,0 +1,374 @@
+{% comment %}
+  Behike - Homepage Sections
+  Hero, Featured Collection, What's Inside, Pricing, Trust, PR Footer
+  Black + Gold theme | Helvetica | Mobile responsive
+{% endcomment %}
+
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#000;--text:#F5F5F7;--dim:#86868B;--gold:#C9A84C;
+    --surface:#111;--border:#222;--radius:12px;--max:1080px;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--gold);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+  /* Nav */
+  .bh-nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+  .bh-nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .bh-nav .logo{font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+  .bh-nav .nav-links{display:flex;gap:28px;font-size:14px}
+  .bh-nav .nav-links a{color:var(--dim);transition:color .2s}
+  .bh-nav .nav-links a:hover{color:var(--text);text-decoration:none}
+  .bh-nav .cart-link{position:relative}
+  .bh-nav .cart-count{position:absolute;top:-6px;right:-10px;background:var(--gold);color:#000;font-size:10px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+  /* ========== HERO ========== */
+  .hero{text-align:center;padding:140px 24px 100px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none}
+  .hero .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.15em;color:var(--gold);margin-bottom:20px}
+  .hero h1{font-size:clamp(38px,7vw,72px);font-weight:700;letter-spacing:-.04em;line-height:1.05;margin-bottom:20px;position:relative}
+  .hero h1 em{font-style:normal;color:var(--gold)}
+  .hero p{font-size:18px;color:var(--dim);max-width:520px;margin:0 auto 40px;line-height:1.5}
+  .hero .cta-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hero .cta-primary{display:inline-block;background:var(--gold);color:#000;padding:16px 36px;border-radius:980px;font-size:16px;font-weight:600;transition:opacity .2s;text-decoration:none}
+  .hero .cta-primary:hover{opacity:.88;text-decoration:none}
+  .hero .cta-secondary{display:inline-block;border:1px solid var(--border);color:var(--text);padding:16px 36px;border-radius:980px;font-size:16px;font-weight:500;transition:all .2s;text-decoration:none}
+  .hero .cta-secondary:hover{border-color:var(--gold);color:var(--gold);text-decoration:none}
+
+  /* ========== FEATURED COLLECTION CAROUSEL ========== */
+  .featured-section{padding:80px 0;border-top:1px solid var(--border)}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding:0 24px}
+  .section-header h2{font-size:28px;font-weight:600;letter-spacing:-.02em}
+  .section-header a{font-size:14px;color:var(--gold)}
+  .carousel-wrap{position:relative;overflow:hidden;padding:0 24px}
+  .carousel{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:8px}
+  .carousel::-webkit-scrollbar{display:none}
+  .carousel-card{flex:0 0 320px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s;text-decoration:none;color:inherit}
+  .carousel-card:hover{border-color:var(--gold);text-decoration:none}
+  .cc-image{aspect-ratio:4/3;background:#0a0a0a;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .cc-image img{width:100%;height:100%;object-fit:cover}
+  .cc-body{padding:20px}
+  .cc-tag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:8px}
+  .cc-body h3{font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text)}
+  .cc-bottom{display:flex;align-items:center;justify-content:space-between}
+  .cc-price{font-size:18px;font-weight:600;color:var(--gold)}
+  .cc-btn{padding:6px 16px;border:1px solid var(--gold);border-radius:980px;font-size:12px;color:var(--gold)}
+  .carousel-card:hover .cc-btn{background:var(--gold);color:#000}
+  .carousel-nav{display:flex;gap:8px;justify-content:center;margin-top:24px}
+  .carousel-nav button{width:8px;height:8px;border-radius:50%;border:none;background:var(--border);cursor:pointer;transition:background .2s;padding:0}
+  .carousel-nav button.active{background:var(--gold);width:24px;border-radius:4px}
+
+  /* ========== WHAT'S INSIDE ========== */
+  .whats-inside{padding:80px 0;border-top:1px solid var(--border)}
+  .whats-inside h2{font-size:28px;font-weight:600;letter-spacing:-.02em;text-align:center;margin-bottom:12px}
+  .whats-inside .subtitle{text-align:center;color:var(--dim);font-size:16px;margin-bottom:48px}
+  .inside-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .inside-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;transition:border-color .2s}
+  .inside-card:hover{border-color:var(--gold)}
+  .inside-icon{width:48px;height:48px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:rgba(201,168,76,.1);border-radius:12px}
+  .inside-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5}
+  .inside-card h3{font-size:16px;font-weight:600;margin-bottom:8px}
+  .inside-card p{font-size:14px;color:var(--dim);line-height:1.5}
+
+  /* ========== PRICING TIERS ========== */
+  .pricing-section{padding:80px 0;border-top:1px solid var(--border)}
+  .pricing-section h2{font-size:28px;font-weight:600;letter-spacing:-.02em;text-align:center;margin-bottom:12px}
+  .pricing-section .subtitle{text-align:center;color:var(--dim);font-size:16px;margin-bottom:48px}
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
+  .pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px;position:relative;transition:border-color .2s}
+  .pricing-card:hover{border-color:var(--gold)}
+  .pricing-card.featured{border-color:var(--gold)}
+  .pricing-card.featured::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:10px;font-weight:700;letter-spacing:.1em;padding:4px 16px;border-radius:980px}
+  .pricing-card .tier-name{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-bottom:8px}
+  .pricing-card .tier-price{font-size:42px;font-weight:700;color:var(--text);margin-bottom:4px;letter-spacing:-.02em}
+  .pricing-card .tier-price span{font-size:16px;color:var(--dim);font-weight:400}
+  .pricing-card .tier-desc{font-size:14px;color:var(--dim);margin-bottom:24px;line-height:1.4}
+  .pricing-card ul{list-style:none;margin-bottom:28px}
+  .pricing-card li{font-size:14px;color:var(--dim);padding:8px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .pricing-card li:last-child{border-bottom:none}
+  .pricing-card li::before{content:'';width:16px;height:16px;background:rgba(201,168,76,.15);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23C9A84C' stroke-width='3'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
+  .pricing-card .tier-btn{display:block;width:100%;padding:14px;border-radius:var(--radius);font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none}
+  .tier-btn-outline{background:none;border:1px solid var(--gold);color:var(--gold)}
+  .tier-btn-outline:hover{background:var(--gold);color:#000;text-decoration:none}
+  .tier-btn-solid{background:var(--gold);border:1px solid var(--gold);color:#000}
+  .tier-btn-solid:hover{opacity:.88;text-decoration:none}
+
+  /* ========== TRUST BADGES ========== */
+  .trust-section{padding:64px 0;border-top:1px solid var(--border);text-align:center}
+  .trust-section p{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-bottom:24px}
+  .trust-badges{display:flex;gap:32px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .trust-badge{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:13px}
+  .trust-badge svg{width:28px;height:28px;fill:var(--dim);opacity:.6}
+
+  /* ========== BUILT IN PR ========== */
+  .pr-section{padding:80px 0;border-top:1px solid var(--border);text-align:center}
+  .pr-section .flag{font-size:48px;margin-bottom:16px}
+  .pr-section h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px}
+  .pr-section h2 em{font-style:normal;color:var(--gold)}
+  .pr-section p{font-size:15px;color:var(--dim);max-width:480px;margin:0 auto;line-height:1.6}
+
+  /* Footer */
+  .bh-footer{border-top:1px solid var(--border);padding:48px 24px;text-align:center}
+  .bh-footer .brand{font-size:14px;font-weight:600;margin-bottom:8px}
+  .bh-footer .meta{font-size:13px;color:var(--dim)}
+  .bh-footer .meta a{color:var(--dim)}
+  .bh-footer .meta a:hover{color:var(--gold)}
+  .footer-links{display:flex;gap:24px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+  .footer-links a{font-size:13px;color:var(--dim);transition:color .2s}
+  .footer-links a:hover{color:var(--gold);text-decoration:none}
+
+  /* Responsive */
+  @media(max-width:768px){
+    .hero{padding:100px 16px 64px}
+    .inside-grid{grid-template-columns:repeat(2,1fr)}
+    .pricing-grid{grid-template-columns:1fr;max-width:400px;margin:0 auto}
+    .carousel-card{flex:0 0 280px}
+    .bh-nav .nav-links{gap:16px;font-size:13px}
+  }
+  @media(max-width:480px){
+    .inside-grid{grid-template-columns:1fr}
+    .hero .cta-group{flex-direction:column;align-items:center}
+    .trust-badges{flex-direction:column;gap:16px}
+  }
+</style>
+
+<!-- Navigation -->
+<nav class="bh-nav">
+  <div class="wrap">
+    <a href="/" class="logo">behike</a>
+    <div class="nav-links">
+      <a href="/collections/all">Products</a>
+      <a href="/pages/about">About</a>
+      <a href="/cart" class="cart-link">
+        Cart
+        {% if cart.item_count > 0 %}
+          <span class="cart-count">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Digital Products for Builders</p>
+    <h1>Built by builders,<br>for <em>builders</em>.</h1>
+    <p>Business blueprints, systems, and kits designed for solopreneurs who ship instead of wait. Everything you need to start, structured so you can move.</p>
+    <div class="cta-group">
+      <a href="/collections/all" class="cta-primary">Browse Products</a>
+      <a href="#pricing" class="cta-secondary">See Pricing</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FEATURED COLLECTION ==================== -->
+<section class="featured-section">
+  <div class="wrap">
+    <div class="section-header">
+      <h2>Featured</h2>
+      <a href="/collections/all">View all &rarr;</a>
+    </div>
+  </div>
+  <div class="carousel-wrap">
+    <div class="wrap">
+      <div class="carousel" id="featured-carousel">
+        {% assign featured = collections.frontpage.products | default: collections.all.products %}
+        {% for product in featured limit:8 %}
+          <a href="{{ product.url }}" class="carousel-card">
+            <div class="cc-image">
+              {% if product.featured_image %}
+                <img src="{{ product.featured_image | img_url: '500x' }}" alt="{{ product.featured_image.alt | escape }}" loading="lazy">
+              {% else %}
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <path d="M3 16l5-5 4 4 4-6 5 7"/>
+                </svg>
+              {% endif %}
+            </div>
+            <div class="cc-body">
+              <div class="cc-tag">
+                {% if product.type != blank %}{{ product.type }}{% elsif product.tags.size > 0 %}{{ product.tags.first }}{% else %}Digital Product{% endif %}
+              </div>
+              <h3>{{ product.title }}</h3>
+              <div class="cc-bottom">
+                <span class="cc-price">{{ product.price | money }}</span>
+                <span class="cc-btn">View</span>
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== WHAT'S INSIDE ==================== -->
+<section class="whats-inside">
+  <div class="wrap">
+    <h2>What's Inside</h2>
+    <p class="subtitle">Every product is designed to remove friction and get you building.</p>
+
+    <div class="inside-grid">
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
+        </div>
+        <h3>Business Blueprints</h3>
+        <p>Step-by-step SVG/PDF frameworks for launching and scaling specific business models.</p>
+      </div>
+
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
+        <h3>Guides</h3>
+        <p>Deep-dive documents covering strategy, execution, and real-world case studies.</p>
+      </div>
+
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <h3>Starter Kits</h3>
+        <p>Bundled templates, checklists, and tools to hit the ground running on day one.</p>
+      </div>
+
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <h3>Notion & Figma Templates</h3>
+        <p>Plug-and-play workspace templates for project management and visual planning.</p>
+      </div>
+
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <h3>Operating System</h3>
+        <p>The complete builder's OS: daily workflows, decision frameworks, and tracking systems.</p>
+      </div>
+
+      <div class="inside-card">
+        <div class="inside-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3>Lifetime Updates</h3>
+        <p>Every purchase includes free updates. When we improve a product, you get the new version.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PRICING TIERS ==================== -->
+<section class="pricing-section" id="pricing">
+  <div class="wrap">
+    <h2>Simple Pricing</h2>
+    <p class="subtitle">Start with one blueprint or get everything at once.</p>
+
+    <div class="pricing-grid">
+
+      <!-- Tier 1: Single -->
+      <div class="pricing-card">
+        <div class="tier-name">Single Blueprint</div>
+        <div class="tier-price">$19<span>.99</span></div>
+        <p class="tier-desc">One focused blueprint to get started.</p>
+        <ul>
+          <li>1 SVG/PDF blueprint</li>
+          <li>GoodNotes + iPad compatible</li>
+          <li>Commercial use license</li>
+          <li>Lifetime updates</li>
+        </ul>
+        <a href="/collections/all" class="tier-btn tier-btn-outline">Browse Blueprints</a>
+      </div>
+
+      <!-- Tier 2: Bundle -->
+      <div class="pricing-card featured">
+        <div class="tier-name">Builder Bundle</div>
+        <div class="tier-price">$47</div>
+        <p class="tier-desc">5 blueprints of your choice. Best value per unit.</p>
+        <ul>
+          <li>Choose any 5 blueprints</li>
+          <li>All formats included</li>
+          <li>Notion & Figma templates</li>
+          <li>Commercial use license</li>
+          <li>Lifetime updates</li>
+        </ul>
+        <a href="/products/builder-bundle" class="tier-btn tier-btn-solid">Get the Bundle</a>
+      </div>
+
+      <!-- Tier 3: Full OS -->
+      <div class="pricing-card">
+        <div class="tier-name">Full Operating System</div>
+        <div class="tier-price">$97</div>
+        <p class="tier-desc">Everything. All blueprints, guides, kits, and the OS.</p>
+        <ul>
+          <li>All current blueprints</li>
+          <li>All guides & kits</li>
+          <li>Builder's Operating System</li>
+          <li>Priority support</li>
+          <li>All future products included</li>
+        </ul>
+        <a href="/products/full-os" class="tier-btn tier-btn-outline">Get Everything</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TRUST BADGES ==================== -->
+<section class="trust-section">
+  <div class="wrap">
+    <p>Secure Checkout</p>
+    <div class="trust-badges">
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        SSL Encrypted
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><path d="M1 10h22"/></svg>
+        Visa / Mastercard
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Apple Pay
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-8 8M8 8l8 8"/></svg>
+        PayPal
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+        Instant Download
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== BUILT IN PUERTO RICO ==================== -->
+<section class="pr-section">
+  <div class="wrap">
+    <div class="flag" aria-label="Puerto Rico flag">&#127477;&#127479;</div>
+    <h2>Built in <em>Puerto Rico</em></h2>
+    <p>Every product is designed and built on the island. We're a small team obsessed with building tools that actually help people ship. No fluff, no filler -- just systems that work.</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bh-footer">
+  <div class="wrap">
+    <div class="footer-links">
+      <a href="/collections/all">Products</a>
+      <a href="/pages/about">About</a>
+      <a href="/policies/terms-of-service">Terms</a>
+      <a href="/policies/privacy-policy">Privacy</a>
+      <a href="/policies/refund-policy">Refunds</a>
+    </div>
+    <div class="brand">behike</div>
+    <p class="meta">&copy; {{ 'now' | date: '%Y' }} Behike. All rights reserved.</p>
+  </div>
+</footer>

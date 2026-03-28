@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="neon">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behique — Quest Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+/* ============ VHS SCANLINE OVERLAY ============ */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(rgba(255,255,255,0.02) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+  animation: flicker 0.15s infinite alternate;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: -2px;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(rgba(255,0,0,0.02) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+.vhs-tracking-line {
+  position: fixed;
+  top: -2px; left: 0;
+  width: 100%; height: 2px;
+  background: rgba(255,255,255,0.1);
+  pointer-events: none;
+  z-index: 10000;
+  animation: tracking 8s linear infinite;
+}
+@keyframes tracking {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  50% { opacity: 1; }
+  100% { opacity: 0.975; }
+}
+
+/* ============ GLITCH HOVER ============ */
+.panel, .card, .pixel-box, .quest-card {
+  transition: transform 0.2s ease, text-shadow 0.3s ease, box-shadow 0.3s ease;
+}
+.panel:hover, .card:hover, .pixel-box:hover, .quest-card:hover {
+  text-shadow: 1px 0 rgba(255,0,255,0.3), -1px 0 rgba(0,255,255,0.3);
+  box-shadow: 0 0 12px rgba(255,192,203,0.15);
+}
+.glitch-active { animation: glitchShift 0.2s; }
+@keyframes glitchShift {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(-2px,1px); }
+  50% { transform: translate(2px,-1px); }
+  75% { transform: translate(-1px,2px); }
+  100% { transform: translate(0,0); }
+}
+
+/* ============ BLACKLETTER MISSION TITLES ============ */
+.quest-title, .mission-title, .quest-card-header .quest-name {
+  font-family: 'UnifrakturMaguntia', serif;
+  font-size: 1.1em;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+</style>
+<style>
+/* ============ PIXEL BORDER UTIL ============ */
+/* Uses box-shadow to create chunky pixel borders */
+
+/* ============ CUSTOM CURSOR — VAPORWAVE ============ */
+/* Default: magenta crosshair */
+body {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cline x1='16' y1='3' x2='16' y2='12' stroke='%23ff2a6d' stroke-width='2'/%3E%3Cline x1='16' y1='20' x2='16' y2='29' stroke='%23ff2a6d' stroke-width='2'/%3E%3Cline x1='3' y1='16' x2='12' y2='16' stroke='%23ff2a6d' stroke-width='2'/%3E%3Cline x1='20' y1='16' x2='29' y2='16' stroke='%23ff2a6d' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='1.5' fill='%23ff2a6d'/%3E%3C/svg%3E") 16 16, crosshair;
+}
+/* Pointer: vaporwave palm tree — magenta trunk, cyan fronds */
+a, button, [onclick], .theme-btn, .font-btn, .tab, .quest-card, input {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32'%3E%3Cline x1='14' y1='16' x2='14' y2='31' stroke='%23ff2a6d' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M14 15C18 10 22 11 24 14' stroke='%2300e5ff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M14 15C18 8 21 5 23 3' stroke='%2300e5ff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M14 15C10 10 6 11 4 14' stroke='%2300e5ff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M14 15C10 8 7 5 5 3' stroke='%2300e5ff' stroke-width='1.5' fill='none'/%3E%3Cpath d='M14 15C14 8 14 4 13 1' stroke='%2300e5ff' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") 14 31, pointer;
+}
+
+/* ============ THEME: NEON (default) ============ */
+[data-theme="neon"] {
+  --primary: #00e88f;
+  --primary-light: #39ffb0;
+  --primary-dark: #00c878;
+  --primary-bg: rgba(0,232,143,0.08);
+  --header-bg: #005533;
+  --bg: #0a0c10;
+  --bg-gradient1: rgba(0,232,143,0.04);
+  --bg-gradient2: rgba(0,229,255,0.03);
+  --card: #111620;
+  --border: #1e2a30;
+  --text: #d0e8dc;
+  --text-light: #5a8070;
+  --done: #3a5048;
+  --gold: #ffc857;
+  --ring-track: #1e2a30;
+  --shadow: 0 4px 0 #000, 0 6px 0 rgba(0,232,143,0.15);
+  --accent: #00e5ff;
+  --ring-high: #00e88f;
+  --ring-mid: #00e5ff;
+  --ring-low: #1a2820;
+  --tab-active-text: #000;
+  --tab-glow: rgba(0,232,143,0.4);
+  --hover-glow: rgba(0,232,143,0.15);
+  --hover-border: #00e88f;
+  --locked-header: #1a1e28;
+  --completed-bg: rgba(255,200,87,0.06);
+  --completed-border: rgba(255,200,87,0.3);
+  --check-text: #000;
+  --title-glow: 0 0 20px rgba(0,232,143,0.5);
+  --pixel-border: #00e88f;
+  --pixel-shadow: #005533;
+  --btn-shadow: #005533;
+  --xp-bar: #00e88f;
+  --xp-track: #0a2018;
+  --scanline: rgba(0,232,143,0.03);
+}
+
+/* ============ THEME: MONO (low dopamine) ============ */
+[data-theme="mono"] {
+  --primary: #cccccc;
+  --primary-light: #ffffff;
+  --primary-dark: #aaaaaa;
+  --primary-bg: rgba(255,255,255,0.03);
+  --header-bg: #1a1a1a;
+  --bg: #080808;
+  --bg-gradient1: rgba(255,255,255,0.01);
+  --bg-gradient2: rgba(255,255,255,0.01);
+  --card: #0e0e0e;
+  --border: #222222;
+  --text: #b0b0b0;
+  --text-light: #555555;
+  --done: #333333;
+  --gold: #888888;
+  --ring-track: #181818;
+  --shadow: 0 4px 0 #000;
+  --accent: #999999;
+  --ring-high: #cccccc;
+  --ring-mid: #777777;
+  --ring-low: #222222;
+  --tab-active-text: #000;
+  --tab-glow: rgba(255,255,255,0.1);
+  --hover-glow: rgba(255,255,255,0.05);
+  --hover-border: #666;
+  --locked-header: #111111;
+  --completed-bg: rgba(255,255,255,0.02);
+  --completed-border: rgba(255,255,255,0.1);
+  --check-text: #000;
+  --title-glow: none;
+  --pixel-border: #555;
+  --pixel-shadow: #222;
+  --btn-shadow: #333;
+  --xp-bar: #aaa;
+  --xp-track: #111;
+  --scanline: rgba(255,255,255,0.015);
+}
+
+/* ============ THEME: NEON VIVID (cyan / magenta / yellow) ============ */
+[data-theme="pastel"] {
+  --primary: #00e5ff;
+  --primary-light: #40f0ff;
+  --primary-dark: #00b8d4;
+  --primary-bg: rgba(0,229,255,0.08);
+  --header-bg: #1a0030;
+  --bg: #0a0014;
+  --bg-gradient1: rgba(0,229,255,0.04);
+  --bg-gradient2: rgba(255,0,128,0.03);
+  --card: #12001e;
+  --border: #2a0848;
+  --text: #e8e0f8;
+  --text-light: #8868b0;
+  --done: #2a1848;
+  --gold: #ffea00;
+  --ring-track: #1a0830;
+  --shadow: 0 4px 0 #000, 0 6px 0 rgba(255,0,128,0.2);
+  --accent: #ff0080;
+  --ring-high: #00e5ff;
+  --ring-mid: #ff0080;
+  --ring-low: #180828;
+  --tab-active-text: #0a0014;
+  --tab-glow: rgba(0,229,255,0.4);
+  --hover-glow: rgba(255,0,128,0.15);
+  --hover-border: #ff0080;
+  --locked-header: #140020;
+  --completed-bg: rgba(255,234,0,0.06);
+  --completed-border: rgba(255,234,0,0.3);
+  --check-text: #0a0014;
+  --title-glow: 0 0 25px rgba(0,229,255,0.5);
+  --pixel-border: #ff0080;
+  --pixel-shadow: #4a0040;
+  --btn-shadow: #4a0040;
+  --xp-bar: #00e5ff;
+  --xp-track: #0a0820;
+  --scanline: rgba(255,0,128,0.03);
+}
+
+/* ============ BASE RESET ============ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  transition: background 0.3s, color 0.3s;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    var(--scanline) 2px,
+    var(--scanline) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============ PIXEL BOX MIXIN ============ */
+.pixel-box {
+  background: var(--card);
+  border: 3px solid var(--pixel-border);
+  box-shadow:
+    inset -3px -3px 0 var(--pixel-shadow),
+    inset 3px 3px 0 rgba(255,255,255,0.05),
+    6px 6px 0 #000;
+  image-rendering: pixelated;
+}
+
+.pixel-box-sm {
+  background: var(--card);
+  border: 2px solid var(--pixel-border);
+  box-shadow:
+    inset -2px -2px 0 var(--pixel-shadow),
+    inset 2px 2px 0 rgba(255,255,255,0.05),
+    4px 4px 0 #000;
+}
+
+/* ============ TOP BAR ============ */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 4px solid var(--pixel-border);
+}
+
+.top-bar-left h1 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: var(--title-glow);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.top-bar-left .subtitle {
+  color: var(--accent);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.top-bar-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.top-bar-right .date {
+  color: var(--text-light);
+  font-size: 15px;
+}
+
+/* ============ XP BAR ============ */
+.xp-section {
+  margin-bottom: 16px;
+}
+.xp-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.xp-label {
+  font-size: 16px;
+  color: var(--accent);
+  white-space: nowrap;
+  min-width: 100px;
+}
+.xp-bar-track {
+  flex: 1;
+  height: 16px;
+  background: var(--xp-track);
+  border: 2px solid var(--pixel-border);
+  box-shadow: inset -2px -2px 0 var(--pixel-shadow), inset 2px 2px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: var(--xp-bar);
+  transition: width 1s ease;
+  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2);
+  image-rendering: pixelated;
+}
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+}
+.xp-text {
+  font-size: 16px;
+  color: var(--gold);
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* ============ FONT SIZE TOGGLE ============ */
+body.font-small { font-size: 13px; }
+body.font-medium { font-size: 16px; }
+body.font-large { font-size: 20px; }
+body.font-small * { font-size: inherit; }
+body.font-large h1 { font-size: 32px; }
+body.font-large h2, body.font-large h3 { font-size: 22px; }
+.font-size-switcher {
+  display: flex;
+  gap: 3px;
+  margin-right: 8px;
+}
+.font-btn {
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  border: 2px solid var(--pixel-border, #333);
+  background: var(--card, #111);
+  color: var(--text-light, #888);
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  box-shadow: 2px 2px 0 #000;
+  transition: all 0.1s;
+}
+.font-btn:active {
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(1px, 1px);
+}
+.font-btn.active {
+  background: var(--primary, #0f0);
+  color: var(--tab-active-text, #000);
+  border-color: var(--primary-light, #0f0);
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.5), 0 0 8px var(--tab-glow, rgba(0,255,0,0.3));
+}
+
+/* ============ THEME SWITCHER ============ */
+.theme-switcher {
+  display: flex;
+  gap: 3px;
+}
+.theme-btn {
+  padding: 6px 10px;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  border: 2px solid var(--pixel-border);
+  background: var(--card);
+  color: var(--text-light);
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  box-shadow: 3px 3px 0 #000;
+  transition: all 0.1s;
+  letter-spacing: 0.5px;
+}
+.theme-btn:active {
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+.theme-btn.active {
+  background: var(--primary);
+  color: var(--tab-active-text);
+  border-color: var(--primary-light);
+  box-shadow: 3px 3px 0 var(--btn-shadow), 0 0 12px var(--tab-glow);
+}
+.theme-btn:hover:not(.active) {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+/* ============ OVERVIEW SECTION ============ */
+.overview {
+  display: grid;
+  grid-template-columns: 180px 1fr 260px;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+}
+.overview-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.overview-ring .label {
+  font-size: 15px;
+  color: var(--text-light);
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ============ SVG DONUT (pixel style) ============ */
+.donut {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.donut svg { transform: rotate(-90deg); }
+.donut .donut-text {
+  position: absolute;
+  color: var(--text);
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+}
+.donut .donut-text.large { font-size: 18px; }
+.donut .donut-text.medium { font-size: 17px; }
+.donut .donut-text.small { font-size: 14px; }
+
+/* ============ BAR CHART ============ */
+.bar-chart { display: flex; flex-direction: column; }
+.bar-chart h3 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 10px;
+  letter-spacing: 0;
+}
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex: 1;
+  padding-bottom: 20px;
+}
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 4px;
+}
+.bar {
+  width: 100%;
+  max-width: 40px;
+  background: var(--primary);
+  min-height: 4px;
+  transition: height 1s ease;
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.1);
+  image-rendering: pixelated;
+}
+.bar-label { font-size: 14px; color: var(--text-light); text-align: center; }
+.bar-value { font-size: 14px; color: var(--text); }
+
+/* ============ STATS PANEL ============ */
+.stats-panel { display: flex; flex-direction: column; gap: 6px; }
+.stats-panel h3 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 0;
+  margin-bottom: 4px;
+}
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 2px dashed var(--border);
+}
+.stat-row .stat-label { color: var(--text-light); font-size: 15px; }
+.stat-row .stat-value { font-size: 16px; color: var(--gold); }
+
+/* ============ TABS ============ */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tab {
+  padding: 8px 14px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid var(--pixel-border);
+  background: var(--card);
+  color: var(--text-light);
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  box-shadow: 3px 3px 0 #000;
+  transition: all 0.1s;
+  border-bottom: none;
+  position: relative;
+  top: 2px;
+}
+.tab:active {
+  box-shadow: 1px 1px 0 #000;
+  transform: translate(2px, 2px);
+}
+.tab.active {
+  background: var(--primary);
+  color: var(--tab-active-text);
+  border-color: var(--primary-light);
+  box-shadow: 3px 3px 0 var(--btn-shadow), 0 0 15px var(--tab-glow);
+  z-index: 2;
+}
+.tab:hover:not(.active) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tab .count {
+  background: rgba(0,0,0,0.2);
+  padding: 2px 6px;
+  font-size: 15px;
+  margin-left: 4px;
+}
+.tab.active .count { background: rgba(0,0,0,0.15); }
+
+/* ============ QUEST GRID ============ */
+.quest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* ============ QUEST CARD ============ */
+.quest-card {
+  transition: all 0.15s;
+}
+.quest-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow:
+    inset -3px -3px 0 var(--pixel-shadow),
+    inset 3px 3px 0 rgba(255,255,255,0.05),
+    8px 8px 0 #000,
+    0 0 20px var(--hover-glow);
+  border-color: var(--hover-border);
+}
+
+.quest-card-header {
+  background: var(--header-bg);
+  color: white;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid rgba(0,0,0,0.3);
+}
+.quest-card-header h3 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+.quest-card-header .quest-type {
+  font-size: 14px;
+  opacity: 0.7;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.quest-card-body { padding: 14px; }
+
+.quest-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.quest-progress-row .completion-text {
+  font-size: 16px;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.quest-reward {
+  font-size: 16px;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(255,200,87,0.05);
+  border: 1px dashed rgba(255,200,87,0.2);
+}
+
+/* ============ OBJECTIVES ============ */
+.objectives { display: flex; flex-direction: column; gap: 4px; }
+.objective {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  padding: 5px 0;
+}
+.objective .checkbox {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  image-rendering: pixelated;
+}
+.objective.done .checkbox {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.objective.done .checkbox::after {
+  content: 'X';
+  color: var(--check-text);
+  font-size: 16px;
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+}
+.objective.done .obj-text {
+  text-decoration: line-through;
+  color: var(--done);
+}
+.objective .obj-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.obj-stars {
+  font-size: 17px;
+  letter-spacing: 1px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+.mario-star {
+  display: inline-block;
+  font-style: normal;
+}
+.mario-star.filled {
+  filter: drop-shadow(0 0 3px rgba(255,215,0,0.6));
+}
+.mario-star.empty {
+  opacity: 0.25;
+}
+
+/* ============ REWARD TIERS ============ */
+.tier-common { color: #666; }
+.tier-uncommon { color: #00e88f; }
+.tier-rare { color: #00e5ff; }
+.tier-epic { color: #b48cff; text-shadow: 0 0 8px rgba(180,140,255,0.6); }
+.tier-legendary { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.6); animation: legendaryPulse 1.5s ease-in-out infinite; }
+
+@keyframes legendaryPulse {
+  0%, 100% { text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+  50% { text-shadow: 0 0 16px rgba(255,215,0,0.9), 0 0 30px rgba(255,215,0,0.3); }
+}
+
+/* MISSION TIER BADGE */
+.mission-tier-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  padding: 3px 6px;
+  text-transform: none;
+  letter-spacing: 0.5px;
+  border: 2px solid;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+.mission-tier-badge.tier-1 { background: rgba(102,102,102,0.2); color: #888; border-color: #555; }
+.mission-tier-badge.tier-2 { background: rgba(0,232,143,0.15); color: #00e88f; border-color: #00a060; }
+.mission-tier-badge.tier-3 { background: rgba(0,229,255,0.15); color: #00e5ff; border-color: #0088aa; }
+.mission-tier-badge.tier-4 { background: rgba(180,140,255,0.2); color: #b48cff; border-color: #7850cc; }
+.mission-tier-badge.tier-5 { background: rgba(255,215,0,0.15); color: #ffd700; border-color: #cc9900; animation: legendaryPulse 1.5s ease-in-out infinite; }
+
+/* ============ DIFFICULTY BADGES ============ */
+.diff-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  padding: 2px 4px;
+  border: 1px solid;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+.diff-very_easy { background: rgba(0,232,143,0.15); color: #00e88f; border-color: #00a060; }
+.diff-easy { background: rgba(0,229,255,0.12); color: #00e5ff; border-color: #0088aa; }
+.diff-medium { background: rgba(255,200,87,0.15); color: #ffc857; border-color: #cc8800; }
+.diff-hard { background: rgba(255,120,80,0.15); color: #ff7850; border-color: #cc4020; }
+.diff-very_hard { background: rgba(255,60,60,0.15); color: #ff3c3c; border-color: #cc2020; }
+
+/* TIME ESTIMATE */
+.time-est {
+  font-size: 13px;
+  color: var(--text-light);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* QUEST HEADER RIGHT */
+.quest-card-header .header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* ============ COMPLETED SECTION ============ */
+.completed-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 4px solid var(--gold);
+}
+.completed-section h2 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+.completed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.completed-card {
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.completed-card .name { font-size: 16px; font-weight: 600; color: var(--gold); }
+.completed-card .reward { font-size: 15px; color: var(--text-light); }
+
+/* ============ HABIT TRACKER ============ */
+.habit-section {
+  margin-top: 20px;
+  padding: 16px;
+}
+.habit-section h3 {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: none;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.habit-grid {
+  display: grid;
+  grid-template-columns: 140px repeat(7, 1fr);
+  gap: 3px;
+  font-size: 15px;
+}
+.habit-grid .day-header {
+  text-align: center;
+  color: var(--text-light);
+  padding: 4px;
+  font-size: 14px;
+}
+.habit-grid .habit-name {
+  padding: 5px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+.habit-grid .habit-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+}
+.habit-check {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  background: var(--bg);
+  image-rendering: pixelated;
+}
+.habit-check:active {
+  transform: scale(0.9);
+}
+.habit-check.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.habit-check.checked::after {
+  content: 'X';
+  color: var(--check-text);
+  font-size: 16px;
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+}
+
+/* ============ FOOTER ============ */
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 12px 0;
+  border-top: 4px solid var(--pixel-border);
+  letter-spacing: 1px;
+  line-height: 2.5;
+}
+
+/* ============ LOCKED QUEST ============ */
+.quest-card.locked { opacity: 0.45; filter: grayscale(0.3); }
+.quest-card.locked .quest-card-header { background: var(--locked-header); }
+.quest-card.locked:hover { transform: none; box-shadow: inset -3px -3px 0 var(--pixel-shadow), inset 3px 3px 0 rgba(255,255,255,0.05), 6px 6px 0 #000; }
+
+/* ============ PIXELATED DECORATION ============ */
+.pixel-divider {
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--pixel-border) 0px,
+    var(--pixel-border) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  margin: 8px 0;
+}
+
+/* ============ PLAYER HUD ============ */
+.player-hud {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+}
+.player-avatar {
+  width: 48px;
+  height: 48px;
+  background: var(--header-bg);
+  border: 3px solid var(--primary);
+  box-shadow: 3px 3px 0 #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  image-rendering: pixelated;
+}
+.player-info {
+  flex: 1;
+}
+.player-name {
+  font-family: 'DotGothic16', 'MS Gothic', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  margin-bottom: 2px;
+}
+.player-title {
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.player-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  color: var(--gold);
+  background: rgba(255,200,87,0.08);
+  border: 2px solid rgba(255,200,87,0.3);
+  padding: 3px 8px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+/* ============ MOBILE ============ */
+@media (max-width: 900px) {
+  body { padding: 10px; font-size: 13px; }
+  .overview { grid-template-columns: 1fr; }
+  .quest-grid { grid-template-columns: 1fr; }
+  .habit-grid { grid-template-columns: 100px repeat(7, 1fr); }
+  .top-bar { flex-direction: column; gap: 10px; }
+  .top-bar-right { align-items: flex-start; }
+  .top-bar-left h1 { font-size: 16px; }
+  .player-hud { flex-direction: column; text-align: center; }
+  .xp-bar-container { flex-direction: column; }
+  .xp-label, .xp-text { min-width: auto; }
+}
+
+/* ============ BLINK CURSOR (retro feel) ============ */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.blink { animation: blink 1s steps(1) infinite; }
+</style>
+</head>
+<body>
+<div class="vhs-tracking-line"></div>
+
+<div class="top-bar">
+  <div class="top-bar-left">
+    <h1>Behique<span class="blink">_</span></h1>
+    <div class="subtitle">QUEST DASHBOARD v3.0</div>
+  </div>
+  <div class="top-bar-right">
+    <div class="font-size-switcher">
+      <button class="font-btn" data-size="small" title="Small text">A</button>
+      <button class="font-btn active" data-size="medium" title="Medium text">A</button>
+      <button class="font-btn" data-size="large" title="Large text">A</button>
+    </div>
+    <div class="theme-switcher">
+      <button class="theme-btn active" data-theme="neon">NEON</button>
+      <button class="theme-btn" data-theme="mono">MONO</button>
+      <button class="theme-btn" data-theme="pastel">PASTEL</button>
+    </div>
+    <div class="date" id="dateDisplay"></div>
+  </div>
+</div>
+
+<div class="player-hud pixel-box">
+  <div class="player-avatar" id="playerAvatar">K</div>
+  <div class="player-info">
+    <div class="player-name" id="playerName">KALANI</div>
+    <div class="player-title" id="playerTitle">BEHIQUE</div>
+    <div class="player-level" id="playerLevel">LVL 3</div>
+  </div>
+  <div style="flex:1;">
+    <div class="xp-section">
+      <div class="xp-bar-container">
+        <div class="xp-label">EXP</div>
+        <div class="xp-bar-track">
+          <div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div>
+        </div>
+        <div class="xp-text" id="xpText">0/0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overview pixel-box">
+  <div class="overview-ring">
+    <div id="overallDonut"></div>
+    <div class="label" id="overallLabel"></div>
+  </div>
+  <div class="bar-chart">
+    <h3>Quest Progress</h3>
+    <div class="bars" id="barChart"></div>
+  </div>
+  <div class="stats-panel" id="statsPanel">
+    <h3>Stats</h3>
+  </div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="quest-grid" id="questGrid"></div>
+
+<div class="habit-section pixel-box">
+  <h3>Habit Tracker — This Week</h3>
+  <div class="habit-grid" id="habitGrid"></div>
+</div>
+
+<div class="completed-section">
+  <h2>Completed Quests</h2>
+  <div class="completed-grid" id="completedGrid"></div>
+</div>
+
+<div class="footer">
+  Behique Systems · Ceiba Navigator v3.0<br>
+  <span id="lastUpdated"></span>
+</div>
+
+<script>
+/* ============ DATA ============ */
+let data = null;
+
+function transformData(json) {
+  return {
+    player: json.player,
+    quests: json.missions.map(m => ({
+      name: m.name,
+      type: m.type,
+      status: m.status,
+      description: m.description || '',
+      objectives: m.objectives,
+      reward: m.reward,
+      reward_tier: m.reward_tier || 1
+    })),
+    completedQuests: (json.completed_missions || []).map(m => ({
+      name: m.name,
+      reward: m.reward,
+      completed: m.completed || '',
+      reward_tier: m.reward_tier || 1
+    })),
+    stats: json.stats || {},
+    habits: json.habits || [],
+    last_updated: json.last_updated || ''
+  };
+}
+
+// Inline fallback
+const FALLBACK_DATA = transformData({
+  "player": { "name": "Kalani", "title": "Behique", "level": 3, "xp": 420, "xp_next": 500 },
+  "missions": [
+    { "id": "ebay-empire", "name": "eBay Empire", "type": "MAIN", "status": "active", "description": "From $0 to revenue. List products, make sales, automate.", "reward": "First revenue stream online", "reward_tier": 5, "objectives": [
+      { "text": "Build listing agent V1", "done": true, "difficulty": "hard", "time_est": "6h", "reward_tier": 3 },
+      { "text": "Get eBay API keys (Prod + Sandbox)", "done": true, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Build V2 auto-publisher", "done": true, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Build quick_list.py", "done": true, "difficulty": "medium", "time_est": "1h", "reward_tier": 2 },
+      { "text": "Generate Funko Pop listing", "done": true, "difficulty": "very_easy", "time_est": "5m", "reward_tier": 1 },
+      { "text": "Post Funko Pops on eBay", "done": false, "difficulty": "very_easy", "time_est": "10m", "reward_tier": 3 },
+      { "text": "Run OAuth consent flow", "done": false, "difficulty": "easy", "time_est": "15m", "reward_tier": 2 },
+      { "text": "First eBay sale", "done": false, "difficulty": "medium", "time_est": "1-7d", "reward_tier": 5 },
+      { "text": "Build Telegram bot /ebay newlisting", "done": false, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Activate V2 API auto-publish", "done": false, "difficulty": "medium", "time_est": "2h", "reward_tier": 4 },
+      { "text": "10 listings live on eBay", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 4 },
+      { "text": "List Hello Kitty cups", "done": false, "difficulty": "easy", "time_est": "15m", "reward_tier": 1 },
+      { "text": "eBay cross-reference engine", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 4 },
+      { "text": "Multi-model description A/B testing", "done": false, "difficulty": "hard", "time_est": "8h", "reward_tier": 3 },
+      { "text": "AI title generator (trained on sold data)", "done": false, "difficulty": "very_hard", "time_est": "2d", "reward_tier": 4 },
+      { "text": "Dropship auto-lister (24/7)", "done": false, "difficulty": "very_hard", "time_est": "1w", "reward_tier": 5 }
+    ]},
+    { "id": "product-research", "name": "Product Research Engine", "type": "MAIN", "status": "active", "description": "Find winning products automatically.", "reward": "Automated product discovery", "reward_tier": 4, "objectives": [
+      { "text": "Research engine core", "done": true, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Scoring engine (0-100, 5 signals)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Product normalizer (fuzzy dedup)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Trends adapter", "done": true, "difficulty": "easy", "time_est": "1h", "reward_tier": 1 },
+      { "text": "Seed from trends workaround", "done": true, "difficulty": "easy", "time_est": "30m", "reward_tier": 1 },
+      { "text": "Trends Intelligence dashboard", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Real scoring with margin/competition data", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 4 },
+      { "text": "Amazon scraper with stealth + proxies", "done": false, "difficulty": "hard", "time_est": "8h", "reward_tier": 3 },
+      { "text": "Integrate Viral Vault 15-point scoring", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 3 },
+      { "text": "Product clustering (group variants)", "done": false, "difficulty": "medium", "time_est": "4h", "reward_tier": 2 },
+      { "text": "Walmart scraper", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 2 },
+      { "text": "AI price predictor (ML)", "done": false, "difficulty": "very_hard", "time_est": "1w", "reward_tier": 4 },
+      { "text": "Overnight autonomous scraping", "done": false, "difficulty": "very_hard", "time_est": "2d", "reward_tier": 5 }
+    ]},
+    { "id": "the-bridge", "name": "The Bridge", "type": "MAIN", "status": "active", "description": "Two-machine AI cluster. Cobo does heavy lifting.", "reward": "AI cluster fully operational", "reward_tier": 5, "objectives": [
+      { "text": "Set up Comp2 (Cobo) as AI worker", "done": true, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Build bridge server (HTTP + bearer auth)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Wire Syncthing between machines", "done": true, "difficulty": "medium", "time_est": "1h", "reward_tier": 2 },
+      { "text": "Switch to secure bridge", "done": false, "difficulty": "easy", "time_est": "15m", "reward_tier": 2 },
+      { "text": "Build wake.sh / sleep.sh power button", "done": false, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Jarvis morning briefing", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 4 },
+      { "text": "Autonomous cross-computer communication", "done": false, "difficulty": "very_hard", "time_est": "2d", "reward_tier": 5 },
+      { "text": "Swarm Mode / Worker spawning", "done": false, "difficulty": "very_hard", "time_est": "1w", "reward_tier": 5 },
+      { "text": "Agent Kernel (~300 line orchestrator)", "done": false, "difficulty": "very_hard", "time_est": "3d", "reward_tier": 5 }
+    ]},
+    { "id": "ceiba-vault", "name": "Ceiba Memory Vault", "type": "SIDE", "status": "active", "description": "Knowledge graph. No more amnesia.", "reward": "Persistent AI memory system", "reward_tier": 4, "objectives": [
+      { "text": "Obsidian vault with wiki links", "done": true, "difficulty": "medium", "time_est": "3h", "reward_tier": 2 },
+      { "text": "Vault knowledge graph scanner", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "vis.js interactive dashboard", "done": true, "difficulty": "medium", "time_est": "3h", "reward_tier": 3 },
+      { "text": "Session stop hooks (auto-summary)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Pre-push security scan hook", "done": true, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Vault context loader hook", "done": true, "difficulty": "medium", "time_est": "1h", "reward_tier": 2 },
+      { "text": "vault-architect skill", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 3 },
+      { "text": "Session transcript persistence", "done": true, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Create 35 ghost node vault files", "done": false, "difficulty": "easy", "time_est": "1h", "reward_tier": 1 },
+      { "text": "Graph query layer (graph_query.py)", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 3 },
+      { "text": "Session auto-generator", "done": false, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "ceiba_run.py orchestrator", "done": false, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Ceiba Memory Protocol (CMP)", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 4 },
+      { "text": "Memory ingestion protocol", "done": false, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Real embeddings for vault search", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 4 },
+      { "text": "Self-healing vault", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 2 },
+      { "text": "Graph-aware prompting", "done": false, "difficulty": "hard", "time_est": "4h", "reward_tier": 4 },
+      { "text": "YAML metadata for typed relationships", "done": false, "difficulty": "easy", "time_est": "2h", "reward_tier": 1 },
+      { "text": "Vault template system", "done": false, "difficulty": "easy", "time_est": "1h", "reward_tier": 1 }
+    ]},
+    { "id": "behiquebot", "name": "BehiqueBot", "type": "SIDE", "status": "active", "description": "Accountability bot on psychologist's framework.", "reward": "Accountability AI active 24/7", "reward_tier": 4, "objectives": [
+      { "text": "Deploy bot on Railway", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Telegram input + classification", "done": true, "difficulty": "medium", "time_est": "3h", "reward_tier": 2 },
+      { "text": "Notion persistence", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Ollama-first classification (local, free)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 3 },
+      { "text": "Memory system (cross-session)", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 4 },
+      { "text": "Claude-powered check-ins", "done": false, "difficulty": "hard", "time_est": "4h", "reward_tier": 4 },
+      { "text": "Session finish-tracker skill", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 3 }
+    ]},
+    { "id": "quest-dashboard", "name": "Quest Dashboard", "type": "SIDE", "status": "active", "description": "Visual progress tracker. Dopamine from data.", "reward": "Motivation system deployed", "reward_tier": 3, "objectives": [
+      { "text": "Dashboard V1 (cards + donut rings)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "3 themes (Neon/Mono/Pastel)", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Low-dopamine mono mode", "done": true, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Load from quests.json", "done": false, "difficulty": "easy", "time_est": "30m", "reward_tier": 1 },
+      { "text": "FocusLab Weekly-style clean layout", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 3 },
+      { "text": "Habit tracker with persistence", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 2 },
+      { "text": "JSON import/export buttons", "done": false, "difficulty": "easy", "time_est": "1h", "reward_tier": 1 },
+      { "text": "Tamagotchi Pi companion device", "done": false, "difficulty": "very_hard", "time_est": "2w", "reward_tier": 5 },
+      { "text": "Tamagotchi mobile app (PWA)", "done": false, "difficulty": "very_hard", "time_est": "2w", "reward_tier": 5 },
+      { "text": "Pixel art city simulator", "done": false, "difficulty": "very_hard", "time_est": "3w", "reward_tier": 5 }
+    ]},
+    { "id": "ai-skills", "name": "AI Skills & Tooling", "type": "SIDE", "status": "active", "description": "Skills that make Ceiba more capable.", "reward": "AI capabilities expanded", "reward_tier": 3, "objectives": [
+      { "text": "vault-architect skill", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Prompt quality comparator skill", "done": false, "difficulty": "hard", "time_est": "4h", "reward_tier": 3 },
+      { "text": "Prompt injection defense skill", "done": false, "difficulty": "medium", "time_est": "3h", "reward_tier": 3 },
+      { "text": "Ralph Loop for autonomous tasks", "done": false, "difficulty": "easy", "time_est": "30m", "reward_tier": 2 },
+      { "text": "Unified CLI orchestrator", "done": false, "difficulty": "hard", "time_est": "6h", "reward_tier": 3 },
+      { "text": "Multi-model vault agent", "done": false, "difficulty": "very_hard", "time_est": "1w", "reward_tier": 4 }
+    ]},
+    { "id": "revenue-diversification", "name": "Revenue Diversification", "type": "FUTURE", "status": "locked", "description": "After eBay proves the model -- expand everywhere.", "reward": "Multiple income streams", "reward_tier": 5, "objectives": [
+      { "text": "Shopify store exists + logo done", "done": true, "difficulty": "medium", "time_est": "2h", "reward_tier": 2 },
+      { "text": "Feed eBay winners to Shopify", "done": false, "difficulty": "medium", "time_est": "4h", "reward_tier": 3 },
+      { "text": "First Shopify sale", "done": false, "difficulty": "medium", "time_est": "1-2w", "reward_tier": 5 },
+      { "text": "n8n Agency -- first client outreach", "done": false, "difficulty": "medium", "time_est": "2h", "reward_tier": 3 },
+      { "text": "n8n Agency -- first paying client", "done": false, "difficulty": "hard", "time_est": "2-4w", "reward_tier": 5 },
+      { "text": "AI ebook (content creation)", "done": false, "difficulty": "hard", "time_est": "1w", "reward_tier": 3 },
+      { "text": "AI video content (Reels, Veo3/Kling)", "done": false, "difficulty": "medium", "time_est": "3d", "reward_tier": 3 },
+      { "text": "Book-to-Agent system", "done": false, "difficulty": "very_hard", "time_est": "3w", "reward_tier": 5 },
+      { "text": "Colmena66 AI consulting play", "done": false, "difficulty": "hard", "time_est": "2w", "reward_tier": 4 },
+      { "text": "PR Government AI consulting", "done": false, "difficulty": "very_hard", "time_est": "2mo", "reward_tier": 5 },
+      { "text": "Digital twin system", "done": false, "difficulty": "very_hard", "time_est": "1mo", "reward_tier": 5 }
+    ]}
+  ],
+  "completed_missions": [
+    { "name": "Ceiba Memory Stack", "reward": "Persistent AI memory", "completed": "2026-03-15", "reward_tier": 3 },
+    { "name": "Product Research Engine V1", "reward": "61 products scored", "completed": "2026-03-15", "reward_tier": 3 },
+    { "name": "Trends Scraper", "reward": "35 categories tracked", "completed": "2026-03-14", "reward_tier": 2 },
+    { "name": "OpenClaw Migration", "reward": "3 bots, 5 skills deployed", "completed": "2026-03-15", "reward_tier": 3 }
+  ],
+  "stats": { "Missions Completed": 4, "Missions Active": 7, "Missions Locked": 1, "Tools Built": 18, "Ideas Captured": 65, "Days Active": 14, "Revenue": "$0" },
+  "habits": [
+    { "name": "Code / Build", "days": [true, true, true, true, true, true, true] },
+    { "name": "List on eBay", "days": [false, false, false, false, false, false, false] },
+    { "name": "Review progress", "days": [false, false, false, true, false, false, true] },
+    { "name": "Log ideas", "days": [true, true, false, true, true, false, true] },
+    { "name": "Read / Learn", "days": [false, true, false, false, true, false, false] },
+    { "name": "Exercise", "days": [false, false, false, false, false, false, false] }
+  ]
+});
+
+async function loadData() {
+  try {
+    const resp = await fetch('quests.json');
+    if (resp.ok) {
+      const json = await resp.json();
+      data = transformData(json);
+      console.log('Loaded from quests.json');
+    } else {
+      data = FALLBACK_DATA;
+      console.log('Using inline fallback data');
+    }
+  } catch (e) {
+    data = FALLBACK_DATA;
+    console.log('Using inline fallback data (fetch failed)');
+  }
+  initDashboard();
+}
+
+loadData();
+
+/* ============ THEME SYSTEM ============ */
+const themeColors = {
+  neon:   { high: '#00e88f', mid: '#00e5ff',  low: '#1a2820', track: '#1e2a30' },
+  mono:   { high: '#cccccc', mid: '#777777',  low: '#222222', track: '#181818' },
+  pastel: { high: '#00e5ff', mid: '#ff0080',  low: '#180828', track: '#1a0830' }
+};
+
+let currentTheme = localStorage.getItem('behique-theme') || 'neon';
+let activeType = 'MAIN';
+
+function setTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('behique-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === theme);
+  });
+  renderAll();
+}
+
+document.querySelectorAll('.theme-btn').forEach(btn => {
+  btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+});
+
+document.documentElement.setAttribute('data-theme', currentTheme);
+document.querySelectorAll('.theme-btn').forEach(b => {
+  b.classList.toggle('active', b.dataset.theme === currentTheme);
+});
+
+/* ============ FONT SIZE TOGGLE ============ */
+let currentFontSize = localStorage.getItem('behique-fontsize') || 'medium';
+
+function setFontSize(size) {
+  currentFontSize = size;
+  document.body.classList.remove('font-small', 'font-medium', 'font-large');
+  document.body.classList.add('font-' + size);
+  localStorage.setItem('behique-fontsize', size);
+  document.querySelectorAll('.font-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.size === size);
+  });
+}
+
+document.querySelectorAll('.font-btn').forEach(btn => {
+  btn.addEventListener('click', () => setFontSize(btn.dataset.size));
+});
+
+setFontSize(currentFontSize);
+
+/* ============ HELPERS ============ */
+function calcProgress(objectives) {
+  if (!objectives.length) return 0;
+  return Math.round(objectives.filter(o => o.done).length / objectives.length * 100);
+}
+
+function createDonut(size, pct, textClass) {
+  const r = (size - 12) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (pct / 100) * circ;
+  const tc = themeColors[currentTheme];
+  const color = pct >= 60 ? tc.high : pct >= 30 ? tc.mid : tc.low;
+
+  const container = document.createElement('div');
+  container.className = 'donut';
+  container.innerHTML = `
+    <svg width="${size}" height="${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${tc.track}" stroke-width="10"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="10"
+        stroke-dasharray="${circ}" stroke-dashoffset="${circ}" stroke-linecap="butt"
+        style="transition: stroke-dashoffset 1.2s ease;">
+      </circle>
+    </svg>
+    <span class="donut-text ${textClass}">${pct}%</span>
+  `;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      container.querySelector('circle:nth-child(2)').style.strokeDashoffset = offset;
+    });
+  });
+  return container;
+}
+
+/* ============ INIT & RENDER ============ */
+function initDashboard() {
+  if (data.player) {
+    document.getElementById('playerName').textContent = data.player.name;
+    document.getElementById('playerTitle').textContent = data.player.title;
+    document.getElementById('playerLevel').textContent = `LVL ${data.player.level}`;
+    document.getElementById('playerAvatar').textContent = data.player.name.charAt(0);
+
+    const xpPct = Math.round((data.player.xp / data.player.xp_next) * 100);
+    document.getElementById('xpBarFill').style.width = xpPct + '%';
+    document.getElementById('xpText').textContent = `${data.player.xp}/${data.player.xp_next} XP`;
+  }
+
+  const types = ['MAIN', 'SIDE', 'FUTURE'];
+  const typeLabels = { MAIN: 'MAIN', SIDE: 'SIDE', FUTURE: 'FUTURE' };
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = '';
+
+  types.forEach(type => {
+    const count = data.quests.filter(q => q.type === type).length;
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (type === activeType ? ' active' : '');
+    tab.innerHTML = `${typeLabels[type]}<span class="count">${count}</span>`;
+    tab.onclick = () => {
+      activeType = type;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderQuests();
+    };
+    tabsEl.appendChild(tab);
+  });
+
+  renderAll();
+}
+
+function renderAll() {
+  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-US', {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  });
+  document.getElementById('lastUpdated').textContent = 'LAST UPDATED: ' + (data.last_updated || new Date().toISOString().slice(0,10));
+
+  const activeQuests = data.quests.filter(q => q.status === 'active');
+  const allObj = activeQuests.flatMap(q => q.objectives);
+  const totalDone = allObj.filter(o => o.done).length;
+  const totalAll = allObj.length;
+  const overallPct = Math.round((totalDone / totalAll) * 100);
+
+  const overallEl = document.getElementById('overallDonut');
+  overallEl.innerHTML = '';
+  overallEl.appendChild(createDonut(130, overallPct, 'large'));
+  document.getElementById('overallLabel').textContent = `${totalDone}/${totalAll} OBJ`;
+
+  // Bar chart
+  const barChart = document.getElementById('barChart');
+  barChart.innerHTML = '';
+  const maxObj = Math.max(...activeQuests.map(q => q.objectives.length));
+  activeQuests.forEach(q => {
+    const done = q.objectives.filter(o => o.done).length;
+    const total = q.objectives.length;
+    const height = total > 0 ? (done / maxObj) * 100 : 0;
+    const col = document.createElement('div');
+    col.className = 'bar-col';
+    const shortName = q.name.length > 10 ? q.name.slice(0,9) + '..' : q.name;
+    col.innerHTML = `
+      <div class="bar-value">${done}/${total}</div>
+      <div class="bar" style="height:${height}px"></div>
+      <div class="bar-label">${shortName}</div>
+    `;
+    barChart.appendChild(col);
+  });
+
+  // Stats
+  const statsPanel = document.getElementById('statsPanel');
+  statsPanel.innerHTML = '<h3>Stats</h3>';
+  for (const [key, val] of Object.entries(data.stats)) {
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    row.innerHTML = `<span class="stat-label">${key}</span><span class="stat-value">${val}</span>`;
+    statsPanel.appendChild(row);
+  }
+
+  renderQuests();
+
+  // Completed
+  const compGrid = document.getElementById('completedGrid');
+  compGrid.innerHTML = '';
+  data.completedQuests.forEach(q => {
+    const cTier = q.reward_tier || 1;
+    const card = document.createElement('div');
+    card.className = 'completed-card pixel-box-sm';
+    card.innerHTML = `
+      <span class="name">+ ${q.name}</span>
+      <span class="reward">
+        <span class="mission-tier-badge tier-${cTier}" style="font-size:13px;padding:2px 4px;">${TIER_NAMES[cTier]}</span>
+        ${q.completed || ''}
+      </span>`;
+    compGrid.appendChild(card);
+  });
+
+  renderHabits();
+}
+
+const TIER_NAMES = { 1: 'COMMON', 2: 'UNCOMMON', 3: 'RARE', 4: 'EPIC', 5: 'LEGEND' };
+const DIFF_LABELS = { very_easy: 'EASY+', easy: 'EASY', medium: 'MED', hard: 'HARD', very_hard: 'HARD+' };
+
+function tierStars(tier) {
+  const t = tier || 1;
+  const colors = { 1: '#888', 2: '#00e88f', 3: '#00e5ff', 4: '#b48cff', 5: '#ffd700' };
+  let stars = '';
+  for (let i = 0; i < 5; i++) {
+    if (i < t) {
+      stars += '<em class="mario-star filled" style="color:' + colors[t] + '">★</em>';
+    } else {
+      stars += '<em class="mario-star empty">★</em>';
+    }
+  }
+  return '<span class="obj-stars">' + stars + '</span>';
+}
+
+function renderQuests() {
+  const grid = document.getElementById('questGrid');
+  grid.innerHTML = '';
+  data.quests.filter(q => q.type === activeType).forEach(q => {
+    const pct = calcProgress(q.objectives);
+    const done = q.objectives.filter(o => o.done).length;
+    const total = q.objectives.length;
+    const isLocked = q.status === 'locked';
+    const mTier = q.reward_tier || 1;
+
+    const card = document.createElement('div');
+    card.className = 'quest-card pixel-box' + (isLocked ? ' locked' : '');
+    card.innerHTML = `
+      <div class="quest-card-header">
+        <div>
+          <h3>${q.name}</h3>
+          <div class="quest-type">${q.description || q.type + ' QUEST'}</div>
+        </div>
+        <div class="header-right">
+          <span class="mission-tier-badge tier-${mTier}">${TIER_NAMES[mTier] || 'COMMON'}</span>
+          <div style="font-size:16px;opacity:0.9;font-weight:600;font-family:'DotGothic16',monospace;">${isLocked ? 'LOCKED' : pct + '%'}</div>
+        </div>
+      </div>
+      <div class="quest-card-body">
+        <div class="quest-progress-row">
+          <div class="donut-slot"></div>
+          <div class="completion-text">${done} OF ${total}<br>OBJECTIVES</div>
+        </div>
+        <div class="quest-reward">+ ${q.reward}</div>
+        <div class="pixel-divider"></div>
+        <div class="objectives">
+          ${q.objectives.map(o => {
+            const diff = o.difficulty || 'medium';
+            const time = o.time_est || '';
+            const oTier = o.reward_tier || 1;
+            return `
+            <div class="objective ${o.done ? 'done' : ''}">
+              <div class="checkbox"></div>
+              <span class="diff-badge diff-${diff}">${DIFF_LABELS[diff] || diff}</span>
+              <span class="obj-text">${o.text}</span>
+              <div class="obj-meta">
+                ${tierStars(oTier)}
+                ${time ? `<span class="time-est">${time}</span>` : ''}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+    card.querySelector('.donut-slot').appendChild(createDonut(65, pct, 'small'));
+  });
+}
+
+function renderHabits() {
+  const habitGrid = document.getElementById('habitGrid');
+  habitGrid.innerHTML = '<div></div>';
+  const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  dayNames.forEach(d => {
+    habitGrid.innerHTML += `<div class="day-header">${d}</div>`;
+  });
+
+  data.habits.forEach((habit, hi) => {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'habit-name';
+    nameEl.textContent = habit.name;
+    habitGrid.appendChild(nameEl);
+
+    habit.days.forEach((checked, di) => {
+      const cell = document.createElement('div');
+      cell.className = 'habit-cell';
+      const check = document.createElement('div');
+      check.className = 'habit-check' + (checked ? ' checked' : '');
+      check.onclick = () => {
+        data.habits[hi].days[di] = !data.habits[hi].days[di];
+        check.classList.toggle('checked');
+      };
+      cell.appendChild(check);
+      habitGrid.appendChild(cell);
+    });
+  });
+}
+
+/* ============ GLITCH HOVER TRIGGER ============ */
+document.querySelectorAll('.panel, .card, .pixel-box, .quest-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    el.classList.add('glitch-active');
+    setTimeout(() => el.classList.remove('glitch-active'), 200);
+  });
+});
+</script>
+</body>
+</html>

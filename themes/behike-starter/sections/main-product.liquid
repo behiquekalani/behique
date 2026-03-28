@@ -1,0 +1,31 @@
+<section class="section-padding">
+  <div class="page-width">
+    <div class="featured-product__grid">
+      <div class="featured-product__image">
+        {%- if product.featured_image != blank -%}
+          <img src="{{ product.featured_image | image_url: width: 800 }}" alt="{{ product.featured_image.alt | default: product.title }}" loading="lazy">
+        {%- else -%}
+          {{ 'product-1' | placeholder_svg_tag }}
+        {%- endif -%}
+      </div>
+      <div class="featured-product__info">
+        <h1 class="featured-product__title">{{ product.title }}</h1>
+        <p class="featured-product__price">{{ product.price | money }}</p>
+        <div class="featured-product__description">{{ product.description }}</div>
+        {% form 'product', product %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          <button type="submit" class="button" {% unless product.available %}disabled{% endunless %}>
+            {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+          </button>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "section"
+}
+{% endschema %}

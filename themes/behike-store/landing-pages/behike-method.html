@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="The Behike Method. How to build a one-person business with AI. A complete framework for ADHD builders who want to start from $0 and build something real.">
+    <title>The Behike Method | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --blue-dim: rgba(10, 132, 255, 0.12);
+            --blue-glow: rgba(10, 132, 255, 0.3);
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --card-bg: #111111;
+            --gray: #86868B;
+            --green: #30D158;
+            --red: #FF453A;
+            --orange: #FF9F0A;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.8s ease-out both;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-cta {
+            background: var(--blue);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: #0070E0;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .container-wide {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 140px 0 80px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--blue-dim);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 7vw, 64px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 16px;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(18px, 3vw, 22px);
+            color: var(--gray);
+            font-weight: 400;
+            max-width: 520px;
+            margin: 0 auto 36px;
+            line-height: 1.5;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 18px 48px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .hero-cta:hover {
+            background: #0070E0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--blue-glow);
+        }
+
+        .hero-price {
+            display: block;
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .hero-social-proof {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        .proof-item {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .proof-item span {
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        /* Section Base */
+        section {
+            padding: 80px 0;
+        }
+
+        .section-divider {
+            border-top: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--blue);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            line-height: 1.15;
+        }
+
+        .section-desc {
+            font-size: 17px;
+            color: var(--gray);
+            max-width: 560px;
+            line-height: 1.6;
+        }
+
+        .section-desc.centered {
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* PAS Section */
+        .pas-section {
+            background: var(--card-bg);
+            border-top: 1px solid rgba(245, 245, 247, 0.06);
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .pas-text {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 500;
+            line-height: 1.5;
+            letter-spacing: -0.02em;
+            max-width: 640px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .pas-text .highlight {
+            color: var(--blue);
+        }
+
+        .pas-text .dim {
+            color: var(--gray);
+        }
+
+        /* Who It's For */
+        .who-section {
+            text-align: center;
+        }
+
+        .who-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 40px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .who-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(245, 245, 247, 0.08);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: left;
+        }
+
+        .who-card .who-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .who-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .who-card p {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* What It Is */
+        .what-it-is {
+            text-align: center;
+        }
+
+        .what-it-is .section-desc {
+            margin: 0 auto 40px;
+        }
+
+        .format-tags {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .format-tag {
+            background: var(--secondary-bg);
+            color: var(--gray);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        /* Module Cards */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 48px;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(245, 245, 247, 0.08);
+            border-radius: 16px;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 20px;
+            align-items: start;
+            transition: border-color 0.3s ease;
+        }
+
+        .module-card:hover {
+            border-color: rgba(10, 132, 255, 0.2);
+        }
+
+        .module-number {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: var(--blue-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .module-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+        }
+
+        .module-content p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .module-features {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .module-feature {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--blue);
+            background: var(--blue-dim);
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        /* Value Stack */
+        .value-stack {
+            text-align: center;
+        }
+
+        .stack-items {
+            max-width: 520px;
+            margin: 40px auto;
+        }
+
+        .stack-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .stack-item-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .stack-item-value {
+            font-size: 16px;
+            color: var(--gray);
+            text-decoration: line-through;
+        }
+
+        .stack-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            margin-top: 8px;
+        }
+
+        .stack-total-label {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stack-total-value {
+            font-size: 18px;
+            color: var(--gray);
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+
+        .stack-price-box {
+            background: var(--blue-dim);
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 32px;
+        }
+
+        .stack-final-price {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--blue);
+            line-height: 1;
+        }
+
+        .stack-savings {
+            font-size: 15px;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        .stack-savings span {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        /* Bundle Section */
+        .bundle-section {
+            text-align: center;
+        }
+
+        .bundle-box {
+            background: var(--card-bg);
+            border: 2px solid var(--blue);
+            border-radius: 20px;
+            padding: 48px 32px;
+            max-width: 560px;
+            margin: 40px auto 0;
+            position: relative;
+        }
+
+        .bundle-badge {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--blue);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 20px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .bundle-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .bundle-items {
+            list-style: none;
+            text-align: left;
+            max-width: 360px;
+            margin: 0 auto 24px;
+        }
+
+        .bundle-items li {
+            font-size: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bundle-items li .check {
+            color: var(--green);
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .bundle-price {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        .bundle-original {
+            font-size: 15px;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+
+        .bundle-original s {
+            color: var(--gray);
+        }
+
+        .bundle-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 600;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .bundle-cta:hover {
+            background: #0070E0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--blue-glow);
+        }
+
+        /* Cross-sells */
+        .cross-sells {
+            text-align: center;
+        }
+
+        .cross-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 40px;
+            max-width: 840px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cross-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(245, 245, 247, 0.08);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: left;
+            transition: border-color 0.3s ease;
+        }
+
+        .cross-card:hover {
+            border-color: rgba(10, 132, 255, 0.2);
+        }
+
+        .cross-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .cross-card p {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .cross-card .cross-price {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--blue);
+        }
+
+        .cross-card .cross-link {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        .cross-card .cross-link:hover {
+            text-decoration: underline;
+        }
+
+        /* FAQ */
+        .faq-section {
+            text-align: center;
+        }
+
+        .faq-list {
+            max-width: 640px;
+            margin: 40px auto 0;
+            text-align: left;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-family: var(--font);
+            font-size: 16px;
+            font-weight: 600;
+            text-align: left;
+            padding: 20px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .faq-question:hover {
+            color: var(--blue);
+        }
+
+        .faq-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+        }
+
+        .faq-answer p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .final-cta p {
+            font-size: 17px;
+            color: var(--gray);
+            max-width: 480px;
+            margin: 0 auto 36px;
+        }
+
+        .buy-btn {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px 56px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .buy-btn:hover {
+            background: #0070E0;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px var(--blue-glow);
+        }
+
+        .buy-guarantee {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 16px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Exit Intent Overlay */
+        .exit-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exit-overlay.active {
+            display: flex;
+        }
+
+        .exit-popup {
+            background: var(--card-bg);
+            border: 1px solid rgba(245, 245, 247, 0.1);
+            border-radius: 20px;
+            padding: 48px 36px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+
+        .exit-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .exit-close:hover {
+            color: var(--light);
+        }
+
+        .exit-popup h3 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .exit-popup p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .exit-popup .exit-price {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .exit-popup .exit-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px 36px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .exit-popup .exit-cta:hover {
+            background: #0070E0;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .hero {
+                padding: 110px 0 60px;
+            }
+
+            section {
+                padding: 60px 0;
+            }
+
+            .module-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 24px;
+            }
+
+            .module-number {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                border-radius: 12px;
+            }
+
+            .format-tags {
+                gap: 8px;
+            }
+
+            .stack-final-price {
+                font-size: 40px;
+            }
+
+            .bundle-box {
+                padding: 40px 24px;
+            }
+
+            .hero-social-proof {
+                gap: 16px;
+            }
+
+            .who-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cross-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .exit-popup {
+                padding: 36px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">Behike</div>
+        <a href="#buy" class="nav-cta">Get it for $14.99</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badge fade-up">Complete Framework</div>
+            <h1 class="fade-up delay-1">The Behike Method</h1>
+            <p class="subtitle fade-up delay-2">How to build a one-person business with AI. From $0 to revenue. Built for the scattered, the broke, and the builders.</p>
+            <a href="#buy" class="hero-cta fade-up delay-3">Get The Behike Method</a>
+            <span class="hero-price fade-up delay-4">$14.99. Instant download. 30-day guarantee.</span>
+            <div class="hero-social-proof fade-up delay-5">
+                <span class="proof-item"><span>6</span> chapters</span>
+                <span class="proof-item"><span>12</span> exercises</span>
+                <span class="proof-item"><span>$0</span> startup cost</span>
+                <span class="proof-item"><span>ADHD</span>-optimized</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAS -->
+    <section class="pas-section section-divider">
+        <div class="container">
+            <div class="pas-text reveal">
+                <span class="dim">You have 47 tabs open, 12 half-finished projects, and $0 in revenue.</span> You know you are capable of building something real. <span class="highlight">The problem is not your ideas. It is that nobody gave you a system built for the way your brain actually works.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Who It's For -->
+    <section class="who-section section-divider">
+        <div class="container">
+            <div class="section-label text-center reveal">Who This Is For</div>
+            <h2 class="section-title text-center reveal">Built for builders who think differently.</h2>
+
+            <div class="who-grid">
+                <div class="who-card reveal">
+                    <span class="who-icon">&#9889;</span>
+                    <h4>ADHD Builders</h4>
+                    <p>Traditional productivity fails you. This system works with hyperfocus, not against it.</p>
+                </div>
+                <div class="who-card reveal">
+                    <span class="who-icon">&#9881;</span>
+                    <h4>$0 Starters</h4>
+                    <p>No savings, no VC, no safety net. Every tool in this guide has a free tier.</p>
+                </div>
+                <div class="who-card reveal">
+                    <span class="who-icon">&#9670;</span>
+                    <h4>AI-Curious Creators</h4>
+                    <p>You know AI can help your business. You just need someone to show you how without the hype.</p>
+                </div>
+                <div class="who-card reveal">
+                    <span class="who-icon">&#9733;</span>
+                    <h4>Solo Operators</h4>
+                    <p>No team, no partners, no employees. Just you and a system that scales.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What It Is -->
+    <section class="what-it-is section-divider">
+        <div class="container">
+            <div class="section-label text-center reveal">What You Get</div>
+            <h2 class="section-title text-center reveal">One guide. Six chapters. A complete system for building alone.</h2>
+            <p class="section-desc centered reveal">The Behike Method is a 6-chapter framework covering vision, domain selection, ADHD-optimized productivity, AI content automation, monetization strategy, and the mindset to actually ship. Written by a builder, not a guru.</p>
+            <div class="format-tags reveal">
+                <span class="format-tag">PDF Guide</span>
+                <span class="format-tag">Fillable Exercises</span>
+                <span class="format-tag">Instant Download</span>
+                <span class="format-tag">Lifetime Access</span>
+                <span class="format-tag">$0 Tool Stack</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chapters -->
+    <section class="section-divider">
+        <div class="container">
+            <div class="section-label text-center reveal">Inside the Method</div>
+            <h2 class="section-title text-center reveal">6 chapters. Zero fluff.</h2>
+
+            <div class="modules-grid">
+
+                <div class="module-card reveal">
+                    <div class="module-number">1</div>
+                    <div class="module-content">
+                        <h3>The Vision</h3>
+                        <p>What are you building and why? Not vague goals. A specific picture of the life you want. The filter that makes every decision easier.</p>
+                        <div class="module-features">
+                            <span class="module-feature">Ideal Tuesday exercise</span>
+                            <span class="module-feature">3 non-negotiables</span>
+                            <span class="module-feature">Vision vs. goal framework</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card reveal">
+                    <div class="module-number">2</div>
+                    <div class="module-content">
+                        <h3>Your Domain Stack</h3>
+                        <p>Pick 3 things you can talk about forever. Money skill + passion topic + differentiator. The intersection where nobody else exists.</p>
+                        <div class="module-features">
+                            <span class="module-feature">3-pillar model</span>
+                            <span class="module-feature">Niche of one</span>
+                            <span class="module-feature">Why niching down is wrong</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card reveal">
+                    <div class="module-number">3</div>
+                    <div class="module-content">
+                        <h3>The ADHD Builder's System</h3>
+                        <p>A productivity system that actually works for scattered brains. Capture everything, focus on one thing, sprint in 25-minute blocks.</p>
+                        <div class="module-features">
+                            <span class="module-feature">Capture system</span>
+                            <span class="module-feature">25-min sprints</span>
+                            <span class="module-feature">Weekly review</span>
+                            <span class="module-feature">ADHD-optimized</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card reveal">
+                    <div class="module-number">4</div>
+                    <div class="module-content">
+                        <h3>The AI Content Engine</h3>
+                        <p>Automate 80% of content creation. Stay human for the 20% that matters. The exact workflow, tools, and strategy, all at $0.</p>
+                        <div class="module-features">
+                            <span class="module-feature">50/30/20 pyramid</span>
+                            <span class="module-feature">4-account strategy</span>
+                            <span class="module-feature">$0 tool stack</span>
+                            <span class="module-feature">What to never automate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card reveal">
+                    <div class="module-number">5</div>
+                    <div class="module-content">
+                        <h3>The Value Ladder</h3>
+                        <p>From free to $5K. Five levels of offers that build on each other. Each step earns trust for the next. No cold selling.</p>
+                        <div class="module-features">
+                            <span class="module-feature">5-level ladder</span>
+                            <span class="module-feature">Lead magnet design</span>
+                            <span class="module-feature">Service pricing</span>
+                            <span class="module-feature">Customer journey map</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card reveal">
+                    <div class="module-number">6</div>
+                    <div class="module-content">
+                        <h3>Ship It</h3>
+                        <p>The only chapter that matters. Perfection is procrastination in disguise. The feedback loop that turns bad first products into real businesses.</p>
+                        <div class="module-features">
+                            <span class="module-feature">Ship-listen-improve loop</span>
+                            <span class="module-feature">First product in a weekend</span>
+                            <span class="module-feature">Revenue as validation</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Stack -->
+    <section class="value-stack section-divider">
+        <div class="container">
+            <div class="section-label reveal">The Math</div>
+            <h2 class="section-title reveal">What you would pay for this separately.</h2>
+
+            <div class="stack-items">
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">Vision + Goal-Setting Workshop</span>
+                    <span class="stack-item-value">$97</span>
+                </div>
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">Domain/Niche Selection Framework</span>
+                    <span class="stack-item-value">$47</span>
+                </div>
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">ADHD Productivity System</span>
+                    <span class="stack-item-value">$47</span>
+                </div>
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">AI Content Automation Guide</span>
+                    <span class="stack-item-value">$49</span>
+                </div>
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">Value Ladder + Pricing Strategy</span>
+                    <span class="stack-item-value">$37</span>
+                </div>
+                <div class="stack-item reveal">
+                    <span class="stack-item-name">12 Fillable Exercises + Templates</span>
+                    <span class="stack-item-value">$20</span>
+                </div>
+                <div class="stack-total reveal">
+                    <span class="stack-total-label">Total Value</span>
+                    <span class="stack-total-value">$297</span>
+                </div>
+            </div>
+
+            <div class="stack-price-box reveal">
+                <div class="stack-final-price">$14.99</div>
+                <p class="stack-savings">That is <span>95% off</span> the real value.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bundle Offer -->
+    <section class="bundle-section section-divider">
+        <div class="container">
+            <div class="section-label reveal">Best Value</div>
+            <h2 class="section-title reveal">Get the complete builder stack.</h2>
+
+            <div class="bundle-box reveal">
+                <div class="bundle-badge">Save 40%</div>
+                <div class="bundle-title">The Builder Bundle</div>
+                <ul class="bundle-items">
+                    <li><span class="check">&#10003;</span> The Behike Method (this guide)</li>
+                    <li><span class="check">&#10003;</span> Solopreneur OS (interactive workbook)</li>
+                    <li><span class="check">&#10003;</span> AI Employee Guide (automation playbook)</li>
+                    <li><span class="check">&#10003;</span> Budget Template (financial tracker)</li>
+                    <li><span class="check">&#10003;</span> All future updates included</li>
+                </ul>
+                <div class="bundle-price">$29.99</div>
+                <p class="bundle-original">Individual price: <s>$49.96</s></p>
+                <a href="https://behikeai.gumroad.com/l/builder-bundle" class="bundle-cta">Get the Bundle</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cross-sells -->
+    <section class="cross-sells section-divider">
+        <div class="container">
+            <div class="section-label text-center reveal">Also from Behike</div>
+            <h2 class="section-title text-center reveal">Tools that pair with The Behike Method.</h2>
+
+            <div class="cross-grid">
+                <div class="cross-card reveal">
+                    <h4>Solopreneur OS</h4>
+                    <p>The interactive workbook for running a one-person business. Vision, strategy, content, monetization, and daily systems in one place.</p>
+                    <span class="cross-price">$12.99</span>
+                    <br>
+                    <a href="solopreneur-os.html" class="cross-link">View product &#8594;</a>
+                </div>
+                <div class="cross-card reveal">
+                    <h4>AI Employee Guide</h4>
+                    <p>How to hire AI to handle 80% of your business operations. Setup guides, prompt templates, and automation workflows.</p>
+                    <span class="cross-price">$12.99</span>
+                    <br>
+                    <a href="ai-employee-guide.html" class="cross-link">View product &#8594;</a>
+                </div>
+                <div class="cross-card reveal">
+                    <h4>Budget Template</h4>
+                    <p>Track income, expenses, and runway. Built for solo builders who need financial clarity without complex spreadsheets.</p>
+                    <span class="cross-price">$9.99</span>
+                    <br>
+                    <a href="budget-template.html" class="cross-link">View product &#8594;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section section-divider">
+        <div class="container">
+            <div class="section-label reveal">FAQ</div>
+            <h2 class="section-title reveal">Common questions.</h2>
+
+            <div class="faq-list">
+
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        <span>Is this another generic business course?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No. This is not a course. It is a framework written by a builder who is doing this right now. No theory from a millionaire who forgot what $0 feels like. Every chapter comes from real experience building a business from nothing.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        <span>Do I need technical skills to use this?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>No. The AI content chapter uses tools anyone can learn in an afternoon. If you can type a message and click a button, you have enough technical skill. The framework is built for non-technical builders too.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        <span>What if I have ADHD? Will this actually work for me?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>This was designed by someone with ADHD. Chapter 3 is entirely dedicated to systems that work with the ADHD brain. Short sprints, capture-everything systems, and permission to work on one thing at a time. No guilt-based productivity hacks.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        <span>I have $0 to invest in tools. Can I still use this?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. Every tool recommended in the guide has a free tier or is completely free. The entire AI content engine can run at $0. The only investment is your time.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item reveal">
+                    <button class="faq-question">
+                        <span>Can I get a refund?</span>
+                        <span class="faq-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Yes. 30-day money-back guarantee. If it is not useful, reach out and you get a full refund. No questions asked.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta section-divider" id="buy">
+        <div class="container">
+            <h2 class="reveal">Stop planning.<br>Start building.</h2>
+            <p class="reveal">6 chapters. 12 exercises. One system designed for the brain that works differently. Your business starts here.</p>
+            <a href="https://behikeai.gumroad.com/l/behike-method" class="buy-btn reveal">Get The Behike Method - $14.99</a>
+            <p class="buy-guarantee reveal">Instant download. 30-day money-back guarantee.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Behike. All rights reserved. Built from Puerto Rico.</p>
+    </footer>
+
+    <!-- Exit Intent Popup -->
+    <div class="exit-overlay" id="exitOverlay">
+        <div class="exit-popup">
+            <button class="exit-close" id="exitClose">&times;</button>
+            <h3>Before you go.</h3>
+            <p>You have the ideas. You have the hunger. The only thing missing is the system. The Behike Method gives you one.</p>
+            <div class="exit-price">$14.99</div>
+            <a href="https://behikeai.gumroad.com/l/behike-method" class="exit-cta">Get The Method</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+    (function() {
+        'use strict';
+
+        // Scroll reveal
+        var reveals = document.querySelectorAll('.reveal');
+
+        function checkReveals() {
+            reveals.forEach(function(el) {
+                var rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 60) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', checkReveals);
+        checkReveals();
+
+        // FAQ toggles
+        document.querySelectorAll('.faq-question').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var item = btn.parentElement;
+                var isOpen = item.classList.contains('open');
+
+                // Close all
+                document.querySelectorAll('.faq-item').forEach(function(i) {
+                    i.classList.remove('open');
+                });
+
+                // Toggle clicked
+                if (!isOpen) {
+                    item.classList.add('open');
+                }
+            });
+        });
+
+        // Exit intent popup
+        var exitShown = false;
+        var overlay = document.getElementById('exitOverlay');
+        var closeBtn = document.getElementById('exitClose');
+
+        document.addEventListener('mouseout', function(e) {
+            if (e.clientY < 10 && !exitShown) {
+                exitShown = true;
+                overlay.classList.add('active');
+            }
+        });
+
+        closeBtn.addEventListener('click', function() {
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                overlay.classList.remove('active');
+            }
+        });
+    })();
+    </script>
+    <script src="settings-widget.js"></script>
+    <script src="chat-widget.js"></script>
+
+</body>
+</html>

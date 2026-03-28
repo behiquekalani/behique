@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Creator Blueprint</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f; --card: #1a1a2e; --inner: #141420; --border: #2d2d3d;
+    --white: #F5F5F7; --gray: #86868B; --cyan: #00D4FF;
+    --font: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  }
+  body { background: var(--bg); color: var(--white); font-family: var(--font); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 900px; margin: 0 auto; padding: 60px 32px; }
+  .header { text-align: center; padding: 80px 0 60px; }
+  .header h1 { font-size: 48px; font-weight: 700; letter-spacing: -0.02em; }
+  .header .sub { font-size: 16px; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 60px; height: 2px; background: var(--cyan); margin: 24px auto; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 48px; margin-bottom: 32px;  }
+  .module-num { font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 8px; }
+  .module-title { font-size: 28px; font-weight: 700; margin-bottom: 32px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 6px; }
+  .fill { border-bottom: 1px dotted #333; min-height: 28px; margin-bottom: 14px; }
+  .inner { background: var(--inner); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+  .inner h4 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  hr.sep { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 14px; line-height: 2.2; display: flex; align-items: center; gap: 10px; }
+  .checklist li::before { content: ''; display: inline-block; width: 16px; height: 16px; min-width: 16px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+  .flow .step { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 600; }
+  .flow .arrow { color: var(--cyan); font-size: 18px; padding: 0 6px; }
+  .kpi { background: var(--inner); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; }
+  .kpi .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 12px; }
+  .kpi .kpi-value { font-size: 24px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted #333; padding-bottom: 8px; }
+  .bar-visual { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .bar-visual .seg { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+  .ladder-wrap { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .ladder-rung { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-radius: 8px; }
+  .ladder-rung .rung-num { font-size: 20px; font-weight: 700; color: var(--cyan); min-width: 32px; }
+  .ladder-rung .rung-text { font-size: 14px; font-weight: 600; flex: 1; }
+  .ladder-rung .rung-fill { flex: 1; border-bottom: 1px dotted #333; min-height: 20px; }
+  .day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-cell { background: var(--inner); border: 1px solid var(--border); border-radius: 10px; padding: 14px 10px; text-align: center; min-height: 90px; }
+  .day-cell .day-name { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 10px; }
+  .day-cell .day-content { font-size: 11px; color: var(--gray); line-height: 1.5; }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 13px; line-height: 2; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 12px; }
+  
+    .module { break-inside: avoid;  }
+  .module:first-of-type { break-before: auto; page-break-before: auto; }
+    
+    .day-cell { background: #f5f5f5; border-color: #ddd; }
+    
+    .checklist { break-inside: avoid;  }
+    
+    .module-num, .kpi .kpi-label, .day-cell .day-name { color: #0099bb; }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Content Creator Blueprint</h1>
+    <div class="sub">Build an audience. Monetize your knowledge.</div>
+    <div class="line"></div>
+  </div>
+
+  <!-- 01 NICHE SELECTION -->
+  <div class="module">
+    <div class="module-num">01 / Niche Selection</div>
+    <div class="module-title">Find Your Lane</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Broad Topic</div><div class="fill"></div>
+        <div class="label">Specific Niche</div><div class="fill"></div>
+        <div class="label">Target Audience</div><div class="fill"></div>
+        <div class="label">Their Biggest Pain</div><div class="fill"></div>
+      </div>
+      <div>
+        <div class="label">Your Unique Angle</div><div class="fill"></div>
+        <div class="label">Credibility / Experience</div><div class="fill"></div>
+        <div class="label">Competitor 1</div><div class="fill"></div>
+        <div class="label">Competitor 2</div><div class="fill"></div>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="inner">
+      <h4>Niche Validation</h4>
+      <ul class="checklist">
+        <li>People actively search for this topic</li>
+        <li>Competitors exist (proves demand)</li>
+        <li>You can talk about this for 2+ years</li>
+        <li>Clear monetization path exists</li>
+        <li>You have a unique perspective or story</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 02 PLATFORM STRATEGY -->
+  <div class="module">
+    <div class="module-num">02 / Platform Strategy</div>
+    <div class="module-title">Where You Show Up</div>
+    <div class="bar-visual" style="margin-bottom:24px;">
+      <div class="seg" style="width:70%;background:rgba(0,212,255,0.25);">PRIMARY 70%</div>
+      <div class="seg" style="width:20%;background:rgba(0,212,255,0.20);">SECONDARY 20%</div>
+      <div class="seg" style="width:10%;background:rgba(0,212,255,0.05);">COMMUNITY 10%</div>
+    </div>
+    <div class="grid-3">
+      <div class="inner" style="border-color:var(--cyan);">
+        <h4>Primary (70%)</h4>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:12px;">Long-form. Searchable. Evergreen.</div>
+        <div class="label">Platform</div><div class="fill"></div>
+        <div class="label">Format</div><div class="fill"></div>
+        <div class="label">Frequency</div><div class="fill"></div>
+        <div class="label">Growth Goal</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Secondary (20%)</h4>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:12px;">Short-form. Discovery. Viral reach.</div>
+        <div class="label">Platform</div><div class="fill"></div>
+        <div class="label">Format</div><div class="fill"></div>
+        <div class="label">Frequency</div><div class="fill"></div>
+        <div class="label">Growth Goal</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Community (10%)</h4>
+        <div style="font-size:13px;color:var(--gray);margin-bottom:12px;">Owned audience. Deep connection.</div>
+        <div class="label">Platform</div><div class="fill"></div>
+        <div class="label">Format</div><div class="fill"></div>
+        <div class="label">Frequency</div><div class="fill"></div>
+        <div class="label">Growth Goal</div><div class="fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 CONTENT FORMULA -->
+  <div class="module">
+    <div class="module-num">03 / Content Formula</div>
+    <div class="module-title">Every Piece, Every Time</div>
+    <div class="inner" style="margin-bottom:24px;">
+      <h4>The Framework</h4>
+      <div class="flow" style="margin:16px 0;">
+        <div class="step">Hook</div><span class="arrow">&rarr;</span>
+        <div class="step">Problem</div><span class="arrow">&rarr;</span>
+        <div class="step">Value</div><span class="arrow">&rarr;</span>
+        <div class="step">Proof</div><span class="arrow">&rarr;</span>
+        <div class="step">CTA</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="inner">
+        <h4>Hook Types</h4>
+        <ul class="checklist">
+          <li>Contrarian take</li>
+          <li>Shocking stat</li>
+          <li>Personal story</li>
+          <li>"Most people think X. They're wrong."</li>
+          <li>Before/after result</li>
+        </ul>
+      </div>
+      <div class="inner">
+        <h4>CTA Types</h4>
+        <ul class="checklist">
+          <li>Follow for more</li>
+          <li>Comment your answer</li>
+          <li>Save this for later</li>
+          <li>Link in bio (free resource)</li>
+          <li>Share with someone who needs this</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="label">Content Pillars (3-5 recurring topics)</div>
+    <div class="grid-3" style="margin-top:12px;">
+      <div><div class="label">Pillar 1</div><div class="fill"></div></div>
+      <div><div class="label">Pillar 2</div><div class="fill"></div></div>
+      <div><div class="label">Pillar 3</div><div class="fill"></div></div>
+    </div>
+    <div class="grid-2" style="margin-top:8px;">
+      <div><div class="label">Pillar 4</div><div class="fill"></div></div>
+      <div><div class="label">Pillar 5</div><div class="fill"></div></div>
+    </div>
+  </div>
+
+  <!-- 04 MONETIZATION LADDER -->
+  <div class="module">
+    <div class="module-num">04 / Monetization Ladder</div>
+    <div class="module-title">Revenue Layers</div>
+    <div class="ladder-wrap">
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.03);"><div class="rung-num">1</div><div class="rung-text">Free Content</div><div style="font-size:12px;color:var(--gray);">Builds audience</div></div>
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.12);"><div class="rung-num">2</div><div class="rung-text">Ad Revenue / Sponsorships</div><div class="rung-fill"></div></div>
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.16);"><div class="rung-num">3</div><div class="rung-text">Digital Products (templates, guides)</div><div class="rung-fill"></div></div>
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.20);"><div class="rung-num">4</div><div class="rung-text">Courses / Workshops</div><div class="rung-fill"></div></div>
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.16);"><div class="rung-num">5</div><div class="rung-text">Membership / Community</div><div class="rung-fill"></div></div>
+      <div class="ladder-rung" style="background:rgba(0,212,255,0.20);"><div class="rung-num">6</div><div class="rung-text">Services / Consulting</div><div class="rung-fill"></div></div>
+    </div>
+    <hr class="sep">
+    <div class="grid-2">
+      <div><div class="label">Current Revenue Layer</div><div class="fill"></div></div>
+      <div><div class="label">Next Layer to Activate</div><div class="fill"></div></div>
+    </div>
+  </div>
+
+  <!-- 05 AUDIENCE GROWTH -->
+  <div class="module">
+    <div class="module-num">05 / Audience Growth</div>
+    <div class="module-title">Growth Engine</div>
+    <div class="inner" style="margin-bottom:24px;">
+      <h4>Growth Flywheel</h4>
+      <div style="display:flex;align-items:center;justify-content:center;gap:0;margin:16px 0;flex-wrap:wrap;">
+        <div class="flow">
+          <div class="step">Create</div><span class="arrow">&rarr;</span>
+          <div class="step">Distribute</div><span class="arrow">&rarr;</span>
+          <div class="step">Engage</div><span class="arrow">&rarr;</span>
+          <div class="step">Convert</div><span class="arrow">&rarr;</span>
+          <div class="step">Retain</div><span class="arrow">&rarr;</span>
+          <div class="step" style="background:rgba(0,212,255,0.25);">Repeat</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Current Followers</div><div class="fill"></div>
+        <div class="label">30-Day Target</div><div class="fill"></div>
+        <div class="label">90-Day Target</div><div class="fill"></div>
+        <div class="label">1-Year Target</div><div class="fill"></div>
+      </div>
+      <div class="inner">
+        <h4>Growth Tactics</h4>
+        <ul class="checklist">
+          <li>Collaborations / guest features</li>
+          <li>Trending topic hijacking</li>
+          <li>Repurpose long to short form</li>
+          <li>Engage 30 min daily (comments)</li>
+          <li>Cross-promote across platforms</li>
+          <li>Lead magnet for email capture</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 PUBLISHING SCHEDULE -->
+  <div class="module">
+    <div class="module-num">06 / Publishing Schedule</div>
+    <div class="module-title">Weekly Content Calendar</div>
+    <div class="day-grid">
+      <div class="day-cell"><div class="day-name">Mon</div><div class="day-content">Long-form<br>publish</div></div>
+      <div class="day-cell"><div class="day-name">Tue</div><div class="day-content">Short-form<br>clip</div></div>
+      <div class="day-cell"><div class="day-name">Wed</div><div class="day-content">Community<br>engage</div></div>
+      <div class="day-cell"><div class="day-name">Thu</div><div class="day-content">Short-form<br>clip</div></div>
+      <div class="day-cell"><div class="day-name">Fri</div><div class="day-content">Long-form<br>publish</div></div>
+      <div class="day-cell"><div class="day-name">Sat</div><div class="day-content">Batch<br>create</div></div>
+      <div class="day-cell"><div class="day-name">Sun</div><div class="day-content">Rest<br>plan week</div></div>
+    </div>
+    <hr class="sep">
+    <div class="grid-3">
+      <div><div class="label">Long-form / Week</div><div class="fill"></div></div>
+      <div><div class="label">Short-form / Week</div><div class="fill"></div></div>
+      <div><div class="label">Emails / Week</div><div class="fill"></div></div>
+    </div>
+  </div>
+
+  <!-- 07 REVENUE STREAMS -->
+  <div class="module">
+    <div class="module-num">07 / Revenue Streams</div>
+    <div class="module-title">Monthly Scorecard</div>
+    <div class="grid-4" style="margin-bottom:24px;">
+      <div class="kpi"><div class="kpi-label">Total Revenue</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Ad / Sponsor</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Products</div><div class="kpi-value">$</div></div>
+      <div class="kpi"><div class="kpi-label">Services</div><div class="kpi-value">$</div></div>
+    </div>
+    <table class="clean">
+      <thead>
+        <tr><th>Month</th><th>Followers</th><th>Ad Rev</th><th>Product Rev</th><th>Service Rev</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Month 1</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Month 2</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Month 3</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Month 4</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Month 5</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+        <tr><td>Month 6</td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td><td class="fill"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 08 ANALYTICS -->
+  <div class="module">
+    <div class="module-num">08 / Analytics</div>
+    <div class="module-title">Track What Matters</div>
+    <div class="grid-3">
+      <div class="inner">
+        <h4>Growth Metrics</h4>
+        <ul class="checklist">
+          <li>Follower growth rate</li>
+          <li>Impressions / reach</li>
+          <li>Profile visits</li>
+          <li>Email list growth</li>
+        </ul>
+      </div>
+      <div class="inner">
+        <h4>Engagement Metrics</h4>
+        <ul class="checklist">
+          <li>Engagement rate</li>
+          <li>Avg watch time</li>
+          <li>Comments per post</li>
+          <li>Saves / shares ratio</li>
+        </ul>
+      </div>
+      <div class="inner">
+        <h4>Revenue Metrics</h4>
+        <ul class="checklist">
+          <li>Revenue per follower</li>
+          <li>Conversion rate</li>
+          <li>Email open rate</li>
+          <li>Click-through rate</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="grid-2">
+      <div><div class="label">Weekly Review Day</div><div class="fill"></div></div>
+      <div><div class="label">Analytics Tool</div><div class="fill"></div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>BEHIKE.CO</strong><br>
+    Built in Puerto Rico
+  </div>
+
+</div>
+
+</body>
+</html>

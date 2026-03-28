@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOS Revenue Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:Helvetica,Arial,sans-serif;padding:20px;max-width:1200px;margin:0 auto}
+h1{color:#C9A84C;font-size:1.6rem;margin-bottom:8px;letter-spacing:1px}
+.subtitle{color:#666;font-size:.8rem;margin-bottom:24px}
+.top-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.metric-card{background:#111;border:1px solid #222;border-radius:8px;padding:16px;text-align:center}
+.metric-card .label{color:#888;font-size:.7rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.metric-card .value{color:#C9A84C;font-size:1.8rem;font-weight:700}
+.metric-card .count{color:#555;font-size:.75rem;margin-top:2px}
+.goal-section{background:#111;border:1px solid #222;border-radius:8px;padding:20px;margin-bottom:24px}
+.goal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.goal-header h2{color:#C9A84C;font-size:1rem}
+.goal-header span{color:#888;font-size:.85rem}
+.goal-bar-bg{background:#1a1a1a;border-radius:6px;height:28px;overflow:hidden;position:relative}
+.goal-bar-fill{background:linear-gradient(90deg,#C9A84C,#e6c65a);height:100%;border-radius:6px;transition:width .5s ease;min-width:2px}
+.goal-bar-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.75rem;font-weight:700;color:#0a0a0a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.panel{background:#111;border:1px solid #222;border-radius:8px;padding:16px}
+.panel h3{color:#C9A84C;font-size:.85rem;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+table{width:100%;border-collapse:collapse}
+th{color:#666;font-size:.7rem;text-transform:uppercase;text-align:left;padding:6px 8px;border-bottom:1px solid #222}
+td{padding:6px 8px;font-size:.8rem;border-bottom:1px solid #1a1a1a}
+td.revenue{color:#C9A84C;font-weight:600}
+.chart{display:flex;align-items:flex-end;gap:4px;height:140px;padding-top:8px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.chart-bar{background:#C9A84C;border-radius:3px 3px 0 0;width:100%;min-height:2px;transition:height .3s ease}
+.chart-label{color:#555;font-size:.6rem;margin-top:4px;white-space:nowrap}
+.chart-val{color:#888;font-size:.6rem;margin-bottom:2px}
+.platform-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:.8rem}
+.platform-row:last-child{border:none}
+.platform-name{color:#ccc}
+.platform-rev{color:#C9A84C;font-weight:600}
+.empty{color:#444;font-style:italic;font-size:.8rem;text-align:center;padding:24px}
+.footer{text-align:center;color:#333;font-size:.65rem;margin-top:16px}
+@media(max-width:700px){.top-bar,.grid{grid-template-columns:1fr 1fr}.metric-card .value{font-size:1.3rem}}
+@media(max-width:480px){.top-bar{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>BIOS REVENUE</h1>
+<p class="subtitle">Auto-refreshes every 60s. Data: analytics/data/sales.json</p>
+
+<div class="top-bar" id="topBar">
+  <div class="metric-card"><div class="label">Today</div><div class="value" id="todayRev">$0</div><div class="count" id="todayCt">0 sales</div></div>
+  <div class="metric-card"><div class="label">This Week</div><div class="value" id="weekRev">$0</div><div class="count" id="weekCt">0 sales</div></div>
+  <div class="metric-card"><div class="label">This Month</div><div class="value" id="monthRev">$0</div><div class="count" id="monthCt">0 sales</div></div>
+  <div class="metric-card"><div class="label">All Time</div><div class="value" id="allRev">$0</div><div class="count" id="allCt">0 sales</div></div>
+</div>
+
+<div class="goal-section">
+  <div class="goal-header"><h2>$10K / Month Goal</h2><span id="goalText">$0 / $10,000</span></div>
+  <div class="goal-bar-bg"><div class="goal-bar-fill" id="goalFill" style="width:0%"></div><div class="goal-bar-text" id="goalPct">0%</div></div>
+</div>
+
+<div class="grid">
+  <div class="panel"><h3>Last 7 Days</h3><div class="chart" id="chart"></div></div>
+  <div class="panel"><h3>Top Products</h3><table><thead><tr><th>Product</th><th>Rev</th><th>Sales</th></tr></thead><tbody id="topProducts"></tbody></table></div>
+</div>
+
+<div class="grid">
+  <div class="panel"><h3>Platform Breakdown</h3><div id="platforms"></div></div>
+  <div class="panel"><h3>Recent Sales</h3><table><thead><tr><th>Product</th><th>Price</th><th>Platform</th></tr></thead><tbody id="recentSales"></tbody></table></div>
+</div>
+
+<p class="footer">BIOS Analytics v1.0</p>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+const fmt2 = n => '$' + n.toFixed(2);
+
+function today() { return new Date().toISOString().slice(0, 10); }
+function weekAgo() { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().slice(0, 10); }
+function monthStart() { return new Date().toISOString().slice(0, 8) + '01'; }
+function dayLabel(dateStr) { return new Date(dateStr + 'T12:00:00').toLocaleDateString('en', {weekday:'short'}); }
+
+async function load() {
+  let sales = [];
+  try {
+    const r = await fetch('data/sales.json');
+    sales = await r.json();
+  } catch(e) { console.log('No sales data yet'); }
+
+  const t = today(), w = weekAgo(), m = monthStart();
+  const todaySales = sales.filter(s => s.date === t);
+  const weekSales = sales.filter(s => s.date >= w);
+  const monthSales = sales.filter(s => s.date >= m);
+
+  const sum = arr => arr.reduce((a, s) => a + s.price, 0);
+  const todayR = sum(todaySales), weekR = sum(weekSales), monthR = sum(monthSales), allR = sum(sales);
+
+  $('todayRev').textContent = fmt(todayR);
+  $('todayCt').textContent = todaySales.length + ' sales';
+  $('weekRev').textContent = fmt(weekR);
+  $('weekCt').textContent = weekSales.length + ' sales';
+  $('monthRev').textContent = fmt(monthR);
+  $('monthCt').textContent = monthSales.length + ' sales';
+  $('allRev').textContent = fmt(allR);
+  $('allCt').textContent = sales.length + ' sales';
+
+  // Goal
+  const pct = Math.min(100, (monthR / 10000) * 100);
+  $('goalFill').style.width = pct + '%';
+  $('goalPct').textContent = pct.toFixed(1) + '%';
+  $('goalText').textContent = fmt(monthR) + ' / $10,000';
+  $('goalPct').style.color = pct > 50 ? '#0a0a0a' : '#C9A84C';
+
+  // Chart - last 7 days
+  const dayMap = {};
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    dayMap[key] = 0;
+  }
+  weekSales.forEach(s => { if (dayMap[s.date] !== undefined) dayMap[s.date] += s.price; });
+  const maxDay = Math.max(...Object.values(dayMap), 1);
+  const chartEl = $('chart');
+  chartEl.innerHTML = '';
+  Object.entries(dayMap).forEach(([date, rev]) => {
+    const h = (rev / maxDay) * 120;
+    chartEl.innerHTML += `<div class="chart-bar-wrap"><div class="chart-val">${rev > 0 ? fmt(rev) : ''}</div><div class="chart-bar" style="height:${Math.max(h,2)}px"></div><div class="chart-label">${dayLabel(date)}</div></div>`;
+  });
+
+  // Top products
+  const prodMap = {};
+  sales.forEach(s => {
+    if (!prodMap[s.product]) prodMap[s.product] = {rev: 0, count: 0};
+    prodMap[s.product].rev += s.price;
+    prodMap[s.product].count++;
+  });
+  const sorted = Object.entries(prodMap).sort((a, b) => b[1].rev - a[1].rev).slice(0, 5);
+  const tp = $('topProducts');
+  tp.innerHTML = sorted.length ? sorted.map(([p, d]) =>
+    `<tr><td>${p}</td><td class="revenue">${fmt2(d.rev)}</td><td>${d.count}</td></tr>`
+  ).join('') : '<tr><td colspan="3" class="empty">No sales yet</td></tr>';
+
+  // Platforms
+  const platMap = {};
+  sales.forEach(s => { platMap[s.platform] = (platMap[s.platform] || 0) + s.price; });
+  const pl = $('platforms');
+  const platEntries = Object.entries(platMap).sort((a, b) => b[1] - a[1]);
+  pl.innerHTML = platEntries.length ? platEntries.map(([p, r]) =>
+    `<div class="platform-row"><span class="platform-name">${p}</span><span class="platform-rev">${fmt2(r)}</span></div>`
+  ).join('') : '<div class="empty">No sales yet</div>';
+
+  // Recent sales
+  const recent = sales.slice(-5).reverse();
+  const rs = $('recentSales');
+  rs.innerHTML = recent.length ? recent.map(s =>
+    `<tr><td>${s.product}</td><td class="revenue">${fmt2(s.price)}</td><td>${s.platform}</td></tr>`
+  ).join('') : '<tr><td colspan="3" class="empty">No sales yet</td></tr>';
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>

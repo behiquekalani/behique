@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Your Product — Behike</title>
+  <meta name="description" content="3 questions to find the right Behike product for your situation.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --black: #000000;
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --light: #F5F5F7;
+      --gray: #86868B;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      background: var(--black);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--light);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--light);
+    }
+
+    /* MAIN LAYOUT */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* SCREENS */
+    .screen {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+      opacity: 0;
+    }
+
+    .screen.visible {
+      opacity: 1;
+    }
+
+    /* INTRO SCREEN */
+    .intro-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 20px;
+    }
+
+    .intro-title {
+      font-size: clamp(40px, 8vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      color: var(--light);
+    }
+
+    .intro-subtitle {
+      font-size: 18px;
+      color: var(--gray);
+      margin-bottom: 48px;
+      line-height: 1.5;
+    }
+
+    /* PROGRESS */
+    .progress-bar-wrap {
+      margin-bottom: 40px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: var(--gray);
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: var(--card-border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 2px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* QUESTION */
+    .question-text {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 32px;
+      color: var(--light);
+    }
+
+    /* OPTIONS */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      color: var(--light);
+      font-family: inherit;
+    }
+
+    .option-btn:hover {
+      border-color: var(--card-border-hover);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.selected {
+      border-color: var(--blue);
+      background: rgba(10, 132, 255, 0.08);
+    }
+
+    .option-letter {
+      width: 32px;
+      height: 32px;
+      border-radius: 980px;
+      border: 1px solid var(--card-border-hover);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      flex-shrink: 0;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .option-btn.selected .option-letter {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: rgba(10, 132, 255, 0.12);
+    }
+
+    .option-text {
+      font-size: 16px;
+      line-height: 1.4;
+      color: var(--light);
+    }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 32px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 980px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--light);
+      border: 1px solid var(--card-border-hover);
+      border-radius: 980px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      background: transparent;
+      color: var(--gray);
+      border: none;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .btn-ghost:hover {
+      color: var(--light);
+    }
+
+    .next-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 32px;
+    }
+
+    .next-btn-wrap {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* RESULT SCREEN */
+    .result-eyebrow {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 20px;
+    }
+
+    .result-headline {
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .result-subheadline {
+      font-size: 16px;
+      color: var(--gray);
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    /* PRODUCT CARDS */
+    .product-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .product-card {
+      padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .product-card.featured {
+      border-color: rgba(10, 132, 255, 0.4);
+      background: rgba(10, 132, 255, 0.04);
+    }
+
+    .product-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .product-name {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--light);
+    }
+
+    .product-price {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--green);
+      white-space: nowrap;
+      padding: 4px 12px;
+      background: rgba(48, 209, 88, 0.1);
+      border-radius: 980px;
+      border: 1px solid rgba(48, 209, 88, 0.2);
+    }
+
+    .product-price.free {
+      color: var(--amber);
+      background: rgba(255, 159, 10, 0.1);
+      border-color: rgba(255, 159, 10, 0.2);
+    }
+
+    .product-price.premium {
+      color: var(--purple);
+      background: rgba(191, 90, 242, 0.1);
+      border-color: rgba(191, 90, 242, 0.2);
+    }
+
+    .product-description {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.6;
+    }
+
+    .product-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 980px;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--blue);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+    }
+
+    .product-badge.done-for-you {
+      background: rgba(191, 90, 242, 0.12);
+      color: var(--purple);
+      border-color: rgba(191, 90, 242, 0.2);
+    }
+
+    .product-badge.entry {
+      background: rgba(48, 209, 88, 0.12);
+      color: var(--green);
+      border-color: rgba(48, 209, 88, 0.2);
+    }
+
+    .product-cta {
+      margin-top: 4px;
+    }
+
+    /* RESULT ACTIONS */
+    .result-secondary-actions {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .result-divider {
+      color: var(--card-border);
+      font-size: 16px;
+    }
+
+    /* OR DIVIDER BETWEEN CARDS */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 24px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--light);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      nav {
+        padding: 16px 20px;
+      }
+
+      .nav-links {
+        gap: 20px;
+      }
+
+      main {
+        padding: 40px 20px;
+        align-items: flex-start;
+      }
+
+      .next-row {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .result-secondary-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .result-divider {
+        display: none;
+      }
+
+      footer {
+        padding: 20px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .product-card-top {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <ul class="nav-links">
+      <li><a href="index.html">All Products</a></li>
+      <li><a href="bundles.html">Bundles</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="quiz-container">
+
+      <!-- INTRO -->
+      <div class="screen" id="screen-intro">
+        <div class="intro-eyebrow">Product Finder</div>
+        <h1 class="intro-title">Find your product.</h1>
+        <p class="intro-subtitle">3 questions. Gets you to the right starting point.</p>
+        <button class="btn-primary" onclick="startQuiz()">Start</button>
+      </div>
+
+      <!-- QUESTION 1 -->
+      <div class="screen" id="screen-q1">
+        <div class="progress-bar-wrap">
+          <div class="progress-label">Question 1 of 3</div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 33%"></div>
+          </div>
+        </div>
+        <h2 class="question-text">What's your main goal right now?</h2>
+        <div class="options-grid" id="options-q1">
+          <button class="option-btn" onclick="selectOption(1, 'A', this)">
+            <span class="option-letter">A</span>
+            <span class="option-text">Build and sell digital products</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(1, 'B', this)">
+            <span class="option-letter">B</span>
+            <span class="option-text">Grow and automate my content</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(1, 'C', this)">
+            <span class="option-letter">C</span>
+            <span class="option-text">Set up AI systems for my business</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(1, 'D', this)">
+            <span class="option-letter">D</span>
+            <span class="option-text">Improve my focus and productivity</span>
+          </button>
+        </div>
+        <div class="next-row">
+          <span></span>
+          <div class="next-btn-wrap">
+            <button class="btn-primary" id="next-q1" onclick="goToQ2()" disabled style="opacity:0.35;cursor:not-allowed;">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 2 -->
+      <div class="screen" id="screen-q2">
+        <div class="progress-bar-wrap">
+          <div class="progress-label">Question 2 of 3</div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 66%"></div>
+          </div>
+        </div>
+        <h2 class="question-text">Where are you starting from?</h2>
+        <div class="options-grid" id="options-q2">
+          <button class="option-btn" onclick="selectOption(2, 'A', this)">
+            <span class="option-letter">A</span>
+            <span class="option-text">Complete beginner, no audience yet</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(2, 'B', this)">
+            <span class="option-letter">B</span>
+            <span class="option-text">I have some skills, building my first system</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(2, 'C', this)">
+            <span class="option-letter">C</span>
+            <span class="option-text">Running a business, want to automate it</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(2, 'D', this)">
+            <span class="option-letter">D</span>
+            <span class="option-text">Student, building alongside my studies</span>
+          </button>
+        </div>
+        <div class="next-row">
+          <button class="btn-ghost" onclick="goBack(2)">Back</button>
+          <div class="next-btn-wrap">
+            <button class="btn-primary" id="next-q2" onclick="goToQ3()" disabled style="opacity:0.35;cursor:not-allowed;">Next</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTION 3 -->
+      <div class="screen" id="screen-q3">
+        <div class="progress-bar-wrap">
+          <div class="progress-label">Question 3 of 3</div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: 100%"></div>
+          </div>
+        </div>
+        <h2 class="question-text">What's your budget for your first purchase?</h2>
+        <div class="options-grid" id="options-q3">
+          <button class="option-btn" onclick="selectOption(3, 'A', this)">
+            <span class="option-letter">A</span>
+            <span class="option-text">Free (lead magnet only)</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(3, 'B', this)">
+            <span class="option-letter">B</span>
+            <span class="option-text">Under $15</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(3, 'C', this)">
+            <span class="option-letter">C</span>
+            <span class="option-text">$15 to $50</span>
+          </button>
+          <button class="option-btn" onclick="selectOption(3, 'D', this)">
+            <span class="option-letter">D</span>
+            <span class="option-text">$50 and above</span>
+          </button>
+        </div>
+        <div class="next-row">
+          <button class="btn-ghost" onclick="goBack(3)">Back</button>
+          <div class="next-btn-wrap">
+            <button class="btn-primary" id="next-q3" onclick="showResult()" disabled style="opacity:0.35;cursor:not-allowed;">See my result</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULT SCREEN -->
+      <div class="screen" id="screen-result">
+        <div class="result-eyebrow" id="result-eyebrow">Your Match</div>
+        <h2 class="result-headline" id="result-headline"></h2>
+        <p class="result-subheadline" id="result-subheadline"></p>
+        <div class="product-cards" id="result-cards"></div>
+        <div class="result-secondary-actions">
+          <a href="index.html" class="btn-ghost">See all products</a>
+          <span class="result-divider">|</span>
+          <button class="btn-ghost" onclick="restartQuiz()">Take quiz again</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-copy">Behike &copy; 2026</span>
+    <div class="footer-links">
+      <a href="index.html">Products</a>
+      <a href="bundles.html">Bundles</a>
+    </div>
+  </footer>
+
+  <script>
+    // State
+    var answers = { q1: null, q2: null, q3: null };
+
+    // Results data
+    var RESULTS = {
+      start_here: {
+        eyebrow: 'Your Match',
+        headline: 'Start here.',
+        subheadline: 'You need a low-friction entry point, not a full system. These get you moving without overthinking it.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'Best fit', type: '' },
+            name: 'ADHD Finance Guide',
+            price: '$9.99',
+            priceClass: '',
+            description: 'A focused system for managing money with an ADHD brain. Clear, actionable, no fluff. Built for people who want results, not a finance degree.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com/l/adhd-finance' }
+          },
+          {
+            featured: false,
+            badge: { label: 'Free', type: 'entry' },
+            name: 'Zero-Dollar AI Stack',
+            price: 'Free',
+            priceClass: 'free',
+            description: 'The exact free AI tools you can start using today to build, create, and automate, without spending a dollar.',
+            cta: { label: 'Download free', href: 'https://behikeai.gumroad.com' }
+          }
+        ]
+      },
+      build_system: {
+        eyebrow: 'Your Match',
+        headline: 'Build your system.',
+        subheadline: 'You have the skills and the hunger. This gives you the operating system to actually execute consistently.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'Best fit', type: '' },
+            name: 'Solopreneur OS',
+            price: '$29.99',
+            priceClass: '',
+            description: 'A complete operating system for one-person businesses. Planning, content, revenue tracking, and execution, all in one place. Built for builders who are done with chaos.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com/l/solopreneur-os' }
+          }
+        ]
+      },
+      content_machine: {
+        eyebrow: 'Your Match',
+        headline: 'Build your content machine.',
+        subheadline: 'Two options depending on where you are: start cheap to test, or go all-in on the system.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'Entry point', type: 'entry' },
+            name: 'Content Waterfall',
+            price: '$4.99',
+            priceClass: '',
+            description: 'One piece of content becomes ten. A simple repurposing system that works for any platform. The best $5 you can spend before building anything bigger.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com' }
+          },
+          {
+            featured: false,
+            badge: { label: 'Full upgrade', type: '' },
+            name: 'Ghost Writer Kit',
+            price: '$99',
+            priceClass: 'premium',
+            description: 'The full content production system. Templates, SOPs, and AI prompts to run a content operation like a team of one.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com' }
+          }
+        ]
+      },
+      ai_automation: {
+        eyebrow: 'Your Match',
+        headline: 'Automate your business.',
+        subheadline: 'Two paths: learn the tools yourself, or have it done for you.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'DIY', type: '' },
+            name: 'n8n Automation Pack',
+            price: '$49.99',
+            priceClass: '',
+            description: 'Pre-built n8n workflows for the most common business automations. Plug in your credentials, turn them on, and get hours back every week.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com' }
+          },
+          {
+            featured: false,
+            badge: { label: 'Done for you', type: 'done-for-you' },
+            name: 'AI Installation Service',
+            price: '$499',
+            priceClass: 'premium',
+            description: 'I build and install the automation systems in your business. You walk away with working automations and a 30-minute walkthrough. For those who want it done right.',
+            cta: { label: 'Inquire on Gumroad', href: 'https://behikeai.gumroad.com' }
+          }
+        ]
+      },
+      student_builder: {
+        eyebrow: 'Your Match',
+        headline: 'Build while you study.',
+        subheadline: 'The most efficient path for students who want to come out of school already ahead.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'Start here', type: 'entry' },
+            name: 'Study Buddy',
+            price: '$7.99/mo',
+            priceClass: '',
+            description: 'An AI-powered study system built for engineers and technical students. Explains concepts, quizzes you, and keeps you moving without burning out.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com' }
+          },
+          {
+            featured: false,
+            badge: { label: 'Career upgrade', type: '' },
+            name: 'Claude Code Course',
+            price: '$49.99',
+            priceClass: '',
+            description: 'Learn to build real tools with Claude Code. The skill that turns students into builders. This is how you build a portfolio that actually gets attention.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com' }
+          }
+        ]
+      },
+      all_in: {
+        eyebrow: 'Your Match',
+        headline: 'Go all in.',
+        subheadline: 'You know what you want. This bundle is the complete toolkit, everything together, better price.',
+        cards: [
+          {
+            featured: true,
+            badge: { label: 'Best value', type: '' },
+            name: 'Complete Bundle',
+            price: '$149.99',
+            priceClass: '',
+            description: 'Every core Behike product in one package. Solopreneur OS, Content Waterfall, automation workflows, guides, and more. Everything you need to build seriously, nothing you do not.',
+            cta: { label: 'Get it on Gumroad', href: 'https://behikeai.gumroad.com/l/complete-bundle' }
+          }
+        ]
+      }
+    };
+
+    // Routing logic
+    function getResult() {
+      var g = answers.q1;  // goal
+      var l = answers.q2;  // level
+      var b = answers.q3;  // budget
+
+      // Student builder override
+      if (l === 'D') return 'student_builder';
+
+      // All in: (Goal A or B) + (Intermediate or Business) + $50+
+      if ((g === 'A' || g === 'B') && (l === 'B' || l === 'C') && b === 'D') return 'all_in';
+
+      // AI Automation: Goal C + $50+
+      if (g === 'C' && b === 'D') return 'ai_automation';
+
+      // AI Automation: Goal C + Business level
+      if (g === 'C' && l === 'C') return 'ai_automation';
+
+      // AI Automation: Goal C
+      if (g === 'C') return 'ai_automation';
+
+      // Content Machine: Goal B
+      if (g === 'B') return 'content_machine';
+
+      // Build System: Goal A + not beginner + $15+
+      if (g === 'A' && (l === 'B' || l === 'C') && (b === 'C' || b === 'D')) return 'build_system';
+
+      // Focus/productivity + not beginner + budget
+      if (g === 'D' && (l === 'B' || l === 'C') && (b === 'C' || b === 'D')) return 'build_system';
+
+      // All in fallback: budget D
+      if (b === 'D' && (l === 'B' || l === 'C')) return 'all_in';
+
+      // Default start here
+      return 'start_here';
+    }
+
+    // Screen transitions
+    function showScreen(id) {
+      var current = document.querySelector('.screen.active');
+      var next = document.getElementById(id);
+
+      function activateNext() {
+        next.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            next.classList.add('visible');
+          });
+        });
+      }
+
+      if (current) {
+        current.classList.remove('visible');
+        setTimeout(function() {
+          current.classList.remove('active');
+          activateNext();
+        }, 300);
+      } else {
+        activateNext();
+      }
+    }
+
+    // Quiz controls
+    function startQuiz() {
+      showScreen('screen-q1');
+    }
+
+    function selectOption(question, value, el) {
+      var grid = document.getElementById('options-q' + question);
+      var btns = grid.querySelectorAll('.option-btn');
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('selected');
+      }
+      el.classList.add('selected');
+      answers['q' + question] = value;
+
+      var nextBtn = document.getElementById('next-q' + question);
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+      nextBtn.style.cursor = 'pointer';
+    }
+
+    function goToQ2() {
+      if (!answers.q1) return;
+      showScreen('screen-q2');
+    }
+
+    function goToQ3() {
+      if (!answers.q2) return;
+      showScreen('screen-q3');
+    }
+
+    function goBack(fromQuestion) {
+      if (fromQuestion === 2) showScreen('screen-q1');
+      if (fromQuestion === 3) showScreen('screen-q2');
+    }
+
+    function showResult() {
+      if (!answers.q3) return;
+      var key = getResult();
+      var data = RESULTS[key];
+      renderResult(data);
+      showScreen('screen-result');
+    }
+
+    function restartQuiz() {
+      answers.q1 = null;
+      answers.q2 = null;
+      answers.q3 = null;
+
+      var qs = ['q1', 'q2', 'q3'];
+      for (var i = 0; i < qs.length; i++) {
+        var q = qs[i];
+        var grid = document.getElementById('options-' + q);
+        if (grid) {
+          var btns = grid.querySelectorAll('.option-btn');
+          for (var j = 0; j < btns.length; j++) {
+            btns[j].classList.remove('selected');
+          }
+        }
+        var nextBtn = document.getElementById('next-' + q);
+        if (nextBtn) {
+          nextBtn.disabled = true;
+          nextBtn.style.opacity = '0.35';
+          nextBtn.style.cursor = 'not-allowed';
+        }
+      }
+
+      showScreen('screen-intro');
+    }
+
+    // Result rendering
+    function renderResult(data) {
+      document.getElementById('result-eyebrow').textContent = data.eyebrow;
+      document.getElementById('result-headline').textContent = data.headline;
+      document.getElementById('result-subheadline').textContent = data.subheadline;
+
+      var container = document.getElementById('result-cards');
+      container.innerHTML = '';
+
+      for (var i = 0; i < data.cards.length; i++) {
+        var card = data.cards[i];
+
+        if (i > 0) {
+          var divider = document.createElement('div');
+          divider.className = 'or-divider';
+          divider.textContent = 'or';
+          container.appendChild(divider);
+        }
+
+        var cardEl = document.createElement('div');
+        cardEl.className = 'product-card' + (card.featured ? ' featured' : '');
+
+        var badgeHtml = '';
+        if (card.badge) {
+          badgeHtml = '<span class="product-badge ' + card.badge.type + '">' + card.badge.label + '</span>';
+        }
+
+        var ctaClass = card.featured ? 'btn-primary' : 'btn-secondary';
+
+        cardEl.innerHTML =
+          badgeHtml +
+          '<div class="product-card-top">' +
+            '<span class="product-name">' + card.name + '</span>' +
+            '<span class="product-price ' + card.priceClass + '">' + card.price + '</span>' +
+          '</div>' +
+          '<p class="product-description">' + card.description + '</p>' +
+          '<div class="product-cta">' +
+            '<a href="' + card.cta.href + '" target="_blank" rel="noopener noreferrer" class="' + ctaClass + '">' +
+              card.cta.label +
+            '</a>' +
+          '</div>';
+
+        container.appendChild(cardEl);
+      }
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', function() {
+      showScreen('screen-intro');
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEHIQUE COCKPIT</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;500&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #060a10;
+  --bg-card: #0c1220;
+  --bg-card-hover: #101828;
+  --cyan: #00f0ff;
+  --purple: #b44dff;
+  --red: #ff3b5c;
+  --green: #00ff88;
+  --gray: #3a4560;
+  --text: #c8d6e5;
+  --text-dim: #5a6a80;
+  --orange: #ff6b2b;
+  --glow-cyan: 0 0 12px rgba(0, 240, 255, 0.3);
+  --glow-purple: 0 0 12px rgba(180, 77, 255, 0.3);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 240, 255, 0.015) 2px,
+    rgba(0, 240, 255, 0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ---- HEADER ---- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.04) 0%, transparent 100%);
+}
+
+.header-title {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.header-clock {
+  color: var(--cyan);
+  font-size: 0.85rem;
+}
+
+.header-updated {
+  opacity: 0.6;
+}
+
+/* ---- LAYOUT ---- */
+.cockpit {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- TOP ROW ---- */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 220px 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Machine cards */
+.machines-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.machine-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.3s;
+}
+
+.machine-card:hover {
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.machine-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.machine-dot.online {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50% { opacity: 0.5; box-shadow: 0 0 10px currentColor; }
+}
+
+.machine-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.machine-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.machine-role {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.machine-ip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+/* Face panel */
+.face-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid rgba(0, 240, 255, 0.1);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+#ceiba-face {
+  display: block;
+}
+
+/* Revenue panel */
+.revenue-panel {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.revenue-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.revenue-amount {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--green);
+}
+
+.revenue-target {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.revenue-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.revenue-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  min-width: 2px;
+}
+
+.revenue-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-align: right;
+}
+
+/* ---- PROJECT GRID ---- */
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.project-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cyan);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.project-card:hover {
+  border-color: rgba(0, 240, 255, 0.15);
+  background: var(--bg-card-hover);
+}
+
+.project-card:hover::before {
+  opacity: 1;
+}
+
+.project-card.status-done::before { background: var(--green); opacity: 0.6; }
+.project-card.status-active::before { background: var(--cyan); opacity: 0.6; }
+.project-card.status-blocked::before { background: var(--red); opacity: 0.8; }
+.project-card.status-idea::before { background: var(--gray); opacity: 0.4; }
+
+.project-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.project-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #e8edf3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.status-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+
+.status-badge.done { background: rgba(0,255,136,0.12); color: var(--green); }
+.status-badge.active { background: rgba(0,240,255,0.12); color: var(--cyan); }
+.status-badge.blocked { background: rgba(255,59,92,0.12); color: var(--red); }
+.status-badge.idea { background: rgba(58,69,96,0.2); color: var(--gray); }
+
+.project-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.project-task-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.project-progress-pct {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+.project-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.project-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.project-bar-fill.done { background: var(--green); }
+.project-bar-fill.active { background: var(--cyan); }
+.project-bar-fill.blocked { background: var(--red); }
+.project-bar-fill.idea { background: var(--gray); }
+
+.project-blocker {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--red);
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: rgba(255,59,92,0.08);
+  border-radius: 4px;
+}
+
+.project-tasks {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: none;
+}
+
+.project-card.expanded .project-tasks {
+  display: block;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.8rem;
+}
+
+.task-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-dot.done { background: var(--green); }
+.task-dot.active { background: var(--cyan); }
+.task-dot.blocked { background: var(--red); }
+.task-dot.todo { background: var(--gray); }
+
+.task-title {
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.task-title.done { text-decoration: line-through; opacity: 0.5; }
+
+/* ---- BOTTOM ROW ---- */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+}
+
+/* Activity feed */
+.activity-panel {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 14px 16px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.activity-panel::-webkit-scrollbar { width: 4px; }
+.activity-panel::-webkit-scrollbar-track { background: transparent; }
+.activity-panel::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.activity-item:last-child { border-bottom: none; }
+
+.activity-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.activity-type.system { background: rgba(0,240,255,0.1); color: var(--cyan); }
+.activity-type.build { background: rgba(180,77,255,0.1); color: var(--purple); }
+.activity-type.task { background: rgba(0,255,136,0.1); color: var(--green); }
+.activity-type.network { background: rgba(0,240,255,0.1); color: var(--cyan); }
+.activity-type.blocker { background: rgba(255,59,92,0.1); color: var(--red); }
+
+.activity-msg {
+  font-size: 0.8rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.activity-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* Blockers panel */
+.blockers-panel {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,59,92,0.15);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.blockers-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  animation: pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.blocker-item {
+  padding: 8px 10px;
+  background: rgba(255,59,92,0.06);
+  border: 1px solid rgba(255,59,92,0.1);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border-left: 3px solid var(--red);
+}
+
+.blocker-item:last-child { margin-bottom: 0; }
+
+.blocker-project {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--red);
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.blocker-text {
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 900px) {
+  .top-row {
+    grid-template-columns: 1fr;
+  }
+  .projects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bottom-row {
+    grid-template-columns: 1fr;
+  }
+  .face-panel {
+    height: 200px;
+  }
+  .machines-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .machine-card {
+    flex: 1;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header { flex-direction: column; gap: 8px; text-align: center; }
+  .header-title { font-size: 1.2rem; }
+  .projects-grid { grid-template-columns: 1fr; }
+  .cockpit { padding: 12px 12px; }
+  .machines-panel { flex-direction: column; }
+  .machine-card { min-width: unset; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">BEHIQUE COCKPIT</div>
+  <div class="header-right">
+    <span class="header-updated" id="last-updated">loading...</span>
+    <span class="header-clock" id="live-clock">--:--:--</span>
+  </div>
+</div>
+
+<div class="cockpit">
+  <!-- TOP ROW -->
+  <div class="top-row">
+    <div class="machines-panel" id="machines-panel"></div>
+    <div class="face-panel">
+      <canvas id="ceiba-face" width="200" height="200"></canvas>
+    </div>
+    <div class="revenue-panel" id="revenue-panel"></div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="section-title">Projects</div>
+  <div class="projects-grid" id="projects-grid"></div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+    <div>
+      <div class="section-title" style="margin-bottom: 10px;">Activity Feed</div>
+      <div class="activity-panel" id="activity-panel"></div>
+    </div>
+    <div>
+      <div class="section-title" style="margin-bottom: 10px;">Blockers</div>
+      <div class="blockers-panel" id="blockers-panel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- STATE ----
+let dashboardData = null;
+let lastFetch = null;
+
+// ---- FETCH ----
+async function fetchDashboard() {
+  try {
+    const res = await fetch('api/dashboard.json');
+    if (!res.ok) throw new Error('fetch failed');
+    dashboardData = await res.json();
+    lastFetch = Date.now();
+    localStorage.setItem('behique_dashboard', JSON.stringify(dashboardData));
+    localStorage.setItem('behique_dashboard_ts', String(lastFetch));
+    render();
+  } catch (e) {
+    console.warn('Fetch failed, using cache', e);
+    const cached = localStorage.getItem('behique_dashboard');
+    const cachedTs = localStorage.getItem('behique_dashboard_ts');
+    if (cached) {
+      dashboardData = JSON.parse(cached);
+      lastFetch = Number(cachedTs) || Date.now();
+      render();
+    }
+  }
+}
+
+// ---- CLOCK ----
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('live-clock').textContent = h + ':' + m + ':' + s;
+
+  if (lastFetch) {
+    const ago = Math.floor((Date.now() - lastFetch) / 1000);
+    let agoStr;
+    if (ago < 60) agoStr = ago + 's ago';
+    else if (ago < 3600) agoStr = Math.floor(ago / 60) + 'm ago';
+    else agoStr = Math.floor(ago / 3600) + 'h ago';
+    document.getElementById('last-updated').textContent = 'updated ' + agoStr;
+  }
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+// ---- RENDER ----
+function render() {
+  if (!dashboardData) return;
+  renderMachines();
+  renderRevenue();
+  renderProjects();
+  renderActivity();
+  renderBlockers();
+}
+
+function renderMachines() {
+  const el = document.getElementById('machines-panel');
+  el.innerHTML = dashboardData.machines.map(function(m) {
+    return '<div class="machine-card">' +
+      '<div class="machine-dot ' + m.status + '" style="background:' + m.color + ';color:' + m.color + '"></div>' +
+      '<div class="machine-info">' +
+        '<div class="machine-name" style="color:' + m.color + '">' + m.name + '</div>' +
+        '<div class="machine-role">' + m.role + '</div>' +
+      '</div>' +
+      '<div class="machine-ip">' + m.ip + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderRevenue() {
+  var r = dashboardData.revenue;
+  var pct = r.target > 0 ? ((r.current / r.target) * 100).toFixed(1) : '0.0';
+  var el = document.getElementById('revenue-panel');
+  el.innerHTML =
+    '<div class="revenue-label">Revenue</div>' +
+    '<div class="revenue-amount">$' + r.current.toLocaleString() + '</div>' +
+    '<div class="revenue-target">target: $' + r.target.toLocaleString() + '</div>' +
+    '<div class="revenue-bar-track"><div class="revenue-bar-fill" style="width:' + Math.max(0.5, parseFloat(pct)) + '%"></div></div>' +
+    '<div class="revenue-pct">' + pct + '%</div>';
+}
+
+function renderProjects() {
+  var el = document.getElementById('projects-grid');
+  el.innerHTML = dashboardData.projects.map(function(p) {
+    var tasksDone = p.tasks.filter(function(t) { return t.status === 'done'; }).length;
+    var tasksTotal = p.tasks.length;
+    var taskStr = tasksTotal > 0 ? tasksDone + '/' + tasksTotal + ' tasks' : 'no tasks';
+
+    var tasksHtml = '';
+    if (p.tasks.length > 0) {
+      tasksHtml = '<div class="project-tasks">' +
+        p.tasks.map(function(t) {
+          var titleClass = t.status === 'done' ? ' done' : '';
+          return '<div class="task-item">' +
+            '<div class="task-dot ' + t.status + '"></div>' +
+            '<span class="task-title' + titleClass + '">' + t.title + '</span>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    var blockerHtml = p.blocker
+      ? '<div class="project-blocker">BLOCKED: ' + p.blocker + '</div>'
+      : '';
+
+    return '<div class="project-card status-' + p.status + '" data-id="' + p.id + '" onclick="toggleProject(this)">' +
+      '<div class="project-header">' +
+        '<span class="project-name">' + p.name + '</span>' +
+        '<span class="status-badge ' + p.status + '">' + p.status + '</span>' +
+      '</div>' +
+      '<div class="project-meta">' +
+        '<span class="project-task-count">' + taskStr + '</span>' +
+        '<span class="project-progress-pct">' + p.progress + '%</span>' +
+      '</div>' +
+      '<div class="project-bar-track"><div class="project-bar-fill ' + p.status + '" style="width:' + p.progress + '%"></div></div>' +
+      blockerHtml +
+      tasksHtml +
+    '</div>';
+  }).join('');
+}
+
+function toggleProject(card) {
+  card.classList.toggle('expanded');
+}
+
+function renderActivity() {
+  var el = document.getElementById('activity-panel');
+  el.innerHTML = dashboardData.activity.map(function(a) {
+    var d = new Date(a.ts);
+    var time = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    return '<div class="activity-item">' +
+      '<span class="activity-type ' + a.type + '">' + a.type + '</span>' +
+      '<span class="activity-msg">' + a.msg + '</span>' +
+      '<span class="activity-time">' + time + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function renderBlockers() {
+  var el = document.getElementById('blockers-panel');
+  var blockers = [];
+  dashboardData.projects.forEach(function(p) {
+    if (p.blocker) {
+      blockers.push({ project: p.name, text: p.blocker });
+    }
+    p.tasks.forEach(function(t) {
+      if (t.status === 'blocked') {
+        blockers.push({ project: p.name, text: t.title });
+      }
+    });
+  });
+
+  if (blockers.length === 0) {
+    el.innerHTML = '<div class="blockers-title">BLOCKERS</div><div style="font-size:0.8rem;color:var(--text-dim);">No active blockers</div>';
+    return;
+  }
+
+  el.innerHTML = '<div class="blockers-title">BLOCKERS (' + blockers.length + ')</div>' +
+    blockers.map(function(b) {
+      return '<div class="blocker-item">' +
+        '<div class="blocker-project">' + b.project + '</div>' +
+        '<div class="blocker-text">' + b.text + '</div>' +
+      '</div>';
+    }).join('');
+}
+
+// ---- CEIBA FACE (particle skull) ----
+(function() {
+  var canvas = document.getElementById('ceiba-face');
+  var ctx = canvas.getContext('2d');
+  var W = 200, H = 200;
+  var particles = [];
+  var time = 0;
+
+  // Build face shape from points
+  // Skull outline
+  var facePoints = [];
+
+  function addEllipse(cx, cy, rx, ry, count, startA, endA) {
+    for (var i = 0; i < count; i++) {
+      var a = startA + (endA - startA) * (i / count);
+      facePoints.push({ x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) });
+    }
+  }
+
+  function addLine(x1, y1, x2, y2, count) {
+    for (var i = 0; i < count; i++) {
+      var t = i / count;
+      facePoints.push({ x: x1 + (x2 - x1) * t, y: y1 + (y2 - y1) * t });
+    }
+  }
+
+  // Cranium (top of skull)
+  addEllipse(100, 80, 50, 50, 40, Math.PI, 2 * Math.PI);
+
+  // Jaw lines
+  addLine(50, 80, 45, 120, 8);
+  addLine(150, 80, 155, 120, 8);
+
+  // Chin
+  addEllipse(100, 135, 30, 15, 15, 0, Math.PI);
+
+  // Left eye socket
+  addEllipse(78, 88, 14, 10, 16, 0, 2 * Math.PI);
+
+  // Right eye socket
+  addEllipse(122, 88, 14, 10, 16, 0, 2 * Math.PI);
+
+  // Nose
+  addLine(100, 98, 95, 112, 5);
+  addLine(100, 98, 105, 112, 5);
+  addLine(95, 112, 105, 112, 4);
+
+  // Mouth line
+  addEllipse(100, 128, 16, 4, 12, 0, Math.PI);
+
+  // Cheekbones
+  addLine(52, 95, 62, 105, 5);
+  addLine(148, 95, 138, 105, 5);
+
+  // Teeth marks
+  for (var ti = 0; ti < 5; ti++) {
+    facePoints.push({ x: 88 + ti * 6, y: 130 });
+  }
+
+  // Inner eye dots (pupils)
+  facePoints.push({ x: 78, y: 88 });
+  facePoints.push({ x: 122, y: 88 });
+
+  // Additional detail: brow ridge
+  addLine(60, 76, 95, 74, 8);
+  addLine(105, 74, 140, 76, 8);
+
+  // Fill with some random interior particles
+  for (var fi = 0; fi < 30; fi++) {
+    var angle = Math.random() * 2 * Math.PI;
+    var r = Math.random() * 35;
+    facePoints.push({ x: 100 + r * Math.cos(angle), y: 90 + r * Math.sin(angle) * 0.8 });
+  }
+
+  // Create particles
+  facePoints.forEach(function(fp) {
+    particles.push({
+      baseX: fp.x,
+      baseY: fp.y,
+      x: fp.x,
+      y: fp.y,
+      size: 1 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.3 + Math.random() * 0.7,
+      drift: 0.5 + Math.random() * 1.5,
+      alpha: 0.4 + Math.random() * 0.6
+    });
+  });
+
+  function drawFace() {
+    ctx.clearRect(0, 0, W, H);
+    time += 0.016;
+
+    // Breathing factor
+    var breath = Math.sin(time * 1.2) * 0.5 + 0.5;
+
+    particles.forEach(function(p) {
+      var dx = Math.sin(time * p.speed + p.phase) * p.drift;
+      var dy = Math.cos(time * p.speed * 0.7 + p.phase) * p.drift * 0.6;
+
+      // Breathing: slight vertical expansion
+      var breathY = (p.baseY - 100) * breath * 0.02;
+
+      p.x = p.baseX + dx;
+      p.y = p.baseY + dy + breathY;
+
+      var alpha = p.alpha * (0.7 + breath * 0.3);
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0, 240, 255, ' + alpha + ')';
+      ctx.fill();
+    });
+
+    // Subtle glow on eyes
+    var eyeGlow = 0.08 + breath * 0.06;
+    ctx.beginPath();
+    ctx.arc(78, 88, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 240, 255, ' + eyeGlow + ')';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(122, 88, 8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 240, 255, ' + eyeGlow + ')';
+    ctx.fill();
+
+    requestAnimationFrame(drawFace);
+  }
+
+  drawFace();
+})();
+
+// ---- INIT ----
+fetchDashboard();
+setInterval(fetchDashboard, 30000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!--
+  CLEAN SAAS THEME
+  Modern SaaS landing page with blue accents, gradient CTAs, and pricing cards.
+
+  SHOPIFY LIQUID CONVERSION GUIDE:
+  =========================================
+  1. Rename this file to theme.liquid or split into sections/
+  2. Replace product/pricing cards with {% for product in collections.frontpage.products %}
+  3. Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  4. Replace prices with {{ product.price | money }}
+  5. Replace "Add to Cart" / "Get Started" buttons with Shopify AJAX cart API calls
+  6. Replace navigation with {% for link in linklists.main-menu.links %}
+  7. Replace footer links with {% for link in linklists.footer.links %}
+  8. Replace newsletter form action with Shopify customer endpoint
+  9. Move CSS custom properties into theme settings via settings_schema.json
+  10. Cart icon badge: {{ cart.item_count }}
+  =========================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean SaaS</title>
+  <style>
+    /* ============================================
+       CSS Custom Properties
+       ============================================ */
+    :root {
+      --color-bg: #ffffff;
+      --color-bg-page: #f8f9fa;
+      --color-bg-card: #ffffff;
+      --color-text: #1a1a2e;
+      --color-text-secondary: #6b7280;
+      --color-accent: #2563eb;
+      --color-accent-light: #3b82f6;
+      --color-accent-bg: rgba(37, 99, 235, 0.06);
+      --color-border: #e5e7eb;
+      --color-success: #10b981;
+      --gradient: linear-gradient(135deg, #2563eb, #7c3aed);
+      --gradient-subtle: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08));
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 100px;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+      --transition: 0.3s ease;
+    }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg-page);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
+
+    /* ============================================
+       Navigation
+       ============================================ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav__logo {
+      font-size: 1.25rem; font-weight: 700;
+      background: var(--gradient); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav__links { display: flex; gap: var(--spacing-md); list-style: none; }
+    .nav__links a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .nav__links a:hover { color: var(--color-text); }
+    .nav__right { display: flex; align-items: center; gap: var(--spacing-sm); }
+    .nav__cart {
+      background: none; border: none; color: var(--color-text);
+      position: relative;
+    }
+    .nav__cart-count {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--color-accent); color: #fff;
+      font-size: 0.6rem; font-weight: 700;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav__cta {
+      padding: 0.5rem 1.25rem; border-radius: var(--radius-full);
+      background: var(--gradient); color: #fff; border: none;
+      font-size: 0.8125rem; font-weight: 600;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .nav__cta:hover { opacity: 0.9; transform: translateY(-1px); }
+    .nav__mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--color-text); }
+
+    /* ============================================
+       Hero
+       ============================================ */
+    .hero {
+      padding: var(--spacing-xl) 0;
+      text-align: center; background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .hero__badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 16px; border-radius: var(--radius-full);
+      background: var(--gradient-subtle); color: var(--color-accent);
+      font-size: 0.8125rem; font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+    .hero__title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800; line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--spacing-sm);
+    }
+    .hero__title span {
+      background: var(--gradient); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero__description {
+      color: var(--color-text-secondary);
+      max-width: 560px; margin: 0 auto var(--spacing-md);
+      font-size: 1.125rem;
+    }
+    .hero__actions { display: flex; gap: var(--spacing-sm); justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.875rem 2rem; border-radius: var(--radius-full);
+      font-size: 0.9375rem; font-weight: 600;
+      border: none; transition: all var(--transition);
+    }
+    .btn--primary {
+      background: var(--gradient); color: #fff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+    .btn--primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); }
+    .btn--secondary {
+      background: var(--color-bg); color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+    .btn--secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+    /* ============================================
+       Products / Pricing
+       ============================================ */
+    .products { padding: var(--spacing-xl) 0; }
+    .section-header { text-align: center; margin-bottom: var(--spacing-lg); }
+    .section-header h2 {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+    }
+    .section-header p {
+      color: var(--color-text-secondary); margin-top: var(--spacing-xs);
+      font-size: 1.0625rem;
+    }
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .product-card {
+      background: var(--color-bg-card); border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .product-card__image {
+      aspect-ratio: 1; background: var(--color-bg-page);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .product-card__info { padding: var(--spacing-sm); }
+    .product-card__name {
+      font-size: 1rem; font-weight: 600; margin-bottom: var(--spacing-xs);
+    }
+    .product-card__price {
+      font-size: 0.9375rem; color: var(--color-accent); font-weight: 700;
+      margin-bottom: var(--spacing-sm);
+    }
+    .product-card__btn {
+      width: 100%; padding: 0.75rem;
+      background: var(--gradient); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 0.875rem; font-weight: 600;
+      transition: opacity var(--transition);
+    }
+    .product-card__btn:hover { opacity: 0.9; }
+
+    /* ============================================
+       Features Table
+       ============================================ */
+    .features {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg);
+    }
+    .features__grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-md);
+    }
+    .feature-card {
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      transition: border-color var(--transition);
+    }
+    .feature-card:hover { border-color: var(--color-accent); }
+    .feature-card__icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      background: var(--gradient-subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-bottom: var(--spacing-sm);
+      color: var(--color-accent);
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: var(--spacing-xs); }
+    .feature-card p { font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6; }
+
+    /* ============================================
+       About
+       ============================================ */
+    .about {
+      padding: var(--spacing-xl) 0;
+    }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-lg); align-items: center;
+    }
+    .about__image {
+      aspect-ratio: 4/3; background: var(--color-bg);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+      box-shadow: var(--shadow-md);
+    }
+    .about__content h2 {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: var(--spacing-sm);
+    }
+    .about__content p {
+      color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);
+      line-height: 1.8; font-size: 1rem;
+    }
+
+    /* ============================================
+       Testimonials
+       ============================================ */
+    .testimonials {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg);
+    }
+    .testimonials__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .testimonial {
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-card);
+    }
+    .testimonial__stars {
+      color: #f59e0b; font-size: 0.875rem;
+      margin-bottom: var(--spacing-sm); letter-spacing: 2px;
+    }
+    .testimonial__text {
+      font-size: 0.9375rem; line-height: 1.8;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm);
+    }
+    .testimonial__author-row {
+      display: flex; align-items: center; gap: var(--spacing-sm);
+    }
+    .testimonial__avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--gradient-subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.875rem; color: var(--color-accent);
+    }
+    .testimonial__author { font-size: 0.875rem; font-weight: 600; }
+    .testimonial__role { font-size: 0.75rem; color: var(--color-text-secondary); }
+
+    /* ============================================
+       Footer
+       ============================================ */
+    .footer {
+      padding: var(--spacing-lg) 0 var(--spacing-md);
+      background: var(--color-text);
+      color: #d1d5db;
+    }
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--spacing-md); margin-bottom: var(--spacing-lg);
+    }
+    .footer__brand-name {
+      font-size: 1.25rem; font-weight: 700; color: #fff;
+    }
+    .footer__brand p { font-size: 0.875rem; margin-top: var(--spacing-xs); }
+    .footer h4 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #fff; margin-bottom: var(--spacing-sm);
+    }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: var(--spacing-xs); }
+    .footer ul a {
+      font-size: 0.875rem; color: #9ca3af;
+      transition: color var(--transition);
+    }
+    .footer ul a:hover { color: #fff; }
+    .footer__newsletter-form {
+      display: flex; gap: 0; margin-top: var(--spacing-xs);
+    }
+    .footer__newsletter-form input {
+      flex: 1; padding: 0.75rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1); border-right: none;
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+      color: #fff; font-size: 0.875rem;
+      font-family: var(--font-body); outline: none;
+    }
+    .footer__newsletter-form input::placeholder { color: #6b7280; }
+    .footer__newsletter-form input:focus { border-color: var(--color-accent); }
+    .footer__newsletter-form button {
+      padding: 0.75rem 1.25rem;
+      background: var(--gradient); color: #fff;
+      border: none; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: 0.875rem; font-weight: 600;
+      transition: opacity var(--transition);
+    }
+    .footer__newsletter-form button:hover { opacity: 0.9; }
+    .footer__social { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+    .footer__social a {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: #9ca3af;
+      transition: all var(--transition);
+    }
+    .footer__social a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .footer__bottom {
+      text-align: center; padding-top: var(--spacing-md);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem; color: #6b7280;
+    }
+
+    /* ============================================
+       Responsive
+       ============================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__mobile-toggle { display: block; }
+      .nav__cta { display: none; }
+      .about__inner { grid-template-columns: 1fr; }
+      .features__grid { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .footer__grid { grid-template-columns: 1fr; }
+      .hero__actions { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">LaunchKit</a>
+      <ul class="nav__links">
+        <li><a href="#products">Products</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+      </ul>
+      <div class="nav__right">
+        <button class="nav__cart" aria-label="Cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="nav__cart-count">0</span>
+        </button>
+        <button class="nav__cta">Get Started</button>
+        <button class="nav__mobile-toggle" aria-label="Menu">&#9776;</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__badge">New Release</div>
+      <h1 class="hero__title">Build faster with<br><span>smarter tools</span></h1>
+      <p class="hero__description">Everything you need to launch, grow, and scale your digital products. No complexity, just results.</p>
+      <div class="hero__actions">
+        <a href="#products" class="btn btn--primary">Browse Products</a>
+        <a href="#features" class="btn btn--secondary">See Features</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Products</h2>
+        <p>Tools designed for modern teams and solo creators</p>
+      </div>
+      <div class="products__grid">
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Starter Kit</h3>
+            <p class="product-card__price">$29.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Pro Bundle</h3>
+            <p class="product-card__price">$79.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Team License</h3>
+            <p class="product-card__price">$149.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Enterprise Suite</h3>
+            <p class="product-card__price">$299.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Choose Us</h2>
+        <p>Built for speed, designed for clarity</p>
+      </div>
+      <div class="features__grid">
+        <div class="feature-card">
+          <div class="feature-card__icon">&#9889;</div>
+          <h3>Lightning Fast</h3>
+          <p>Optimized for performance from the ground up. Load times under 200ms, guaranteed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">&#128274;</div>
+          <h3>Secure by Default</h3>
+          <p>Enterprise-grade security built into every layer. Your data stays yours, always.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card__icon">&#128640;</div>
+          <h3>Easy to Scale</h3>
+          <p>Start small and grow without limits. Our infrastructure scales automatically with your needs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about__inner">
+        <div class="about__image">800 x 600</div>
+        <div class="about__content">
+          <h2>Built by builders, for builders</h2>
+          <p>We started LaunchKit because we were tired of stitching together a dozen different tools just to launch a product. So we built one platform that does it all.</p>
+          <p>Our team has shipped products used by millions. We understand the pain of building software, and we built LaunchKit to eliminate it. Simple as that.</p>
+          <a href="#" class="btn btn--primary">Learn Our Story</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>Loved by Creators</h2>
+        <p>Over 10,000 teams trust LaunchKit</p>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"LaunchKit cut our development time in half. We shipped our MVP in two weeks instead of two months. The ROI is incredible."</p>
+          <div class="testimonial__author-row">
+            <div class="testimonial__avatar">SM</div>
+            <div>
+              <p class="testimonial__author">Sarah Mitchell</p>
+              <p class="testimonial__role">CTO, Finley</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"I have tried every tool on the market. LaunchKit is the only one that actually delivers on its promises. Clean, fast, and it just works."</p>
+          <div class="testimonial__author-row">
+            <div class="testimonial__avatar">RK</div>
+            <div>
+              <p class="testimonial__author">Ryan Kim</p>
+              <p class="testimonial__role">Founder, Drift Labs</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial__stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial__text">"Our team of 15 uses LaunchKit daily. The collaboration features alone are worth it. Support is also best in class."</p>
+          <div class="testimonial__author-row">
+            <div class="testimonial__avatar">LP</div>
+            <div>
+              <p class="testimonial__author">Lisa Park</p>
+              <p class="testimonial__role">VP Engineering, Noma</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <p class="footer__brand-name">LaunchKit</p>
+          <p>Build faster with smarter tools. Used by 10,000+ teams worldwide.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Twitter">X</a>
+            <a href="#" aria-label="GitHub">GH</a>
+            <a href="#" aria-label="LinkedIn">LI</a>
+            <a href="#" aria-label="YouTube">YT</a>
+          </div>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">Documentation</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Stay Updated</h4>
+          <p style="font-size:0.875rem;margin-bottom:var(--spacing-xs);">Product updates and tips delivered to your inbox.</p>
+          <form class="footer__newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" aria-label="Email address">
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 LaunchKit. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

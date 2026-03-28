@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Command Center</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08080a;--surface:#0e0e12;--border:#1a1a22;--text:#e8e8ec;--muted:#555;--accent:#0066ff;--success:#00c853;--warn:#ff9800;--danger:#ff4444;--purple:#8b5cf6;--cyan:#06b6d4}
+body{font-family:'SF Mono',-apple-system,monospace;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px}
+
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:1.1em;font-weight:600;letter-spacing:1px}
+.header h1 span{color:var(--cyan)}
+.header .status-bar{display:flex;gap:16px;font-size:.8em}
+.header .status-bar .indicator{display:flex;align-items:center;gap:5px}
+.header .status-bar .dot{width:6px;height:6px;border-radius:50%}
+.header .status-bar .dot.on{background:var(--success);box-shadow:0 0 6px var(--success)}
+.header .status-bar .dot.off{background:var(--danger)}
+.header .status-bar .dot.idle{background:var(--warn)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto auto;gap:12px;padding:16px}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;overflow:hidden}
+.panel h3{font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.panel h3 .badge{font-size:.9em;padding:2px 8px;border-radius:8px;text-transform:none;letter-spacing:0}
+.panel h3 .badge.green{background:rgba(0,200,83,.1);color:var(--success)}
+.panel h3 .badge.blue{background:rgba(0,102,255,.1);color:var(--accent)}
+
+/* Machine status */
+.machine{display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;margin-bottom:6px;background:rgba(255,255,255,.02)}
+.machine .icon{font-size:1.2em}
+.machine .info{flex:1}
+.machine .name{font-weight:600;font-size:.85em}
+.machine .detail{font-size:.7em;color:var(--muted)}
+.machine .status{font-size:.65em;padding:2px 8px;border-radius:8px}
+.machine .status.online{background:rgba(0,200,83,.1);color:var(--success)}
+.machine .status.offline{background:rgba(255,68,68,.1);color:var(--danger)}
+
+/* Revenue */
+.revenue-num{font-size:2.2em;font-weight:800;color:var(--success);text-align:center;margin:10px 0}
+.revenue-target{text-align:center;color:var(--muted);font-size:.8em;margin-bottom:10px}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0}
+.progress-bar .fill{height:100%;background:var(--success);border-radius:3px;transition:width .5s}
+
+/* Products */
+.product-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85em}
+.product-row:last-child{border:none}
+.product-row .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-row .price{color:var(--success);font-weight:600;margin-left:8px}
+.product-row .status{font-size:.65em;padding:2px 6px;border-radius:6px;margin-left:6px}
+.product-row .status.listed{background:rgba(0,200,83,.1);color:var(--success)}
+.product-row .status.pending{background:rgba(255,152,0,.1);color:var(--warn)}
+
+/* Content */
+.content-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:.8em}
+.content-item .platform{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.6em;font-weight:700;flex-shrink:0}
+.content-item .platform.ig{background:#e1306c}
+.content-item .platform.yt{background:#ff0000}
+.content-item .platform.x{background:#1da1f2}
+.content-item .title{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+
+/* Tools */
+.tool-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;margin-bottom:4px;cursor:pointer;transition:background .15s;font-size:.8em}
+.tool-item:hover{background:rgba(255,255,255,.05)}
+.tool-item .icon{font-size:1.1em}
+.tool-item .name{flex:1}
+.tool-item .status-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+
+/* Activity log */
+.log-item{padding:4px 0;font-size:.75em;border-bottom:1px solid rgba(255,255,255,.03)}
+.log-item .time{color:var(--muted);margin-right:6px}
+.log-item .msg{color:var(--text)}
+.log-item .msg.success{color:var(--success)}
+.log-item .msg.warn{color:var(--warn)}
+
+/* Quick actions */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.action-btn{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.75em;text-align:center;transition:all .15s;font-family:inherit}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.action-btn .icon{font-size:1.2em;display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>BEHIKE <span>COMMAND</span> CENTER</h1>
+  <div class="status-bar">
+    <div class="indicator"><span class="dot on"></span>Ceiba</div>
+    <div class="indicator"><span class="dot off"></span>Cobo</div>
+    <div class="indicator"><span class="dot off"></span>Hutia</div>
+    <div class="indicator" style="color:var(--muted)" id="clock"></div>
+  </div>
+</div>
+
+<div class="grid">
+  <!-- Infrastructure -->
+  <div class="panel">
+    <h3>Infrastructure <span class="badge green">3 nodes</span></h3>
+    <div class="machine">
+      <div class="icon">&#128187;</div>
+      <div class="info"><div class="name">Ceiba (M4 Mac)</div><div class="detail">192.168.0.145 | 16GB | Metal 3</div></div>
+      <span class="status online">ONLINE</span>
+    </div>
+    <div class="machine">
+      <div class="icon">&#128421;</div>
+      <div class="info"><div class="name">Cobo (Windows)</div><div class="detail">192.168.0.151 | GTX 1080 Ti | Ollama</div></div>
+      <span class="status offline">OFFLINE</span>
+    </div>
+    <div class="machine">
+      <div class="icon">&#128421;</div>
+      <div class="info"><div class="name">Hutia (Dedicated)</div><div class="detail">192.168.0.152 | Always-on node</div></div>
+      <span class="status offline">OFFLINE</span>
+    </div>
+  </div>
+
+  <!-- Revenue -->
+  <div class="panel">
+    <h3>Revenue <span class="badge blue">March 2026</span></h3>
+    <div class="revenue-num">$0</div>
+    <div class="revenue-target">Target: $10,000 / month</div>
+    <div class="progress-bar"><div class="fill" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:.7em;color:var(--muted);margin-top:4px">
+      <span>Gumroad: $0</span><span>Services: $0</span><span>Other: $0</span>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="panel">
+    <h3>Products <span class="badge green">9 built</span></h3>
+    <div class="product-row"><span class="name">AI Employee Guide</span><span class="price">$19.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">Cash Flow Dashboard</span><span class="price">$14.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">Ecommerce Playbook</span><span class="price">$14.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">AI Security Guide</span><span class="price">$14.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">Budget Template</span><span class="price">$9.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">Prompt Cheat Sheet</span><span class="price">$9.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">Meditation App</span><span class="price">$4.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">ChordGenie</span><span class="price">$29.99</span><span class="status pending">LIST</span></div>
+    <div class="product-row"><span class="name">BeatSmith</span><span class="price">$29.99</span><span class="status pending">LIST</span></div>
+  </div>
+
+  <!-- Content Pipeline -->
+  <div class="panel">
+    <h3>Content Pipeline <span class="badge green">24 queued</span></h3>
+    <div class="content-item"><div class="platform ig">IG</div><div class="title">The $0 AI Employee</div></div>
+    <div class="content-item"><div class="platform x">X</div><div class="title">Thread: 5 AI tools I use daily</div></div>
+    <div class="content-item"><div class="platform ig">IG</div><div class="title">Behind the scenes: AI setup</div></div>
+    <div class="content-item"><div class="platform yt">YT</div><div class="title">I Built an AI Employee for $0</div></div>
+    <div class="content-item"><div class="platform ig">IG</div><div class="title">Budget template launch</div></div>
+    <div style="text-align:center;padding:6px;font-size:.7em;color:var(--muted)">+ 19 more posts ready</div>
+  </div>
+
+  <!-- Tools -->
+  <div class="panel">
+    <h3>Active Tools</h3>
+    <a href="polymarket-dashboard.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#128200;</span><span class="name">Polymarket Dashboard</span><span class="status-dot"></span></a>
+    <a href="../../tools/chord-genie/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#127929;</span><span class="name">ChordGenie</span><span class="status-dot"></span></a>
+    <a href="../../tools/beatsmith/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#129345;</span><span class="name">BeatSmith</span><span class="status-dot"></span></a>
+    <a href="../../tools/content-calendar/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#128197;</span><span class="name">Content Calendar</span><span class="status-dot"></span></a>
+    <a href="../../tools/music-suite/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#127911;</span><span class="name">Music Suite</span><span class="status-dot"></span></a>
+    <a href="../../Ceiba/projects/content-empire/products/quiz/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#129302;</span><span class="name">Interactive Tools Hub</span><span class="status-dot"></span></a>
+    <a href="../../themes/shopify/index.html" class="tool-item" style="text-decoration:none;color:var(--text)"><span class="icon">&#127912;</span><span class="name">Theme Marketplace</span><span class="status-dot"></span></a>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="panel">
+    <h3>Quick Actions</h3>
+    <div class="actions">
+      <div class="action-btn" onclick="window.open('../projects/content-empire/gumroad-all-products.md')"><span class="icon">&#128176;</span>List Products</div>
+      <div class="action-btn" onclick="window.open('../../tools/content-calendar/index.html')"><span class="icon">&#128197;</span>Content Calendar</div>
+      <div class="action-btn" onclick="window.open('polymarket-dashboard.html')"><span class="icon">&#128200;</span>Markets</div>
+      <div class="action-btn" onclick="window.open('../../tools/music-suite/index.html')"><span class="icon">&#127929;</span>Music Suite</div>
+      <div class="action-btn" onclick="window.open('../../themes/shopify/index.html')"><span class="icon">&#127912;</span>Themes</div>
+      <div class="action-btn" onclick="window.open('../projects/content-empire/products/quiz/index.html')"><span class="icon">&#129302;</span>Quizzes</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000);
+updateClock();
+</script>
+</body>
+</html>

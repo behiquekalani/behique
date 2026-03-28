@@ -1,0 +1,388 @@
+<!--
+  BIOS WAR ROOM - WebXR VR Command Center
+  ========================================
+  How to view:
+    1. Serve this file from your Mac: python3 -m http.server 8092 --directory ~/behique/bios/dashboard
+    2. Open Quest 2 browser and navigate to: http://192.168.0.145:8092/warroom.html
+    3. Click "Enter VR" to go immersive, or use mouse look in flat mode
+    4. Works in any WebXR-compatible browser or as a regular webpage
+
+  v2 - Live BIOS data feeds from convictions, social_signals, pr_signals
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>BIOS War Room</title>
+  <meta name="description" content="BIOS Command Center - WebXR VR Dashboard">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #0a0a0f; }
+    #info-overlay {
+      position: fixed; top: 16px; left: 16px; color: #448aff;
+      font-family: 'Courier New', monospace; font-size: 13px;
+      z-index: 10; pointer-events: none;
+      text-shadow: 0 0 8px rgba(68, 138, 255, 0.5);
+    }
+    #info-overlay .label { color: #666; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+<div id="info-overlay">
+  <div class="label">BIOS WAR ROOM v2.0</div>
+  <div>Click and drag to look around. Click "Enter VR" for immersive mode.</div>
+</div>
+
+<a-scene
+  vr-mode-ui="enabled: true"
+  renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+  fog="type: exponential; color: #0a0a0f; density: 0.015"
+  background="color: #0a0a0f"
+>
+  <a-assets><canvas id="grid-canvas" width="512" height="512"></canvas></a-assets>
+
+  <!-- CAMERA + CURSOR -->
+  <a-entity id="rig" position="0 1.6 0">
+    <a-camera look-controls="pointerLockEnabled: false" wasd-controls="acceleration: 20">
+      <a-cursor color="#448aff" fuse="false" raycaster="objects: .clickable"
+        geometry="primitive: ring; radiusInner: 0.005; radiusOuter: 0.008"
+        material="color: #448aff; opacity: 0.7"></a-cursor>
+    </a-camera>
+  </a-entity>
+
+  <!-- ROOM GEOMETRY -->
+  <a-plane id="floor" rotation="-90 0 0" width="16" height="16"
+    material="color: #0d0d14; opacity: 1; metalness: 0.8; roughness: 0.2"></a-plane>
+  <a-entity id="floor-grid" position="0 0.005 0" rotation="-90 0 0">
+    <a-plane width="16" height="0.01" position="0 -3 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="16" height="0.01" position="0 -1 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="16" height="0.01" position="0 1 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="16" height="0.01" position="0 3 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="0.01" height="16" position="-3 0 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="0.01" height="16" position="-1 0 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="0.01" height="16" position="1 0 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+    <a-plane width="0.01" height="16" position="3 0 0" material="color: #1a1a2e; opacity: 0.5; shader: flat"></a-plane>
+  </a-entity>
+  <a-plane rotation="90 0 0" width="16" height="16" position="0 4 0" material="color: #08080d; shader: flat"></a-plane>
+  <a-plane width="16" height="4" position="0 2 -8" material="color: #0c0c15; shader: flat"></a-plane>
+  <a-plane width="16" height="4" position="0 2 8" rotation="0 180 0" material="color: #0c0c15; shader: flat"></a-plane>
+  <a-plane width="16" height="4" position="-8 2 0" rotation="0 90 0" material="color: #0c0c15; shader: flat"></a-plane>
+  <a-plane width="16" height="4" position="8 2 0" rotation="0 -90 0" material="color: #0c0c15; shader: flat"></a-plane>
+
+  <!-- LIGHTING -->
+  <a-light type="ambient" color="#1a1a2e" intensity="0.3"></a-light>
+  <a-light type="spot" color="#448aff" intensity="0.4" position="0 3.9 -7" target="#front-panel" angle="45" penumbra="0.5" decay="2"></a-light>
+  <a-light type="spot" color="#448aff" intensity="0.3" position="-7 3.9 0" target="#left-panel" angle="45" penumbra="0.5" decay="2"></a-light>
+  <a-light type="spot" color="#448aff" intensity="0.3" position="7 3.9 0" target="#right-panel" angle="45" penumbra="0.5" decay="2"></a-light>
+  <a-light type="spot" color="#ffd740" intensity="0.3" position="0 3.9 7" target="#back-panel" angle="45" penumbra="0.5" decay="2"></a-light>
+  <a-light type="point" color="#448aff" intensity="0.6" position="0 2 0" decay="2" distance="6"></a-light>
+
+  <!-- FRONT WALL: WORLD EVENTS (convictions) -->
+  <a-entity id="front-panel" position="0 2.2 -7.9">
+    <a-plane width="8" height="3" material="color: #0a0a14; opacity: 0.9; shader: flat"></a-plane>
+    <a-plane width="8.06" height="3.06" position="0 0 -0.01" material="color: #448aff; opacity: 0.15; shader: flat"></a-plane>
+    <a-plane width="8" height="0.01" position="0 1.5 0.01" material="color: #448aff; opacity: 0.8; shader: flat"></a-plane>
+    <a-plane width="8" height="0.01" position="0 -1.5 0.01" material="color: #448aff; opacity: 0.4; shader: flat"></a-plane>
+    <a-text value="WORLD EVENTS" position="0 1.2 0.02" align="center" color="#448aff" width="6" font="monoid" letter-spacing="4"></a-text>
+    <a-plane width="6" height="0.005" position="0 1.0 0.02" material="color: #448aff; opacity: 0.5; shader: flat"></a-plane>
+    <a-text id="conv-1" value="Loading..." position="-3.5 0.6 0.02" align="left" color="#888899" width="5" font="monoid"></a-text>
+    <a-text id="conv-2" value="" position="-3.5 0.2 0.02" align="left" color="#888899" width="5" font="monoid"></a-text>
+    <a-text id="conv-3" value="" position="-3.5 -0.2 0.02" align="left" color="#888899" width="5" font="monoid"></a-text>
+    <a-text id="conv-4" value="" position="-3.5 -0.6 0.02" align="left" color="#888899" width="5" font="monoid"></a-text>
+    <a-text id="conv-5" value="" position="-3.5 -1.0 0.02" align="left" color="#888899" width="5" font="monoid"></a-text>
+    <a-text id="conv-ts" value="" position="0 -1.3 0.02" align="center" color="#333355" width="3.5" font="monoid"></a-text>
+    <a-circle id="front-status" radius="0.04" position="-3.6 1.2 0.02" material="color: #ff1744; shader: flat; emissive: #ff1744; emissiveIntensity: 0.5">
+      <a-animation attribute="material.opacity" from="1" to="0.3" dur="1000" direction="alternate" repeat="indefinite"></a-animation>
+    </a-circle>
+  </a-entity>
+
+  <!-- LEFT WALL: MARKETS (social_signals - CoinGecko + Fear & Greed) -->
+  <a-entity id="left-panel" position="-7.9 2.2 0" rotation="0 90 0">
+    <a-plane width="7" height="3" material="color: #0a0a14; opacity: 0.9; shader: flat"></a-plane>
+    <a-plane width="7.06" height="3.06" position="0 0 -0.01" material="color: #448aff; opacity: 0.15; shader: flat"></a-plane>
+    <a-plane width="7" height="0.01" position="0 1.5 0.01" material="color: #448aff; opacity: 0.8; shader: flat"></a-plane>
+    <a-plane width="7" height="0.01" position="0 -1.5 0.01" material="color: #448aff; opacity: 0.4; shader: flat"></a-plane>
+    <a-text value="MARKETS" position="0 1.2 0.02" align="center" color="#448aff" width="5" font="monoid" letter-spacing="4"></a-text>
+    <a-plane width="5" height="0.005" position="0 1.0 0.02" material="color: #448aff; opacity: 0.5; shader: flat"></a-plane>
+    <!-- BTC row -->
+    <a-text value="BTC" position="-2.5 0.6 0.02" align="left" color="#888899" width="4" font="monoid"></a-text>
+    <a-text id="btc-price" value="---,---" position="0.5 0.6 0.02" align="center" color="#555566" width="4" font="monoid"></a-text>
+    <a-text id="btc-change" value="--.-%" position="2.3 0.6 0.02" align="right" color="#555566" width="3" font="monoid"></a-text>
+    <!-- ETH row -->
+    <a-text value="ETH" position="-2.5 0.2 0.02" align="left" color="#888899" width="4" font="monoid"></a-text>
+    <a-text id="eth-price" value="---,---" position="0.5 0.2 0.02" align="center" color="#555566" width="4" font="monoid"></a-text>
+    <a-text id="eth-change" value="--.-%" position="2.3 0.2 0.02" align="right" color="#555566" width="3" font="monoid"></a-text>
+    <!-- Fear & Greed -->
+    <a-plane width="5" height="0.005" position="0 -0.1 0.02" material="color: #448aff; opacity: 0.3; shader: flat"></a-plane>
+    <a-text id="fear-greed" value="FEAR & GREED: ---" position="0 -0.4 0.02" align="center" color="#ffd740" width="4" font="monoid"></a-text>
+    <a-text id="fear-greed-label" value="" position="0 -0.7 0.02" align="center" color="#555566" width="3.5" font="monoid"></a-text>
+    <a-text id="market-ts" value="" position="0 -1.1 0.02" align="center" color="#333355" width="3" font="monoid"></a-text>
+    <a-circle id="left-status" radius="0.04" position="-3.1 1.2 0.02" material="color: #ff1744; shader: flat">
+      <a-animation attribute="material.opacity" from="1" to="0.3" dur="1000" direction="alternate" repeat="indefinite"></a-animation>
+    </a-circle>
+  </a-entity>
+
+  <!-- RIGHT WALL: PR NEWS (pr_signals) -->
+  <a-entity id="right-panel" position="7.9 2.2 0" rotation="0 -90 0">
+    <a-plane width="7" height="3" material="color: #0a0a14; opacity: 0.9; shader: flat"></a-plane>
+    <a-plane width="7.06" height="3.06" position="0 0 -0.01" material="color: #ffd740; opacity: 0.08; shader: flat"></a-plane>
+    <a-plane width="7" height="0.01" position="0 1.5 0.01" material="color: #ffd740; opacity: 0.8; shader: flat"></a-plane>
+    <a-plane width="7" height="0.01" position="0 -1.5 0.01" material="color: #ffd740; opacity: 0.4; shader: flat"></a-plane>
+    <a-text value="PUERTO RICO" position="0 1.2 0.02" align="center" color="#ffd740" width="5" font="monoid" letter-spacing="4"></a-text>
+    <a-plane width="5" height="0.005" position="0 1.0 0.02" material="color: #ffd740; opacity: 0.5; shader: flat"></a-plane>
+    <a-text id="pr-1" value="Loading..." position="-2.8 0.6 0.02" align="left" color="#888899" width="4.2" font="monoid"></a-text>
+    <a-text id="pr-2" value="" position="-2.8 0.0 0.02" align="left" color="#888899" width="4.2" font="monoid"></a-text>
+    <a-text id="pr-3" value="" position="-2.8 -0.6 0.02" align="left" color="#888899" width="4.2" font="monoid"></a-text>
+    <a-text id="pr-ts" value="" position="0 -1.2 0.02" align="center" color="#333355" width="3" font="monoid"></a-text>
+    <a-circle id="right-status" radius="0.04" position="-3.1 1.2 0.02" material="color: #ff1744; shader: flat">
+      <a-animation attribute="material.opacity" from="1" to="0.3" dur="800" direction="alternate" repeat="indefinite"></a-animation>
+    </a-circle>
+  </a-entity>
+
+  <!-- CENTER: BIOS HOLOGRAM -->
+  <a-entity id="bios-hologram" position="0 1.8 -2">
+    <a-entity>
+      <a-animation attribute="rotation" from="0 0 0" to="0 360 0" dur="20000" easing="linear" repeat="indefinite"></a-animation>
+      <a-text value="BIOS" position="0 0 0" align="center" color="#448aff" width="8" font="monoid" letter-spacing="6" material="opacity: 0.9"></a-text>
+      <a-ring radius-inner="0.55" radius-outer="0.58" position="0 0 0" material="color: #448aff; opacity: 0.3; shader: flat; side: double"></a-ring>
+      <a-entity>
+        <a-animation attribute="rotation" from="0 0 0" to="0 -720 0" dur="20000" easing="linear" repeat="indefinite"></a-animation>
+        <a-ring radius-inner="0.4" radius-outer="0.42" position="0 0 0" material="color: #448aff; opacity: 0.2; shader: flat; side: double"></a-ring>
+      </a-entity>
+    </a-entity>
+    <a-cylinder radius="0.02" height="1.8" position="0 -0.9 0" material="color: #448aff; opacity: 0.15; shader: flat"></a-cylinder>
+    <a-cylinder radius="0.3" height="0.02" position="0 -1.8 0" material="color: #448aff; opacity: 0.2; shader: flat"></a-cylinder>
+    <a-text value="COMMAND CENTER v2.0" position="0 -0.35 0" align="center" color="#333355" width="3" font="monoid" letter-spacing="2"></a-text>
+    <a-cylinder radius="0.5" height="0.005" position="0 -1.79 0" material="color: #448aff; opacity: 0.1; shader: flat">
+      <a-animation attribute="scale" from="1 1 1" to="2 1 2" dur="3000" easing="easeOutQuad" direction="alternate" repeat="indefinite"></a-animation>
+      <a-animation attribute="material.opacity" from="0.1" to="0" dur="3000" easing="easeOutQuad" direction="alternate" repeat="indefinite"></a-animation>
+    </a-cylinder>
+  </a-entity>
+
+  <!-- AMBIENT DETAILS -->
+  <a-plane width="0.02" height="4" position="-7.99 2 -7.99" rotation="0 45 0" material="color: #448aff; opacity: 0.3; shader: flat"></a-plane>
+  <a-plane width="0.02" height="4" position="7.99 2 -7.99" rotation="0 -45 0" material="color: #448aff; opacity: 0.3; shader: flat"></a-plane>
+  <a-plane width="0.02" height="4" position="-7.99 2 7.99" rotation="0 135 0" material="color: #448aff; opacity: 0.3; shader: flat"></a-plane>
+  <a-plane width="0.02" height="4" position="7.99 2 7.99" rotation="0 -135 0" material="color: #448aff; opacity: 0.3; shader: flat"></a-plane>
+  <a-plane width="10" height="0.05" position="0 3.99 -4" rotation="-90 0 0" material="color: #1a1a3e; opacity: 0.6; shader: flat"></a-plane>
+  <a-plane width="10" height="0.05" position="0 3.99 0" rotation="-90 0 0" material="color: #1a1a3e; opacity: 0.6; shader: flat"></a-plane>
+  <a-plane width="10" height="0.05" position="0 3.99 4" rotation="-90 0 0" material="color: #1a1a3e; opacity: 0.6; shader: flat"></a-plane>
+  <a-plane width="16" height="0.03" position="0 0.01 -7.98" material="color: #448aff; opacity: 0.2; shader: flat"></a-plane>
+  <a-plane width="16" height="0.03" position="0 0.01 7.98" material="color: #448aff; opacity: 0.2; shader: flat"></a-plane>
+  <a-plane width="0.03" height="16" position="-7.98 0.01 0" rotation="-90 0 0" material="color: #448aff; opacity: 0.2; shader: flat"></a-plane>
+  <a-plane width="0.03" height="16" position="7.98 0.01 0" rotation="-90 0 0" material="color: #448aff; opacity: 0.2; shader: flat"></a-plane>
+
+  <!-- FLOATING PARTICLES -->
+  <a-entity id="particles">
+    <a-sphere radius="0.01" position="-3 2.5 -4" material="color: #448aff; opacity: 0.3; shader: flat">
+      <a-animation attribute="position" from="-3 2.5 -4" to="-3 3 -4" dur="4000" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+    <a-sphere radius="0.008" position="2 3 -2" material="color: #448aff; opacity: 0.2; shader: flat">
+      <a-animation attribute="position" from="2 3 -2" to="2 2.5 -2" dur="3500" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+    <a-sphere radius="0.012" position="-1 2.8 3" material="color: #448aff; opacity: 0.25; shader: flat">
+      <a-animation attribute="position" from="-1 2.8 3" to="-1 3.2 3" dur="5000" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+    <a-sphere radius="0.009" position="4 2.2 1" material="color: #448aff; opacity: 0.15; shader: flat">
+      <a-animation attribute="position" from="4 2.2 1" to="4 2.7 1" dur="3000" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+    <a-sphere radius="0.011" position="-5 3.1 -1" material="color: #ffd740; opacity: 0.15; shader: flat">
+      <a-animation attribute="position" from="-5 3.1 -1" to="-5 2.6 -1" dur="4500" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+    <a-sphere radius="0.007" position="1 2.9 -5" material="color: #448aff; opacity: 0.2; shader: flat">
+      <a-animation attribute="position" from="1 2.9 -5" to="1 3.3 -5" dur="3800" direction="alternate" repeat="indefinite"></a-animation>
+    </a-sphere>
+  </a-entity>
+
+  <!-- DESK / CONSOLE -->
+  <a-entity id="console" position="0 0.8 -1.2">
+    <a-box width="2.5" height="0.05" depth="0.8" material="color: #111122; metalness: 0.6; roughness: 0.3"></a-box>
+    <a-plane width="2.5" height="0.01" position="0 0.026 -0.4" material="color: #448aff; opacity: 0.4; shader: flat"></a-plane>
+    <a-plane width="2.5" height="0.01" position="0 0.026 0.4" material="color: #448aff; opacity: 0.2; shader: flat"></a-plane>
+    <a-text id="console-sys" value="SYS: ONLINE" position="-0.8 0.04 -0.1" rotation="-60 0 0" align="left" color="#00c853" width="2" font="monoid"></a-text>
+    <a-text id="console-feeds" value="FEEDS: 0/3" position="0 0.04 -0.1" rotation="-60 0 0" align="center" color="#ff1744" width="2" font="monoid"></a-text>
+    <a-text id="console-uptime" value="UPTIME: 00:00" position="0.8 0.04 -0.1" rotation="-60 0 0" align="right" color="#448aff" width="2" font="monoid"></a-text>
+    <a-box width="0.05" height="0.8" depth="0.05" position="-1.15 -0.4 -0.3" material="color: #111122; shader: flat"></a-box>
+    <a-box width="0.05" height="0.8" depth="0.05" position="1.15 -0.4 -0.3" material="color: #111122; shader: flat"></a-box>
+    <a-box width="0.05" height="0.8" depth="0.05" position="-1.15 -0.4 0.3" material="color: #111122; shader: flat"></a-box>
+    <a-box width="0.05" height="0.8" depth="0.05" position="1.15 -0.4 0.3" material="color: #111122; shader: flat"></a-box>
+  </a-entity>
+
+</a-scene>
+
+<script>
+(function() {
+  var startTime = Date.now();
+  var feedsOnline = 0;
+
+  function setTxt(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('text', 'value', val);
+  }
+  function setColor(id, col) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('text', 'color', col);
+  }
+  function setIndicator(id, color) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('material', 'color', color);
+  }
+  function truncate(str, max) {
+    return str.length > max ? str.substring(0, max - 2) + '..' : str;
+  }
+  function levelColor(level) {
+    if (level === 'HIGH') return '#ff1744';
+    if (level === 'MEDIUM') return '#ffd740';
+    return '#448aff';
+  }
+  function timeAgo(ts) {
+    var d = new Date(ts), now = new Date();
+    var m = Math.floor((now - d) / 60000);
+    if (m < 60) return m + 'm ago';
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    return Math.floor(h / 24) + 'd ago';
+  }
+
+  // FRONT WALL: Convictions
+  function loadConvictions() {
+    fetch('../storage/convictions.json').then(function(r) { return r.json(); }).then(function(data) {
+      var top5 = (data.convictions || []).slice(0, 5);
+      for (var i = 0; i < 5; i++) {
+        var id = 'conv-' + (i + 1);
+        if (i < top5.length) {
+          var c = top5[i];
+          var label = c.topic.toUpperCase();
+          var line = label + '  ' + c.score.toFixed(1) + '  [' + c.level + ']  ' + c.signal_count + ' signals';
+          setTxt(id, truncate(line, 50));
+          setColor(id, levelColor(c.level));
+        } else {
+          setTxt(id, '');
+        }
+      }
+      setTxt('conv-ts', 'Updated: ' + timeAgo(data.generated_at) + ' | ' + data.signal_count + ' total signals');
+      setIndicator('front-status', '#00c853');
+      return true;
+    }).catch(function() {
+      setTxt('conv-1', 'FEED: OFFLINE');
+      setColor('conv-1', '#ff1744');
+      setIndicator('front-status', '#ff1744');
+      return false;
+    });
+  }
+
+  // LEFT WALL: Markets
+  function loadMarkets() {
+    fetch('../storage/social_signals.json').then(function(r) { return r.json(); }).then(function(signals) {
+      var btc = null, eth = null, fg = null;
+      for (var i = 0; i < signals.length; i++) {
+        var s = signals[i];
+        if (!btc && s.source === 'coingecko' && s.title.indexOf('Bitcoin (BTC)') === 0) btc = s;
+        if (!eth && s.source === 'coingecko' && s.title.indexOf('Ethereum (ETH)') === 0) eth = s;
+        if (!fg && s.source === 'fear_greed_index') fg = s;
+        if (btc && eth && fg) break;
+      }
+      function parsePrice(title) {
+        var m = title.match(/\|\s*\$([\d,]+\.?\d*)/);
+        return m ? '$' + m[1] : '---';
+      }
+      function parseChange(title) {
+        var m = title.match(/([+-]?\d+\.?\d*)%/);
+        return m ? m[1] + '%' : '--.-%';
+      }
+      function changeColor(title) {
+        var m = title.match(/([+-]?\d+\.?\d*)%/);
+        if (!m) return '#555566';
+        return parseFloat(m[1]) >= 0 ? '#00c853' : '#ff1744';
+      }
+      if (btc) {
+        setTxt('btc-price', parsePrice(btc.title));
+        setTxt('btc-change', parseChange(btc.title));
+        setColor('btc-price', '#ccccdd');
+        setColor('btc-change', changeColor(btc.title));
+      }
+      if (eth) {
+        setTxt('eth-price', parsePrice(eth.title));
+        setTxt('eth-change', parseChange(eth.title));
+        setColor('eth-price', '#ccccdd');
+        setColor('eth-change', changeColor(eth.title));
+      }
+      if (fg) {
+        var fgm = fg.title.match(/(\d+)\s*\(([^)]+)\)/);
+        if (fgm) {
+          setTxt('fear-greed', 'FEAR & GREED: ' + fgm[1]);
+          setTxt('fear-greed-label', fgm[2].toUpperCase());
+          var fgv = parseInt(fgm[1]);
+          setColor('fear-greed', fgv <= 25 ? '#ff1744' : fgv <= 50 ? '#ffd740' : '#00c853');
+          setColor('fear-greed-label', fgv <= 25 ? '#ff1744' : fgv <= 50 ? '#ffd740' : '#00c853');
+        }
+      }
+      var latest = btc || eth || fg;
+      if (latest) setTxt('market-ts', 'Updated: ' + timeAgo(latest.timestamp));
+      setIndicator('left-status', '#00c853');
+      return true;
+    }).catch(function() {
+      setTxt('btc-price', 'OFFLINE');
+      setColor('btc-price', '#ff1744');
+      setIndicator('left-status', '#ff1744');
+      return false;
+    });
+  }
+
+  // RIGHT WALL: PR News
+  function loadPRNews() {
+    fetch('../storage/pr_signals.json').then(function(r) { return r.json(); }).then(function(signals) {
+      var sorted = signals.sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+      for (var i = 0; i < 3; i++) {
+        var id = 'pr-' + (i + 1);
+        if (i < sorted.length) {
+          var raw = sorted[i].title.replace(/\s*-\s*[^-]+$/, '');
+          setTxt(id, truncate(raw, 55));
+          setColor(id, '#ccccaa');
+        } else {
+          setTxt(id, '');
+        }
+      }
+      if (sorted.length > 0) setTxt('pr-ts', timeAgo(sorted[0].timestamp));
+      setIndicator('right-status', '#00c853');
+      return true;
+    }).catch(function() {
+      setTxt('pr-1', 'FEED: OFFLINE');
+      setColor('pr-1', '#ff1744');
+      setIndicator('right-status', '#ff1744');
+      return false;
+    });
+  }
+
+  function updateAll() {
+    feedsOnline = 0;
+    Promise.all([
+      fetch('../storage/convictions.json').then(function() { feedsOnline++; }).catch(function() {}),
+      fetch('../storage/social_signals.json').then(function() { feedsOnline++; }).catch(function() {}),
+      fetch('../storage/pr_signals.json').then(function() { feedsOnline++; }).catch(function() {})
+    ]).then(function() {
+      setTxt('console-feeds', 'FEEDS: ' + feedsOnline + '/3');
+      setColor('console-feeds', feedsOnline === 3 ? '#00c853' : feedsOnline > 0 ? '#ffd740' : '#ff1744');
+    });
+    loadConvictions();
+    loadMarkets();
+    loadPRNews();
+  }
+
+  // Uptime counter
+  setInterval(function() {
+    var elapsed = Math.floor((Date.now() - startTime) / 1000);
+    var mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    var secs = String(elapsed % 60).padStart(2, '0');
+    setTxt('console-uptime', 'UPTIME: ' + mins + ':' + secs);
+  }, 1000);
+
+  // Initial load + 60s refresh
+  setTimeout(updateAll, 2000);
+  setInterval(updateAll, 60000);
+})();
+</script>
+
+</body>
+</html>

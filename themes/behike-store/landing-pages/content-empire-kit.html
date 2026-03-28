@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="The Content Machine. 8 products, 3 bonuses. One idea per week becomes 50 posts per month on 30 minutes per day. $99.99.">
+    <title>The Content Machine | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0B0B0F;
+            --surface: #14141A;
+            --surface-2: #1C1C24;
+            --violet: #8B5CF6;
+            --violet-dim: rgba(139, 92, 246, 0.1);
+            --violet-glow: rgba(139, 92, 246, 0.15);
+            --violet-border: rgba(139, 92, 246, 0.2);
+            --light: #E8E8ED;
+            --muted: #7A7A85;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            --font-display: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            --mono: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Demo-first: show the output immediately */
+        .demo {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 24px 0;
+        }
+
+        .demo-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--violet);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .demo-title {
+            font-family: var(--font-display);
+            font-size: clamp(28px, 5vw, 44px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .demo-sub {
+            text-align: center;
+            font-size: 17px;
+            color: var(--muted);
+            max-width: 520px;
+            margin: 0 auto 48px;
+        }
+
+        /* Waterfall visualization */
+        .waterfall {
+            background: var(--surface);
+            border: 1px solid var(--violet-border);
+            border-radius: 16px;
+            padding: 40px 32px;
+            margin-bottom: 80px;
+            overflow: hidden;
+        }
+
+        .waterfall-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .waterfall-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .waterfall-dot.red { background: #FF5F56; }
+        .waterfall-dot.yellow { background: #FFBD2E; }
+        .waterfall-dot.green { background: #27C93F; }
+
+        .waterfall-tab {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .waterfall-flow {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2px;
+        }
+
+        .flow-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        @media (max-width: 600px) {
+            .flow-row { grid-template-columns: 80px 1fr; }
+        }
+
+        .flow-input {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--violet);
+            text-align: right;
+        }
+
+        .flow-outputs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .flow-tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: var(--violet-dim);
+            color: var(--violet);
+            border: 1px solid var(--violet-border);
+            white-space: nowrap;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: 14px;
+            padding: 4px 0;
+        }
+
+        .flow-total {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--violet-border);
+        }
+
+        .flow-total-number {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--violet);
+        }
+
+        .flow-total-label {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Problem section (anti-sell) */
+        .anti-sell {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .anti-sell h2 {
+            font-family: var(--font-display);
+            font-size: clamp(22px, 4vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .anti-sell p {
+            font-size: 16px;
+            color: var(--muted);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .anti-sell strong {
+            color: var(--light);
+        }
+
+        /* Product grid: card-based */
+        .products {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .products-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--violet);
+            margin-bottom: 12px;
+        }
+
+        .products-title {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 48px;
+            line-height: 1.2;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 28px 24px;
+            transition: border-color 0.2s, transform 0.15s;
+        }
+
+        .product-card:hover {
+            border-color: var(--violet-border);
+            transform: translateY(-2px);
+        }
+
+        .product-card.is-bonus {
+            background: var(--violet-dim);
+            border-color: var(--violet-border);
+        }
+
+        .card-eyebrow {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .card-eyebrow.bonus-eyebrow {
+            color: var(--violet);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-price {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .card-price s { opacity: 0.4; }
+        .card-price .free { color: var(--violet); font-weight: 600; }
+
+        /* Value equation: visual bar chart */
+        .value-section {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .value-section h2 {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .value-bar-group {
+            margin-bottom: 24px;
+        }
+
+        .value-bar-label {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .value-bar-label span:last-child {
+            font-family: var(--mono);
+            font-size: 13px;
+        }
+
+        .value-bar-track {
+            height: 8px;
+            background: var(--surface-2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .value-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--violet);
+            transition: width 1s ease;
+        }
+
+        .value-bar-fill.accent { background: linear-gradient(90deg, var(--violet), #A78BFA); }
+
+        .value-total {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .value-total-label {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .value-total-price {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--violet);
+        }
+
+        .value-total-price s {
+            color: var(--muted);
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        /* Who this is NOT for */
+        .not-for {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .not-for h2 {
+            font-family: var(--font-display);
+            font-size: clamp(22px, 4vw, 28px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            color: #FF5F56;
+        }
+
+        .not-for ul {
+            list-style: none;
+        }
+
+        .not-for li {
+            font-size: 15px;
+            color: var(--muted);
+            padding: 10px 0 10px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+        }
+
+        .not-for li::before {
+            content: "x";
+            position: absolute;
+            left: 0;
+            color: #FF5F56;
+            font-family: var(--mono);
+            font-weight: 700;
+        }
+
+        .yes-for {
+            margin-top: 40px;
+        }
+
+        .yes-for h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--violet);
+        }
+
+        .yes-for li::before {
+            content: "/";
+            color: var(--violet) !important;
+        }
+
+        /* CTA */
+        .cta {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .cta-price-old {
+            font-size: 16px;
+            color: var(--muted);
+            text-decoration: line-through;
+        }
+
+        .cta-price {
+            font-family: var(--font-display);
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin: 8px 0;
+        }
+
+        .cta-price sup {
+            font-size: 24px;
+            font-weight: 500;
+            vertical-align: super;
+        }
+
+        .cta-note {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: var(--violet);
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 18px 56px;
+            border-radius: 10px;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.35);
+        }
+
+        .cta-spots {
+            margin-top: 24px;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--violet);
+        }
+
+        .cta-guarantee {
+            max-width: 440px;
+            margin: 40px auto 0;
+            padding: 20px 24px;
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .cta-guarantee strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .cta-guarantee p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* FAQ: toggle style */
+        .faq {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .faq-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--violet);
+            margin-bottom: 32px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .faq-q {
+            padding: 20px 0;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-q::after {
+            content: "+";
+            font-family: var(--mono);
+            font-size: 18px;
+            color: var(--violet);
+            transition: transform 0.2s;
+        }
+
+        .faq-item.open .faq-q::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-a {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.open .faq-a {
+            max-height: 300px;
+            padding-bottom: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .footer a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .footer a:hover { color: var(--violet); }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Demo first: show the waterfall output immediately -->
+    <section class="demo">
+        <div class="demo-label">The Content Machine</div>
+        <h1 class="demo-title">One idea. 50+ posts. 30 minutes/day.</h1>
+        <p class="demo-sub">This is what your content week looks like when you have a machine instead of a to-do list.</p>
+
+        <div class="waterfall">
+            <div class="waterfall-header">
+                <span class="waterfall-dot red"></span>
+                <span class="waterfall-dot yellow"></span>
+                <span class="waterfall-dot green"></span>
+                <span class="waterfall-tab">content-pipeline.sh</span>
+            </div>
+
+            <div class="waterfall-flow">
+                <div class="flow-row">
+                    <div class="flow-input">1 idea</div>
+                    <div class="flow-outputs">
+                        <span class="flow-tag">Blog post</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">|</div>
+                <div class="flow-row">
+                    <div class="flow-input">Blog post</div>
+                    <div class="flow-outputs">
+                        <span class="flow-tag">IG Carousel</span>
+                        <span class="flow-tag">X Thread</span>
+                        <span class="flow-tag">LinkedIn</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">|</div>
+                <div class="flow-row">
+                    <div class="flow-input">Carousel</div>
+                    <div class="flow-outputs">
+                        <span class="flow-tag">Reel script</span>
+                        <span class="flow-tag">Story slides</span>
+                        <span class="flow-tag">Pin</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">|</div>
+                <div class="flow-row">
+                    <div class="flow-input">Thread</div>
+                    <div class="flow-outputs">
+                        <span class="flow-tag">Newsletter</span>
+                        <span class="flow-tag">Quote cards</span>
+                        <span class="flow-tag">Hook bank</span>
+                    </div>
+                </div>
+                <div class="flow-arrow">|</div>
+                <div class="flow-row">
+                    <div class="flow-input">All of it</div>
+                    <div class="flow-outputs">
+                        <span class="flow-tag">TikTok</span>
+                        <span class="flow-tag">YouTube Short</span>
+                        <span class="flow-tag">Email</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-total">
+                <div class="flow-total-number">50+</div>
+                <div class="flow-total-label">pieces of content per month from 4 ideas</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Anti-sell: this is not for everyone -->
+    <section class="anti-sell reveal">
+        <h2>Honest warning before you buy this.</h2>
+        <p>This kit assumes you are going to do something with it. It is not a collection of PDFs to make you feel productive for buying them. It is a working system that requires you to show up for 30 minutes a day.</p>
+        <p>If you want a magic button that creates a content empire while you watch Netflix, this is not it. There is no magic button. There is a machine you build and run.</p>
+        <p><strong>If you are willing to commit 30 minutes a day for 30 days, this kit will produce more content than most agencies deliver in a quarter.</strong> That is the trade.</p>
+    </section>
+
+    <!-- Product grid -->
+    <section class="products reveal">
+        <div class="products-label">Everything inside</div>
+        <h2 class="products-title">8 products. 3 bonuses. One system.</h2>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="card-eyebrow">The framework</div>
+                <div class="card-title">Content Waterfall Guide</div>
+                <div class="card-desc">The repurposing engine. One idea becomes 10+ pieces across every platform. Visual flowchart included.</div>
+                <div class="card-price"><s>$4.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">The pipeline</div>
+                <div class="card-title">Social Media Pipeline Guide</div>
+                <div class="card-desc">From idea capture to published post. Batching, scheduling, platform adaptation. Build once, run weekly.</div>
+                <div class="card-price"><s>$4.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">The AI toolkit</div>
+                <div class="card-title">Claude Code Course (video)</div>
+                <div class="card-desc">10 lessons on using Claude Code as a real content creation tool. Not just chatting. Building.</div>
+                <div class="card-price"><s>$19.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">Audience automation</div>
+                <div class="card-title">AI Chatbot Setup Guide</div>
+                <div class="card-desc">Put an AI chatbot on your website in 30 minutes. Answers questions, captures leads, works 24/7.</div>
+                <div class="card-price"><s>$4.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">Idea engine</div>
+                <div class="card-title">AI News Tracker Guide</div>
+                <div class="card-desc">Build a personal AI news feed. 5-minute daily digest. Never run out of content ideas again.</div>
+                <div class="card-price"><s>$4.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">The destination</div>
+                <div class="card-title">Landing Page Template</div>
+                <div class="card-desc">Where all your content drives traffic. 8 themes, fully responsive, zero dependencies, $0/month hosting.</div>
+                <div class="card-price"><s>$9.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">The business model</div>
+                <div class="card-title">The Behike Method v2</div>
+                <div class="card-desc">8 chapters. The full playbook for a one-person content business. AI-first, $0 startup, no employees.</div>
+                <div class="card-price"><s>$19.99</s> included</div>
+            </div>
+
+            <div class="product-card">
+                <div class="card-eyebrow">The operating system</div>
+                <div class="card-title">Solopreneur OS</div>
+                <div class="card-desc">5-module daily OS. Task management, content pipeline, product development, finance, acquisition.</div>
+                <div class="card-price"><s>$12.99</s> included</div>
+            </div>
+
+            <div class="product-card is-bonus">
+                <div class="card-eyebrow bonus-eyebrow">Bonus 1</div>
+                <div class="card-title">Voice Bible Template</div>
+                <div class="card-desc">The same brand voice definition system Behike uses. Define your voice so AI content actually sounds like you.</div>
+                <div class="card-price"><span class="free">FREE with purchase</span></div>
+            </div>
+
+            <div class="product-card is-bonus">
+                <div class="card-eyebrow bonus-eyebrow">Bonus 2</div>
+                <div class="card-title">30-Day Content Calendar</div>
+                <div class="card-desc">Pre-filled with 30 days of content topics, hooks, and platform assignments. First 20 buyers get it customized to their niche.</div>
+                <div class="card-price"><span class="free">FREE with purchase</span></div>
+            </div>
+
+            <div class="product-card is-bonus">
+                <div class="card-eyebrow bonus-eyebrow">Bonus 3</div>
+                <div class="card-title">n8n Automation Workflow</div>
+                <div class="card-desc">Copy-paste workflow for automated content publishing. Connect, configure, run. Your content posts itself.</div>
+                <div class="card-price"><span class="free">FREE with purchase</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value bars -->
+    <section class="value-section reveal">
+        <h2>What you are actually getting</h2>
+
+        <div class="value-bar-group">
+            <div class="value-bar-label">
+                <span>8 digital products (if bought separately)</span>
+                <span>$82.92</span>
+            </div>
+            <div class="value-bar-track">
+                <div class="value-bar-fill" style="width: 45%;"></div>
+            </div>
+        </div>
+
+        <div class="value-bar-group">
+            <div class="value-bar-label">
+                <span>Voice Bible template (setup time saved)</span>
+                <span>~$50</span>
+            </div>
+            <div class="value-bar-track">
+                <div class="value-bar-fill accent" style="width: 27%;"></div>
+            </div>
+        </div>
+
+        <div class="value-bar-group">
+            <div class="value-bar-label">
+                <span>30-day content calendar (research time saved)</span>
+                <span>~$75</span>
+            </div>
+            <div class="value-bar-track">
+                <div class="value-bar-fill accent" style="width: 40%;"></div>
+            </div>
+        </div>
+
+        <div class="value-bar-group">
+            <div class="value-bar-label">
+                <span>n8n automation workflow (dev time saved)</span>
+                <span>~$100</span>
+            </div>
+            <div class="value-bar-track">
+                <div class="value-bar-fill accent" style="width: 55%;"></div>
+            </div>
+        </div>
+
+        <div class="value-total">
+            <div class="value-total-label">Total value</div>
+            <div class="value-total-price"><s>$307.92</s> $99.99</div>
+        </div>
+    </section>
+
+    <!-- Not for / Yes for -->
+    <section class="not-for reveal">
+        <h2>Do not buy this if:</h2>
+        <ul>
+            <li>You want to "learn about content marketing" without actually creating content</li>
+            <li>You are not willing to commit 30 minutes a day</li>
+            <li>You need someone to hold your hand through every step</li>
+            <li>You think buying a kit is the same as doing the work</li>
+            <li>You do not have a topic, niche, or business to create content for</li>
+        </ul>
+
+        <div class="yes-for">
+            <h3>Buy this if:</h3>
+            <ul>
+                <li>You post inconsistently and know you need a system</li>
+                <li>You have ideas but no pipeline to turn them into content</li>
+                <li>You spend hours creating content that gets 12 likes</li>
+                <li>You know AI can help but do not know how to wire it up</li>
+                <li>You want 50+ posts/month without hiring an agency</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta reveal" id="buy">
+        <div class="cta-price-old">$307.92 total value</div>
+        <div class="cta-price"><sup>$</sup>99<sup>.99</sup></div>
+        <div class="cta-note">One-time payment. All updates included. No subscription.</div>
+
+        <a href="https://behikeai.gumroad.com/l/content-empire-kit" class="cta-btn">Get The Content Machine</a>
+
+        <div class="cta-spots">First 20 buyers get custom content calendar. <span id="spots-left">Spots remaining: 20</span></div>
+
+        <div class="cta-guarantee">
+            <strong>30-day guarantee.</strong>
+            <p>Use the system for 30 days. If you follow the process and your content output does not at least double, email me. Full refund. I would rather have satisfied builders than unhappy customers.</p>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq reveal">
+        <div class="faq-label">Questions</div>
+
+        <div class="faq-item">
+            <div class="faq-q">Can I use this if I am not technical?</div>
+            <div class="faq-a">Yes. The Claude Code course starts from zero. The chatbot guide is copy-paste. The n8n workflow has setup instructions. You do not need to be a developer. You need to be willing to follow instructions.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">What platforms does this cover?</div>
+            <div class="faq-a">Instagram, X/Twitter, LinkedIn, TikTok, YouTube, Pinterest, email newsletters, and blogs. The waterfall system adapts one piece of content to all of them.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">How is this different from the Starter Pack?</div>
+            <div class="faq-a">The Weekend Launch Kit gives you a business foundation. The Content Machine gives you a content engine. There is overlap (Behike Method, Solopreneur OS, Content Waterfall). But this kit adds Claude Code, the chatbot, the news tracker, the landing page template, and three automation bonuses. If content is your main growth channel, this is the kit.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">What if I already own some of these products?</div>
+            <div class="faq-a">The bonuses alone (Voice Bible, content calendar, n8n workflow) are worth $200+ in saved time. Even if you own every included product, the bonuses and the way everything connects into a single system make this worthwhile.</div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-q">Do I need paid AI tools?</div>
+            <div class="faq-a">The Claude Code course uses Claude (free tier works for learning). The chatbot can use free models via Ollama. n8n is free and self-hosted. The only cost you might have is an API key at $20/month if you want high-volume generation. But you can start at $0.</div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 Behike. Built in Puerto Rico.</p>
+        <p style="margin-top: 8px;"><a href="index.html">All Products</a></p>
+    </footer>
+
+    <script>
+        // FAQ toggle
+        document.querySelectorAll('.faq-q').forEach(q => {
+            q.addEventListener('click', () => {
+                q.parentElement.classList.toggle('open');
+            });
+        });
+
+        // Scroll reveal
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.08 });
+        reveals.forEach(el => observer.observe(el));
+
+        // Animate value bars on scroll
+        const valueBars = document.querySelectorAll('.value-bar-fill');
+        const valueObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = entry.target;
+                    const width = target.style.width;
+                    target.style.width = '0%';
+                    setTimeout(() => { target.style.width = width; }, 100);
+                }
+            });
+        }, { threshold: 0.5 });
+        valueBars.forEach(bar => valueObserver.observe(bar));
+    </script>
+
+</body>
+</html>

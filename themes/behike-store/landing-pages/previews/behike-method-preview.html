@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Preview - The Behike Method</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000000;
+            --bg2: #1D1D1F;
+            --accent: #0A84FF;
+            --text: #F5F5F7;
+            --gray: #86868B;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top Banner */
+        .preview-banner {
+            background: var(--accent);
+            color: #fff;
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 56px);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 520px;
+            margin: 0 auto 24px;
+        }
+
+        .hero .author {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .hero .author strong {
+            color: var(--text);
+        }
+
+        /* Who This Is For intro */
+        .intro-block {
+            font-size: 17px;
+            color: rgba(245, 245, 247, 0.85);
+            line-height: 1.8;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(134, 134, 139, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .intro-block p {
+            margin-bottom: 16px;
+        }
+
+        /* Chapter Content */
+        .chapter-header {
+            border-top: 1px solid rgba(134, 134, 139, 0.3);
+            padding-top: 40px;
+            margin-bottom: 32px;
+        }
+
+        .chapter-label {
+            font-size: 13px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .chapter-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .chapter-content {
+            font-size: 17px;
+            color: rgba(245, 245, 247, 0.85);
+            line-height: 1.8;
+        }
+
+        .chapter-content p {
+            margin-bottom: 20px;
+        }
+
+        .chapter-content strong {
+            color: var(--text);
+        }
+
+        .chapter-content h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 40px 0 16px;
+        }
+
+        /* Exercise blocks */
+        .exercise-block {
+            margin: 32px 0;
+            padding: 32px 24px;
+            background: var(--bg2);
+            border-radius: 16px;
+            border: 1px solid rgba(10, 132, 255, 0.3);
+        }
+
+        .exercise-label {
+            font-size: 13px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .exercise-block h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .exercise-block p {
+            font-size: 15px;
+            color: rgba(245, 245, 247, 0.75);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .exercise-block .example {
+            margin: 16px 0;
+            padding: 16px 20px;
+            background: rgba(10, 132, 255, 0.08);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            font-size: 15px;
+            color: rgba(245, 245, 247, 0.7);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .exercise-block .worksheet {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(134, 134, 139, 0.3);
+            border-radius: 8px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 2.2;
+            white-space: pre-line;
+        }
+
+        .non-negotiables {
+            list-style: none;
+            padding: 0;
+            margin: 16px 0;
+        }
+
+        .non-negotiables li {
+            padding: 8px 0;
+            font-size: 15px;
+            color: rgba(245, 245, 247, 0.75);
+            line-height: 1.6;
+        }
+
+        .non-negotiables li strong {
+            color: var(--text);
+        }
+
+        /* Chapter List */
+        .chapter-list {
+            margin: 60px 0;
+        }
+
+        .chapter-list h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .chapter-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(134, 134, 139, 0.15);
+        }
+
+        .chapter-num {
+            font-size: 14px;
+            color: var(--gray);
+            font-weight: 600;
+            min-width: 32px;
+            padding-top: 2px;
+        }
+
+        .chapter-info {
+            flex: 1;
+        }
+
+        .chapter-info h4 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chapter-info .desc {
+            font-size: 14px;
+            color: var(--gray);
+            filter: blur(4px);
+            user-select: none;
+        }
+
+        .lock-icon {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* Who This Is For cards */
+        .audience-section {
+            margin: 60px 0;
+        }
+
+        .audience-section h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .audience-card {
+            background: var(--bg2);
+            border: 1px solid rgba(134, 134, 139, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .audience-card .card-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .audience-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .audience-card p {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 540px) {
+            .audience-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 32px 0;
+            border-top: 1px solid rgba(134, 134, 139, 0.2);
+            border-bottom: 1px solid rgba(134, 134, 139, 0.2);
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .cta-price {
+            display: block;
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 13px;
+            color: var(--gray);
+            border-top: 1px solid rgba(134, 134, 139, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="preview-banner">Free Preview - Chapter 1 of 6</div>
+
+<div class="container">
+
+    <section class="hero">
+        <h1>The Behike Method</h1>
+        <p class="subtitle">How to Build a One-Person Business with AI</p>
+        <p class="author">By <strong>Behike</strong></p>
+    </section>
+
+    <section class="chapter-header">
+        <div class="chapter-label">Chapter 1</div>
+        <h2>The Vision (What Are You Building and Why?)</h2>
+    </section>
+
+    <div class="chapter-content">
+        <p>Most people skip this chapter. They want to jump straight to "how do I make money." I get it. I did the same thing. I spent months bouncing between eBay reselling, Shopify, Telegram bots, AI video content, automation services, and ebook publishing. All at the same time. All half-finished.</p>
+
+        <p>The problem was not that I lacked ideas. I had too many. The problem was that I had no vision pulling all of them together.</p>
+
+        <p>A goal is "make $5,000 a month." A vision is knowing exactly what your Tuesday morning looks like when you have already won. Goals are checkboxes. Visions are magnets. A goal tells you what to do. A vision tells you who to become.</p>
+
+        <p>When you have a clear vision, the daily decisions get easier. Should I take this freelance gig? Does it move me toward the vision or away from it? Should I post on Instagram today or build the product? Which one gets me closer?</p>
+
+        <p>Without a vision, every option looks equal. And when every option looks equal, you do nothing. Or worse, you do everything at 10%.</p>
+
+        <p>Here is what changed for me. I stopped asking "what should I build" and started asking "what does my life look like when this works." The answer was specific. Working from home. Supporting my family. Building things I care about. Having time for my faith and the people who matter. Running a business that does not require me to trade hours for dollars forever.</p>
+
+        <p>That vision did not eliminate the chaos. But it gave the chaos a direction.</p>
+
+        <h3>Exercise 1: Write Your Tuesday</h3>
+    </div>
+
+    <div class="exercise-block">
+        <div class="exercise-label">Exercise 1</div>
+        <h4>Write Your Tuesday</h4>
+        <p>Not Monday (too much pressure). Not Friday (too much relief). Tuesday. The most normal day of the week.</p>
+        <p>Write out your ideal Tuesday three years from now. Be specific. What time do you wake up? Where are you? What is the first thing you do? When do you work and on what? Who do you talk to? What do you eat? When do you stop working? What does the evening look like?</p>
+        <p>Do not write what sounds impressive. Write what sounds peaceful. Write the life you actually want, not the one that gets likes on Twitter.</p>
+
+        <div class="example">
+            <strong style="color: var(--accent); font-style: normal;">My Tuesday (for reference):</strong><br><br>
+            Wake up at 7. No alarm. Coffee on the balcony. Check my systems, not my phone. The AI agents ran overnight. New sales came in. Content got posted. Nothing is on fire. I spend the morning building something new, a tool, a product, a piece of writing. Lunch with my family. Afternoon is reading, learning, going deeper on whatever has my attention. Evening is mine. Faith, rest, presence. I made money today without selling my time.
+        </div>
+
+        <div class="worksheet">MY TUESDAY (3 YEARS FROM NOW):
+______________________________________________
+______________________________________________
+______________________________________________
+______________________________________________
+______________________________________________</div>
+    </div>
+
+    <div class="chapter-content">
+        <h3>Exercise 2: Name Your Three Non-Negotiables</h3>
+    </div>
+
+    <div class="exercise-block">
+        <div class="exercise-label">Exercise 2</div>
+        <h4>Name Your Three Non-Negotiables</h4>
+        <p>What are the three things that your business must never compromise? These are the things that, if violated, mean you are building the wrong thing. Even if it is making money.</p>
+
+        <p><strong style="color: var(--text);">Mine are:</strong></p>
+        <ul class="non-negotiables">
+            <li><strong>1. Faith.</strong> My foundation. If the business requires me to compromise my values, it is the wrong business.</li>
+            <li><strong>2. Family.</strong> The whole point. If I am too busy for the people I am doing this for, I have already failed.</li>
+            <li><strong>3. Freedom.</strong> Not "laptop lifestyle" freedom. The freedom to choose what I work on, when I work, and who I work with.</li>
+        </ul>
+
+        <div class="worksheet">MY THREE NON-NEGOTIABLES:
+1. ________________________________________
+2. ________________________________________
+3. ________________________________________</div>
+
+        <p style="margin-top: 16px;">These three things are your filter. Every opportunity, every project, every partnership gets tested against this list. If it violates one, you say no. Even if the money is good. Especially if the money is good, because that is when it is hardest to say no.</p>
+    </div>
+
+    <div class="chapter-content">
+        <h3>Why Most People Skip This and Fail</h3>
+
+        <p>Because it feels soft. It feels like journaling instead of building. And the internet has convinced everyone that the only thing that matters is execution.</p>
+
+        <p>Execution without vision is just busy work. You will build the wrong thing fast. You will optimize systems that should not exist. You will wake up six months from now having "worked hard" on something you do not actually want.</p>
+
+        <p>I know because I did it. I built a scraper bot, got it banned, rebuilt it, got it banned again. Was it useful? Yes. Was it part of my vision? I had not checked. I was just building to build.</p>
+
+        <p>Do the exercises. They take 20 minutes. They will save you months.</p>
+    </div>
+
+    <section class="chapter-list">
+        <h3>Full Table of Contents</h3>
+
+        <div class="chapter-item">
+            <div class="chapter-num">01</div>
+            <div class="chapter-info">
+                <h4>The Vision <span style="color: #30D158; font-size: 12px;">&#10003; Reading now</span></h4>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">02</div>
+            <div class="chapter-info">
+                <h4>Your Domain Stack <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Pick 3 things you can talk about forever. The Money Skill, the Passion Topic, and the Differentiator that makes you the only one at the intersection.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">03</div>
+            <div class="chapter-info">
+                <h4>The ADHD Builder's System <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Capture-everything system, one priority per week, 25-minute sprints. A productivity framework built for brains that do not run on schedules.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">04</div>
+            <div class="chapter-info">
+                <h4>The AI Content Engine <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">The 50/30/20 content pyramid. How to use AI for the 80% that is tedious while you handle the 20% that only you can do. All with $0 tools.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">05</div>
+            <div class="chapter-info">
+                <h4>The Value Ladder <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">From free lead magnets to $5,000 done-for-you services. Five levels that turn strangers into paying customers without cold selling.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">06</div>
+            <div class="chapter-info">
+                <h4>Ship It <span class="lock-icon">&#x1F512;</span></h4>
+                <p class="desc">Perfection is procrastination in disguise. The feedback loop that turns bad first products into good businesses. Stop polishing, start publishing.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="audience-section">
+        <h3>Who This Is For</h3>
+        <div class="audience-grid">
+            <div class="audience-card">
+                <div class="card-icon">&#x1F9E0;</div>
+                <h4>ADHD Builders</h4>
+                <p>Too many ideas, not enough systems. This guide was built for your brain. Not as a workaround. As an advantage.</p>
+            </div>
+            <div class="audience-card">
+                <div class="card-icon">&#x1F4B0;</div>
+                <h4>$0 Starters</h4>
+                <p>Broke is not a blocker. Everything in here works at zero dollars. No subscriptions, no startup capital required.</p>
+            </div>
+            <div class="audience-card">
+                <div class="card-icon">&#x1F916;</div>
+                <h4>AI-Curious</h4>
+                <p>You know AI is the leverage point but you have not figured out how to use it without losing your voice or your wallet.</p>
+            </div>
+            <div class="audience-card">
+                <div class="card-icon">&#x1F680;</div>
+                <h4>Solo Operators</h4>
+                <p>No team, no investors, no Silicon Valley connections. Just you, a laptop, and the willingness to build from wherever you are.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Chapters</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">5,300</div>
+            <div class="stat-label">Words</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Exercises</div>
+        </div>
+    </div>
+
+    <section class="cta-section">
+        <a href="#" class="cta-btn">Unlock All 6 Chapters - $14.99</a>
+        <span class="cta-price">Instant download. PDF + Markdown. Lifetime updates.</span>
+    </section>
+
+    <footer>
+        &copy; 2026 Behike
+    </footer>
+
+</div>
+
+<script src="../settings-widget.js"></script>
+</body>
+</html>

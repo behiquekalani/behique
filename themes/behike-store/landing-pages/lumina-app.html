@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <title>Lumina App — Circadian Wellness | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue: #0A84FF;
+            --green: #30D158;
+            --amber: #FF9F0A;
+            --purple: #BF5AF2;
+            --red: #FF453A;
+            --bg: #000000;
+            --surface: #111111;
+            --surface2: #1a1a1a;
+            --border: rgba(255,255,255,0.08);
+            --text: #F5F5F7;
+            --text-dim: #86868B;
+            --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ---- BLUE LIGHT FILTER OVERLAY ---- */
+        #filter-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: background 1.2s ease, opacity 1.2s ease;
+            mix-blend-mode: multiply;
+            opacity: 0;
+        }
+
+        /* ---- HEADER ---- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .logo span {
+            color: var(--blue);
+        }
+
+        #mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid;
+            transition: all 0.6s ease;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        #header-clock {
+            font-size: 14px;
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.02em;
+        }
+
+        .pro-link {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: border-color 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+
+        .pro-link:hover {
+            color: var(--amber);
+            border-color: var(--amber);
+        }
+
+        /* ---- CIRCADIAN MODE SELECTOR ---- */
+        .mode-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .mode-bar::-webkit-scrollbar { display: none; }
+
+        .mode-btn {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mode-btn:hover {
+            border-color: rgba(255,255,255,0.2);
+            color: var(--text);
+        }
+
+        .mode-btn.active {
+            color: #000;
+            font-weight: 600;
+            border-color: transparent;
+        }
+
+        .mode-btn.auto-tag::after {
+            content: "auto";
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            color: currentColor;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        /* ---- MAIN GRID ---- */
+        main {
+            padding: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 700px) {
+            main { grid-template-columns: 1fr; }
+        }
+
+        /* ---- CARD ---- */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-icon {
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        /* ---- POMODORO ---- */
+        #timer-display {
+            font-size: 88px;
+            font-weight: 300;
+            text-align: center;
+            letter-spacing: -4px;
+            line-height: 1;
+            margin: 4px 0 16px;
+            font-variant-numeric: tabular-nums;
+            color: var(--text);
+        }
+
+        .timer-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        #session-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            transition: background 0.4s;
+        }
+
+        #session-dot.focus { background: var(--red); }
+        #session-dot.break { background: var(--green); }
+
+        #session-label {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn:active { transform: scale(0.97); }
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover { opacity: 0.85; }
+
+        .pomodoro-count {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .pomo-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pomo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+
+        .pomo-dot.done { background: var(--red); border-color: var(--red); }
+
+        /* ---- BREATHING ---- */
+        .breath-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        #breath-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(10,132,255,0.25) 0%, rgba(10,132,255,0.05) 70%);
+            border: 2px solid rgba(10,132,255,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background 0.6s ease, border-color 0.6s ease;
+            margin-bottom: 14px;
+        }
+
+        #breath-circle.inhale {
+            background: radial-gradient(circle, rgba(10,132,255,0.35) 0%, rgba(10,132,255,0.08) 70%);
+            border-color: rgba(10,132,255,0.7);
+        }
+
+        #breath-circle.hold {
+            background: radial-gradient(circle, rgba(191,90,242,0.3) 0%, rgba(191,90,242,0.06) 70%);
+            border-color: rgba(191,90,242,0.6);
+        }
+
+        #breath-circle.exhale {
+            background: radial-gradient(circle, rgba(48,209,88,0.25) 0%, rgba(48,209,88,0.05) 70%);
+            border-color: rgba(48,209,88,0.5);
+        }
+
+        #breath-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dim);
+            min-height: 22px;
+            margin-bottom: 6px;
+            letter-spacing: 0.03em;
+        }
+
+        #breath-countdown {
+            font-size: 28px;
+            font-weight: 300;
+            color: var(--text);
+            min-height: 36px;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 12px;
+        }
+
+        #breath-cycles {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 14px;
+        }
+
+        .breath-technique {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .technique-btn {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .technique-btn.active {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+
+        /* ---- AMBIENT SOUND ---- */
+        .sound-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .sound-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .sound-option.active {
+            border-color: var(--green);
+        }
+
+        .sound-icon {
+            font-size: 20px;
+            width: 32px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sound-info {
+            flex: 1;
+        }
+
+        .sound-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .sound-desc {
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .sound-toggle {
+            width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .sound-toggle.on {
+            background: var(--green);
+            border-color: var(--green);
+        }
+
+        .sound-toggle::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .sound-toggle.on::after {
+            transform: translateX(16px);
+        }
+
+        .volume-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .volume-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            white-space: nowrap;
+        }
+
+        #volume-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--surface2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        #volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--green);
+            cursor: pointer;
+        }
+
+        #volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--green);
+            cursor: pointer;
+            border: none;
+        }
+
+        /* ---- SCHEDULE ---- */
+        .schedule-time {
+            font-size: 52px;
+            font-weight: 300;
+            letter-spacing: -2px;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .schedule-date {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+
+        .next-mode {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .next-mode span { color: var(--text); font-weight: 500; }
+
+        /* timeline */
+        .timeline-wrap {
+            margin-bottom: 6px;
+        }
+
+        .timeline-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .timeline-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--surface2);
+            position: relative;
+            overflow: visible;
+            display: flex;
+            margin-bottom: 18px;
+        }
+
+        .timeline-segment {
+            height: 100%;
+            transition: opacity 0.3s;
+        }
+
+        .timeline-segment:first-child { border-radius: 4px 0 0 4px; }
+        .timeline-segment:last-child { border-radius: 0 4px 4px 0; }
+
+        #timeline-cursor {
+            position: absolute;
+            top: -3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #000;
+            transform: translateX(-50%);
+            transition: left 0.5s ease;
+            z-index: 2;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.15);
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .mode-legend {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ---- FOOTER ---- */
+        footer {
+            text-align: center;
+            padding: 28px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        footer a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        footer a:hover { text-decoration: underline; }
+
+        /* ---- MODE COLORS ---- */
+        .morning-active { background: #FFD60A; color: #000; }
+        .focus-active { background: var(--blue); color: #fff; }
+        .wind-active { background: var(--amber); color: #000; }
+        .evening-active { background: #FF6B35; color: #fff; }
+        .night-active { background: #8B4513; color: #fff; }
+
+        /* badge colors */
+        .badge-morning { background: rgba(255,214,10,0.15); border-color: rgba(255,214,10,0.4); color: #FFD60A; }
+        .badge-focus { background: rgba(10,132,255,0.15); border-color: rgba(10,132,255,0.4); color: var(--blue); }
+        .badge-wind { background: rgba(255,159,10,0.15); border-color: rgba(255,159,10,0.4); color: var(--amber); }
+        .badge-evening { background: rgba(255,107,53,0.15); border-color: rgba(255,107,53,0.4); color: #FF6B35; }
+        .badge-night { background: rgba(139,69,19,0.25); border-color: rgba(139,69,19,0.6); color: #D2691E; }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 480px) {
+            #timer-display { font-size: 64px; }
+            .schedule-time { font-size: 40px; }
+            header { padding: 10px 14px; }
+            main { padding: 14px; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Blue light filter overlay -->
+<div id="filter-overlay"></div>
+
+<!-- ====== HEADER ====== -->
+<header>
+    <div class="header-left">
+        <div class="logo">Lumi<span>na</span></div>
+        <div id="mode-badge" class="badge-focus">
+            <span class="badge-dot" id="badge-dot"></span>
+            <span id="badge-text">Focus</span>
+        </div>
+    </div>
+    <div class="header-right">
+        <span id="header-clock">00:00:00</span>
+        <a href="https://behikeai.gumroad.com/l/lumina" target="_blank" class="pro-link">Lumina Pro — $9.99</a>
+    </div>
+</header>
+
+<!-- ====== CIRCADIAN MODE SELECTOR ====== -->
+<div class="mode-bar">
+    <button class="mode-btn" data-mode="morning" onclick="setMode('morning', true)">🌅 Morning</button>
+    <button class="mode-btn" data-mode="focus" onclick="setMode('focus', true)">🎯 Focus</button>
+    <button class="mode-btn" data-mode="wind" onclick="setMode('wind', true)">🌤 Wind Down</button>
+    <button class="mode-btn" data-mode="evening" onclick="setMode('evening', true)">🌇 Evening</button>
+    <button class="mode-btn" data-mode="night" onclick="setMode('night', true)">🌙 Night</button>
+</div>
+
+<!-- ====== MAIN GRID ====== -->
+<main>
+
+    <!-- LEFT: POMODORO TIMER -->
+    <div class="card">
+        <div class="card-title">
+            <span class="card-title-icon" style="background:rgba(255,69,58,0.15); color:var(--red);">⏱</span>
+            Focus Timer
+        </div>
+
+        <div id="timer-display">25:00</div>
+
+        <div class="timer-status">
+            <div id="session-dot" class="focus"></div>
+            <span id="session-label">Focus Session</span>
+        </div>
+
+        <div class="timer-controls">
+            <button class="btn btn-primary" id="timer-toggle-btn" onclick="toggleTimer()">Start</button>
+            <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
+        </div>
+
+        <div class="pomodoro-count">
+            <div id="pomo-count-label">Today: 0 sessions completed</div>
+            <div class="pomo-dots" id="pomo-dots"></div>
+        </div>
+    </div>
+
+    <!-- LEFT: BREATHING -->
+    <div class="card">
+        <div class="card-title">
+            <span class="card-title-icon" style="background:rgba(191,90,242,0.15); color:var(--purple);">◎</span>
+            Breathing Exercise
+        </div>
+
+        <div class="breath-technique">
+            <button class="technique-btn active" data-technique="478" onclick="setTechnique('478', this)">4-7-8</button>
+            <button class="technique-btn" data-technique="box" onclick="setTechnique('box', this)">Box</button>
+            <button class="technique-btn" data-technique="calm" onclick="setTechnique('calm', this)">Calm</button>
+        </div>
+
+        <div class="breath-container">
+            <div id="breath-circle"></div>
+            <div id="breath-label">Ready</div>
+            <div id="breath-countdown"></div>
+            <div id="breath-cycles">Cycles: 0</div>
+            <button class="btn btn-secondary" id="breath-btn" onclick="toggleBreath()">Start</button>
+        </div>
+    </div>
+
+    <!-- RIGHT: AMBIENT SOUND -->
+    <div class="card">
+        <div class="card-title">
+            <span class="card-title-icon" style="background:rgba(48,209,88,0.15); color:var(--green);">♫</span>
+            Ambient Sound
+        </div>
+
+        <div class="sound-options">
+            <div class="sound-option" id="sound-brown" onclick="selectSound('brown')">
+                <div class="sound-icon">🌊</div>
+                <div class="sound-info">
+                    <div class="sound-name">Brown Noise</div>
+                    <div class="sound-desc">Deep, warm. Masks distractions, promotes focus.</div>
+                </div>
+                <div class="sound-toggle" id="toggle-brown"></div>
+            </div>
+            <div class="sound-option" id="sound-pink" onclick="selectSound('pink')">
+                <div class="sound-icon">🌧</div>
+                <div class="sound-info">
+                    <div class="sound-name">Pink Noise</div>
+                    <div class="sound-desc">Balanced spectrum. Better for sleep and memory.</div>
+                </div>
+                <div class="sound-toggle" id="toggle-pink"></div>
+            </div>
+            <div class="sound-option" id="sound-binaural" onclick="selectSound('binaural')">
+                <div class="sound-icon">🧠</div>
+                <div class="sound-info">
+                    <div class="sound-name">40Hz Binaural Focus</div>
+                    <div class="sound-desc">200Hz / 240Hz. Use headphones for full effect.</div>
+                </div>
+                <div class="sound-toggle" id="toggle-binaural"></div>
+            </div>
+        </div>
+
+        <div class="volume-row">
+            <span class="volume-label">Volume</span>
+            <input type="range" id="volume-slider" min="0" max="100" value="40" oninput="setVolume(this.value)">
+            <span class="volume-label" id="volume-value">40%</span>
+        </div>
+    </div>
+
+    <!-- RIGHT: SCHEDULE -->
+    <div class="card">
+        <div class="card-title">
+            <span class="card-title-icon" style="background:rgba(10,132,255,0.15); color:var(--blue);">◷</span>
+            Schedule
+        </div>
+
+        <div class="schedule-time" id="schedule-clock">12:00</div>
+        <div class="schedule-date" id="schedule-date">Loading...</div>
+
+        <div class="next-mode" id="next-mode-banner">
+            Next: <span id="next-mode-text">calculating...</span>
+        </div>
+
+        <div class="timeline-wrap">
+            <div class="timeline-label">Your day at a glance</div>
+            <div class="timeline-bar" id="timeline-bar">
+                <!-- segments injected by JS -->
+                <div id="timeline-cursor"></div>
+            </div>
+            <div class="timeline-labels">
+                <span>6am</span>
+                <span>10am</span>
+                <span>2pm</span>
+                <span>6pm</span>
+                <span>9pm</span>
+                <span>12am</span>
+            </div>
+        </div>
+
+        <div class="mode-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#FFD60A"></div>Morning (6-10am)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Focus (10am-2pm)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Wind Down (2-6pm)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#FF6B35"></div>Evening (6-9pm)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8B4513"></div>Night (9pm+)</div>
+        </div>
+    </div>
+
+</main>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+    A <a href="https://behike.shop" target="_blank">Behike</a> tool. &nbsp;|&nbsp;
+    <a href="https://behikeai.gumroad.com/l/lumina" target="_blank">Lumina Pro — $9.99 one-time</a>
+    &nbsp;|&nbsp; Your screen, working with your body. Not against it.
+</footer>
+
+<script>
+// ============================================================
+// LUMINA APP — COMPLETE FUNCTIONAL IMPLEMENTATION
+// Copyright 2026 Behike. All rights reserved.
+// ============================================================
+
+// ------- MODE CONFIG -------
+const MODES = {
+    morning: {
+        name: 'Morning',
+        hours: [6, 10],
+        filter: { color: 'rgba(255,220,80,0)', opacity: 0 },
+        badge: 'badge-morning',
+        btnClass: 'morning-active',
+        color: '#FFD60A',
+        dotColor: '#FFD60A',
+    },
+    focus: {
+        name: 'Focus',
+        hours: [10, 14],
+        filter: { color: 'rgba(180,210,255,0.04)', opacity: 0.04 },
+        badge: 'badge-focus',
+        btnClass: 'focus-active',
+        color: '#0A84FF',
+        dotColor: '#0A84FF',
+    },
+    wind: {
+        name: 'Wind Down',
+        hours: [14, 18],
+        filter: { color: 'rgba(255,159,10,0.18)', opacity: 0.18 },
+        badge: 'badge-wind',
+        btnClass: 'wind-active',
+        color: '#FF9F0A',
+        dotColor: '#FF9F0A',
+    },
+    evening: {
+        name: 'Evening',
+        hours: [18, 21],
+        filter: { color: 'rgba(255,100,0,0.28)', opacity: 0.28 },
+        badge: 'badge-evening',
+        btnClass: 'evening-active',
+        color: '#FF6B35',
+        dotColor: '#FF6B35',
+    },
+    night: {
+        name: 'Night',
+        hours: [21, 30],
+        filter: { color: 'rgba(180,80,0,0.45)', opacity: 0.45 },
+        badge: 'badge-night',
+        btnClass: 'night-active',
+        color: '#8B4513',
+        dotColor: '#D2691E',
+    },
+};
+
+const MODE_ORDER = ['morning', 'focus', 'wind', 'evening', 'night'];
+
+let currentMode = 'focus';
+let manualOverride = false;
+
+function getAutoMode(hour) {
+    if (hour >= 6 && hour < 10) return 'morning';
+    if (hour >= 10 && hour < 14) return 'focus';
+    if (hour >= 14 && hour < 18) return 'wind';
+    if (hour >= 18 && hour < 21) return 'evening';
+    return 'night';
+}
+
+function setMode(mode, isManual) {
+    if (isManual) manualOverride = true;
+    currentMode = mode;
+    const cfg = MODES[mode];
+
+    // update overlay
+    const overlay = document.getElementById('filter-overlay');
+    if (cfg.filter.opacity === 0) {
+        overlay.style.opacity = '0';
+        overlay.style.background = 'transparent';
+    } else {
+        overlay.style.background = cfg.filter.color;
+        overlay.style.opacity = '1';
+    }
+
+    // update badge
+    const badge = document.getElementById('mode-badge');
+    badge.className = 'badge-' + mode;
+    badge.querySelector('#badge-text').textContent = cfg.name;
+    document.getElementById('badge-dot').style.background = cfg.dotColor;
+
+    // update buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active', 'morning-active', 'focus-active', 'wind-active', 'evening-active', 'night-active', 'auto-tag');
+        if (btn.dataset.mode === mode) {
+            btn.classList.add('active', cfg.btnClass);
+        }
+    });
+
+    // mark auto button
+    if (!isManual) {
+        const autoBtn = document.querySelector(`.mode-btn[data-mode="${mode}"]`);
+        if (autoBtn) autoBtn.classList.add('auto-tag');
+    }
+
+    updateNextMode();
+}
+
+function updateNextMode() {
+    const now = new Date();
+    const hour = now.getHours() + now.getMinutes() / 60;
+    const modeIdx = MODE_ORDER.indexOf(currentMode);
+    const nextIdx = (modeIdx + 1) % MODE_ORDER.length;
+    const nextModeName = MODES[MODE_ORDER[nextIdx]].name;
+
+    // compute minutes to next transition
+    const boundaries = [6, 10, 14, 18, 21, 30]; // 30 = 6am next day
+    let minutesToNext = null;
+    for (let i = 0; i < boundaries.length - 1; i++) {
+        if (hour >= boundaries[i] && hour < boundaries[i + 1]) {
+            minutesToNext = Math.round((boundaries[i + 1] - hour) * 60);
+            break;
+        }
+    }
+    if (minutesToNext === null) {
+        // after 9pm, count to 6am
+        minutesToNext = Math.round((30 - hour) * 60);
+    }
+
+    const el = document.getElementById('next-mode-text');
+    if (minutesToNext >= 60) {
+        const h = Math.floor(minutesToNext / 60);
+        const m = minutesToNext % 60;
+        el.textContent = `${nextModeName} in ${h}h ${m}m`;
+    } else {
+        el.textContent = `${nextModeName} in ${minutesToNext}m`;
+    }
+}
+
+// ------- CLOCK + AUTO MODE -------
+function padZ(n) { return String(n).padStart(2, '0'); }
+
+function tickClock() {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const s = now.getSeconds();
+
+    // header clock (12h)
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    document.getElementById('header-clock').textContent = `${h12}:${padZ(m)}:${padZ(s)} ${ampm}`;
+
+    // schedule clock
+    document.getElementById('schedule-clock').textContent = `${h12}:${padZ(m)}`;
+
+    // date
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('schedule-date').textContent =
+        `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+    // auto mode
+    if (!manualOverride) {
+        const auto = getAutoMode(h);
+        if (auto !== currentMode) setMode(auto, false);
+    }
+
+    updateTimeline(h, m);
+}
+
+// ------- TIMELINE -------
+function buildTimeline() {
+    const bar = document.getElementById('timeline-bar');
+    // remove old segments
+    bar.querySelectorAll('.timeline-segment').forEach(s => s.remove());
+
+    const total = 18; // hours shown: 6am to midnight
+    const segments = [
+        { mode: 'morning', start: 6,  end: 10, color: '#FFD60A' },
+        { mode: 'focus',   start: 10, end: 14, color: '#0A84FF' },
+        { mode: 'wind',    start: 14, end: 18, color: '#FF9F0A' },
+        { mode: 'evening', start: 18, end: 21, color: '#FF6B35' },
+        { mode: 'night',   start: 21, end: 24, color: '#8B4513' },
+    ];
+
+    segments.forEach(seg => {
+        const el = document.createElement('div');
+        el.className = 'timeline-segment';
+        el.dataset.mode = seg.mode;
+        const width = ((seg.end - seg.start) / total) * 100;
+        el.style.width = width + '%';
+        el.style.background = seg.color;
+        el.style.opacity = seg.mode === currentMode ? '1' : '0.35';
+        bar.insertBefore(el, document.getElementById('timeline-cursor'));
+    });
+}
+
+function updateTimeline(h, m) {
+    // cursor position: map 6am-midnight to 0-100%
+    const hour = h + m / 60;
+    const clamped = Math.max(6, Math.min(24, hour));
+    const pct = ((clamped - 6) / 18) * 100;
+    document.getElementById('timeline-cursor').style.left = pct + '%';
+
+    // dim non-active segments
+    document.querySelectorAll('.timeline-segment').forEach(seg => {
+        seg.style.opacity = seg.dataset.mode === currentMode ? '1' : '0.35';
+    });
+}
+
+// ------- POMODORO TIMER -------
+let timerRunning = false;
+let timerInterval = null;
+let timerSeconds = 25 * 60;
+let isBreak = false;
+let pomodorosToday = 0;
+const FOCUS_DURATION = 25 * 60;
+const BREAK_DURATION = 5 * 60;
+
+function updateTimerDisplay() {
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    document.getElementById('timer-display').textContent = `${padZ(m)}:${padZ(s)}`;
+}
+
+function toggleTimer() {
+    if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById('timer-toggle-btn').textContent = 'Resume';
+    } else {
+        timerRunning = true;
+        document.getElementById('timer-toggle-btn').textContent = 'Pause';
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay();
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                playAlert();
+                if (!isBreak) {
+                    pomodorosToday++;
+                    updatePomoDots();
+                    isBreak = true;
+                    timerSeconds = BREAK_DURATION;
+                    document.getElementById('session-dot').className = 'break';
+                    document.getElementById('session-label').textContent = 'Break Time';
+                    document.getElementById('timer-toggle-btn').textContent = 'Start Break';
+                } else {
+                    isBreak = false;
+                    timerSeconds = FOCUS_DURATION;
+                    document.getElementById('session-dot').className = 'focus';
+                    document.getElementById('session-label').textContent = 'Focus Session';
+                    document.getElementById('timer-toggle-btn').textContent = 'Start Focus';
+                }
+                updateTimerDisplay();
+            }
+        }, 1000);
+    }
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    timerRunning = false;
+    isBreak = false;
+    timerSeconds = FOCUS_DURATION;
+    document.getElementById('session-dot').className = 'focus';
+    document.getElementById('session-label').textContent = 'Focus Session';
+    document.getElementById('timer-toggle-btn').textContent = 'Start';
+    updateTimerDisplay();
+}
+
+function updatePomoDots() {
+    const container = document.getElementById('pomo-dots');
+    document.getElementById('pomo-count-label').textContent =
+        `Today: ${pomodorosToday} session${pomodorosToday !== 1 ? 's' : ''} completed`;
+    container.innerHTML = '';
+    for (let i = 0; i < Math.max(4, pomodorosToday + 1); i++) {
+        const dot = document.createElement('div');
+        dot.className = 'pomo-dot' + (i < pomodorosToday ? ' done' : '');
+        container.appendChild(dot);
+    }
+}
+
+// ------- WEB AUDIO -------
+let audioCtx = null;
+let masterGain = null;
+let activeSound = null;
+let activeNodes = [];
+let currentSoundType = null;
+
+function getAudioCtx() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.4;
+        masterGain.connect(audioCtx.destination);
+    }
+    return audioCtx;
+}
+
+function stopAllSounds() {
+    activeNodes.forEach(n => {
+        try { n.stop(); } catch(e) {}
+        try { n.disconnect(); } catch(e) {}
+    });
+    activeNodes = [];
+    currentSoundType = null;
+
+    // update UI
+    ['brown','pink','binaural'].forEach(id => {
+        document.getElementById('sound-' + id).classList.remove('active');
+        document.getElementById('toggle-' + id).classList.remove('on');
+    });
+}
+
+function createNoiseBuffer(ctx, type) {
+    const bufferSize = ctx.sampleRate * 3;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    if (type === 'white' || type === 'brown') {
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            if (type === 'brown') {
+                lastOut = (lastOut + 0.02 * white) / 1.02;
+                data[i] = lastOut * 14;
+            } else {
+                data[i] = white;
+            }
+        }
+    } else if (type === 'pink') {
+        // Voss algorithm approximation
+        let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0;
+        for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + white * 0.5362) * 0.11;
+        }
+    }
+
+    return buffer;
+}
+
+function playBrownNoise() {
+    const ctx = getAudioCtx();
+    const buffer = createNoiseBuffer(ctx, 'brown');
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 600;
+    filter.Q.value = 0.3;
+
+    source.connect(filter);
+    filter.connect(masterGain);
+    source.start();
+    activeNodes.push(source, filter);
+}
+
+function playPinkNoise() {
+    const ctx = getAudioCtx();
+    const buffer = createNoiseBuffer(ctx, 'pink');
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+    source.connect(masterGain);
+    source.start();
+    activeNodes.push(source);
+}
+
+function playBinaural() {
+    const ctx = getAudioCtx();
+
+    // 40Hz binaural: left 200Hz, right 240Hz
+    const splitter = ctx.createChannelSplitter(2);
+    const merger = ctx.createChannelMerger(2);
+
+    const oscLeft = ctx.createOscillator();
+    oscLeft.type = 'sine';
+    oscLeft.frequency.value = 200;
+
+    const oscRight = ctx.createOscillator();
+    oscRight.type = 'sine';
+    oscRight.frequency.value = 240;
+
+    const gainLeft = ctx.createGain();
+    const gainRight = ctx.createGain();
+    gainLeft.gain.value = 0.5;
+    gainRight.gain.value = 0.5;
+
+    oscLeft.connect(gainLeft);
+    oscRight.connect(gainRight);
+
+    // Create stereo output
+    const stereoMerger = ctx.createChannelMerger(2);
+    gainLeft.connect(stereoMerger, 0, 0);
+    gainRight.connect(stereoMerger, 0, 1);
+    stereoMerger.connect(masterGain);
+
+    oscLeft.start();
+    oscRight.start();
+    activeNodes.push(oscLeft, oscRight, gainLeft, gainRight, stereoMerger);
+}
+
+function selectSound(type) {
+    if (currentSoundType === type) {
+        // toggle off
+        stopAllSounds();
+        return;
+    }
+
+    stopAllSounds();
+
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+
+    currentSoundType = type;
+
+    if (type === 'brown') playBrownNoise();
+    else if (type === 'pink') playPinkNoise();
+    else if (type === 'binaural') playBinaural();
+
+    document.getElementById('sound-' + type).classList.add('active');
+    document.getElementById('toggle-' + type).classList.add('on');
+}
+
+function setVolume(val) {
+    document.getElementById('volume-value').textContent = val + '%';
+    if (masterGain) {
+        masterGain.gain.value = val / 100;
+    }
+}
+
+// alert beep
+function playAlert() {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+}
+
+// ------- BREATHING -------
+const TECHNIQUES = {
+    '478': { name: '4-7-8 Sleep', phases: [
+        { label: 'Inhale',  duration: 4,  class: 'inhale',  scale: 1.6 },
+        { label: 'Hold',    duration: 7,  class: 'hold',    scale: 1.6 },
+        { label: 'Exhale',  duration: 8,  class: 'exhale',  scale: 1.0 },
+    ]},
+    box: { name: 'Box Breathing', phases: [
+        { label: 'Inhale',  duration: 4,  class: 'inhale',  scale: 1.6 },
+        { label: 'Hold',    duration: 4,  class: 'hold',    scale: 1.6 },
+        { label: 'Exhale',  duration: 4,  class: 'exhale',  scale: 1.0 },
+        { label: 'Hold',    duration: 4,  class: 'hold',    scale: 1.0 },
+    ]},
+    calm: { name: 'Calm Breathing', phases: [
+        { label: 'Inhale',  duration: 5,  class: 'inhale',  scale: 1.5 },
+        { label: 'Exhale',  duration: 5,  class: 'exhale',  scale: 1.0 },
+    ]},
+};
+
+let breathTechnique = '478';
+let breathRunning = false;
+let breathPhaseIndex = 0;
+let breathCycles = 0;
+let breathTimer = null;
+let breathSecondsLeft = 0;
+let breathSecondsInterval = null;
+
+function setTechnique(key, btn) {
+    if (breathRunning) stopBreath();
+    breathTechnique = key;
+    document.querySelectorAll('.technique-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    breathPhaseIndex = 0;
+    breathCycles = 0;
+    document.getElementById('breath-label').textContent = 'Ready';
+    document.getElementById('breath-countdown').textContent = '';
+    document.getElementById('breath-cycles').textContent = 'Cycles: 0';
+    const circle = document.getElementById('breath-circle');
+    circle.style.transform = 'scale(1)';
+    circle.className = '';
+}
+
+function toggleBreath() {
+    if (breathRunning) {
+        stopBreath();
+    } else {
+        startBreath();
+    }
+}
+
+function startBreath() {
+    breathRunning = true;
+    document.getElementById('breath-btn').textContent = 'Stop';
+    runBreathPhase();
+}
+
+function stopBreath() {
+    breathRunning = false;
+    clearTimeout(breathTimer);
+    clearInterval(breathSecondsInterval);
+    document.getElementById('breath-btn').textContent = 'Start';
+    document.getElementById('breath-label').textContent = 'Ready';
+    document.getElementById('breath-countdown').textContent = '';
+    const circle = document.getElementById('breath-circle');
+    circle.style.transform = 'scale(1)';
+    circle.className = '';
+}
+
+function runBreathPhase() {
+    if (!breathRunning) return;
+    const phases = TECHNIQUES[breathTechnique].phases;
+    const phase = phases[breathPhaseIndex];
+
+    const circle = document.getElementById('breath-circle');
+    circle.className = phase.class;
+    circle.style.transition = `transform ${phase.duration}s ease-in-out`;
+    circle.style.transform = `scale(${phase.scale})`;
+
+    document.getElementById('breath-label').textContent = phase.label;
+
+    breathSecondsLeft = phase.duration;
+    document.getElementById('breath-countdown').textContent = breathSecondsLeft;
+
+    clearInterval(breathSecondsInterval);
+    breathSecondsInterval = setInterval(() => {
+        breathSecondsLeft--;
+        document.getElementById('breath-countdown').textContent = Math.max(0, breathSecondsLeft);
+    }, 1000);
+
+    breathTimer = setTimeout(() => {
+        clearInterval(breathSecondsInterval);
+        breathPhaseIndex++;
+        if (breathPhaseIndex >= phases.length) {
+            breathPhaseIndex = 0;
+            breathCycles++;
+            document.getElementById('breath-cycles').textContent = `Cycles: ${breathCycles}`;
+        }
+        runBreathPhase();
+    }, phase.duration * 1000);
+}
+
+// ------- INIT -------
+function init() {
+    updateTimerDisplay();
+    updatePomoDots();
+    buildTimeline();
+
+    const now = new Date();
+    const hour = now.getHours();
+    const auto = getAutoMode(hour);
+    setMode(auto, false);
+
+    // mark auto button
+    const autoBtn = document.querySelector(`.mode-btn[data-mode="${auto}"]`);
+    if (autoBtn) autoBtn.classList.add('auto-tag');
+
+    tickClock();
+    setInterval(tickClock, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

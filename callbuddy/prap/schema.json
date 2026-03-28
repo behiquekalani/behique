@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PRAP Request",
+  "description": "Puerto Rico Agentic Protocol - Standard request schema for agent-to-agency communication.",
+  "type": "object",
+  "required": ["protocol_version", "transaction_id", "identity", "intent"],
+  "properties": {
+    "protocol_version": {
+      "type": "string",
+      "description": "PRAP protocol version (e.g. '1.0').",
+      "example": "1.0"
+    },
+    "transaction_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this transaction."
+    },
+    "identity": {
+      "type": "object",
+      "description": "Agent identity credentials.",
+      "required": ["passport_token"],
+      "properties": {
+        "passport_token": {
+          "type": "string",
+          "description": "Signed JWT from PRAP identity_signer."
+        },
+        "did": {
+          "type": "string",
+          "description": "Optional decentralized identifier for the agent or user.",
+          "example": "did:prap:agent:787123"
+        }
+      }
+    },
+    "intent": {
+      "type": "object",
+      "description": "What the agent wants to do.",
+      "required": ["domain", "action"],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Government domain (e.g. 'vehicles', 'taxes', 'elections').",
+          "enum": ["vehicles", "taxes", "elections", "fines", "appointments"]
+        },
+        "action": {
+          "type": "string",
+          "description": "Specific action to perform.",
+          "enum": ["renew_marbete", "property_tax", "voter_id", "pay_fine", "schedule_appointment"]
+        },
+        "params": {
+          "type": "object",
+          "description": "Action-specific parameters (e.g. plate number, account number).",
+          "additionalProperties": true
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Optional constraints on how the request should be handled.",
+      "properties": {
+        "max_wait_seconds": {
+          "type": "integer",
+          "description": "Maximum time the agent should wait for a response.",
+          "default": 300
+        },
+        "preferred_language": {
+          "type": "string",
+          "description": "Preferred language for the interaction.",
+          "enum": ["es", "en"],
+          "default": "es"
+        },
+        "fallback_allowed": {
+          "type": "boolean",
+          "description": "Whether Shadow Protocol (voice fallback via CallBuddy) is allowed.",
+          "default": true
+        },
+        "require_confirmation": {
+          "type": "boolean",
+          "description": "Whether the agent must confirm with the user before executing.",
+          "default": true
+        }
+      }
+    }
+  }
+}

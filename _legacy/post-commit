@@ -1,0 +1,14 @@
+#!/bin/bash
+# post-commit hook — auto-logs every commit to project_memory.md
+# Install: copy this file to .git/hooks/post-commit and run chmod +x .git/hooks/post-commit
+
+MEMORY_FILE="project_memory.md"
+TIMESTAMP=$(date "+%Y-%m-%d %H:%M")
+BRANCH=$(git branch --show-current)
+COMMIT_MSG=$(git log -1 --pretty=%B)
+COMMIT_HASH=$(git log -1 --pretty=%h)
+FILES_CHANGED=$(git diff-tree --no-commit-id -r --name-only HEAD | tr '\n' ', ')
+
+echo "- [$TIMESTAMP] [$BRANCH] $COMMIT_HASH: $COMMIT_MSG (files: $FILES_CHANGED)" >> $MEMORY_FILE
+
+echo "✓ Logged to $MEMORY_FILE"

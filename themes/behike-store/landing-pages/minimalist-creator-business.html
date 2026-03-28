@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Minimalist Creator's Business — Behike</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #000000;
+    color: #F5F5F7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  /* Nav */
+  nav {
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 18px 0;
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+  }
+  nav .inner {
+    max-width: 980px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand {
+    font-size: 15px; font-weight: 600; letter-spacing: 0.04em;
+    color: #F5F5F7; text-decoration: none; text-transform: uppercase;
+  }
+  .nav-cta {
+    background: #30D158; color: #000; padding: 8px 20px;
+    border-radius: 980px; font-size: 14px; font-weight: 600;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* Hero */
+  .hero {
+    padding: 120px 0 80px;
+    text-align: center;
+  }
+  .hero-label {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #0A84FF;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 700; letter-spacing: -0.03em;
+    line-height: 1.08;
+    margin-bottom: 24px;
+    max-width: 800px; margin-left: auto; margin-right: auto;
+  }
+  .hero h1 em { font-style: normal; color: #0A84FF; }
+  .hero-sub {
+    font-size: 19px; color: rgba(245,245,247,0.7);
+    max-width: 560px; margin: 0 auto 48px;
+    line-height: 1.5;
+  }
+  .price-block {
+    display: inline-flex; align-items: center; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .price { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; }
+  .price-note { font-size: 13px; color: rgba(245,245,247,0.45); text-align: left; line-height: 1.4; }
+  .btn-primary {
+    display: inline-block;
+    background: #30D158; color: #000;
+    padding: 16px 40px; border-radius: 980px;
+    font-size: 17px; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+    letter-spacing: -0.01em;
+  }
+  .btn-primary:hover { background: #28b84e; transform: translateY(-1px); }
+  .hero-meta {
+    margin-top: 24px;
+    font-size: 13px; color: rgba(245,245,247,0.4);
+  }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 72px;
+  }
+  @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr; } }
+  .stat-item {
+    background: #000;
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 40px; font-weight: 700;
+    letter-spacing: -0.04em; color: #0A84FF;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 13px; color: rgba(245,245,247,0.5);
+    margin-top: 6px;
+  }
+
+  /* Section */
+  .section { padding: 96px 0; }
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #0A84FF; margin-bottom: 16px;
+  }
+  .section h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.15; margin-bottom: 24px;
+  }
+  .section p {
+    color: rgba(245,245,247,0.75);
+    max-width: 620px; margin-bottom: 20px;
+  }
+  .divider {
+    border: none; border-top: 1px solid rgba(255,255,255,0.08);
+    margin: 0;
+  }
+
+  /* Cost cards */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 48px;
+  }
+  .cost-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 28px 24px;
+  }
+  .cost-card .tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #FF453A;
+    margin-bottom: 10px;
+  }
+  .cost-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  .cost-card p { font-size: 14px; color: rgba(245,245,247,0.5); margin: 0; }
+
+  /* Thesis */
+  .thesis-block {
+    background: rgba(10,132,255,0.07);
+    border: 1px solid rgba(10,132,255,0.2);
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin: 72px 0;
+    text-align: center;
+  }
+  .thesis-block blockquote {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 500; letter-spacing: -0.02em;
+    line-height: 1.35; color: #F5F5F7;
+    max-width: 700px; margin: 0 auto;
+  }
+  .thesis-block cite {
+    display: block; margin-top: 20px;
+    font-size: 13px; color: rgba(245,245,247,0.4);
+    font-style: normal;
+  }
+
+  /* Contents */
+  .contents-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 56px;
+  }
+  @media (max-width: 680px) { .contents-grid { grid-template-columns: 1fr; gap: 28px; } }
+  .chapter-item {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 20px;
+  }
+  .chapter-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #0A84FF; margin-bottom: 8px;
+  }
+  .chapter-item h3 {
+    font-size: 18px; font-weight: 600;
+    letter-spacing: -0.01em; margin-bottom: 8px;
+  }
+  .chapter-item p {
+    font-size: 14px; color: rgba(245,245,247,0.55); margin: 0;
+  }
+
+  /* MVB model */
+  .mvb-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+  @media (max-width: 600px) { .mvb-grid { grid-template-columns: 1fr; } }
+  .mvb-card {
+    background: rgba(48,209,88,0.05);
+    border: 1px solid rgba(48,209,88,0.2);
+    border-radius: 14px;
+    padding: 28px 24px;
+  }
+  .mvb-card .mvb-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #30D158; margin-bottom: 10px;
+  }
+  .mvb-card h4 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  .mvb-card p { font-size: 14px; color: rgba(245,245,247,0.6); margin: 0; }
+
+  /* 4-hour section */
+  .hours-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+  @media (max-width: 680px) { .hours-row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 400px) { .hours-row { grid-template-columns: 1fr; } }
+  .hour-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .hour-num {
+    font-size: 32px; font-weight: 700;
+    color: #30D158; letter-spacing: -0.04em;
+    line-height: 1; margin-bottom: 8px;
+  }
+  .hour-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .hour-card p { font-size: 12px; color: rgba(245,245,247,0.45); margin: 0; }
+
+  /* For who */
+  .for-section { padding: 80px 0; }
+  .for-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  @media (max-width: 680px) { .for-grid { grid-template-columns: 1fr; } }
+  .for-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+  }
+  .check {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(48,209,88,0.15);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #30D158; margin-top: 2px;
+  }
+  .for-item p { font-size: 15px; color: rgba(245,245,247,0.8); margin: 0; }
+
+  /* CTA */
+  .cta-section {
+    padding: 120px 0;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 0%, rgba(48,209,88,0.07) 0%, transparent 70%);
+  }
+  .cta-section h2 {
+    font-size: clamp(30px, 5vw, 52px);
+    font-weight: 700; letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    font-size: 17px; color: rgba(245,245,247,0.6);
+    max-width: 480px; margin: 0 auto 40px;
+  }
+  .cta-price-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 20px; margin-bottom: 32px;
+  }
+  .cta-price { font-size: 52px; font-weight: 700; letter-spacing: -0.04em; }
+  .cta-includes {
+    font-size: 13px; color: rgba(245,245,247,0.4);
+    margin-top: 20px;
+  }
+  .cta-includes span { color: rgba(245,245,247,0.7); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 32px 0;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(245,245,247,0.3);
+  }
+  footer a { color: rgba(245,245,247,0.4); text-decoration: none; }
+  footer a:hover { color: rgba(245,245,247,0.7); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a class="nav-brand" href="/">Behike</a>
+    <a class="nav-cta" href="https://behikeai.gumroad.com/l/minimalist-creator-business">Get It — $17.99</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="reveal">
+      <span class="hero-label">Business Design</span>
+      <h1>The Minimalist <em>Creator's</em> Business</h1>
+      <p class="hero-sub">Build less. Earn more. Keep it running in four hours a day.</p>
+      <div class="price-block">
+        <div class="price">$17.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <br>
+      <a href="https://behikeai.gumroad.com/l/minimalist-creator-business" class="btn-primary">Get the Guide</a>
+      <p class="hero-meta">5,000+ words. Worksheets included. No fluff.</p>
+    </div>
+
+    <div class="stats-row reveal">
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Focused hours per day is enough</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Channel. Done right, beats five done poorly</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">80%</div>
+        <div class="stat-label">Of your results come from 20% of your activities</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">The Core Problem</p>
+      <h2>You built complexity.<br>It is costing you more than you know.</h2>
+      <p>Every tool you added solved a problem. Every platform you joined was someone's good advice. Every product you created came from a real idea. The decisions made sense individually. The aggregate result is a business that feels like a second job.</p>
+      <p>The complexity trap is not about bad decisions. It is about building by accumulation rather than design. This guide is a framework for stripping back to what matters and rebuilding with intention.</p>
+    </div>
+    <div class="cost-grid">
+      <div class="cost-card reveal">
+        <p class="tag">Time Cost</p>
+        <h3>Tool and Platform Maintenance</h3>
+        <p>Every tool and platform consumes maintenance time that compounds invisibly until it owns your schedule.</p>
+      </div>
+      <div class="cost-card reveal">
+        <p class="tag">Attention Cost</p>
+        <h3>Fragmented Focus</h3>
+        <p>Each additional project divides your attention further. Quality degrades before output does.</p>
+      </div>
+      <div class="cost-card reveal">
+        <p class="tag">Opportunity Cost</p>
+        <h3>Maintaining the Wrong Things</h3>
+        <p>Time spent on what is not working is time not spent doubling down on what is.</p>
+      </div>
+      <div class="cost-card reveal">
+        <p class="tag">Clarity Cost</p>
+        <h3>Can't See What Works</h3>
+        <p>Five channels and three products create tangled data. You cannot optimize what you cannot see clearly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<div class="thesis-block reveal container">
+  <blockquote>
+    "Simplicity is not about earning less. It is about removing the friction that prevents you from earning what your best work deserves."
+  </blockquote>
+  <cite>From The Minimalist Creator's Business</cite>
+</div>
+
+<hr class="divider">
+
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">The Minimum Viable Business</p>
+      <h2>Four components. That is it.</h2>
+      <p>A minimum viable creator business does not need ten products, five channels, and a sophisticated funnel architecture. It needs four things done well.</p>
+    </div>
+    <div class="mvb-grid">
+      <div class="mvb-card reveal">
+        <p class="mvb-label">Component 01</p>
+        <h4>One Primary Channel</h4>
+        <p>Full commitment to one platform where your best thinking lives. Not repurposing from elsewhere. Primary creation.</p>
+      </div>
+      <div class="mvb-card reveal">
+        <p class="mvb-label">Component 02</p>
+        <h4>One Email List</h4>
+        <p>The only audience you own. Every social platform can change its algorithm or disappear. Your list is yours.</p>
+      </div>
+      <div class="mvb-card reveal">
+        <p class="mvb-label">Component 03</p>
+        <h4>One to Two Products</h4>
+        <p>Not a catalog. One product that solves the core problem, or two at different price points that work together.</p>
+      </div>
+      <div class="mvb-card reveal">
+        <p class="mvb-label">Component 04</p>
+        <h4>One Clear Path</h4>
+        <p>From content to email list. From email list to product. Direct, simple, and obvious. Not a seven-step funnel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">What Is Inside</p>
+      <h2>A systematic approach to building less and earning more.</h2>
+    </div>
+    <div class="contents-grid">
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 01</p>
+        <h3>The Complexity Trap</h3>
+        <p>How you got here, what complexity actually costs, and why the full-stack creator model is a performance, not a business.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 02</p>
+        <h3>The Case for Building Less</h3>
+        <p>The 20% that produces 80% of results, why simplicity and revenue are not in conflict, and how focus creates compound returns.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 03</p>
+        <h3>The Minimum Viable Business Model</h3>
+        <p>The four-component foundation, the revenue math on a minimal model, and when to expand beyond it.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 04</p>
+        <h3>Eliminating Dead Weight</h3>
+        <p>How to identify what is not working, the four-category cutting framework, and how to stop things cleanly.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 05</p>
+        <h3>Simplifying Your Tech Stack</h3>
+        <p>The minimal creator stack, how to audit your current subscriptions, and how to resist adding more tools.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 06</p>
+        <h3>The One-Channel Focus Strategy</h3>
+        <p>Why single-channel dominance works, how to choose your primary platform, and when to go wide.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 07</p>
+        <h3>The Four-Hour Business Day</h3>
+        <p>What four hours actually covers, how to design for focus, and the weekly operating rhythm that makes it sustainable.</p>
+      </div>
+      <div class="chapter-item reveal">
+        <p class="chapter-num">Part 08</p>
+        <h3>What to Cut When Overwhelmed</h3>
+        <p>The overwhelm triage protocol, the minimum viable operation, and how to rebuild with intention.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">The Four-Hour Day</p>
+      <h2>Four focused hours is a design outcome.</h2>
+      <p>When the architecture is right, a lean creator business does not require more than four to five focused hours a day to maintain and grow. Here is what those hours cover.</p>
+    </div>
+    <div class="hours-row">
+      <div class="hour-card reveal">
+        <div class="hour-num">1h</div>
+        <h4>Content Creation</h4>
+        <p>Write, record, or produce. One thing at a time. No multitasking.</p>
+      </div>
+      <div class="hour-card reveal">
+        <div class="hour-num">1h</div>
+        <h4>Product and Strategy</h4>
+        <p>Build your product, improve your offer, or do strategic thinking.</p>
+      </div>
+      <div class="hour-card reveal">
+        <div class="hour-num">1h</div>
+        <h4>Distribution</h4>
+        <p>Publish, engage with comments and email, show up in the community.</p>
+      </div>
+      <div class="hour-card reveal">
+        <div class="hour-num">1h</div>
+        <h4>Operations</h4>
+        <p>Admin, analytics, reading. The work that keeps the machine running.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="for-section">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-label">Who This Is For</p>
+      <h2>For builders who want a business, not a second job.</h2>
+    </div>
+    <div class="for-grid">
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Solopreneurs who feel like they are maintaining more than they are building</p>
+      </div>
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Creators who have added too many platforms and none of them are working</p>
+      </div>
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Anyone running five tools where two would do</p>
+      </div>
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Builders who want to work four focused hours and actually be done for the day</p>
+      </div>
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Creators who want to be excellent in one place instead of mediocre everywhere</p>
+      </div>
+      <div class="for-item reveal">
+        <div class="check">&#10003;</div>
+        <p>Anyone who has built something complicated and wants a clear path to simplify it</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section class="cta-section">
+  <div class="container">
+    <div class="reveal">
+      <h2>Build the business that fits your life.</h2>
+      <p>A 5,000-word framework with worksheets for business triage, minimal tech stack audit, and the subtraction rule for avoiding complexity creep.</p>
+      <div class="cta-price-row">
+        <div class="cta-price">$17.99</div>
+      </div>
+      <a href="https://behikeai.gumroad.com/l/minimalist-creator-business" class="btn-primary">Get The Minimalist Creator's Business</a>
+      <p class="cta-includes">Includes: <span>PDF guide</span>, <span>business triage worksheet</span>, <span>tech stack audit</span>, <span>weekly four-hour schedule</span>, <span>minimum viable operation checklist</span></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      <a href="/">Behike</a> &nbsp;|&nbsp;
+      <a href="https://behikeai.gumroad.com">Store</a> &nbsp;|&nbsp;
+      <a href="https://instagram.com/behikeai">Instagram</a>
+    </p>
+    <p style="margin-top:10px;">Built by Behike. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

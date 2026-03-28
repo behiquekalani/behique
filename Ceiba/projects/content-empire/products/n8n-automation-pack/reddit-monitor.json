@@ -1,0 +1,151 @@
+{
+  "name": "Reddit Keyword Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "b8c9d0e1-0001-4000-8000-000000000001",
+      "name": "Schedule Trigger - Every 2 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://oauth.reddit.com/search.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "q", "value": "digital products OR solopreneur OR \"AI tools\" OR \"passive income\" OR \"n8n automation\"" },
+            { "name": "sort", "value": "new" },
+            { "name": "limit", "value": "25" },
+            { "name": "t", "value": "day" },
+            { "name": "type", "value": "link,self" }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "BehikeBot/1.0 by YOUR_REDDIT_USERNAME_HERE" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8c9d0e1-0002-4000-8000-000000000002",
+      "name": "HTTP Request - Reddit Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "notes": "Requires Reddit OAuth2 app. Create at reddit.com/prefs/apps. Use Authorization header: Bearer YOUR_REDDIT_ACCESS_TOKEN_HERE"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.data?.children?.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b8c9d0e1-0003-4000-8000-000000000003",
+      "name": "IF - New Posts Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter and format Reddit posts\nconst response = $input.first().json;\nconst posts = response?.data?.children || [];\n\n// Score each post by engagement and relevance\nconst scored = posts\n  .map(p => {\n    const post = p.data;\n    const score = post.score + (post.num_comments * 3); // weight comments higher\n    return {\n      id: post.id,\n      title: post.title,\n      subreddit: post.subreddit_name_prefixed,\n      score: post.score,\n      comments: post.num_comments,\n      engagementScore: score,\n      url: `https://reddit.com${post.permalink}`,\n      externalUrl: post.url,\n      author: post.author,\n      created: new Date(post.created_utc * 1000).toISOString(),\n      selftext: (post.selftext || '').substring(0, 300)\n    };\n  })\n  .filter(p => p.engagementScore > 5) // filter low-engagement\n  .sort((a, b) => b.engagementScore - a.engagementScore)\n  .slice(0, 5); // top 5 only\n\nreturn [{\n  json: {\n    postCount: scored.length,\n    topPosts: scored,\n    digestTime: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "b8c9d0e1-0004-4000-8000-000000000004",
+      "name": "Code - Filter Relevant Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID_HERE",
+        "text": "Reddit Digest — {{ $json.postCount }} posts\n\n{{ $json.topPosts.map((p, i) => `${i+1}. ${p.title}\\n   ${p.subreddit} | ${p.score} upvotes | ${p.comments} comments\\n   ${p.url}`).join('\\n\\n') }}\n\n{{ $json.digestTime }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "b8c9d0e1-0005-4000-8000-000000000005",
+      "name": "Telegram - Send Digest",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1120, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Every 2 Hours": {
+      "main": [
+        [
+          { "node": "HTTP Request - Reddit Search", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "HTTP Request - Reddit Search": {
+      "main": [
+        [
+          { "node": "IF - New Posts Found?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "IF - New Posts Found?": {
+      "main": [
+        [
+          { "node": "Code - Filter Relevant Posts", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    },
+    "Code - Filter Relevant Posts": {
+      "main": [
+        [
+          { "node": "Telegram - Send Digest", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "reddit", "market-research", "monitoring"]
+}

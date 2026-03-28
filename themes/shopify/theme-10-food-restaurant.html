@@ -1,0 +1,497 @@
+<!--
+  SHOPIFY THEME: Food / Restaurant
+  ================================
+  Shopify Liquid Conversion Notes:
+  - Replace logo placeholder with: {{ shop.name }} or {{ 'logo.png' | asset_url | img_tag }}
+  - Replace hero image placeholder with: {{ section.settings.hero_image | img_url: '1920x' | img_tag }}
+  - Replace dish cards with: {% for product in collections['featured-dishes'].products limit:4 %}
+  - Replace prices with: {{ product.price | money }}
+  - Replace cart icon count with: {{ cart.item_count }}
+  - Replace newsletter form action with: {% form 'customer' %}...{% endform %}
+  - Extract CSS custom properties into theme settings via settings_schema.json
+  - Move sections into /sections/*.liquid files for drag-and-drop customization
+  - Replace testimonials with metafield content or section blocks
+  - Add {{ content_for_header }} to <head> and {{ content_for_layout }} to body
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Mesa - Authentic Flavors</title>
+  <style>
+    :root {
+      --color-bg: #0a1f0a;
+      --color-bg-light: #132613;
+      --color-bg-card: #1a2e1a;
+      --color-gold: #d4a74a;
+      --color-gold-light: #e8c97a;
+      --color-gold-dark: #b8903a;
+      --color-text: #e8e0d4;
+      --color-text-muted: #a89e90;
+      --color-white: #fff;
+      --color-overlay: rgba(10, 31, 10, 0.85);
+      --font-heading: Georgia, 'Times New Roman', serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--color-gold); text-decoration: none; transition: color var(--transition); }
+    a:hover { color: var(--color-gold-light); }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    /* ===== NAVIGATION ===== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: var(--color-overlay);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212, 167, 74, 0.15);
+      padding: 16px 0;
+      transition: padding var(--transition);
+    }
+
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-size: 1.6rem; color: var(--color-gold);
+      letter-spacing: 0.04em; font-weight: 700;
+    }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; align-items: center; }
+
+    .nav-links a {
+      color: var(--color-text); font-size: 0.9rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      position: relative; padding-bottom: 4px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1px; background: var(--color-gold);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover { color: var(--color-gold); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cart {
+      position: relative; color: var(--color-text);
+      font-size: 1.2rem; cursor: pointer; transition: color var(--transition);
+    }
+    .nav-cart:hover { color: var(--color-gold); }
+    .nav-cart-count {
+      position: absolute; top: -8px; right: -10px;
+      background: var(--color-gold); color: var(--color-bg);
+      font-size: 0.65rem; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-toggle { display: none; background: none; border: none; color: var(--color-text); font-size: 1.5rem; cursor: pointer; }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; overflow: hidden;
+    }
+
+    .hero-image {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #2d1a0a 0%, #1a3a1a 50%, #0a1f0a 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted); font-size: 1.2rem; font-style: italic;
+    }
+    .hero-image::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(10,31,10,0.4) 0%, rgba(10,31,10,0.8) 100%);
+    }
+
+    .hero-content { position: relative; z-index: 2; padding: 0 24px; max-width: 720px; }
+
+    .hero-label {
+      font-family: var(--font-body); font-size: 0.85rem;
+      text-transform: uppercase; letter-spacing: 0.25em;
+      color: var(--color-gold); margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: var(--font-heading); font-size: clamp(2.4rem, 5vw, 4rem);
+      color: var(--color-white); line-height: 1.15;
+      margin-bottom: 20px; font-weight: 400;
+    }
+
+    .hero p {
+      font-size: 1.1rem; color: var(--color-text-muted);
+      margin-bottom: 36px; max-width: 520px; margin-left: auto; margin-right: auto;
+    }
+
+    .btn {
+      display: inline-block; padding: 14px 40px;
+      font-family: var(--font-body); font-size: 0.85rem;
+      text-transform: uppercase; letter-spacing: 0.15em;
+      border: 2px solid var(--color-gold); color: var(--color-gold);
+      background: transparent; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn:hover {
+      background: var(--color-gold); color: var(--color-bg);
+    }
+    .btn-filled {
+      background: var(--color-gold); color: var(--color-bg);
+    }
+    .btn-filled:hover {
+      background: var(--color-gold-light); color: var(--color-bg);
+      border-color: var(--color-gold-light);
+    }
+
+    /* ===== SECTION COMMON ===== */
+    .section { padding: 100px 0; }
+    .section-label {
+      font-size: 0.8rem; text-transform: uppercase;
+      letter-spacing: 0.2em; color: var(--color-gold); margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-heading); font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--color-white); margin-bottom: 16px; font-weight: 400;
+    }
+    .section-subtitle {
+      color: var(--color-text-muted); max-width: 560px;
+      margin-bottom: 48px; font-size: 1rem;
+    }
+    .text-center { text-align: center; }
+    .text-center .section-subtitle { margin-left: auto; margin-right: auto; }
+
+    /* ===== FEATURED DISHES ===== */
+    .dishes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 28px;
+    }
+
+    .dish-card {
+      background: var(--color-bg-card);
+      border: 1px solid rgba(212, 167, 74, 0.1);
+      overflow: hidden; transition: transform var(--transition), border-color var(--transition);
+    }
+    .dish-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(212, 167, 74, 0.3);
+    }
+
+    .dish-image {
+      width: 100%; aspect-ratio: 4/3;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--color-text-muted); font-style: italic;
+    }
+    .dish-card:nth-child(1) .dish-image { background: linear-gradient(135deg, #3a2a10, #2a1a08); }
+    .dish-card:nth-child(2) .dish-image { background: linear-gradient(135deg, #1a3020, #0f2010); }
+    .dish-card:nth-child(3) .dish-image { background: linear-gradient(135deg, #302010, #201508); }
+    .dish-card:nth-child(4) .dish-image { background: linear-gradient(135deg, #1a2a20, #102018); }
+
+    .dish-info { padding: 24px; }
+    .dish-name {
+      font-family: var(--font-heading); font-size: 1.2rem;
+      color: var(--color-white); margin-bottom: 8px;
+    }
+    .dish-desc { font-size: 0.9rem; color: var(--color-text-muted); margin-bottom: 16px; }
+    .dish-price { font-size: 1.1rem; color: var(--color-gold); font-weight: 600; }
+
+    /* ===== ABOUT ===== */
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .about-image {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, #2a1a08, #1a3018);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted); font-style: italic; font-size: 0.95rem;
+      border: 1px solid rgba(212, 167, 74, 0.1);
+    }
+    .about-text .section-subtitle { margin-bottom: 20px; }
+    .about-text p { color: var(--color-text-muted); margin-bottom: 16px; font-size: 0.95rem; line-height: 1.8; }
+    .about-signature {
+      font-family: var(--font-heading); font-size: 1.3rem;
+      color: var(--color-gold); margin-top: 24px; font-style: italic;
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    .testimonials { background: var(--color-bg-light); }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px;
+    }
+    .testimonial-card {
+      background: var(--color-bg-card); padding: 36px;
+      border: 1px solid rgba(212, 167, 74, 0.08);
+      transition: border-color var(--transition);
+    }
+    .testimonial-card:hover { border-color: rgba(212, 167, 74, 0.25); }
+    .testimonial-stars { color: var(--color-gold); font-size: 0.9rem; margin-bottom: 16px; letter-spacing: 4px; }
+    .testimonial-text {
+      font-size: 0.95rem; color: var(--color-text); line-height: 1.8;
+      margin-bottom: 20px; font-style: italic;
+    }
+    .testimonial-author { font-size: 0.85rem; color: var(--color-gold); font-weight: 600; }
+    .testimonial-date { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 4px; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--color-bg-light);
+      border-top: 1px solid rgba(212, 167, 74, 0.1);
+      padding: 80px 0 40px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px;
+      margin-bottom: 48px;
+    }
+    .footer-heading {
+      font-family: var(--font-heading); font-size: 1.1rem;
+      color: var(--color-white); margin-bottom: 20px;
+    }
+    .footer p, .footer li { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.8; }
+    .footer ul { list-style: none; }
+    .footer ul a { color: var(--color-text-muted); }
+    .footer ul a:hover { color: var(--color-gold); }
+
+    .footer-hours span { display: block; }
+    .footer-hours .day { color: var(--color-text); font-weight: 600; }
+
+    .social-links { display: flex; gap: 16px; margin-top: 12px; }
+    .social-link {
+      width: 40px; height: 40px;
+      border: 1px solid rgba(212, 167, 74, 0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted); font-size: 0.75rem; font-weight: 700;
+      transition: all var(--transition);
+    }
+    .social-link:hover {
+      border-color: var(--color-gold); color: var(--color-gold);
+    }
+
+    .newsletter-form { display: flex; gap: 0; margin-top: 8px; }
+    .newsletter-input {
+      flex: 1; padding: 12px 16px;
+      background: var(--color-bg); border: 1px solid rgba(212, 167, 74, 0.2);
+      color: var(--color-text); font-size: 0.85rem;
+      border-right: none; outline: none;
+      transition: border-color var(--transition);
+    }
+    .newsletter-input::placeholder { color: var(--color-text-muted); }
+    .newsletter-input:focus { border-color: var(--color-gold); }
+    .newsletter-btn {
+      padding: 12px 20px; background: var(--color-gold); color: var(--color-bg);
+      border: 1px solid var(--color-gold); font-size: 0.8rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      cursor: pointer; font-weight: 600; transition: background var(--transition);
+    }
+    .newsletter-btn:hover { background: var(--color-gold-light); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(212, 167, 74, 0.08);
+      padding-top: 24px; text-align: center;
+      font-size: 0.8rem; color: var(--color-text-muted);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .nav-links.active {
+        display: flex; flex-direction: column;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--color-overlay); backdrop-filter: blur(12px);
+        padding: 24px; gap: 20px;
+        border-bottom: 1px solid rgba(212, 167, 74, 0.15);
+      }
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .section { padding: 64px 0; }
+      .hero { min-height: 90vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">La Mesa</a>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('active')" aria-label="Toggle menu">&#9776;</button>
+      <ul class="nav-links">
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#testimonials">Reservations</a></li>
+        <li><a href="#footer">Contact</a></li>
+        <li>
+          <span class="nav-cart">
+            &#128722;
+            <span class="nav-cart-count">0</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-image">Hero Image</div>
+    <div class="hero-content">
+      <p class="hero-label">Est. 2024</p>
+      <h1>Authentic flavors, crafted with passion</h1>
+      <p>Every dish tells a story. From locally sourced ingredients to time-honored recipes, we bring the warmth of home to your table.</p>
+      <a href="#menu" class="btn">View Our Menu</a>
+    </div>
+  </section>
+
+  <!-- Featured Dishes -->
+  <section class="section" id="menu">
+    <div class="container text-center">
+      <p class="section-label">Our Favorites</p>
+      <h2 class="section-title">Featured Dishes</h2>
+      <p class="section-subtitle">Seasonal highlights from our kitchen, prepared fresh daily with ingredients from local farms and markets.</p>
+      <div class="dishes-grid">
+        <div class="dish-card">
+          <div class="dish-image">Dish Photo</div>
+          <div class="dish-info">
+            <h3 class="dish-name">Braised Short Rib</h3>
+            <p class="dish-desc">Slow-cooked for eight hours with root vegetables, red wine reduction, and fresh herbs.</p>
+            <span class="dish-price">$34.00</span>
+          </div>
+        </div>
+        <div class="dish-card">
+          <div class="dish-image">Dish Photo</div>
+          <div class="dish-info">
+            <h3 class="dish-name">Herb-Crusted Salmon</h3>
+            <p class="dish-desc">Wild-caught Atlantic salmon with a dill crust, served over roasted fennel and citrus.</p>
+            <span class="dish-price">$29.00</span>
+          </div>
+        </div>
+        <div class="dish-card">
+          <div class="dish-image">Dish Photo</div>
+          <div class="dish-info">
+            <h3 class="dish-name">Wild Mushroom Risotto</h3>
+            <p class="dish-desc">Arborio rice with porcini, chanterelle, and truffle oil, finished with aged parmesan.</p>
+            <span class="dish-price">$26.00</span>
+          </div>
+        </div>
+        <div class="dish-card">
+          <div class="dish-image">Dish Photo</div>
+          <div class="dish-info">
+            <h3 class="dish-name">Grilled Lamb Chops</h3>
+            <p class="dish-desc">New Zealand lamb with rosemary-garlic marinade, pomegranate glaze, and mint yogurt.</p>
+            <span class="dish-price">$38.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image">Restaurant Interior Photo</div>
+        <div class="about-text">
+          <p class="section-label">Our Story</p>
+          <h2 class="section-title">A tradition built on flavor</h2>
+          <p>La Mesa began as a simple idea: bring people together around food that matters. What started in a small kitchen with family recipes has grown into a gathering place for the community.</p>
+          <p>Our chef sources ingredients from local farms every morning. The menu changes with the seasons because we believe the best food comes from what the land gives us right now. No shortcuts, no compromises.</p>
+          <p>Every plate that leaves our kitchen carries the same care we would put into a meal for our own family.</p>
+          <p class="about-signature">Chef Marco, Founder</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="section testimonials" id="testimonials">
+    <div class="container text-center">
+      <p class="section-label">What People Say</p>
+      <h2 class="section-title">From Our Guests</h2>
+      <p class="section-subtitle">Real words from the people who share our table.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The braised short rib was unlike anything I have had before. You can taste the time and care in every bite. This place is special."</p>
+          <p class="testimonial-author">Sofia M.</p>
+          <p class="testimonial-date">February 2026</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"We came for a birthday dinner and left feeling like family. The staff, the atmosphere, and the food were all incredible. Already planning our next visit."</p>
+          <p class="testimonial-author">David R.</p>
+          <p class="testimonial-date">January 2026</p>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I am a regular now. The mushroom risotto is my go-to, but honestly everything on the menu is worth trying. Consistently excellent."</p>
+          <p class="testimonial-author">Ana L.</p>
+          <p class="testimonial-date">March 2026</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3 class="footer-heading">La Mesa</h3>
+          <p>Authentic flavors, crafted with passion. Join us for an experience that nourishes both body and soul.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Instagram">IG</a>
+            <a href="#" class="social-link" aria-label="Facebook">FB</a>
+            <a href="#" class="social-link" aria-label="Twitter">TW</a>
+            <a href="#" class="social-link" aria-label="TikTok">TK</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="footer-heading">Hours</h3>
+          <div class="footer-hours">
+            <p><span class="day">Monday - Thursday</span> 5:00 PM - 10:00 PM</p>
+            <p><span class="day">Friday - Saturday</span> 5:00 PM - 11:00 PM</p>
+            <p><span class="day">Sunday</span> 11:00 AM - 9:00 PM (Brunch from 11-3)</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="footer-heading">Location</h3>
+          <p>123 Main Street<br>San Juan, PR 00901</p>
+          <p style="margin-top: 12px;">
+            <a href="tel:+17875551234">(787) 555-1234</a><br>
+            <a href="mailto:hello@lamesa.com">hello@lamesa.com</a>
+          </p>
+        </div>
+        <div>
+          <h3 class="footer-heading">Newsletter</h3>
+          <p>Get updates on seasonal menus, special events, and exclusive offers.</p>
+          <form class="newsletter-form" onsubmit="event.preventDefault();">
+            <input type="email" class="newsletter-input" placeholder="Your email" aria-label="Email address" required>
+            <button type="submit" class="newsletter-btn">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 La Mesa. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Storytelling Masterclass — Behike</title>
+  <meta name="description" content="The one skill that separates forgotten content from content that spreads. A complete storytelling framework for creators who want their content to do what it was designed to do.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a845;
+      --border: rgba(255,255,255,0.08);
+      --card-bg: rgba(255,255,255,0.04);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-price {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+    }
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .price-tag {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .price-tag span {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-left: 4px;
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      color: var(--text-secondary);
+      font-size: 18px;
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* FADE IN */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .hero-eyebrow.visible,
+    .hero-title.visible,
+    .hero-subtitle.visible,
+    .hero-cta-group.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* PROBLEM SECTION */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* WHAT'S INSIDE */
+    .chapters-list {
+      margin-top: 48px;
+      display: grid;
+      gap: 2px;
+    }
+    .chapter-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    .chapter-item:last-child {
+      border-bottom: none;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      padding-top: 3px;
+    }
+    .chapter-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .chapter-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .for-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .for-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cta);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+    .for-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* THESIS BOX */
+    .thesis-box {
+      background: rgba(10, 132, 255, 0.06);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 16px;
+      padding: 40px;
+      margin-top: 48px;
+    }
+    .thesis-box p {
+      font-size: 20px;
+      line-height: 1.65;
+      color: var(--text);
+      max-width: 700px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta .section-title {
+      margin-bottom: 16px;
+    }
+    .final-cta .section-body {
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+    .final-cta .price-tag {
+      display: block;
+      margin-bottom: 24px;
+      font-size: 36px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    footer a:hover {
+      color: var(--text);
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 60px 0 48px; }
+      section { padding: 60px 0; }
+      .thesis-box { padding: 28px; }
+      .thesis-box p { font-size: 17px; }
+      .btn-primary { padding: 14px 28px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/index.html" class="nav-brand">Behike</a>
+      <span class="nav-price">$23.99 — Digital PDF</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" style="border-top: none;">
+    <div class="container">
+      <p class="hero-eyebrow">Creator's Storytelling Masterclass</p>
+      <h1 class="hero-title">The one skill that separates forgotten content from content that spreads.</h1>
+      <p class="hero-subtitle">A complete framework for creators who want their content to hold attention, build trust, and do what it was designed to do.</p>
+      <div class="hero-cta-group">
+        <div class="price-tag">$23.99 <span>one-time</span></div>
+        <a href="https://behike.gumroad.com/l/creators-storytelling-masterclass" class="btn-primary" target="_blank" rel="noopener">Get Instant Access</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">The Real Problem</p>
+      <h2 class="section-title fade-in">Most creators try to solve a reach problem when they actually have a resonance problem.</h2>
+      <p class="section-body fade-in">Optimizing posting times, testing hashtags, and tweaking thumbnails addresses distribution. It does not address why the content does not hold attention when it arrives.</p>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <h3>Content that gets no traction</h3>
+          <p>You post consistently. The audience does not grow. The problem is not frequency. It is that the content has no narrative pull. People start reading and have no reason to finish.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <h3>Stories that feel forced</h3>
+          <p>You know you should be personal and authentic. But every time you try, it feels awkward. That is because you are using story as decoration instead of structure.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <h3>Content that does not convert</h3>
+          <p>Views do not turn into subscribers. Subscribers do not turn into buyers. The gap is almost always in the story. People buy from people they have experienced, not just read.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">The Thesis</p>
+      <h2 class="section-title fade-in">Story is not the wrapper. It is the delivery mechanism.</h2>
+      <div class="thesis-box fade-in">
+        <p>Information delivered inside a story is absorbed differently than information delivered as a list. The brain processes narrative and data in entirely different ways. Narrative wins. Every creator who has built a meaningful audience has one thing in common: they made you feel something before they made you buy something. This masterclass teaches the craft of how that works.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">What's Inside</p>
+      <h2 class="section-title fade-in">Introduction + 8 chapters of applied storytelling craft.</h2>
+      <p class="section-body fade-in">Not theory. Repeatable structures you can apply to your next piece of content immediately.</p>
+      <div class="chapters-list">
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">Intro</span>
+          <div>
+            <p class="chapter-title">Why Storytelling Is the Core Skill</p>
+            <p class="chapter-desc">The distinction between a reach problem and a resonance problem. Why story is a delivery mechanism, not a format choice.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">01</span>
+          <div>
+            <p class="chapter-title">Storytelling as the Core Skill of Creator Marketing</p>
+            <p class="chapter-desc">Why expertise without story stays abstract. The mechanism by which story creates trust that bullet points cannot create.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">02</span>
+          <div>
+            <p class="chapter-title">The Narrative Arc Applied to Content</p>
+            <p class="chapter-desc">Setup, disruption, tension, resolution, implication. How to apply this structure to a tweet, an essay, a series, or an entire body of work.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">03</span>
+          <div>
+            <p class="chapter-title">Mining Your Own Life for Compelling Stories</p>
+            <p class="chapter-desc">The Decision Log, Failure Archive, Belief Shift Journal, and Observation Notes. Practical frameworks for finding the stories already in your experience.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">04</span>
+          <div>
+            <p class="chapter-title">The Before/After/Bridge Structure</p>
+            <p class="chapter-desc">The simplest complete story format. Why it works at any scale and how to use it to make your products, posts, and pitches land harder.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">05</span>
+          <div>
+            <p class="chapter-title">Emotional Hooks That Keep People Reading</p>
+            <p class="chapter-desc">Curiosity, recognition, stakes, tension, validation. How to deploy each with precision rather than treating emotion as decoration.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">06</span>
+          <div>
+            <p class="chapter-title">Stories That Sell Without Being Manipulative</p>
+            <p class="chapter-desc">Proof of experience, social proximity, lowered resistance, the honest caveat. How to sell through demonstration rather than declaration.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">07</span>
+          <div>
+            <p class="chapter-title">Building Your Library of Signature Stories</p>
+            <p class="chapter-desc">The Origin Story, Failure Story, Contrarian Story, Values Story, and Stakes Story. How to identify, refine, and deploy four to six stories that anchor your creator identity.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in">
+          <span class="chapter-num">08</span>
+          <div>
+            <p class="chapter-title">The Story Audit Framework</p>
+            <p class="chapter-desc">Six questions to run on every piece of content before publishing. Catch weak structures before they reach your audience.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">Who It's For</p>
+      <h2 class="section-title fade-in">Built for creators who take content seriously.</h2>
+      <p class="section-body fade-in">This is not for people looking for hacks. It is for people building something that lasts.</p>
+      <div class="for-list">
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">Creators who post consistently but are not growing the way they expected.</p>
+        </div>
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">Writers, newsletter operators, and long-form content builders who want their work to convert.</p>
+        </div>
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">Solopreneurs who know their expertise but struggle to communicate it in a way that resonates.</p>
+        </div>
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">Anyone who has tried to tell personal stories in content and found it awkward or ineffective.</p>
+        </div>
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">People building a digital product business who need content that drives trust before it drives sales.</p>
+        </div>
+        <div class="for-item fade-in">
+          <div class="for-dot"></div>
+          <p class="for-text">Video creators, podcasters, and short-form creators who want their ideas to land with more depth.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <div class="final-cta">
+    <div class="container">
+      <p class="section-label fade-in">Creator's Storytelling Masterclass</p>
+      <h2 class="section-title fade-in">Start building content that holds attention from the first sentence to the last.</h2>
+      <p class="section-body fade-in">Introduction, 8 chapters, story audit framework, signature story templates. Delivered as a PDF you keep permanently.</p>
+      <span class="price-tag fade-in">$23.99 <span style="font-size:18px; font-weight:400; color: var(--text-secondary);">one-time, instant download</span></span>
+      <div class="fade-in">
+        <a href="https://behike.gumroad.com/l/creators-storytelling-masterclass" class="btn-primary" target="_blank" rel="noopener">Get Instant Access — $23.99</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. <a href="/privacy.html">Privacy</a> &middot; <a href="/refund.html">Refund Policy</a> &middot; <a href="/index.html">Store</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Hero entrance
+    document.querySelectorAll('.hero-eyebrow, .hero-title, .hero-subtitle, .hero-cta-group').forEach(el => {
+      setTimeout(() => el.classList.add('visible'), 50);
+    });
+
+    // Scroll fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

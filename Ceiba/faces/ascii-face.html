@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEIBA // ASCII Mode</title>
+<style>
+  @font-face {
+    font-family: 'PxPlus';
+    src: url('./assets/PxPlus_HP_100LX_8x8.ttf') format('truetype');
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #060a10;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: crosshair;
+  }
+  canvas { display: block; }
+  #status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'PxPlus', 'Courier New', monospace;
+    font-size: 12px;
+    color: #00f0ff44;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<canvas id="face"></canvas>
+<div id="status">CEIBA // ASCII MODE</div>
+<script>
+const canvas = document.getElementById('face');
+const ctx = canvas.getContext('2d');
+
+const CHARS = '@#$%&*+=~.:;0123456789ABCDEFabcdef'.split('');
+const EYE_CHARS = '@#*0O8'.split('');
+
+let W, H, cx, cy, faceRadius;
+let glyphs = [];
+let mouse = { x: -9999, y: -9999 };
+let breathPhase = 0;
+let glitchTimer = 0;
+let nextGlitch = Math.random() * 300 + 100;
+let fontReady = false;
+let scanY = 0;
+
+// Load font
+const font = new FontFace('PxPlus', "url('./assets/PxPlus_HP_100LX_8x8.ttf')");
+font.load().then(f => {
+  document.fonts.add(f);
+  fontReady = true;
+}).catch(() => {
+  fontReady = true; // fallback to Courier
+});
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  cx = W / 2;
+  cy = H / 2;
+  faceRadius = Math.min(W, H) * 0.3;
+  initGlyphs();
+}
+
+function getFacePoints() {
+  const pts = [];
+  const r = faceRadius;
+  const spacing = Math.max(10, r * 0.045);
+
+  // Skull outline
+  for (let a = 0; a < Math.PI * 2; a += 0.06) {
+    const rx = r * 0.7;
+    const ry = r * 0.9;
+    const x = cx + Math.cos(a) * rx;
+    const y = cy + Math.sin(a) * ry - r * 0.05;
+    pts.push({ x, y, type: 'outline' });
+  }
+
+  // Second outline layer for thickness
+  for (let a = 0; a < Math.PI * 2; a += 0.12) {
+    const rx = r * 0.68;
+    const ry = r * 0.88;
+    const x = cx + Math.cos(a) * rx;
+    const y = cy + Math.sin(a) * ry - r * 0.05;
+    pts.push({ x, y, type: 'outline' });
+  }
+
+  // Left eye socket
+  for (let a = 0; a < Math.PI * 2; a += 0.1) {
+    const ex = cx - r * 0.22;
+    const ey = cy - r * 0.15;
+    const erx = r * 0.14;
+    const ery = r * 0.12;
+    pts.push({ x: ex + Math.cos(a) * erx, y: ey + Math.sin(a) * ery, type: 'eye' });
+  }
+  // Left eye fill
+  for (let i = 0; i < 20; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * r * 0.09;
+    pts.push({ x: cx - r * 0.22 + Math.cos(a) * d, y: cy - r * 0.15 + Math.sin(a) * d, type: 'eye-fill' });
+  }
+
+  // Right eye socket
+  for (let a = 0; a < Math.PI * 2; a += 0.1) {
+    const ex = cx + r * 0.22;
+    const ey = cy - r * 0.15;
+    const erx = r * 0.14;
+    const ery = r * 0.12;
+    pts.push({ x: ex + Math.cos(a) * erx, y: ey + Math.sin(a) * ery, type: 'eye' });
+  }
+  // Right eye fill
+  for (let i = 0; i < 20; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * r * 0.09;
+    pts.push({ x: cx + r * 0.22 + Math.cos(a) * d, y: cy - r * 0.15 + Math.sin(a) * d, type: 'eye-fill' });
+  }
+
+  // Nose
+  const ny = cy + r * 0.08;
+  for (let i = 0; i < 8; i++) {
+    const t = i / 7;
+    pts.push({ x: cx - r * 0.04 + t * r * 0.08, y: ny + r * 0.12, type: 'nose' });
+  }
+  for (let i = 0; i < 5; i++) {
+    const t = i / 4;
+    pts.push({ x: cx, y: cy - r * 0.02 + t * r * 0.2, type: 'nose' });
+  }
+
+  // Mouth
+  for (let a = -0.8; a <= 0.8; a += 0.05) {
+    const mx = cx + Math.sin(a) * r * 0.2;
+    const my = cy + r * 0.38 + Math.cos(a * 2) * r * 0.01;
+    pts.push({ x: mx, y: my, type: 'mouth' });
+  }
+
+  // Cheekbones
+  for (let i = 0; i < 25; i++) {
+    const side = i < 12 ? -1 : 1;
+    const x = cx + side * (r * 0.4 + Math.random() * r * 0.15);
+    const y = cy + r * 0.05 + Math.random() * r * 0.2;
+    pts.push({ x, y, type: 'cheek' });
+  }
+
+  // Jaw line
+  for (let a = 0.3; a < Math.PI - 0.3; a += 0.08) {
+    const x = cx + Math.cos(a - Math.PI / 2) * r * 0.55;
+    const y = cy + r * 0.35 + Math.sin(a) * r * 0.25;
+    pts.push({ x, y, type: 'jaw' });
+  }
+
+  // Forehead scatter
+  for (let i = 0; i < 30; i++) {
+    const x = cx + (Math.random() - 0.5) * r * 1.0;
+    const y = cy - r * 0.4 - Math.random() * r * 0.35;
+    pts.push({ x, y, type: 'forehead' });
+  }
+
+  // Ambient floating chars
+  for (let i = 0; i < 80; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = r * 0.4 + Math.random() * r * 0.7;
+    pts.push({ x: cx + Math.cos(a) * d, y: cy + Math.sin(a) * d, type: 'ambient' });
+  }
+
+  return pts;
+}
+
+function initGlyphs() {
+  const points = getFacePoints();
+  glyphs = points.map(fp => {
+    const isEye = fp.type === 'eye' || fp.type === 'eye-fill';
+    const charSet = isEye ? EYE_CHARS : CHARS;
+    return {
+      tx: fp.x,
+      ty: fp.y,
+      x: cx + (Math.random() - 0.5) * W,
+      y: cy + (Math.random() - 0.5) * H,
+      vx: 0,
+      vy: 0,
+      type: fp.type,
+      char: charSet[Math.floor(Math.random() * charSet.length)],
+      charSet: charSet,
+      alpha: 0,
+      targetAlpha: fp.type === 'ambient' ? 0.15 + Math.random() * 0.2 : 0.5 + Math.random() * 0.5,
+      driftAngle: Math.random() * Math.PI * 2,
+      driftSpeed: 0.001 + Math.random() * 0.004,
+      driftRadius: 0.5 + Math.random() * 2,
+      phase: Math.random() * Math.PI * 2,
+      flickerSpeed: 0.015 + Math.random() * 0.03,
+      flickerPhase: Math.random() * Math.PI * 2,
+      charSwapTimer: Math.random() * 200,
+      charSwapInterval: 80 + Math.random() * 300,
+      fontSize: isEye ? 13 + Math.random() * 4 : 8 + Math.random() * 6,
+      rotation: (Math.random() - 0.5) * 0.3,
+      rotSpeed: (Math.random() - 0.5) * 0.002,
+    };
+  });
+}
+
+function update() {
+  breathPhase += 0.008;
+  glitchTimer++;
+  scanY = (scanY + 1.5) % H;
+
+  const breathScale = 1 + Math.sin(breathPhase) * 0.008;
+  const isGlitching = glitchTimer > nextGlitch && glitchTimer < nextGlitch + 10;
+
+  if (glitchTimer > nextGlitch + 10) {
+    glitchTimer = 0;
+    nextGlitch = Math.random() * 400 + 150;
+  }
+
+  for (const g of glyphs) {
+    // Target with breathing
+    const dx = g.tx - cx;
+    const dy = g.ty - cy;
+    const targetX = cx + dx * breathScale;
+    const targetY = cy + dy * breathScale;
+
+    // Drift
+    g.driftAngle += g.driftSpeed;
+    const driftX = Math.cos(g.driftAngle) * g.driftRadius;
+    const driftY = Math.sin(g.driftAngle * 0.7) * g.driftRadius;
+
+    // Mouse repulsion
+    const mdx = g.x - mouse.x;
+    const mdy = g.y - mouse.y;
+    const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+    let repelX = 0, repelY = 0;
+    if (mDist < 140) {
+      const force = (140 - mDist) / 140 * 10;
+      repelX = (mdx / mDist) * force;
+      repelY = (mdy / mDist) * force;
+    }
+
+    // Spring physics
+    const sx = targetX + driftX - g.x;
+    const sy = targetY + driftY - g.y;
+    g.vx += sx * 0.025 + repelX;
+    g.vy += sy * 0.025 + repelY;
+    g.vx *= 0.87;
+    g.vy *= 0.87;
+
+    // Glitch
+    if (isGlitching && Math.random() < 0.2) {
+      g.vx += (Math.random() - 0.5) * 25;
+      g.vy += (Math.random() - 0.5) * 25;
+      g.char = g.charSet[Math.floor(Math.random() * g.charSet.length)];
+    }
+
+    g.x += g.vx;
+    g.y += g.vy;
+
+    // Alpha fade in
+    g.alpha += (g.targetAlpha - g.alpha) * 0.02;
+
+    // Flicker
+    g.flickerPhase += g.flickerSpeed;
+
+    // Rotation drift
+    g.rotation += g.rotSpeed;
+
+    // Character swap
+    g.charSwapTimer++;
+    if (g.charSwapTimer > g.charSwapInterval) {
+      g.charSwapTimer = 0;
+      g.char = g.charSet[Math.floor(Math.random() * g.charSet.length)];
+      g.charSwapInterval = 80 + Math.random() * 300;
+    }
+  }
+}
+
+function draw() {
+  // Fade trail
+  ctx.fillStyle = 'rgba(6, 10, 16, 0.2)';
+  ctx.fillRect(0, 0, W, H);
+
+  const fontName = fontReady ? "'PxPlus', 'Courier New', monospace" : "'Courier New', monospace";
+
+  for (const g of glyphs) {
+    const flicker = 0.6 + Math.sin(g.flickerPhase) * 0.4;
+    const alpha = g.alpha * flicker;
+    if (alpha < 0.01) continue;
+
+    const isEye = g.type === 'eye' || g.type === 'eye-fill';
+    const isMouth = g.type === 'mouth';
+
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.rotation);
+
+    ctx.font = `${Math.round(g.fontSize)}px ${fontName}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (isEye) {
+      ctx.fillStyle = `rgba(0, 240, 255, ${alpha})`;
+      if (alpha > 0.3) {
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 8;
+      }
+    } else if (isMouth) {
+      ctx.fillStyle = `rgba(0, 240, 255, ${alpha * 0.6})`;
+      ctx.shadowColor = '#00f0ff';
+      ctx.shadowBlur = 3;
+    } else if (g.type === 'ambient') {
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.35})`;
+    } else {
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
+    }
+
+    ctx.fillText(g.char, 0, 0);
+
+    ctx.restore();
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+  }
+
+  // Scan lines — horizontal bars across entire screen
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+  for (let y = 0; y < H; y += 3) {
+    ctx.fillRect(0, y, W, 1);
+  }
+
+  // Moving scan line
+  const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+  scanGrad.addColorStop(0, 'rgba(0, 240, 255, 0)');
+  scanGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.03)');
+  scanGrad.addColorStop(1, 'rgba(0, 240, 255, 0)');
+  ctx.fillStyle = scanGrad;
+  ctx.fillRect(0, scanY - 30, W, 60);
+
+  // Occasional horizontal glitch bar
+  if (Math.random() < 0.02) {
+    const gy = Math.random() * H;
+    const gh = 1 + Math.random() * 3;
+    ctx.fillStyle = `rgba(0, 240, 255, ${0.03 + Math.random() * 0.04})`;
+    ctx.fillRect(0, gy, W, gh);
+  }
+
+  // CRT vignette
+  const vignette = ctx.createRadialGradient(cx, cy, faceRadius * 0.5, cx, cy, Math.max(W, H) * 0.7);
+  vignette.addColorStop(0, 'rgba(6, 10, 16, 0)');
+  vignette.addColorStop(1, 'rgba(6, 10, 16, 0.5)');
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Events
+window.addEventListener('resize', resize);
+canvas.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+canvas.addEventListener('mouseleave', () => {
+  mouse.x = -9999;
+  mouse.y = -9999;
+});
+canvas.addEventListener('click', () => {
+  glitchTimer = nextGlitch;
+});
+
+// Status text pulse
+setInterval(() => {
+  const el = document.getElementById('status');
+  el.style.color = `rgba(0, 240, 255, ${0.2 + Math.sin(Date.now() / 800) * 0.12})`;
+}, 50);
+
+resize();
+loop();
+</script>
+</body>
+</html>

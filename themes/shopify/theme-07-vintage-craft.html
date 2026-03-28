@@ -1,0 +1,431 @@
+<!--
+  THEME 07: VINTAGE CRAFT
+  Warm, textured aesthetic inspired by artisan workshops and handmade goods.
+  Paper-like backgrounds, hand-drawn borders, serif typography.
+
+  SHOPIFY LIQUID CONVERSION NOTES:
+  - Replace product cards with {% for product in collections.featured.products %}
+  - Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  - Replace prices with {{ product.price | money }}
+  - Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  - Replace nav links with {{ shop.name }}, {{ linklists.main-menu.links }}
+  - Replace newsletter form action with Shopify customer signup or Klaviyo endpoint
+  - Replace testimonials with metafield content or a dedicated section schema
+  - Wrap sections in {% schema %} blocks for Shopify theme editor customization
+  - Move CSS to assets/theme.css and reference with {{ 'theme.css' | asset_url | stylesheet_tag }}
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vintage Craft Store</title>
+  <style>
+    :root {
+      --color-bg: #f5f0e8;
+      --color-surface: #ece6d9;
+      --color-text: #3d2b1f;
+      --color-text-light: #7a6555;
+      --color-accent: #8b4513;
+      --color-accent-hover: #a0522d;
+      --color-border: #c9b99a;
+      --color-card-bg: #faf6ef;
+      --font-heading: Georgia, 'Times New Roman', serif;
+      --font-body: Georgia, 'Times New Roman', serif;
+      --radius: 2px;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--color-accent); text-decoration: none; transition: color var(--transition); }
+    a:hover { color: var(--color-accent-hover); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* Decorative border style */
+    .hand-border {
+      border: 2px solid var(--color-border);
+      border-image: repeating-linear-gradient(
+        45deg, var(--color-border), var(--color-border) 4px, transparent 4px, transparent 8px
+      ) 8;
+    }
+
+    .ornament {
+      text-align: center; margin: 30px 0; color: var(--color-border);
+      font-size: 1.4rem; letter-spacing: 8px;
+    }
+
+    /* NAV */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(245, 240, 232, 0.97);
+      border-bottom: 2px solid var(--color-border);
+      padding: 14px 0;
+    }
+    .nav .container {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-logo {
+      font-family: var(--font-heading); font-size: 1.5rem;
+      color: var(--color-text); font-style: italic; letter-spacing: 1px;
+    }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      color: var(--color-text-light); font-size: 0.9rem; letter-spacing: 1px;
+    }
+    .nav-links a:hover { color: var(--color-accent); }
+    .nav-cart {
+      color: var(--color-text); font-size: 0.9rem;
+      border: 1px solid var(--color-border); padding: 6px 16px;
+      border-radius: var(--radius); transition: all var(--transition);
+    }
+    .nav-cart:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .mobile-toggle { display: none; background: none; border: none; color: var(--color-text); font-size: 1.5rem; cursor: pointer; }
+
+    /* HERO */
+    .hero {
+      padding: 150px 0 90px;
+      text-align: center;
+      background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-surface) 100%);
+    }
+    .hero h1 {
+      font-family: var(--font-heading); font-size: 3rem;
+      font-weight: normal; font-style: italic; margin-bottom: 16px;
+      color: var(--color-text);
+    }
+    .hero p {
+      font-size: 1.05rem; color: var(--color-text-light);
+      max-width: 550px; margin: 0 auto 36px;
+    }
+    .btn-primary {
+      display: inline-block; padding: 14px 36px; font-family: var(--font-body);
+      font-size: 0.95rem; letter-spacing: 1px;
+      border: 2px solid var(--color-accent); color: var(--color-accent);
+      background: transparent; cursor: pointer; transition: all var(--transition);
+    }
+    .btn-primary:hover {
+      background: var(--color-accent); color: var(--color-bg);
+    }
+
+    /* PRODUCTS */
+    .products { padding: 70px 0; }
+    .section-title {
+      text-align: center; font-family: var(--font-heading);
+      font-size: 2rem; font-weight: normal; font-style: italic;
+      margin-bottom: 10px; color: var(--color-text);
+    }
+    .section-subtitle {
+      text-align: center; color: var(--color-text-light);
+      font-size: 0.9rem; margin-bottom: 50px;
+    }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+    }
+    .product-card {
+      background: var(--color-card-bg); border: 1px solid var(--color-border);
+      overflow: hidden; transition: all var(--transition);
+    }
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(61, 43, 31, 0.1);
+    }
+    .product-image {
+      width: 100%; height: 240px;
+      background: linear-gradient(135deg, var(--color-surface), #e8dfd0);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-light); font-size: 0.85rem; font-style: italic;
+    }
+    .product-info { padding: 20px; text-align: center; }
+    .product-name {
+      font-family: var(--font-heading); font-size: 1rem;
+      font-style: italic; margin-bottom: 8px;
+    }
+    .product-price { color: var(--color-accent); font-size: 1.05rem; margin-bottom: 16px; }
+    .btn-cart {
+      width: 100%; padding: 10px; background: transparent;
+      border: 1px solid var(--color-border); color: var(--color-text);
+      font-family: var(--font-body); font-size: 0.85rem; cursor: pointer;
+      letter-spacing: 1px; transition: all var(--transition);
+    }
+    .btn-cart:hover {
+      background: var(--color-accent); color: var(--color-bg);
+      border-color: var(--color-accent);
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 70px 0;
+      background: var(--color-surface);
+    }
+    .about-content {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;
+    }
+    .about-image {
+      height: 340px; background: linear-gradient(135deg, #e0d5c4, #d4c8b3);
+      border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-light); font-size: 0.85rem; font-style: italic;
+    }
+    .about-text h2 {
+      font-family: var(--font-heading); font-size: 1.8rem;
+      font-weight: normal; font-style: italic; margin-bottom: 20px;
+    }
+    .about-text p { color: var(--color-text-light); margin-bottom: 14px; font-size: 0.95rem; }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 70px 0; }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .testimonial-card {
+      background: var(--color-card-bg); border: 1px solid var(--color-border);
+      padding: 30px; text-align: center; transition: all var(--transition);
+    }
+    .testimonial-card:hover {
+      box-shadow: 0 4px 15px rgba(61, 43, 31, 0.08);
+    }
+    .testimonial-quote {
+      font-size: 2rem; color: var(--color-border); margin-bottom: 10px;
+      font-family: var(--font-heading);
+    }
+    .testimonial-text {
+      color: var(--color-text-light); font-size: 0.9rem;
+      margin-bottom: 20px; line-height: 1.8; font-style: italic;
+    }
+    .testimonial-author {
+      font-size: 0.85rem; color: var(--color-accent); letter-spacing: 1px;
+    }
+
+    /* FOOTER */
+    .footer {
+      padding: 50px 0 24px;
+      border-top: 2px solid var(--color-border);
+      background: var(--color-surface);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 2fr; gap: 36px;
+      margin-bottom: 36px;
+    }
+    .footer h4 {
+      font-family: var(--font-heading); font-size: 1rem;
+      font-weight: normal; font-style: italic;
+      margin-bottom: 16px; color: var(--color-text);
+    }
+    .footer p { color: var(--color-text-light); font-size: 0.85rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 10px; }
+    .footer-links a { color: var(--color-text-light); font-size: 0.85rem; }
+    .footer-links a:hover { color: var(--color-accent); }
+    .social-links { display: flex; gap: 12px; margin-top: 10px; }
+    .social-links a {
+      width: 34px; height: 34px; border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-light); font-size: 0.7rem;
+      transition: all var(--transition);
+    }
+    .social-links a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .newsletter-form { display: flex; gap: 8px; margin-top: 10px; }
+    .newsletter-form input {
+      flex: 1; padding: 10px 14px; background: var(--color-bg);
+      border: 1px solid var(--color-border); color: var(--color-text);
+      font-family: var(--font-body); font-size: 0.85rem;
+    }
+    .newsletter-form input:focus { outline: none; border-color: var(--color-accent); }
+    .newsletter-form button {
+      padding: 10px 20px; background: var(--color-accent); color: var(--color-bg);
+      border: none; font-family: var(--font-body); font-size: 0.85rem;
+      cursor: pointer; letter-spacing: 1px; transition: all var(--transition);
+    }
+    .newsletter-form button:hover { background: var(--color-accent-hover); }
+    .footer-bottom {
+      text-align: center; padding-top: 24px;
+      border-top: 1px solid var(--color-border);
+      color: var(--color-text-light); font-size: 0.8rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-toggle { display: block; }
+      .hero h1 { font-size: 2rem; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .about-content { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .newsletter-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav-logo">The Craft Studio</a>
+      <ul class="nav-links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#about">Our Story</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#" class="nav-cart">Basket (0)</a>
+      <button class="mobile-toggle">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <h1>Handmade with Heart</h1>
+      <p>Every piece in our collection is crafted by artisans who pour their soul into their work. No factories, no shortcuts, just honest craftsmanship.</p>
+      <button class="btn-primary">Explore the Collection</button>
+    </div>
+  </section>
+
+  <div class="ornament">~ ~ ~</div>
+
+  <!-- PRODUCTS -->
+  <section class="products" id="products">
+    <div class="container">
+      <h2 class="section-title">Featured Creations</h2>
+      <p class="section-subtitle">Each item tells a story of patience, skill, and love for the craft.</p>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">[Product Image]</div>
+          <div class="product-info">
+            <div class="product-name">Hand-Stitched Leather Journal</div>
+            <div class="product-price">$48.00</div>
+            <button class="btn-cart">Add to Basket</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">[Product Image]</div>
+          <div class="product-info">
+            <div class="product-name">Ceramic Pour-Over Set</div>
+            <div class="product-price">$62.00</div>
+            <button class="btn-cart">Add to Basket</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">[Product Image]</div>
+          <div class="product-info">
+            <div class="product-name">Beeswax Candle Trio</div>
+            <div class="product-price">$34.00</div>
+            <button class="btn-cart">Add to Basket</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">[Product Image]</div>
+          <div class="product-info">
+            <div class="product-name">Walnut Cutting Board</div>
+            <div class="product-price">$75.00</div>
+            <button class="btn-cart">Add to Basket</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-content">
+        <div class="about-image">[Workshop Image]</div>
+        <div class="about-text">
+          <h2>Our Story</h2>
+          <p>We started this journey in a small workshop with a simple belief: the things we surround ourselves with should be made with care. Every product in our store comes from artisans who treat their craft as a calling, not a job.</p>
+          <p>From hand-thrown pottery to slow-stitched leather goods, we partner with makers who use traditional techniques passed down through generations. The result is something you can feel the moment you hold it in your hands.</p>
+          <p>We believe in buying less and buying better. Every item here is built to last a lifetime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ornament">~ ~ ~</div>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <h2 class="section-title">What Our Customers Say</h2>
+      <p class="section-subtitle">Real words from people who chose handmade.</p>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">The leather journal is absolutely beautiful. You can tell it was made by someone who cares deeply about their work. It feels like an heirloom already.</p>
+          <div class="testimonial-author">Sarah M.</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">I ordered the ceramic set as a gift and ended up keeping it for myself. The glaze, the weight, the way it pours. Everything about it is perfect.</p>
+          <div class="testimonial-author">David L.</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">This is what shopping should feel like. Thoughtful packaging, a handwritten note, and a product that is clearly made with love. I will be back for more.</p>
+          <div class="testimonial-author">Emma R.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>The Craft Studio</h4>
+          <p>Handmade goods from independent artisans. Every purchase supports a maker and their craft.</p>
+          <div class="social-links">
+            <a href="#">IG</a>
+            <a href="#">FB</a>
+            <a href="#">PT</a>
+            <a href="#">ET</a>
+          </div>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul class="footer-links">
+            <li><a href="#">All Products</a></li>
+            <li><a href="#">Leather Goods</a></li>
+            <li><a href="#">Ceramics</a></li>
+            <li><a href="#">Home</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Info</h4>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">Care Guide</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Stay in Touch</h4>
+          <p>Join our newsletter for new arrivals and artisan stories.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="your@email.com">
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 The Craft Studio. Handmade with care.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEIBA // Vault Knowledge Graph</title>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cyan: #00f0ff;
+    --cyan-dim: #00f0ff33;
+    --green: #00ff88;
+    --green-dim: #00ff8833;
+    --orange: #ff6b2b;
+    --orange-dim: #ff6b2b33;
+    --purple: #b44dff;
+    --purple-dim: #b44dff33;
+    --red: #ff3366;
+    --red-dim: #ff336633;
+    --gold: #ffd700;
+    --gold-dim: #ffd70033;
+    --pink: #ff69b4;
+    --teal: #20b2aa;
+    --bg-dark: #0a0e17;
+    --bg-card: #0d1220;
+    --bg-card-hover: #111a2e;
+    --border: #1a2744;
+    --text: #c8d6e5;
+    --text-dim: #5a6a80;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #0d1220 0%, #0a0e17 100%);
+    z-index: 10;
+    position: relative;
+  }
+
+  .header-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 3px;
+  }
+
+  .header-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-left: 16px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-value {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .stat-label { color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    position: absolute;
+    top: 70px;
+    left: 24px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .search-bar input {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    padding: 8px 16px;
+    border-radius: 4px;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .search-bar input:focus { border-color: var(--cyan); }
+
+  .search-bar select {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── GRAPH CONTAINER ── */
+  #graph-container {
+    width: 100%;
+    height: calc(100vh - 60px);
+    position: relative;
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    position: absolute;
+    top: 70px;
+    right: 24px;
+    width: 320px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    z-index: 10;
+    display: none;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+  }
+
+  .detail-panel.active { display: block; }
+
+  .detail-panel h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    color: var(--cyan);
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #1a274422;
+    font-size: 0.8rem;
+  }
+
+  .detail-label { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .detail-value { color: var(--text); font-weight: 600; }
+
+  .detail-links {
+    margin-top: 12px;
+  }
+
+  .detail-links h4 {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .link-tag {
+    display: inline-block;
+    background: var(--cyan-dim);
+    color: var(--cyan);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .link-tag:hover { background: var(--cyan); color: var(--bg-dark); }
+
+  .link-tag.incoming { background: var(--green-dim); color: var(--green); }
+  .link-tag.incoming:hover { background: var(--green); color: var(--bg-dark); }
+
+  .link-tag.missing { background: var(--red-dim); color: var(--red); }
+
+  /* ── LEGEND ── */
+  .legend {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    z-index: 10;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .legend-item:hover { opacity: 1; }
+  .legend-item.dimmed { opacity: 0.3; }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* ── PULSE ANIMATION ── */
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--cyan-dim); }
+    50% { box-shadow: 0 0 20px 4px var(--cyan-dim); }
+  }
+
+  /* ── CLOSE BTN ── */
+  .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  .close-btn:hover { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:baseline;">
+    <span class="header-title">CEIBA</span>
+    <span class="header-subtitle">VAULT KNOWLEDGE GRAPH</span>
+  </div>
+  <div class="header-stats">
+    <div class="stat-item">
+      <span class="stat-value" id="stat-files" style="color:var(--cyan)">—</span>
+      <span class="stat-label">nodes</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="stat-links" style="color:var(--green)">—</span>
+      <span class="stat-label">edges</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="stat-orphans" style="color:var(--orange)">—</span>
+      <span class="stat-label">orphans</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="stat-missing" style="color:var(--red)">—</span>
+      <span class="stat-label">ghosts</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" id="stat-generated" style="color:var(--text-dim)">—</span>
+      <span class="stat-label">updated</span>
+    </div>
+  </div>
+</div>
+
+<div class="search-bar">
+  <input type="text" id="search-input" placeholder="Search nodes..." />
+  <select id="type-filter">
+    <option value="all">ALL TYPES</option>
+  </select>
+</div>
+
+<div id="graph-container"></div>
+
+<div class="detail-panel" id="detail-panel">
+  <button class="close-btn" onclick="closeDetail()">&times;</button>
+  <h3 id="detail-name">—</h3>
+  <div class="detail-row"><span class="detail-label">Type</span><span class="detail-value" id="detail-type">—</span></div>
+  <div class="detail-row"><span class="detail-label">Path</span><span class="detail-value" id="detail-path">—</span></div>
+  <div class="detail-row"><span class="detail-label">Words</span><span class="detail-value" id="detail-words">—</span></div>
+  <div class="detail-row"><span class="detail-label">Links Out</span><span class="detail-value" id="detail-out">—</span></div>
+  <div class="detail-row"><span class="detail-label">Links In</span><span class="detail-value" id="detail-in">—</span></div>
+  <div class="detail-links" id="detail-tags-section">
+    <h4>Tags</h4>
+    <div id="detail-tags"></div>
+  </div>
+  <div class="detail-links">
+    <h4>Links Out</h4>
+    <div id="detail-links-out"></div>
+  </div>
+  <div class="detail-links">
+    <h4>Links In</h4>
+    <div id="detail-links-in"></div>
+  </div>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<script>
+// ── COLOR MAP ──
+const TYPE_COLORS = {
+  project:   { bg: '#ff6b2b', border: '#ff6b2b', font: '#fff' },
+  goal:      { bg: '#ffd700', border: '#ffd700', font: '#000' },
+  session:   { bg: '#20b2aa', border: '#20b2aa', font: '#fff' },
+  pattern:   { bg: '#b44dff', border: '#b44dff', font: '#fff' },
+  knowledge: { bg: '#00f0ff', border: '#00f0ff', font: '#000' },
+  identity:  { bg: '#ff69b4', border: '#ff69b4', font: '#000' },
+  tool:      { bg: '#00ff88', border: '#00ff88', font: '#000' },
+  system:    { bg: '#5a6a80', border: '#5a6a80', font: '#fff' },
+  unknown:   { bg: '#2a3a5a', border: '#3a4a6a', font: '#c8d6e5' },
+};
+
+let network = null;
+let allNodes = null;
+let allEdges = null;
+let graphData = null;
+let activeFilter = 'all';
+
+// ── LOAD DATA ──
+async function loadGraph() {
+  try {
+    // Try relative path first (same directory), then absolute
+    let resp;
+    try {
+      resp = await fetch('vault_graph.json');
+      if (!resp.ok) throw new Error('not found');
+    } catch {
+      resp = await fetch('/vault_graph.json');
+    }
+    graphData = await resp.json();
+  } catch (e) {
+    // Fallback: try to load from embedded data or show error
+    document.getElementById('graph-container').innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;">
+        <span style="font-family:Orbitron;font-size:1.2rem;color:var(--red);">VAULT_GRAPH.JSON NOT FOUND</span>
+        <span style="font-family:JetBrains Mono;font-size:0.8rem;color:var(--text-dim);">
+          Run: python3 ~/behique/tools/vault_grapher.py<br>
+          Then open this file from ~/behique/Ceiba/
+        </span>
+      </div>`;
+    return;
+  }
+
+  buildGraph(graphData);
+}
+
+function buildGraph(data) {
+  // ── Stats ──
+  document.getElementById('stat-files').textContent = data.stats.total_files;
+  document.getElementById('stat-links').textContent = data.stats.total_links;
+  document.getElementById('stat-orphans').textContent = data.stats.orphans;
+  document.getElementById('stat-missing').textContent = data.stats.missing_targets;
+  if (data.generated) {
+    const d = new Date(data.generated);
+    document.getElementById('stat-generated').textContent =
+      d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  }
+
+  // ── Build backlinks map ──
+  const backlinks = {};
+  for (const [src, tgt] of data.edges) {
+    if (!backlinks[tgt]) backlinks[tgt] = [];
+    backlinks[tgt].push(src);
+  }
+
+  // ── Collect types for filter ──
+  const types = new Set();
+  for (const node of Object.values(data.nodes)) {
+    types.add(node.type);
+  }
+
+  const typeFilter = document.getElementById('type-filter');
+  for (const t of [...types].sort()) {
+    const opt = document.createElement('option');
+    opt.value = t;
+    opt.textContent = t.toUpperCase();
+    typeFilter.appendChild(opt);
+  }
+
+  // ── Build legend ──
+  const legendEl = document.getElementById('legend');
+  for (const t of [...types].sort()) {
+    const colors = TYPE_COLORS[t] || TYPE_COLORS.unknown;
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.dataset.type = t;
+    item.innerHTML = `<div class="legend-dot" style="background:${colors.bg}"></div>${t}`;
+    item.onclick = () => toggleTypeFilter(t);
+    legendEl.appendChild(item);
+  }
+
+  // ── Build vis.js nodes ──
+  const nodes = [];
+  for (const [name, node] of Object.entries(data.nodes)) {
+    const colors = TYPE_COLORS[node.type] || TYPE_COLORS.unknown;
+    const totalLinks = (node.links ? node.links.length : 0) + (backlinks[name] ? backlinks[name].length : 0);
+    const size = Math.max(12, Math.min(40, 10 + totalLinks * 2));
+
+    nodes.push({
+      id: name,
+      label: name.replace(/_/g, ' '),
+      size: size,
+      color: {
+        background: colors.bg + 'cc',
+        border: colors.border,
+        highlight: { background: colors.bg, border: '#ffffff' },
+        hover: { background: colors.bg, border: '#ffffff' },
+      },
+      font: {
+        color: '#c8d6e5',
+        size: Math.max(10, Math.min(16, 8 + totalLinks)),
+        face: 'Rajdhani',
+        strokeWidth: 2,
+        strokeColor: '#0a0e17',
+      },
+      borderWidth: 2,
+      shadow: { enabled: true, color: colors.bg + '44', size: 10 },
+      _type: node.type,
+      _path: node.path,
+      _links: node.links || [],
+      _backlinks: backlinks[name] || [],
+      _tags: node.tags || [],
+      _wordCount: node.word_count || 0,
+    });
+  }
+
+  // ── Build vis.js edges (deduplicated) ──
+  const edgeSet = new Set();
+  const edges = [];
+  for (const [src, tgt] of data.edges) {
+    const key = `${src}→${tgt}`;
+    if (edgeSet.has(key)) continue;
+    edgeSet.add(key);
+    // Only add edge if target node exists
+    if (data.nodes[tgt]) {
+      edges.push({
+        from: src,
+        to: tgt,
+        arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+        color: { color: '#1a274488', highlight: '#00f0ff88', hover: '#00f0ff44' },
+        width: 1,
+        smooth: { type: 'continuous', roundness: 0.2 },
+      });
+    }
+  }
+
+  allNodes = new vis.DataSet(nodes);
+  allEdges = new vis.DataSet(edges);
+
+  // ── Network options ──
+  const options = {
+    nodes: {
+      shape: 'dot',
+      scaling: { min: 10, max: 40 },
+    },
+    edges: {
+      smooth: { type: 'continuous', roundness: 0.2 },
+    },
+    physics: {
+      solver: 'forceAtlas2Based',
+      forceAtlas2Based: {
+        gravitationalConstant: -80,
+        centralGravity: 0.01,
+        springLength: 120,
+        springConstant: 0.04,
+        damping: 0.4,
+        avoidOverlap: 0.3,
+      },
+      stabilization: { iterations: 200, fit: true },
+      maxVelocity: 30,
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 100,
+      navigationButtons: false,
+      keyboard: { enabled: true },
+      zoomView: true,
+    },
+    layout: {
+      improvedLayout: true,
+    },
+  };
+
+  const container = document.getElementById('graph-container');
+  network = new vis.Network(container, { nodes: allNodes, edges: allEdges }, options);
+
+  // ── Click handler ──
+  network.on('click', function(params) {
+    if (params.nodes.length > 0) {
+      showDetail(params.nodes[0]);
+    } else {
+      closeDetail();
+    }
+  });
+
+  // ── Double-click to focus ──
+  network.on('doubleClick', function(params) {
+    if (params.nodes.length > 0) {
+      focusNode(params.nodes[0]);
+    }
+  });
+}
+
+// ── DETAIL PANEL ──
+function showDetail(nodeId) {
+  const node = allNodes.get(nodeId);
+  if (!node) return;
+
+  const panel = document.getElementById('detail-panel');
+  panel.classList.add('active');
+
+  document.getElementById('detail-name').textContent = nodeId;
+  document.getElementById('detail-type').textContent = node._type.toUpperCase();
+  document.getElementById('detail-path').textContent = node._path;
+  document.getElementById('detail-words').textContent = node._wordCount.toLocaleString();
+  document.getElementById('detail-out').textContent = node._links.length;
+  document.getElementById('detail-in').textContent = node._backlinks.length;
+
+  // Tags
+  const tagsSection = document.getElementById('detail-tags-section');
+  const tagsEl = document.getElementById('detail-tags');
+  if (node._tags.length > 0) {
+    tagsSection.style.display = 'block';
+    tagsEl.innerHTML = node._tags.map(t => `<span class="link-tag">#${t}</span>`).join('');
+  } else {
+    tagsSection.style.display = 'none';
+  }
+
+  // Links out
+  const linksOutEl = document.getElementById('detail-links-out');
+  const uniqueOut = [...new Set(node._links.map(l => l.split('/').pop().split('#')[0]))];
+  linksOutEl.innerHTML = uniqueOut.map(l => {
+    const exists = allNodes.get(l);
+    const cls = exists ? '' : ' missing';
+    return `<span class="link-tag${cls}" onclick="navigateTo('${l}')">${l}</span>`;
+  }).join('');
+
+  // Links in
+  const linksInEl = document.getElementById('detail-links-in');
+  linksInEl.innerHTML = node._backlinks.map(l =>
+    `<span class="link-tag incoming" onclick="navigateTo('${l}')">${l}</span>`
+  ).join('');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('active');
+}
+
+function navigateTo(nodeId) {
+  const node = allNodes.get(nodeId);
+  if (node) {
+    network.selectNodes([nodeId]);
+    network.focus(nodeId, { scale: 1.5, animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    showDetail(nodeId);
+  }
+}
+
+function focusNode(nodeId) {
+  // Highlight connected nodes, dim everything else
+  const node = allNodes.get(nodeId);
+  if (!node) return;
+
+  const connected = new Set([nodeId]);
+  const uniqueOut = [...new Set(node._links.map(l => l.split('/').pop().split('#')[0]))];
+  uniqueOut.forEach(l => connected.add(l));
+  node._backlinks.forEach(l => connected.add(l));
+
+  allNodes.forEach(n => {
+    if (connected.has(n.id)) {
+      allNodes.update({ id: n.id, opacity: 1.0 });
+    } else {
+      allNodes.update({ id: n.id, opacity: 0.15 });
+    }
+  });
+
+  // Reset on next click elsewhere
+  network.once('click', () => {
+    allNodes.forEach(n => {
+      allNodes.update({ id: n.id, opacity: 1.0 });
+    });
+  });
+}
+
+// ── SEARCH ──
+document.getElementById('search-input').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase();
+  if (!query) {
+    allNodes.forEach(n => allNodes.update({ id: n.id, hidden: false }));
+    return;
+  }
+  allNodes.forEach(n => {
+    const match = n.id.toLowerCase().includes(query) ||
+                  n._type.toLowerCase().includes(query) ||
+                  n._tags.some(t => t.toLowerCase().includes(query));
+    allNodes.update({ id: n.id, hidden: !match });
+  });
+});
+
+// ── TYPE FILTER ──
+document.getElementById('type-filter').addEventListener('change', function(e) {
+  activeFilter = e.target.value;
+  applyFilter();
+});
+
+function toggleTypeFilter(type) {
+  const items = document.querySelectorAll('.legend-item');
+  const item = document.querySelector(`.legend-item[data-type="${type}"]`);
+
+  if (activeFilter === type) {
+    // Reset
+    activeFilter = 'all';
+    items.forEach(i => i.classList.remove('dimmed'));
+    document.getElementById('type-filter').value = 'all';
+  } else {
+    activeFilter = type;
+    items.forEach(i => i.classList.toggle('dimmed', i.dataset.type !== type));
+    document.getElementById('type-filter').value = type;
+  }
+  applyFilter();
+}
+
+function applyFilter() {
+  if (activeFilter === 'all') {
+    allNodes.forEach(n => allNodes.update({ id: n.id, hidden: false }));
+  } else {
+    allNodes.forEach(n => {
+      allNodes.update({ id: n.id, hidden: n._type !== activeFilter });
+    });
+  }
+}
+
+// ── INIT ──
+loadGraph();
+</script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave a Review - Behike</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        background: #0a0a0a;
+        color: #e0e0e0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+
+    .container {
+        max-width: 520px;
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: #d4a017;
+    }
+
+    .subtitle {
+        color: #888;
+        font-size: 14px;
+        margin-bottom: 32px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 12px 14px;
+        background: #141414;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        color: #e0e0e0;
+        font-size: 15px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #d4a017;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23888'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        cursor: pointer;
+    }
+
+    select option {
+        background: #141414;
+        color: #e0e0e0;
+    }
+
+    /* Star rating */
+    .star-rating {
+        display: flex;
+        gap: 6px;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+    .star-rating input {
+        display: none;
+    }
+
+    .star-rating label {
+        font-size: 32px;
+        color: #333;
+        cursor: pointer;
+        transition: color 0.15s;
+        text-transform: none;
+        letter-spacing: 0;
+        margin-bottom: 0;
+    }
+
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #d4a017;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 14px;
+        background: #d4a017;
+        color: #0a0a0a;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        margin-top: 8px;
+    }
+
+    .btn:hover {
+        background: #e6b422;
+    }
+
+    .btn:active {
+        transform: scale(0.98);
+    }
+
+    .btn:disabled {
+        background: #555;
+        cursor: not-allowed;
+    }
+
+    /* Thank you state */
+    .thank-you {
+        display: none;
+        text-align: center;
+        padding: 48px 24px;
+    }
+
+    .thank-you.active {
+        display: block;
+    }
+
+    .thank-you h2 {
+        font-size: 24px;
+        color: #d4a017;
+        margin-bottom: 12px;
+    }
+
+    .thank-you p {
+        color: #999;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .form-wrapper.hidden {
+        display: none;
+    }
+
+    .error {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 6px;
+        display: none;
+    }
+
+    .error.active {
+        display: block;
+    }
+
+    .optional {
+        color: #555;
+        font-size: 11px;
+        margin-left: 4px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-wrapper" id="formWrapper">
+        <h1>Leave a Review</h1>
+        <p class="subtitle">Your feedback helps us improve and helps others decide.</p>
+
+        <form id="reviewForm">
+            <div class="form-group">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" placeholder="How should we display your name?" required>
+            </div>
+
+            <div class="form-group">
+                <label for="product">Product</label>
+                <select id="product" name="product" required>
+                    <option value="" disabled selected>Select a product...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5">
+                    <label for="star5" title="5 stars">&#9733;</label>
+                    <input type="radio" id="star4" name="rating" value="4">
+                    <label for="star4" title="4 stars">&#9733;</label>
+                    <input type="radio" id="star3" name="rating" value="3">
+                    <label for="star3" title="3 stars">&#9733;</label>
+                    <input type="radio" id="star2" name="rating" value="2">
+                    <label for="star2" title="2 stars">&#9733;</label>
+                    <input type="radio" id="star1" name="rating" value="1">
+                    <label for="star1" title="1 star">&#9733;</label>
+                </div>
+                <p class="error" id="ratingError">Please select a rating.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="text">Your Review</label>
+                <textarea id="text" name="text" placeholder="What did you think? Be honest." required minlength="10" maxlength="2000"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email <span class="optional">(optional)</span></label>
+                <input type="email" id="email" name="email" placeholder="Only used if we need to follow up">
+            </div>
+
+            <p class="error" id="formError"></p>
+
+            <button type="submit" class="btn" id="submitBtn">Submit Review</button>
+        </form>
+    </div>
+
+    <div class="thank-you" id="thankYou">
+        <h2>Thank you.</h2>
+        <p>Your review has been submitted and will appear after moderation. We appreciate you taking the time.</p>
+    </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+// Load products into dropdown
+async function loadProducts() {
+    try {
+        const res = await fetch(`${API_BASE}/review/products`);
+        if (!res.ok) throw new Error('Failed to load products');
+        const products = await res.json();
+        const select = document.getElementById('product');
+        products.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.title;
+            select.appendChild(opt);
+        });
+    } catch (err) {
+        console.error('Could not load products:', err);
+        // Allow manual entry if products fail to load
+        const select = document.getElementById('product');
+        const opt = document.createElement('option');
+        opt.value = 'general';
+        opt.textContent = 'General feedback';
+        select.appendChild(opt);
+    }
+}
+
+// Form submission
+document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const ratingEl = document.querySelector('input[name="rating"]:checked');
+    const ratingError = document.getElementById('ratingError');
+    const formError = document.getElementById('formError');
+    const btn = document.getElementById('submitBtn');
+
+    // Reset errors
+    ratingError.classList.remove('active');
+    formError.classList.remove('active');
+
+    if (!ratingEl) {
+        ratingError.classList.add('active');
+        return;
+    }
+
+    const payload = {
+        name: document.getElementById('name').value.trim(),
+        product: document.getElementById('product').value,
+        rating: parseInt(ratingEl.value),
+        text: document.getElementById('text').value.trim(),
+        email: document.getElementById('email').value.trim() || null,
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+        const res = await fetch(`${API_BASE}/review/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.detail || 'Submission failed');
+        }
+
+        // Show thank you
+        document.getElementById('formWrapper').classList.add('hidden');
+        document.getElementById('thankYou').classList.add('active');
+    } catch (err) {
+        formError.textContent = err.message;
+        formError.classList.add('active');
+        btn.disabled = false;
+        btn.textContent = 'Submit Review';
+    }
+});
+
+loadProducts();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,240 @@
+{
+  "name": "RSS to Instagram Carousel",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 4
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/TechCrunch",
+        "options": {
+          "itemsPerPage": 10
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+      "name": "RSS Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.title + ' ' + $json.contentSnippet }}",
+              "operation": "contains",
+              "value2": "AI"
+            }
+          ]
+        },
+        "combineOperation": "any"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567803",
+      "name": "Keyword Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a content strategist writing for an Instagram carousel.\n\nArticle title: {{ $json.title }}\nArticle summary: {{ $json.contentSnippet }}\n\nWrite 10 bullet points for an Instagram carousel about this article.\nEach bullet should be 1-2 sentences, written to stand alone as a slide.\nBe direct. No filler language. No hype words.\nStart with the most interesting or unexpected point.",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.7,
+          "maxTokens": 600
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567804",
+      "name": "OpenAI Summarize",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [900, 260],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map(item => {\n  const title = item.json.title || 'Untitled';\n  const bulletText = item.json.message?.content || item.json.choices?.[0]?.message?.content || '';\n  const bullets = bulletText.split('\\n').filter(line => line.trim().length > 0);\n\n  // Format each bullet as a numbered slide\n  const slides = bullets.map((bullet, idx) => {\n    const clean = bullet.replace(/^[\\d\\-\\*\\.]+\\s*/, '').trim();\n    return `Slide ${idx + 1}:\\n${clean}`;\n  });\n\n  const carouselText = [\n    `--- ${title} ---`,\n    '',\n    ...slides,\n    '',\n    'Slide 11 (CTA):',\n    'Follow @behikeai for more AI tools built for real builders.'\n  ].join('\\n');\n\n  return {\n    json: {\n      ...item.json,\n      carousel_text: carouselText,\n      slide_count: slides.length,\n      article_title: title\n    }\n  };\n});"
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567805",
+      "name": "Format Carousel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 260]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.bufferapp.com/1/updates/create.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_BUFFER_TOKEN_HERE"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "profile_ids[]",
+              "value": "YOUR_BUFFER_PROFILE_ID_HERE"
+            },
+            {
+              "name": "text",
+              "value": "={{ $json.carousel_text.substring(0, 500) }}"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567806",
+      "name": "Schedule to Buffer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1340, 260]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@youremail.com",
+        "subject": "=Instagram Carousel Queue - {{ $now.format('MMM D, YYYY') }}",
+        "emailType": "html",
+        "message": "=<h2>Carousels Queued for Review</h2>\n<p><strong>Article:</strong> {{ $json.article_title }}</p>\n<hr>\n<pre>{{ $json.carousel_text }}</pre>\n<p>Review your Buffer queue to approve or edit before posting.</p>",
+        "options": {}
+      },
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567807",
+      "name": "Gmail Review Digest",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1560, 260],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-cred-1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed": {
+      "main": [
+        [
+          {
+            "node": "Keyword Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Filter": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "OpenAI Summarize": {
+      "main": [
+        [
+          {
+            "node": "Format Carousel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Carousel": {
+      "main": [
+        [
+          {
+            "node": "Schedule to Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule to Buffer": {
+      "main": [
+        [
+          {
+            "node": "Gmail Review Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "content",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    },
+    {
+      "name": "instagram",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    }
+  ]
+}

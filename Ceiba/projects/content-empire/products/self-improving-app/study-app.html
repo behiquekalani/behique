@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdaptLearn - Self-Improving Study App</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#141414;--border:#222;--text:#fff;--muted:#888;--accent:#0066ff;--success:#00c853;--danger:#ff4444;--gold:#c9a84c;--warn:#ff9800}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:700px;margin:0 auto;padding:20px}
+header{text-align:center;padding:30px 0 20px}
+header h1{font-size:2em;font-weight:700;letter-spacing:-1px}
+header h1 span{color:var(--accent)}
+header p{color:var(--muted);margin-top:6px}
+.screen{display:none;animation:fadeUp .3s ease}.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+/* Subject selection */
+.subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}
+@media(max-width:500px){.subject-grid{grid-template-columns:1fr}}
+.subject-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer;transition:all .25s}
+.subject-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.subject-card .icon{font-size:2em;margin-bottom:8px}
+.subject-card h3{font-size:1.1em;margin-bottom:4px}
+.subject-card p{color:var(--muted);font-size:.85em}
+.subject-card .level{margin-top:8px;font-size:.75em;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+
+/* Question area */
+.q-progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:.85em;color:var(--muted)}
+.q-progress .bar-wrap{flex:1;height:4px;background:var(--border);border-radius:2px;margin:0 16px}
+.q-progress .bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.q-difficulty{font-size:.75em;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:1px}
+.q-difficulty.easy{background:rgba(0,200,83,.15);color:var(--success)}
+.q-difficulty.medium{background:rgba(255,152,0,.15);color:var(--warn)}
+.q-difficulty.hard{background:rgba(255,68,68,.15);color:var(--danger)}
+
+.question-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:30px;margin:16px 0}
+.question-box h2{font-size:1.3em;line-height:1.4;margin-bottom:20px}
+.answers{display:flex;flex-direction:column;gap:10px}
+.answer-btn{background:var(--bg);border:2px solid var(--border);border-radius:10px;padding:14px 20px;cursor:pointer;transition:all .2s;font-size:1em;color:var(--text);text-align:left;display:flex;align-items:center;gap:12px}
+.answer-btn:hover{border-color:var(--accent);background:#111}
+.answer-btn.correct{border-color:var(--success);background:rgba(0,200,83,.1)}
+.answer-btn.wrong{border-color:var(--danger);background:rgba(255,68,68,.1)}
+.answer-btn .letter{width:30px;height:30px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8em;flex-shrink:0}
+.answer-btn.correct .letter{background:var(--success);color:#000}
+.answer-btn.wrong .letter{background:var(--danger);color:#fff}
+
+.explanation{background:rgba(0,102,255,.05);border:1px solid rgba(0,102,255,.2);border-radius:10px;padding:16px;margin-top:16px;font-size:.9em;line-height:1.5;display:none}
+.next-btn{display:none;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;margin-top:16px;transition:all .2s}
+.next-btn:hover{background:#0052cc}
+
+/* Feedback */
+.feedback-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:30px;text-align:center;margin:20px 0}
+.feedback-box h2{margin-bottom:6px}
+.feedback-box p{color:var(--muted);margin-bottom:20px;font-size:.95em}
+.feedback-options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.fb-btn{padding:12px 24px;background:var(--bg);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:.95em;color:var(--text)}
+.fb-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+.fb-btn.selected{border-color:var(--accent);background:rgba(0,102,255,.1)}
+.fb-note{color:var(--muted);font-size:.8em;margin-top:16px;font-style:italic}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+@media(max-width:500px){.stats-grid{grid-template-columns:1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center}
+.stat-card .value{font-size:2em;font-weight:700}
+.stat-card .label{color:var(--muted);font-size:.8em;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.stat-card.accent .value{color:var(--accent)}
+.stat-card.success .value{color:var(--success)}
+.stat-card.gold .value{color:var(--gold)}
+
+/* Chart */
+.chart-area{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin:20px 0}
+.chart-area h3{font-size:.9em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:120px}
+.chart-bar{flex:1;background:var(--accent);border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;position:relative}
+.chart-bar:hover::after{content:attr(data-val);position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:.7em;color:var(--accent);white-space:nowrap}
+
+.btn{display:inline-block;padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:1em;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
+.btn:hover{background:#0052cc;transform:translateY(-1px)}
+.btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.outline:hover{border-color:var(--accent)}
+.btn-row{display:flex;gap:12px;justify-content:center;margin:20px 0}
+footer{text-align:center;padding:30px 0;color:var(--muted);font-size:.85em}
+footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1>Adapt<span>Learn</span></h1><p>The study app that learns how you learn.</p></header>
+
+<!-- Subject Selection -->
+<div class="screen active" id="s-subjects">
+  <h2 style="text-align:center;margin-bottom:6px">Choose a subject</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:20px">Your difficulty adapts based on your performance and feedback.</p>
+  <div class="subject-grid" id="subjectGrid"></div>
+  <div class="btn-row"><button class="btn outline" onclick="showStats()">View Progress</button></div>
+</div>
+
+<!-- Quiz -->
+<div class="screen" id="s-quiz">
+  <div class="q-progress">
+    <span id="qCount">1/5</span>
+    <div class="bar-wrap"><div class="bar-fill" id="qBar" style="width:20%"></div></div>
+    <span class="q-difficulty" id="qDiff">Medium</span>
+  </div>
+  <div class="question-box">
+    <h2 id="qText"></h2>
+    <div class="answers" id="qAnswers"></div>
+    <div class="explanation" id="qExplain"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question</button>
+  </div>
+</div>
+
+<!-- Feedback -->
+<div class="screen" id="s-feedback">
+  <div class="feedback-box">
+    <h2>How was that round?</h2>
+    <p>Your answer helps the app adjust to your level.</p>
+    <div class="feedback-options">
+      <div class="fb-btn" onclick="giveFeedback('too_easy')">Too Easy</div>
+      <div class="fb-btn" onclick="giveFeedback('just_right')">Just Right</div>
+      <div class="fb-btn" onclick="giveFeedback('too_hard')">Too Hard</div>
+    </div>
+    <p class="fb-note">This is optional. You can skip it.</p>
+    <div class="btn-row" style="margin-top:16px"><button class="btn outline" onclick="giveFeedback('skip')">Skip</button></div>
+  </div>
+  <div id="roundStats" style="margin-top:16px"></div>
+</div>
+
+<!-- Stats -->
+<div class="screen" id="s-stats">
+  <h2 style="text-align:center;margin-bottom:20px">Your Progress</h2>
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="chart-area"><h3>Accuracy over last 10 sessions</h3><div class="chart-bars" id="chartBars"></div></div>
+  <div id="adaptNote" style="text-align:center;color:var(--muted);font-size:.9em;margin:16px 0"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="show('s-subjects')">Study More</button>
+    <button class="btn outline" onclick="resetProgress()">Reset All</button>
+  </div>
+</div>
+
+<footer><p>Built by <a href="#">Behike</a>. Your data stays on your device.</p></footer>
+</div>
+
+<script>
+// Question bank
+const QUESTIONS = {
+  math: {
+    easy: [
+      {q:"What is 15 + 27?",a:["42","38","45","40"],c:0,e:"15 + 27 = 42. Break it down: 15 + 25 = 40, then add 2."},
+      {q:"What is 8 x 7?",a:["54","56","63","48"],c:1,e:"8 x 7 = 56. A common multiplication fact worth memorizing."},
+      {q:"What is 100 - 37?",a:["67","63","73","57"],c:1,e:"100 - 37 = 63. Subtract 40, then add 3 back."},
+      {q:"What is 144 / 12?",a:["11","12","13","14"],c:1,e:"144 / 12 = 12. 12 squared is 144."},
+      {q:"What is 25% of 80?",a:["15","20","25","16"],c:1,e:"25% = 1/4. So 80 / 4 = 20."},
+    ],
+    medium: [
+      {q:"Solve: 3x + 7 = 22. What is x?",a:["3","5","7","4"],c:1,e:"3x + 7 = 22. Subtract 7: 3x = 15. Divide by 3: x = 5."},
+      {q:"What is the area of a triangle with base 10 and height 6?",a:["60","30","16","36"],c:1,e:"Area = (base x height) / 2 = (10 x 6) / 2 = 30."},
+      {q:"What is the square root of 169?",a:["11","12","13","14"],c:2,e:"13 x 13 = 169. So the square root of 169 is 13."},
+      {q:"If a shirt costs $40 and is 30% off, what do you pay?",a:["$28","$30","$12","$32"],c:0,e:"30% of 40 = $12 discount. $40 - $12 = $28."},
+      {q:"What is 2^8?",a:["128","256","512","64"],c:1,e:"2^8 = 256. Double 2 eight times: 2, 4, 8, 16, 32, 64, 128, 256."},
+    ],
+    hard: [
+      {q:"What is the derivative of f(x) = 3x^2 + 5x?",a:["6x + 5","3x + 5","6x^2 + 5","x^2 + 5x"],c:0,e:"Power rule: bring down exponent, reduce by 1. 3(2)x^1 + 5(1)x^0 = 6x + 5."},
+      {q:"Solve: x^2 - 5x + 6 = 0",a:["x=1, x=6","x=2, x=3","x=-2, x=-3","x=1, x=5"],c:1,e:"Factor: (x-2)(x-3) = 0. So x = 2 or x = 3."},
+      {q:"What is the integral of 2x dx?",a:["x^2 + C","2x^2 + C","x + C","x^2"],c:0,e:"Integral of 2x = 2(x^2/2) + C = x^2 + C."},
+      {q:"In a right triangle with legs 5 and 12, what is the hypotenuse?",a:["15","13","17","14"],c:1,e:"Pythagorean theorem: 5^2 + 12^2 = 25 + 144 = 169. Square root of 169 = 13."},
+      {q:"What is log base 2 of 64?",a:["5","6","7","8"],c:1,e:"2^6 = 64, so log2(64) = 6."},
+    ]
+  },
+  science: {
+    easy: [
+      {q:"What gas do plants absorb from the air?",a:["Oxygen","Nitrogen","Carbon Dioxide","Hydrogen"],c:2,e:"Plants absorb CO2 during photosynthesis and release oxygen."},
+      {q:"What is the chemical symbol for water?",a:["HO","H2O","O2","H2"],c:1,e:"Water is two hydrogen atoms and one oxygen atom: H2O."},
+      {q:"How many planets are in our solar system?",a:["7","8","9","10"],c:1,e:"8 planets: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune."},
+      {q:"What organ pumps blood through the body?",a:["Lungs","Brain","Heart","Liver"],c:2,e:"The heart pumps blood through the circulatory system."},
+      {q:"What force keeps us on the ground?",a:["Magnetism","Friction","Gravity","Inertia"],c:2,e:"Gravity is the force that attracts objects toward the center of the Earth."},
+    ],
+    medium: [
+      {q:"What is the powerhouse of the cell?",a:["Nucleus","Ribosome","Mitochondria","Golgi body"],c:2,e:"Mitochondria produce ATP, the energy currency of cells."},
+      {q:"What is Newton's second law of motion?",a:["F = ma","E = mc^2","V = IR","PV = nRT"],c:0,e:"Force equals mass times acceleration. F = ma."},
+      {q:"What element has atomic number 6?",a:["Nitrogen","Oxygen","Carbon","Boron"],c:2,e:"Carbon has 6 protons, making its atomic number 6."},
+      {q:"What type of bond shares electrons?",a:["Ionic","Covalent","Metallic","Hydrogen"],c:1,e:"Covalent bonds involve sharing electrons between atoms."},
+      {q:"What is the speed of light in km/s (approx)?",a:["100,000","200,000","300,000","400,000"],c:2,e:"Light travels at approximately 300,000 km/s (299,792 km/s exactly)."},
+    ],
+    hard: [
+      {q:"What is the Heisenberg uncertainty principle about?",a:["Energy conservation","Position and momentum","Relativity","Entropy"],c:1,e:"You cannot simultaneously know both the exact position and momentum of a particle."},
+      {q:"What is the pH of a neutral solution?",a:["0","7","14","1"],c:1,e:"pH 7 is neutral. Below 7 is acidic, above 7 is basic."},
+      {q:"What organelle is responsible for protein synthesis?",a:["Lysosome","Ribosome","Vacuole","Chloroplast"],c:1,e:"Ribosomes translate mRNA into proteins."},
+      {q:"What is Avogadro's number?",a:["6.022 x 10^23","3.14 x 10^8","9.8 x 10^2","1.6 x 10^-19"],c:0,e:"Avogadro's number (6.022 x 10^23) is the number of particles in one mole."},
+      {q:"In DNA, adenine pairs with which base?",a:["Cytosine","Guanine","Thymine","Uracil"],c:2,e:"In DNA: A-T (adenine-thymine) and C-G (cytosine-guanine)."},
+    ]
+  },
+  coding: {
+    easy: [
+      {q:"What does HTML stand for?",a:["Hyper Text Markup Language","High Tech Modern Language","Home Tool Markup Language","Hyper Transfer ML"],c:0,e:"HTML = HyperText Markup Language. It structures web content."},
+      {q:"Which symbol is used for comments in Python?",a:["//","#","/*","--"],c:1,e:"Python uses # for single-line comments."},
+      {q:"What does CSS stand for?",a:["Computer Style Sheets","Cascading Style Sheets","Creative Style System","Coded Style Sheets"],c:1,e:"CSS = Cascading Style Sheets. It styles HTML elements."},
+      {q:"What is the output of: print(2 + 3)?",a:["23","5","2+3","Error"],c:1,e:"Python adds the integers: 2 + 3 = 5."},
+      {q:"Which is NOT a programming language?",a:["Python","Java","HTML","C++"],c:2,e:"HTML is a markup language, not a programming language."},
+    ],
+    medium: [
+      {q:"What is the time complexity of binary search?",a:["O(n)","O(log n)","O(n^2)","O(1)"],c:1,e:"Binary search halves the search space each step: O(log n)."},
+      {q:"In JavaScript, what does === check?",a:["Value only","Type only","Value and type","Assignment"],c:2,e:"=== checks both value AND type (strict equality)."},
+      {q:"What data structure uses FIFO?",a:["Stack","Queue","Tree","Graph"],c:1,e:"Queue = First In, First Out. Stack = Last In, First Out."},
+      {q:"What HTTP method is used to create a resource?",a:["GET","POST","PUT","DELETE"],c:1,e:"POST creates new resources. GET reads, PUT updates, DELETE removes."},
+      {q:"What is a closure in programming?",a:["A loop that never ends","A function with access to outer scope","A class method","A type of error"],c:1,e:"A closure is a function that retains access to variables from its enclosing scope."},
+    ],
+    hard: [
+      {q:"What is the space complexity of merge sort?",a:["O(1)","O(log n)","O(n)","O(n log n)"],c:2,e:"Merge sort requires O(n) extra space for the temporary arrays during merging."},
+      {q:"What design pattern ensures only one instance of a class?",a:["Factory","Observer","Singleton","Strategy"],c:2,e:"Singleton pattern restricts instantiation to one object."},
+      {q:"In Python, what is a decorator?",a:["A class attribute","A function that modifies another function","A type hint","A loop construct"],c:1,e:"Decorators wrap functions to extend behavior without modifying the original."},
+      {q:"What is the difference between TCP and UDP?",a:["TCP is faster","UDP guarantees delivery","TCP guarantees delivery","They are the same"],c:2,e:"TCP guarantees ordered delivery with acknowledgments. UDP is faster but unreliable."},
+      {q:"What does ACID stand for in databases?",a:["Add Create Insert Delete","Atomicity Consistency Isolation Durability","Async Concurrent Independent Distributed","None of these"],c:1,e:"ACID: Atomicity, Consistency, Isolation, Durability. Core transaction properties."},
+    ]
+  },
+  business: {
+    easy: [
+      {q:"What is revenue?",a:["Total income from sales","Profit after expenses","Money in the bank","Investor funding"],c:0,e:"Revenue is the total income generated from sales before any expenses are deducted."},
+      {q:"What does ROI stand for?",a:["Rate of Income","Return on Investment","Revenue of Interest","Risk of Inflation"],c:1,e:"ROI = Return on Investment. It measures profitability relative to cost."},
+      {q:"What is a target market?",a:["A shopping mall","The specific group you sell to","Your competitor","A marketing budget"],c:1,e:"Your target market is the specific group of people most likely to buy your product."},
+      {q:"What is the difference between B2B and B2C?",a:["B2B is bigger","B2B sells to businesses, B2C to consumers","B2C is online only","They are the same"],c:1,e:"B2B = Business to Business. B2C = Business to Consumer."},
+      {q:"What is a lead magnet?",a:["A physical magnet","Free content to attract potential customers","A type of ad","A pricing strategy"],c:1,e:"A lead magnet is free valuable content offered in exchange for contact info."},
+    ],
+    medium: [
+      {q:"What is a value ladder?",a:["A tool for measuring value","Products at increasing prices","A company hierarchy","A growth metric"],c:1,e:"A value ladder offers products from free to premium, moving customers up in price and value."},
+      {q:"What is CAC?",a:["Customer Acquisition Cost","Company Annual Capital","Content Audience Count","Customer Average Cart"],c:0,e:"CAC = Customer Acquisition Cost. How much you spend to get one customer."},
+      {q:"What is LTV in business?",a:["Long Term Vision","Lifetime Value","Latest Trade Volume","Low Ticket Value"],c:1,e:"LTV = Lifetime Value. Total revenue a customer generates over their relationship with you."},
+      {q:"What is a sales funnel?",a:["A kitchen tool","The journey from awareness to purchase","A type of chart","A pricing model"],c:1,e:"A sales funnel maps the customer journey: awareness, interest, decision, action."},
+      {q:"What is the 80/20 rule in business?",a:["80% profit, 20% loss","80% of results come from 20% of efforts","Work 80 hours, rest 20","Spend 80% on ads, 20% on product"],c:1,e:"The Pareto Principle: roughly 80% of results come from 20% of inputs."},
+    ],
+    hard: [
+      {q:"What is the difference between margin and markup?",a:["They are the same","Margin is % of selling price, markup is % of cost","Margin is always higher","Markup is % of selling price"],c:1,e:"Margin = profit / selling price. Markup = profit / cost. Same dollar amount, different percentages."},
+      {q:"What is a moat in business strategy?",a:["A water feature","A sustainable competitive advantage","A type of debt","A marketing channel"],c:1,e:"A moat is a durable competitive advantage that protects a business from competitors."},
+      {q:"What does MRR stand for?",a:["Monthly Recurring Revenue","Maximum Return Rate","Market Research Report","Minimum Required Revenue"],c:0,e:"MRR = Monthly Recurring Revenue. Key metric for subscription businesses."},
+      {q:"What is churn rate?",a:["Customer growth rate","Percentage of customers who leave","Employee turnover","Product defect rate"],c:1,e:"Churn rate measures what percentage of customers cancel or stop buying in a given period."},
+      {q:"What is arbitrage?",a:["A type of loan","Buying low in one market and selling high in another","A legal contract","A marketing strategy"],c:1,e:"Arbitrage exploits price differences between markets for profit."},
+    ]
+  }
+};
+
+const SUBJECTS = [
+  {id:'math',name:'Mathematics',icon:'📐',desc:'Arithmetic to calculus'},
+  {id:'science',name:'Science',icon:'🔬',desc:'Physics, chemistry, biology'},
+  {id:'coding',name:'Programming',icon:'💻',desc:'Concepts and languages'},
+  {id:'business',name:'Business',icon:'📊',desc:'Strategy and finance'}
+];
+
+// State
+let state = JSON.parse(localStorage.getItem('adaptlearn_state') || 'null') || {
+  subjects: {},
+  sessions: [],
+  totalQuestions: 0,
+  totalCorrect: 0
+};
+
+function saveState(){localStorage.setItem('adaptlearn_state',JSON.stringify(state))}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+
+// Subject state
+function getSubjectState(id){
+  if(!state.subjects[id]) state.subjects[id]={difficulty:1,correct:0,total:0,feedback:[],sessions:[]};
+  return state.subjects[id];
+}
+
+function getDiffLabel(d){return d<=0?'easy':d>=2?'hard':'medium'}
+function getDiffQuestions(subId,diff){
+  const label=getDiffLabel(diff);
+  return QUESTIONS[subId]?.[label]||QUESTIONS[subId]?.medium||[];
+}
+
+// Render subjects
+function renderSubjects(){
+  const grid=document.getElementById('subjectGrid');
+  grid.innerHTML='';
+  SUBJECTS.forEach(s=>{
+    const ss=getSubjectState(s.id);
+    const dl=getDiffLabel(ss.difficulty);
+    const card=document.createElement('div');
+    card.className='subject-card';
+    card.onclick=()=>startQuiz(s.id);
+    card.innerHTML=`<div class="icon">${s.icon}</div><h3>${s.name}</h3><p>${s.desc}</p><div class="level">Level: ${dl} ${ss.total>0?'('+Math.round(ss.correct/ss.total*100)+'% accuracy)':''}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// Quiz
+let quiz={subject:'',questions:[],current:0,correct:0,total:5,answered:false};
+
+function startQuiz(subId){
+  const ss=getSubjectState(subId);
+  const qs=getDiffQuestions(subId,ss.difficulty);
+  const shuffled=[...qs].sort(()=>Math.random()-.5).slice(0,5);
+  if(shuffled.length<5){
+    // Pad with questions from other difficulties
+    const all=[...QUESTIONS[subId].easy,...QUESTIONS[subId].medium,...QUESTIONS[subId].hard];
+    while(shuffled.length<5){
+      const r=all[Math.floor(Math.random()*all.length)];
+      if(!shuffled.includes(r))shuffled.push(r);
+    }
+  }
+  quiz={subject:subId,questions:shuffled,current:0,correct:0,total:shuffled.length,answered:false};
+  show('s-quiz');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=quiz.questions[quiz.current];
+  const dl=getDiffLabel(getSubjectState(quiz.subject).difficulty);
+  document.getElementById('qCount').textContent=`${quiz.current+1}/${quiz.total}`;
+  document.getElementById('qBar').style.width=`${((quiz.current+1)/quiz.total)*100}%`;
+  const diffEl=document.getElementById('qDiff');
+  diffEl.textContent=dl;diffEl.className=`q-difficulty ${dl}`;
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qExplain').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  quiz.answered=false;
+
+  const ans=document.getElementById('qAnswers');
+  ans.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.a.forEach((a,i)=>{
+    const btn=document.createElement('button');
+    btn.className='answer-btn';
+    btn.innerHTML=`<span class="letter">${letters[i]}</span>${a}`;
+    btn.onclick=()=>checkAnswer(i);
+    ans.appendChild(btn);
+  });
+}
+
+function checkAnswer(idx){
+  if(quiz.answered)return;
+  quiz.answered=true;
+  const q=quiz.questions[quiz.current];
+  const btns=document.querySelectorAll('.answer-btn');
+  btns[idx].classList.add(idx===q.c?'correct':'wrong');
+  if(idx!==q.c)btns[q.c].classList.add('correct');
+  if(idx===q.c)quiz.correct++;
+
+  const exp=document.getElementById('qExplain');
+  exp.textContent=q.e;exp.style.display='block';
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function nextQuestion(){
+  quiz.current++;
+  if(quiz.current>=quiz.total){
+    showFeedback();
+  }else{
+    renderQuestion();
+  }
+}
+
+function showFeedback(){
+  const pct=Math.round(quiz.correct/quiz.total*100);
+  const ss=getSubjectState(quiz.subject);
+  ss.correct+=quiz.correct;ss.total+=quiz.total;
+  ss.sessions.push({date:new Date().toISOString(),correct:quiz.correct,total:quiz.total,pct});
+  state.totalCorrect+=quiz.correct;state.totalQuestions+=quiz.total;
+  saveState();
+
+  document.getElementById('roundStats').innerHTML=`
+    <div class="stats-grid">
+      <div class="stat-card ${pct>=80?'success':pct>=50?'gold':''}"><div class="value">${pct}%</div><div class="label">This Round</div></div>
+      <div class="stat-card accent"><div class="value">${quiz.correct}/${quiz.total}</div><div class="label">Correct</div></div>
+      <div class="stat-card"><div class="value">${getDiffLabel(ss.difficulty)}</div><div class="label">Current Level</div></div>
+    </div>`;
+  show('s-feedback');
+}
+
+function giveFeedback(fb){
+  const ss=getSubjectState(quiz.subject);
+  const pct=Math.round(quiz.correct/quiz.total*100);
+
+  // Record feedback
+  ss.feedback.push({date:new Date().toISOString(),feedback:fb,accuracy:pct});
+  state.sessions.push({subject:quiz.subject,date:new Date().toISOString(),correct:quiz.correct,total:quiz.total,feedback:fb});
+
+  // Adjust difficulty based on BOTH accuracy and feedback
+  let adjustment=0;
+
+  // Accuracy signal
+  if(pct>=80)adjustment+=0.3;
+  else if(pct<40)adjustment-=0.3;
+
+  // Feedback signal (stronger than accuracy)
+  if(fb==='too_easy')adjustment+=0.5;
+  else if(fb==='too_hard')adjustment-=0.5;
+  else if(fb==='just_right')adjustment+=0; // Stay
+
+  ss.difficulty=Math.max(-1,Math.min(3,ss.difficulty+adjustment));
+  saveState();
+
+  // Show confirmation
+  const msg=adjustment>0?'Increasing difficulty next time.':adjustment<0?'Making it easier next time.':'Keeping the same level.';
+  alert(`Got it. ${msg}`);
+
+  renderSubjects();
+  show('s-subjects');
+}
+
+function showStats(){
+  const grid=document.getElementById('statsGrid');
+  const pct=state.totalQuestions>0?Math.round(state.totalCorrect/state.totalQuestions*100):0;
+  grid.innerHTML=`
+    <div class="stat-card accent"><div class="value">${state.totalQuestions}</div><div class="label">Total Questions</div></div>
+    <div class="stat-card success"><div class="value">${pct}%</div><div class="label">Overall Accuracy</div></div>
+    <div class="stat-card gold"><div class="value">${state.sessions.length}</div><div class="label">Sessions</div></div>`;
+
+  // Chart
+  const bars=document.getElementById('chartBars');
+  bars.innerHTML='';
+  const recent=state.sessions.slice(-10);
+  if(recent.length>0){
+    recent.forEach(s=>{
+      const p=Math.round(s.correct/s.total*100);
+      const bar=document.createElement('div');
+      bar.className='chart-bar';
+      bar.style.height=`${p}%`;
+      bar.setAttribute('data-val',`${p}%`);
+      bars.appendChild(bar);
+    });
+  }else{
+    bars.innerHTML='<p style="color:var(--muted);width:100%;text-align:center;padding:40px 0">No sessions yet. Start studying to see your progress.</p>';
+  }
+
+  // Adaptation note
+  const note=document.getElementById('adaptNote');
+  const feedbacks=state.sessions.filter(s=>s.feedback&&s.feedback!=='skip');
+  note.textContent=feedbacks.length>0?`The app has adapted ${feedbacks.length} time${feedbacks.length>1?'s':''} based on your feedback.`:'Complete a session and give feedback to start adapting.';
+
+  show('s-stats');
+}
+
+function resetProgress(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    state={subjects:{},sessions:[],totalQuestions:0,totalCorrect:0};
+    saveState();renderSubjects();show('s-subjects');
+  }
+}
+
+renderSubjects();
+</script>
+</body>
+</html>

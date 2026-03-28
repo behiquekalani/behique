@@ -1,0 +1,204 @@
+{
+  "name": "Weekly Analytics Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "weekday": 0
+            }
+          ]
+        },
+        "options": {
+          "timezone": "America/Puerto_Rico"
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900001",
+      "name": "Schedule Trigger Sunday 8AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://graph.instagram.com/me/media",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,caption,media_type,timestamp,like_count,comments_count,reach,impressions"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            },
+            {
+              "name": "access_token",
+              "value": "YOUR_INSTAGRAM_ACCESS_TOKEN_HERE"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900002",
+      "name": "Fetch Instagram Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the post data from Instagram API response\nconst response = $input.first().json;\nconst posts = response.data || [];\n\n// Filter to last 7 days\nconst oneWeekAgo = new Date();\noneWeekAgo.setDate(oneWeekAgo.getDate() - 7);\nconst recentPosts = posts.filter(p => new Date(p.timestamp) > oneWeekAgo);\n\n// Calculate engagement rate for each post\nconst withEngagement = recentPosts.map(p => ({\n  ...p,\n  // Use reach if available, fall back to like_count as denominator estimate\n  engagement_rate: ((p.like_count + p.comments_count) / Math.max(p.reach || p.like_count || 1, 1) * 100).toFixed(2),\n  total_interactions: (p.like_count || 0) + (p.comments_count || 0),\n  // Truncate caption for display\n  caption_short: (p.caption || '(no caption)').substring(0, 80) + ((p.caption || '').length > 80 ? '...' : '')\n}));\n\n// Sort by total interactions descending\nconst sorted = withEngagement.sort((a, b) => b.total_interactions - a.total_interactions);\n\n// Return top 5\nconst top5 = sorted.slice(0, 5);\n\n// Also compute weekly totals for summary\nconst weeklyTotals = {\n  total_posts: recentPosts.length,\n  total_likes: recentPosts.reduce((sum, p) => sum + (p.like_count || 0), 0),\n  total_comments: recentPosts.reduce((sum, p) => sum + (p.comments_count || 0), 0),\n  avg_engagement_rate: recentPosts.length > 0\n    ? (recentPosts.reduce((sum, p) => sum + parseFloat(((p.like_count + p.comments_count) / Math.max(p.reach || p.like_count || 1, 1) * 100)), 0) / recentPosts.length).toFixed(2)\n    : '0.00'\n};\n\nreturn top5.map(post => ({\n  json: {\n    ...post,\n    weekly_totals: weeklyTotals\n  }\n}));"
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900003",
+      "name": "Calculate Engagement",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "text",
+        "operation": "message",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Instagram post data:\nCaption: {{ $json.caption_short }}\nLikes: {{ $json.like_count }}\nComments: {{ $json.comments_count }}\nEngagement rate: {{ $json.engagement_rate }}%\nDate posted: {{ $json.timestamp }}\n\nWrite exactly 2 sentences:\n1. What likely made this post perform at this level (be specific, not generic).\n2. One concrete thing to do differently or repeat next week based on this data.\n\nBe direct. No hedging. No filler.",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.5,
+          "maxTokens": 150
+        }
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900004",
+      "name": "OpenAI Post Summary",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [900, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-cred-1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all post items with their AI summaries\nconst items = $input.all();\n\nif (items.length === 0) {\n  return [{ json: { html_report: '<p>No posts found in the last 7 days.</p>', subject: 'Weekly Report - No Posts' } }];\n}\n\nconst weeklyTotals = items[0].json.weekly_totals || {};\nconst reportDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });\n\n// Build HTML email\nconst postsHtml = items.map((item, idx) => {\n  const post = item.json;\n  const aiSummary = post.message?.content || post.choices?.[0]?.message?.content || 'No summary available.';\n  return `\n    <div style=\"border-left: 3px solid #333; padding-left: 12px; margin-bottom: 24px;\">\n      <p style=\"margin:0; font-size:13px; color:#888;\">#${idx + 1} &mdash; ${new Date(post.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>\n      <p style=\"margin:6px 0; font-weight:bold;\">${post.caption_short}</p>\n      <p style=\"margin:4px 0; font-size:14px;\">\n        Likes: <strong>${post.like_count || 0}</strong> &nbsp;\n        Comments: <strong>${post.comments_count || 0}</strong> &nbsp;\n        Engagement: <strong>${post.engagement_rate}%</strong>\n      </p>\n      <p style=\"margin:8px 0; font-size:14px; color:#444;\">${aiSummary}</p>\n    </div>\n  `;\n}).join('');\n\nconst summaryHtml = `\n  <div style=\"background:#f5f5f5; padding:16px; border-radius:6px; margin-bottom:24px;\">\n    <h3 style=\"margin:0 0 8px 0;\">This Week</h3>\n    <p style=\"margin:0;\">Posts published: <strong>${weeklyTotals.total_posts || items.length}</strong></p>\n    <p style=\"margin:4px 0;\">Total likes: <strong>${weeklyTotals.total_likes || 0}</strong></p>\n    <p style=\"margin:4px 0;\">Total comments: <strong>${weeklyTotals.total_comments || 0}</strong></p>\n    <p style=\"margin:4px 0;\">Avg engagement rate: <strong>${weeklyTotals.avg_engagement_rate || '0.00'}%</strong></p>\n  </div>\n`;\n\nconst fullHtml = `\n  <div style=\"font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width:600px; margin:0 auto; padding:24px;\">\n    <h2 style=\"margin:0 0 4px 0;\">Weekly Instagram Report</h2>\n    <p style=\"margin:0 0 24px 0; color:#888; font-size:14px;\">${reportDate}</p>\n    ${summaryHtml}\n    <h3 style=\"margin:0 0 16px 0;\">Top 5 Posts</h3>\n    ${postsHtml}\n    <p style=\"font-size:12px; color:#999; margin-top:32px;\">Generated by Ceiba / n8n. Review, adjust content plan for next week.</p>\n  </div>\n`;\n\nreturn [{ json: {\n  html_report: fullHtml,\n  subject: `Weekly Instagram Report - ${reportDate}`\n} }];"
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900005",
+      "name": "Build Email Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "you@youremail.com",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html_report }}",
+        "options": {}
+      },
+      "id": "e5f6a7b8-c9d0-1234-efab-345678900006",
+      "name": "Send Weekly Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1340, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-cred-1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger Sunday 8AM": {
+      "main": [
+        [
+          {
+            "node": "Fetch Instagram Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Instagram Posts": {
+      "main": [
+        [
+          {
+            "node": "Calculate Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Engagement": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Post Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Post Summary": {
+      "main": [
+        [
+          {
+            "node": "Build Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Report": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "analytics",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    },
+    {
+      "name": "instagram",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    }
+  ]
+}

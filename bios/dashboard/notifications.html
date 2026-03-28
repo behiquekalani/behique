@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIOS Notification Center</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'Courier New',monospace;overflow-x:hidden}
+#header{padding:20px 24px 12px;border-bottom:1px solid #1a1a2e;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+#header h1{font-size:16px;letter-spacing:3px;text-transform:uppercase;color:#888}
+#header h1 span{color:#448aff}
+#status{font-size:11px;color:#555;display:flex;align-items:center;gap:8px}
+#status .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+#summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;padding:16px 24px}
+.stat-card{background:#111118;border:1px solid #1a1a2e;border-radius:8px;padding:14px 16px}
+.stat-card .label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#555;margin-bottom:6px}
+.stat-card .value{font-size:22px;font-weight:bold}
+.stat-card.revenue .value{color:#22c55e}
+.stat-card.leads .value{color:#06b6d4}
+.stat-card.tickets .value{color:#ef4444}
+.stat-card.reviews .value{color:#eab308}
+#filters{padding:8px 24px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-btn{background:#111118;border:1px solid #1a1a2e;color:#888;padding:6px 14px;border-radius:16px;font-size:11px;font-family:inherit;cursor:pointer;transition:.2s}
+.filter-btn.active{border-color:currentColor;color:#e0e0e0}
+.filter-btn[data-type="sale"]{--c:#22c55e}.filter-btn[data-type="sale"].active{color:#22c55e;background:#22c55e11}
+.filter-btn[data-type="review"]{--c:#eab308}.filter-btn[data-type="review"].active{color:#eab308;background:#eab30811}
+.filter-btn[data-type="ticket"]{--c:#ef4444}.filter-btn[data-type="ticket"].active{color:#ef4444;background:#ef444411}
+.filter-btn[data-type="signup"]{--c:#06b6d4}.filter-btn[data-type="signup"].active{color:#06b6d4;background:#06b6d411}
+.filter-btn[data-type="signal"]{--c:#a855f7}.filter-btn[data-type="signal"].active{color:#a855f7;background:#a855f711}
+#sound-toggle{margin-left:auto;background:none;border:1px solid #1a1a2e;color:#555;padding:6px 12px;border-radius:16px;font-size:11px;font-family:inherit;cursor:pointer}
+#sound-toggle.on{color:#22c55e;border-color:#22c55e44}
+#feed{padding:12px 24px 40px;display:flex;flex-direction:column;gap:8px}
+.event{background:#111118;border:1px solid #1a1a2e;border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.event .dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.event.sale .dot{background:#22c55e}
+.event.review .dot{background:#eab308}
+.event.ticket .dot{background:#ef4444}
+.event.signup .dot{background:#06b6d4}
+.event.signal .dot{background:#a855f7}
+.event .body{flex:1;min-width:0}
+.event .title{font-size:13px;margin-bottom:2px}
+.event .meta{font-size:10px;color:#555}
+.event .amount{font-size:13px;font-weight:bold;margin-left:auto;white-space:nowrap;padding-left:12px}
+.event.sale .amount{color:#22c55e}
+.event.signal .amount{color:#a855f7}
+#empty{text-align:center;padding:60px 24px;color:#333;font-size:13px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="header">
+  <h1><span>BIOS</span> Notification Center</h1>
+  <div id="status"><div class="dot"></div><span>Live</span> <span id="clock"></span></div>
+</div>
+<div id="summary">
+  <div class="stat-card revenue"><div class="label">Today Revenue</div><div class="value" id="s-revenue">$0</div></div>
+  <div class="stat-card leads"><div class="label">New Leads</div><div class="value" id="s-leads">0</div></div>
+  <div class="stat-card tickets"><div class="label">Open Tickets</div><div class="value" id="s-tickets">0</div></div>
+  <div class="stat-card reviews"><div class="label">New Reviews</div><div class="value" id="s-reviews">0</div></div>
+</div>
+<div id="filters">
+  <button class="filter-btn active" data-type="all">All</button>
+  <button class="filter-btn active" data-type="sale">Sales</button>
+  <button class="filter-btn active" data-type="review">Reviews</button>
+  <button class="filter-btn active" data-type="ticket">Tickets</button>
+  <button class="filter-btn active" data-type="signup">Signups</button>
+  <button class="filter-btn active" data-type="signal">Signals</button>
+  <button id="sound-toggle">Sound Off</button>
+</div>
+<div id="feed"></div>
+<div id="empty">No activity yet. Data sources will appear as JSON files populate.</div>
+<script>
+const BASE = window.location.pathname.replace(/dashboard\/.*$/, '');
+const SOURCES = {
+  sales:       BASE + 'analytics/data/sales.json',
+  reviews:     BASE + 'sales/data/reviews.json',
+  tickets:     BASE + 'sales/data/tickets.json',
+  leads:       BASE + 'analytics/data/leads.json',
+  convictions: BASE + 'storage/convictions.json'
+};
+let allEvents = [], soundOn = false, prevSaleCount = 0, activeFilters = new Set(['sale','review','ticket','signup','signal']);
+const feed = document.getElementById('feed');
+const empty = document.getElementById('empty');
+
+// Sound
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playChime() {
+  if (!soundOn) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.connect(g); g.connect(audioCtx.destination);
+  o.frequency.value = 880; o.type = 'sine';
+  g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+  o.start(); o.stop(audioCtx.currentTime + 0.5);
+}
+
+// Filters
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.type;
+    if (t === 'all') {
+      const allActive = activeFilters.size === 5;
+      document.querySelectorAll('.filter-btn[data-type]').forEach(b => {
+        if (b.dataset.type !== 'all') { allActive ? b.classList.remove('active') : b.classList.add('active'); }
+      });
+      activeFilters = allActive ? new Set() : new Set(['sale','review','ticket','signup','signal']);
+      btn.classList.toggle('active', !allActive);
+    } else {
+      btn.classList.toggle('active');
+      btn.classList.contains('active') ? activeFilters.add(t) : activeFilters.delete(t);
+      document.querySelector('[data-type="all"]').classList.toggle('active', activeFilters.size === 5);
+    }
+    renderFeed();
+  });
+});
+
+document.getElementById('sound-toggle').addEventListener('click', function() {
+  soundOn = !soundOn;
+  this.textContent = soundOn ? 'Sound On' : 'Sound Off';
+  this.classList.toggle('on', soundOn);
+  if (soundOn) audioCtx.resume();
+});
+
+// Clock
+function tick() {
+  const d = new Date();
+  document.getElementById('clock').textContent = d.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+tick(); setInterval(tick, 1000);
+
+// Fetch helper
+async function grab(url) {
+  try { const r = await fetch(url, {cache:'no-store'}); if (!r.ok) return null; return await r.json(); } catch { return null; }
+}
+
+// Normalize events from each source
+function parseSales(data) {
+  if (!Array.isArray(data)) return [];
+  return data.map(s => ({
+    type: 'sale', ts: new Date(s.date || s.timestamp || s.created_at || Date.now()),
+    title: s.product || s.title || 'Sale', detail: s.customer || s.email || '',
+    amount: s.amount || s.price || s.revenue || 0
+  }));
+}
+function parseReviews(data) {
+  const arr = Array.isArray(data) ? data : (data?.reviews || []);
+  return arr.map(r => ({
+    type: 'review', ts: new Date(r.date || r.timestamp || r.created_at || Date.now()),
+    title: (r.rating ? r.rating + ' star' + (r.rating > 1 ? 's':'') + ' - ' : '') + (r.product || r.title || 'Review'),
+    detail: r.comment || r.text || r.body || '', amount: null
+  }));
+}
+function parseTickets(data) {
+  const arr = Array.isArray(data) ? data : (data?.tickets || []);
+  return arr.map(t => ({
+    type: 'ticket', ts: new Date(t.date || t.timestamp || t.created_at || Date.now()),
+    title: t.subject || t.title || 'Support Ticket',
+    detail: t.status || t.priority || '', amount: null, status: t.status
+  }));
+}
+function parseLeads(data) {
+  const arr = Array.isArray(data) ? data : (data?.leads || []);
+  return arr.map(l => ({
+    type: 'signup', ts: new Date(l.date || l.timestamp || l.signed_up || Date.now()),
+    title: l.name || l.email || 'New Signup',
+    detail: l.source || l.channel || '', amount: null
+  }));
+}
+function parseConvictions(data) {
+  const arr = data?.convictions || [];
+  return arr.filter(c => c.level === 'HIGH').map(c => ({
+    type: 'signal', ts: new Date(data.generated_at || Date.now()),
+    title: c.topic.toUpperCase() + ' - High Conviction Signal',
+    detail: 'Score: ' + c.score.toFixed(1) + ' | ' + c.sources.length + ' sources | ' + c.signal_count + ' signals',
+    amount: c.score
+  }));
+}
+
+// Main load
+async function loadAll() {
+  const [sales, reviews, tickets, leads, convictions] = await Promise.all([
+    grab(SOURCES.sales), grab(SOURCES.reviews), grab(SOURCES.tickets),
+    grab(SOURCES.leads), grab(SOURCES.convictions)
+  ]);
+  const events = [
+    ...parseSales(sales), ...parseReviews(reviews), ...parseTickets(tickets),
+    ...parseLeads(leads), ...parseConvictions(convictions)
+  ].sort((a, b) => b.ts - a.ts);
+
+  // Check for new sales
+  const saleCount = events.filter(e => e.type === 'sale').length;
+  if (saleCount > prevSaleCount && prevSaleCount > 0) playChime();
+  prevSaleCount = saleCount;
+
+  allEvents = events;
+  updateSummary(sales, leads, tickets, reviews);
+  renderFeed();
+}
+
+function updateSummary(sales, leads, tickets, reviews) {
+  const today = new Date().toISOString().slice(0, 10);
+  const todaySales = parseSales(sales).filter(e => e.ts.toISOString().slice(0,10) === today);
+  const rev = todaySales.reduce((s, e) => s + (e.amount || 0), 0);
+  document.getElementById('s-revenue').textContent = '$' + rev.toFixed(2);
+  document.getElementById('s-leads').textContent = parseLeads(leads).filter(e => e.ts.toISOString().slice(0,10) === today).length;
+  const tix = parseTickets(tickets);
+  document.getElementById('s-tickets').textContent = tix.filter(t => !t.status || t.status === 'open').length;
+  document.getElementById('s-reviews').textContent = parseReviews(reviews).filter(e => e.ts.toISOString().slice(0,10) === today).length;
+}
+
+function renderFeed() {
+  const visible = allEvents.filter(e => activeFilters.has(e.type));
+  empty.classList.toggle('hidden', visible.length > 0);
+  feed.innerHTML = visible.slice(0, 100).map(e => `
+    <div class="event ${e.type}">
+      <div class="dot"></div>
+      <div class="body">
+        <div class="title">${esc(e.title)}</div>
+        <div class="meta">${esc(e.detail)} ${timeAgo(e.ts)}</div>
+      </div>
+      ${e.amount != null && e.type === 'sale' ? `<div class="amount">$${Number(e.amount).toFixed(2)}</div>` : ''}
+      ${e.amount != null && e.type === 'signal' ? `<div class="amount">${Number(e.amount).toFixed(1)}</div>` : ''}
+    </div>`).join('');
+}
+
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function timeAgo(d) {
+  const s = Math.floor((Date.now() - d) / 1000);
+  if (s < 60) return s + 's ago'; if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago'; return Math.floor(s/86400) + 'd ago';
+}
+
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

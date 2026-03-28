@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Build a consistent visual brand with Canva. Brand kit setup, template systems, platform-specific design, and cover designs that convert. A systematic approach for serious creators.">
+    <title>Creator's Canva Design System | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #000000;
+            --surface: #0D0D0D;
+            --surface2: #161616;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #F5F5F7;
+            --muted: #888888;
+            --accent: #0A84FF;
+            --cta: #30D158;
+            --cta-dim: rgba(48, 209, 88, 0.12);
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Nav */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: -0.02em;
+            text-decoration: none;
+        }
+
+        .nav-cta {
+            background: var(--cta);
+            color: #000;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover { opacity: 0.85; }
+
+        /* Layout */
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 140px 0 80px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .hero-tag.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-title {
+            font-size: clamp(36px, 6vw, 68px);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            max-width: 760px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+        }
+
+        .hero-title.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-title span {
+            color: var(--accent);
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 540px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+        }
+
+        .hero-sub.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-cta-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+        }
+
+        .hero-cta-group.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--cta);
+            color: #000;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.88;
+            transform: translateY(-1px);
+        }
+
+        .price-tag {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .price-tag span {
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        /* Section base */
+        section {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .section-body {
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 600px;
+        }
+
+        /* Problem section */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 48px;
+        }
+
+        .problem-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .problem-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .problem-icon {
+            font-size: 22px;
+            margin-bottom: 14px;
+        }
+
+        .problem-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .problem-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* Solution section */
+        .solution-list {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .solution-item {
+            display: flex;
+            gap: 20px;
+            padding: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateX(-16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .solution-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .solution-num {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            min-width: 36px;
+            padding-top: 2px;
+        }
+
+        .solution-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .solution-content p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* TOC section */
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            margin-top: 40px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .toc-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toc-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        .toc-text {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .toc-text span {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* CTA section */
+        .cta-section {
+            padding: 100px 0;
+        }
+
+        .cta-box {
+            background: var(--surface);
+            border: 1px solid rgba(48, 209, 88, 0.2);
+            border-radius: 16px;
+            padding: 60px 48px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .cta-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-title {
+            font-size: clamp(26px, 4vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 12px;
+        }
+
+        .cta-desc {
+            font-size: 16px;
+            color: var(--muted);
+            max-width: 480px;
+            margin: 0 auto 36px;
+            line-height: 1.65;
+        }
+
+        .cta-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .cta-price span {
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .cta-guarantee {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        footer a {
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text);
+        }
+
+        @media (max-width: 640px) {
+            .hero { padding: 120px 0 60px; }
+            .cta-box { padding: 40px 24px; }
+            .hero-cta-group { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <a href="/themes/behike-store/landing-pages/index.html" class="nav-logo">Behike</a>
+    <a href="https://behike.gumroad.com" class="nav-cta">Get It Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="border-top: none;">
+    <div class="container">
+        <div class="hero-tag">Design System</div>
+        <h1 class="hero-title">Stop designing from scratch. Build a <span>visual system</span> that runs itself.</h1>
+        <p class="hero-sub">A complete Canva design system for creators who want professional, consistent output at scale. Not design theory. A working system.</p>
+        <div class="hero-cta-group">
+            <a href="https://behike.gumroad.com" class="btn-primary">Get the Design System</a>
+            <div class="price-tag">$16.99 <span>one-time</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+    <div class="container">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">Visual inconsistency is costing you recognition you already earned.</h2>
+        <p class="section-body">Your audience is doing pattern recognition every time they scroll. When your content does not match, that recognition never builds. You reset the clock constantly.</p>
+
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="problem-icon">01</div>
+                <div class="problem-title">Constant Reinvention</div>
+                <p class="problem-desc">Rebrand every few months because you are bored with your look. Your audience never develops the recognition pattern you need for growth.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">02</div>
+                <div class="problem-title">Inconsistency Without System</div>
+                <p class="problem-desc">Good taste, no documented rules. Every piece designed from scratch. Good decisions made slowly and differently each time. Your feed looks like five different people made it.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">03</div>
+                <div class="problem-title">Design Takes Too Long</div>
+                <p class="problem-desc">A single Instagram post takes 45 minutes. A thumbnail takes an hour. Volume is impossible when every piece requires design decisions from zero.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SOLUTION -->
+<section>
+    <div class="container">
+        <div class="section-label">The System</div>
+        <h2 class="section-title">Design decisions made once. Every output after that is execution.</h2>
+        <p class="section-body">This is not a design tutorial. It is a systematic approach where the hard work happens once in the system, and every subsequent piece of content uses that system to output professional work without starting over.</p>
+
+        <div class="solution-list">
+            <div class="solution-item">
+                <div class="solution-num">01</div>
+                <div class="solution-content">
+                    <h3>Brand Kit Architecture</h3>
+                    <p>Exact setup for Canva's Brand Kit. Color palette logic, font pairing selection, logo variation requirements, and the secondary neutral system most creators skip. Your brand constants in one place, accessible to every design.</p>
+                </div>
+            </div>
+            <div class="solution-item">
+                <div class="solution-num">02</div>
+                <div class="solution-content">
+                    <h3>Deep Template System</h3>
+                    <p>The difference between shallow templates (colors applied to a blank canvas) and deep templates (layout logic, pre-positioned elements, placeholder content) is the difference between two minutes per post and twenty. Build deep templates once.</p>
+                </div>
+            </div>
+            <div class="solution-item">
+                <div class="solution-num">03</div>
+                <div class="solution-content">
+                    <h3>Platform-Specific Systems</h3>
+                    <p>Instagram grid logic, carousel architecture, YouTube thumbnail principles, PDF interior design. Each platform has different requirements. Each one addressed with specific rules and templates, not generic advice.</p>
+                </div>
+            </div>
+            <div class="solution-item">
+                <div class="solution-num">04</div>
+                <div class="solution-content">
+                    <h3>Product Covers That Convert</h3>
+                    <p>What buyers are actually filtering for in the glance stage. The four high-converting cover patterns. How to build a cohesive product catalog that makes buyers trust the next product because the last one delivered.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TOC -->
+<section>
+    <div class="container">
+        <div class="section-label">What Is Inside</div>
+        <h2 class="section-title">Six parts. Sixteen chapters. A complete system.</h2>
+        <p class="section-body">From brand research before building, through platform-specific systems, to quarterly maintenance. Everything needed to build and sustain a professional visual brand.</p>
+
+        <div class="toc-grid">
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">The Foundation
+                    <span>Why consistency compounds. Anatomy of a visual brand. Brand research process.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Canva Brand Kit Setup
+                    <span>Color logic. Typography system. Template architecture. Deep vs shallow templates.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Color Psychology
+                    <span>60-30-10 rule. Dark vs light modes. Visual hierarchy. The neutral system.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Typography Mastery
+                    <span>Type scales per platform. Tracking and leading. Mixing weights. Text as graphic element.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Instagram System
+                    <span>Grid strategy. Feed design rules. Full carousel template architecture.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">YouTube Thumbnails
+                    <span>Four template patterns. Text rules. Testing against real search results.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">PDF and Product Design
+                    <span>Cover patterns that build trust. Interior layout standards. Mockup system.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Production Workflow
+                    <span>Two-minute design principle. Canva organization. Batch production. Template review cycle.</span>
+                </div>
+            </div>
+            <div class="toc-item">
+                <div class="toc-dot"></div>
+                <div class="toc-text">Scaling the System
+                    <span>Documentation. Template versioning. When to evolve your visual identity.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" style="border-top: 1px solid var(--border);">
+    <div class="container">
+        <div class="cta-box">
+            <div class="section-label" style="margin-bottom: 16px;">Creator's Canva Design System</div>
+            <h2 class="cta-title">Build the system once. Use it for years.</h2>
+            <p class="cta-desc">A 5000+ word PDF guide with complete frameworks, checklists, and template specifications. Everything in one place, structured for implementation, not just reading.</p>
+            <div class="cta-price">$16.99 <span>one-time, instant download</span></div>
+            <a href="https://behike.gumroad.com" class="btn-primary" style="font-size: 16px; padding: 16px 36px;">Get the Design System</a>
+            <p class="cta-guarantee">PDF delivered immediately. No subscription. No upsells.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>Behike. Built by <a href="https://behike.gumroad.com">Kalani Andre Gomez Padin</a>.
+            <a href="/themes/behike-store/landing-pages/privacy.html">Privacy</a> &middot;
+            <a href="/themes/behike-store/landing-pages/refund.html">Refund Policy</a>
+        </p>
+    </div>
+</footer>
+
+<script>
+    // IntersectionObserver for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                const delay = entry.target.dataset.delay || 0;
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    // Hero elements animate on load
+    document.querySelectorAll('.hero-tag, .hero-title, .hero-sub, .hero-cta-group').forEach(el => {
+        el.classList.add('visible');
+    });
+
+    // Observe scroll-animated elements
+    document.querySelectorAll('.problem-card, .solution-item, .toc-item, .cta-box').forEach((el, i) => {
+        el.dataset.delay = (i % 4) * 80;
+        observer.observe(el);
+    });
+</script>
+
+</body>
+</html>

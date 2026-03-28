@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Behike Flowmap — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --surface-2: #1A1A1A;
+      --border: #2A2A2A;
+      --radius: 12px;
+      --max-width: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: var(--radius);
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 19px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .price-tag {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 52px;
+    }
+
+    /* PROBLEM CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* INSIDE LIST */
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .inside-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .inside-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .inside-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+
+    .inside-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      margin-bottom: 4px;
+    }
+
+    .inside-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .personas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .persona-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .persona-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .persona-card h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .persona-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .testimonial.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .testimonial-quote {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .testimonial-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* PRICING BOX */
+    .pricing-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px;
+      max-width: 580px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .pricing-box.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pricing-product {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 36px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .pricing-features li:last-child { border-bottom: none; }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px;
+      border-radius: var(--radius);
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .pricing-cta:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 18px;
+    }
+
+    .final-cta p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .final-cta .btn-primary {
+      font-size: 17px;
+      padding: 16px 40px;
+    }
+
+    .final-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 70px 0 60px; }
+      .section { padding: 60px 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .pricing-box { padding: 32px 24px; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">Behi<span>ke</span></div>
+      <a href="https://behikeai.gumroad.com/l/behike-flowmap" class="nav-cta" target="_blank" rel="noopener">
+        Get it for $14.99
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">Visual Business Tool</div>
+      <h1>Map your business. See the gaps. Fix them.</h1>
+      <p class="hero-sub">
+        A visual mapping system for solopreneurs. Put your revenue streams, content pipeline, product funnels, and automations on one page. See the whole picture for the first time.
+      </p>
+      <div class="hero-actions">
+        <a href="https://behikeai.gumroad.com/l/behike-flowmap" class="btn-primary" target="_blank" rel="noopener">
+          Download Now
+        </a>
+        <div>
+          <div class="price-tag">$14.99</div>
+          <div class="price-note">One-time. Instant access.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">You are running a business you cannot see</h2>
+      <p class="section-sub">Most solopreneurs operate entirely from memory. That is where the gaps hide.</p>
+
+      <div class="cards-grid">
+        <div class="card fade-in">
+          <div class="card-number">01</div>
+          <h3>Your revenue sources are disconnected</h3>
+          <p>You have a product, maybe an affiliate link, maybe a service. None of them are mapped together. You cannot see which one is worth your time and which one is noise.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">02</div>
+          <h3>Your content has no system behind it</h3>
+          <p>You post. Sometimes consistently, sometimes not. But the connection between content, audience, and revenue is invisible. You are publishing without a pipeline.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">03</div>
+          <h3>You cannot fix what you cannot see</h3>
+          <p>Every bottleneck in your business is a gap in the map you have never drawn. Flowmap makes the invisible visible so you can act on what is actually broken.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">What's inside</div>
+      <h2 class="section-title">5 templates. One complete system.</h2>
+      <p class="section-sub">Each template is built for a specific layer of a solopreneur business. Use them individually or stack them into a full business map.</p>
+
+      <div class="inside-grid">
+        <div class="inside-item fade-in">
+          <div class="inside-num">01</div>
+          <div>
+            <h4>Revenue Stream Flowmap</h4>
+            <p>Map every income source, its volume, frequency, and what it depends on. See which ones are stable and which ones are single points of failure.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">02</div>
+          <div>
+            <h4>Content Pipeline Flowmap</h4>
+            <p>From idea to distribution. Map the full flow of how content moves from creation to audience to revenue. Find where it breaks down.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">03</div>
+          <div>
+            <h4>Product Funnel Flowmap</h4>
+            <p>Visualize the path from stranger to buyer. Map awareness, interest, trust, and conversion at each stage of your product funnel.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">04</div>
+          <div>
+            <h4>Automation Flow Flowmap</h4>
+            <p>Document every automated system in your business: emails, delivery, social posting, lead capture. See what is actually automated and what still runs on you.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">05</div>
+          <div>
+            <h4>Weekly Ops Flowmap</h4>
+            <p>Map how your week actually runs. Tasks, decisions, recurring systems. Find where time is going and where leverage is hiding.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">06</div>
+          <div>
+            <h4>Blank Canvas Template + Instructions</h4>
+            <p>A clean starting point for mapping anything not covered by the five templates. Full instructions for using the system included as a digital download.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Who this is for</div>
+      <h2 class="section-title">Built for three kinds of builders</h2>
+      <p class="section-sub">If you run your business largely alone, this tool was designed for your situation.</p>
+
+      <div class="personas-grid">
+        <div class="persona-card fade-in">
+          <div class="persona-icon">01</div>
+          <h4>The Solopreneur Who Feels Scattered</h4>
+          <p>You have multiple things running at once but no single view of the whole system. Flowmap is the first time you will see your business on one page rather than across five open tabs.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">02</div>
+          <h4>The Creator Building Toward Revenue</h4>
+          <p>You are publishing content but the link between content and income is fuzzy. The content pipeline and funnel templates will show you exactly where the connection is missing.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">03</div>
+          <h4>The Builder Ready to Automate</h4>
+          <p>Before you automate anything, you need to know what your system actually is. The automation flowmap gives you a clear picture of what to hand off and what still needs you.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">From buyers</div>
+      <h2 class="section-title">What people found when they mapped it out</h2>
+      <p class="section-sub">The most common response is surprise at what was invisible until it was drawn.</p>
+
+      <div class="testimonials-grid">
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"I mapped my revenue streams in 20 minutes and immediately saw that 80% of my income depended on one client referral channel I had never noticed. That alone was worth it."</p>
+          <div class="testimonial-author">Marcus T.</div>
+          <div class="testimonial-role">Freelance consultant</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"The content pipeline template showed me I was creating content that never connected to any product. I had been publishing into a void. Fixed that in a week."</p>
+          <div class="testimonial-author">Daniela R.</div>
+          <div class="testimonial-role">Digital product creator</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"Simple format, clear instructions, practical templates. Not a complicated tool. Just a well-designed way to see what you are actually doing."</p>
+          <div class="testimonial-author">James K.</div>
+          <div class="testimonial-role">Solopreneur, coaching + content</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">One price. Everything included.</h2>
+      <p class="section-sub">No subscription. No upsell. The full system in one download.</p>
+
+      <div class="pricing-box fade-in">
+        <div class="pricing-product">Behike Flowmap</div>
+        <div class="pricing-price">$14.99</div>
+        <div class="pricing-description">Instant download. Use it today.</div>
+        <ul class="pricing-features">
+          <li>Revenue Stream Flowmap template</li>
+          <li>Content Pipeline Flowmap template</li>
+          <li>Product Funnel Flowmap template</li>
+          <li>Automation Flow Flowmap template</li>
+          <li>Weekly Ops Flowmap template</li>
+          <li>Blank canvas template for custom mapping</li>
+          <li>Full instructions and usage guide</li>
+          <li>Digital download via Gumroad</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/behike-flowmap" class="pricing-cta" target="_blank" rel="noopener">
+          Get Behike Flowmap for $14.99
+        </a>
+        <p class="pricing-guarantee">One-time payment. Instant access. Refundable via Gumroad if it does not deliver.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>Your business is running. You just cannot see it yet.</h2>
+      <p>Five templates, one system, one clear view of everything you have built. Map it once and you will not go back to operating blind.</p>
+      <a href="https://behikeai.gumroad.com/l/behike-flowmap" class="btn-primary" target="_blank" rel="noopener">
+        Download Flowmap for $14.99
+      </a>
+      <p class="final-note">Instant PDF download via Gumroad. One-time payment.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2026 Behike.
+        <a href="index.html">All Products</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

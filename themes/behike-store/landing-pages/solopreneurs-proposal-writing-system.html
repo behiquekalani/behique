@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Proposal Writing System — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card: #0A0A0A;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-price {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .nav-price span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 100px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.55;
+    }
+    .hero-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .hero-cta:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .problem-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* SOLUTION */
+    .solution-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-top: 56px;
+    }
+    @media (max-width: 680px) {
+      .solution-body { grid-template-columns: 1fr; gap: 40px; }
+    }
+    .solution-text .section-body { max-width: none; }
+    .solution-text p + p { margin-top: 16px; }
+    .solution-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .stat-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* TOC */
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 56px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.45s, transform 0.45s;
+    }
+    .toc-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toc-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 24px;
+      padding-top: 2px;
+    }
+    .toc-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .toc-content p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 120px 0;
+    }
+    .cta-section .section-title {
+      max-width: 620px;
+      margin: 0 auto 20px;
+    }
+    .cta-section .section-body {
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+    .cta-box {
+      display: inline-block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 56px;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+    }
+    .cta-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+    .cta-price-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .btn-buy {
+      display: block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 16px;
+    }
+    .btn-buy:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .cta-includes {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .cta-includes span {
+      display: inline-block;
+      margin: 0 6px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ANIMATION */
+    .animate {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .animate.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/storefront" class="nav-brand">Behike</a>
+    <div class="nav-price">Digital Guide <span>$19.99</span></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-tag animate visible">Client Acquisition</div>
+    <h1 class="animate visible">Most proposals lose <em>before the client reads them.</em> Here is the system that wins.</h1>
+    <p class="hero-sub animate visible">A 1-page proposal framework, a three-message follow-up sequence, and a retrospective process that makes every lost proposal improve the next one.</p>
+    <a href="https://behike.gumroad.com/l/solopreneurs-proposal-writing-system" class="hero-cta animate visible">Get the System — $19.99</a>
+    <p class="hero-meta animate visible">PDF download. 2,500+ words. Instant access.</p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <div class="section-label animate">Why proposals fail</div>
+    <h2 class="section-title animate">The proposal was lost before it was read</h2>
+    <p class="section-body animate">Most proposals fail for one of three reasons. None of them require more talent to fix. They require a better process.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>The length problem</h3>
+        <p>A four-page proposal signals one thing to the client: the person writing it is not confident enough to distill the work. Length does not communicate thoroughness. It communicates uncertainty.</p>
+      </div>
+      <div class="problem-card">
+        <h3>Leading with credentials</h3>
+        <p>Opening a proposal with your background makes the document about you. The client is trying to answer one question: can this person fix my problem? They cannot find that answer in a credential list.</p>
+      </div>
+      <div class="problem-card">
+        <h3>Pricing with apology</h3>
+        <p>Hedging language around the number, burying the price, presenting a range instead of a figure: each behavior signals that you are not confident in your own investment. Clients take that signal seriously.</p>
+      </div>
+      <div class="problem-card">
+        <h3>No follow-up system</h3>
+        <p>Proposals stall for reasons unrelated to interest. A follow-up sequence that adds value with each message converts stalled deals. "Just checking in" does not. Most solopreneurs send one or neither.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section>
+  <div class="container">
+    <div class="section-label animate">What is inside</div>
+    <h2 class="section-title animate">The 1-page proposal that wins at higher rates</h2>
+    <div class="solution-body">
+      <div class="solution-text">
+        <p class="section-body animate">The 1-page framework has five sections, each with a specific function. Problem statement. Proposed solution. Success criteria. Investment. Next steps. Nothing more. The constraint forces clarity, and clarity communicates confidence.</p>
+        <p class="section-body animate" style="margin-top:16px;">This guide covers the full system: writing scope that protects you without killing the deal, presenting pricing without qualification, placing social proof where it reduces risk rather than padding the document, the three-message follow-up sequence, and the retrospective log that turns lost proposals into a compounding improvement process.</p>
+      </div>
+      <div class="solution-stats">
+        <div class="stat-card">
+          <span class="stat-num">9</span>
+          <span class="stat-label">Core chapters</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">1</span>
+          <span class="stat-label">Page per proposal</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Follow-up messages</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">2.5K</span>
+          <span class="stat-label">Words</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION PREVIEWS / TOC -->
+<section>
+  <div class="container">
+    <div class="section-label animate">What you get</div>
+    <h2 class="section-title animate">Nine chapters. Every proposal failure addressed.</h2>
+    <p class="section-body animate">From the first sentence of the problem statement through the retrospective that makes each proposal better than the last.</p>
+
+    <div class="toc-grid">
+      <div class="toc-item">
+        <span class="toc-num">01</span>
+        <div class="toc-content">
+          <h4>Why most proposals lose before they're read</h4>
+          <p>Length as a signal of uncertainty. The direct correlation between proposal pages and lost deals. What one page communicates that four pages cannot.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">02</span>
+        <div class="toc-content">
+          <h4>The 1-page proposal framework</h4>
+          <p>Five sections. Problem statement. Proposed solution. Success criteria. Investment. Next steps. The function of each section and what to include in each one.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">03</span>
+        <div class="toc-content">
+          <h4>Leading with the problem, not your credentials</h4>
+          <p>Why credentials-first proposals frame the document around the wrong person. Where credentials belong in the structure and how to connect them to the solution.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">04</span>
+        <div class="toc-content">
+          <h4>Writing the scope section</h4>
+          <p>Deliverables vs tasks. The "not included" clause that prevents scope creep. How to be specific enough to protect yourself without writing a project brief the client will edit.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">05</span>
+        <div class="toc-content">
+          <h4>Presenting pricing without apology</h4>
+          <p>Present the number first. Neutral framing. Why the proposal is not the place for value justification. When to offer two tiers and how to structure them.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">06</span>
+        <div class="toc-content">
+          <h4>Social proof placement in proposals</h4>
+          <p>Relevant proof only. Where it belongs in the structure. What makes proof credible vs decorative. The maximum number of proof points before it backfires.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">07</span>
+        <div class="toc-content">
+          <h4>The follow-up sequence after sending</h4>
+          <p>Three messages. Three to five business days apart. Each one adds something new. Message three creates a decision point and gives the client permission to say no cleanly.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">08</span>
+        <div class="toc-content">
+          <h4>Proposal tools: PDF vs web vs software</h4>
+          <p>The trade-offs of each format. When read tracking justifies the subscription cost. E-signature integration and why it matters at higher price points.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">09</span>
+        <div class="toc-content">
+          <h4>The proposal retrospective</h4>
+          <p>The log format. What patterns emerge after 10 to 15 proposals. The three most common reasons proposals lose. How to ask for feedback after a decline without creating friction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="section-label animate">Get the system</div>
+    <h2 class="section-title animate">A repeatable proposal process that improves over time</h2>
+    <p class="section-body animate">One-time payment. Instant PDF download. No upsells.</p>
+
+    <div style="display:flex;justify-content:center;margin-top:48px;">
+      <div class="cta-box animate">
+        <div class="cta-price">$19.99</div>
+        <div class="cta-price-sub">One-time. Instant download.</div>
+        <a href="https://behike.gumroad.com/l/solopreneurs-proposal-writing-system" class="btn-buy">Get the System</a>
+        <div class="cta-includes">
+          <span>2,500+ word PDF</span>
+          <span>·</span>
+          <span>9 chapters</span>
+          <span>·</span>
+          <span>Yours forever</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Behike — Digital products for serious builders. <a href="/storefront" style="color:var(--accent);text-decoration:none;">Browse all products</a></p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate, .problem-card, .stat-card, .toc-item').forEach(el => {
+    if (!el.classList.contains('visible')) {
+      observer.observe(el);
+    }
+  });
+</script>
+</body>
+</html>

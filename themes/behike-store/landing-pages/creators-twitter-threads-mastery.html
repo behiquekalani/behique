@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Threads Mastery - Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #28B94E;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+    nav { border-bottom: 1px solid var(--border); padding: 18px 0; }
+    nav .container { display: flex; align-items: center; justify-content: space-between; }
+    .nav-brand { font-size: 15px; font-weight: 600; letter-spacing: 0.04em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; }
+    .nav-price { font-size: 15px; color: var(--text-muted); }
+
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+    .hero h1 { font-size: clamp(38px, 6vw, 64px); font-weight: 700; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 28px; max-width: 760px; margin-left: auto; margin-right: auto; }
+    .hero-sub { font-size: 19px; color: var(--text-muted); max-width: 560px; margin: 0 auto 48px; line-height: 1.55; }
+    .hero-cta { display: inline-block; background: var(--cta); color: #000; font-size: 17px; font-weight: 600; padding: 16px 40px; border-radius: 980px; text-decoration: none; transition: background 0.2s ease, transform 0.15s ease; }
+    .hero-cta:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .hero-meta { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+
+    hr.section-divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+    .thesis { padding: 80px 0; text-align: center; }
+    .thesis-statement { font-size: clamp(22px, 3vw, 30px); font-weight: 500; line-height: 1.4; max-width: 700px; margin: 0 auto; color: var(--text); }
+    .thesis-statement strong { color: var(--accent); }
+
+    .section { padding: 80px 0; }
+    .section-label { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    .section h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 48px; line-height: 1.15; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2px; background: var(--border); border: 1px solid var(--border); }
+    .feature-card { background: var(--surface); padding: 36px 32px; }
+    .feature-num { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 12px; }
+    .feature-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.55; }
+
+    .previews { padding: 80px 0; background: var(--surface); }
+    .preview-list { display: flex; flex-direction: column; gap: 0; }
+    .preview-item { border-top: 1px solid var(--border); padding: 32px 0; display: grid; grid-template-columns: 200px 1fr; gap: 32px; align-items: start; }
+    .preview-item:last-child { border-bottom: 1px solid var(--border); }
+    .preview-label { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); padding-top: 3px; }
+    .preview-content h3 { font-size: 20px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.01em; }
+    .preview-content p { font-size: 16px; color: var(--text-muted); line-height: 1.6; max-width: 560px; }
+
+    .quote-section { padding: 80px 0; text-align: center; }
+    .pull-quote { font-size: clamp(20px, 2.5vw, 26px); font-weight: 400; font-style: italic; color: var(--text-muted); max-width: 640px; margin: 0 auto; line-height: 1.5; }
+
+    .final-cta { padding: 100px 0; text-align: center; background: var(--surface-2); border-top: 1px solid var(--border); }
+    .final-cta h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 20px; }
+    .final-cta p { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-block { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+    .buy-btn { display: inline-block; background: var(--cta); color: #000; font-size: 18px; font-weight: 700; padding: 18px 52px; border-radius: 980px; text-decoration: none; transition: background 0.2s ease, transform 0.15s ease; }
+    .buy-btn:hover { background: var(--cta-hover); transform: translateY(-2px); }
+    .price-display { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; }
+    .guarantee { font-size: 13px; color: var(--text-muted); }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: 13px; color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .preview-item { grid-template-columns: 1fr; gap: 12px; }
+      .hero { padding: 60px 0 48px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="#" class="nav-brand">Behike</a>
+    <span class="nav-price">$19.99</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Digital Guide</div>
+    <h1>Write Threads That Build Audiences and Drive Sales</h1>
+    <p class="hero-sub">A thread is not a long post. It is a reading experience. This guide teaches the mechanics of writing threads that people finish, follow from, and buy from.</p>
+    <a href="#buy" class="hero-cta">Get the Guide for $19.99</a>
+    <p class="hero-meta">Instant PDF download. 30-day guarantee.</p>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<section class="thesis">
+  <div class="container">
+    <p class="thesis-statement">Impressions measure reach. Follows and clicks measure conversion. <strong>The writers earning real income from Twitter treat threads as relationship-building and sales mechanisms, not just content.</strong></p>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<section class="section">
+  <div class="container">
+    <div class="section-label">What you will learn</div>
+    <h2>Six chapters. One practice.</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <h3>What Makes a Thread Work</h3>
+        <p>The reading contract, the five thread structures that perform, matching format to goal, and why most threads are too long and how to cut them right.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <h3>Generating Thread Ideas</h3>
+        <p>Four idea sources that never run dry, the three-question idea filter, and how to build an idea bank so you never start a writing session from zero.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <h3>Writing Hooks That Earn the Click</h3>
+        <p>The four hook types that work, bold claims, specific value, narrative open loops, and how to test and iterate on your hooks systematically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">04</div>
+        <h3>Structuring Threads for Completion</h3>
+        <p>The three-part architecture, tweet-by-tweet momentum techniques, how to handle list items with different depth, and writing a finish that earns the follow.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">05</div>
+        <h3>Converting Readers into Followers and Buyers</h3>
+        <p>Why most threads do not convert, the specific follow prompt strategy, where to place CTAs, and how to use threads to build your email list.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">06</div>
+        <h3>Building a Thread Practice That Compounds</h3>
+        <p>The weekly rhythm, repurposing threads across platforms, the tracking log, and the compounding audience dynamic that rewards consistency.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="previews">
+  <div class="container">
+    <div class="section-label">Inside the guide</div>
+    <h2>Chapter previews</h2>
+    <div class="preview-list">
+      <div class="preview-item">
+        <div class="preview-label">Chapter 1</div>
+        <div class="preview-content">
+          <h3>Understanding What Makes a Thread Work</h3>
+          <p>When someone clicks "show this thread," they are making a micro-commitment. They expect to arrive somewhere different from where they started. Every thread either honors that contract or breaks it.</p>
+        </div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-label">Chapter 3</div>
+        <div class="preview-content">
+          <h3>Writing Hooks That Earn the Click</h3>
+          <p>A bold claim hook states something true but non-obvious with confidence. The reader sees it and either agrees strongly, disagrees, or is curious which side they fall on. Any of those three reactions earns the click.</p>
+        </div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-label">Chapter 5</div>
+        <div class="preview-content">
+          <h3>Converting Thread Readers into Followers and Buyers</h3>
+          <p>A strong thread that converts 0.5 to 1% of impressions to email subscribers will grow your list meaningfully over time. At 50,000 impressions per month, that is 250 to 500 new subscribers.</p>
+        </div>
+      </div>
+      <div class="preview-item">
+        <div class="preview-label">Chapter 6</div>
+        <div class="preview-content">
+          <h3>Building a Thread Practice That Compounds</h3>
+          <p>A genuinely excellent thread gets saved, retweeted, and referenced for months. A mediocre thread disappears within 24 hours. One strong thread per week beats three forgettable ones every time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-section">
+  <div class="container">
+    <p class="pull-quote">"The writers earning real income from Twitter threads are not more talented than you. They started earlier and kept going after the first three months felt like nothing was working."</p>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<section class="final-cta" id="buy">
+  <div class="container">
+    <h2>Write threads that earn attention and trust.</h2>
+    <p>Complete guide. Instant download. Post your first strong thread this week.</p>
+    <div class="cta-block">
+      <div class="price-display">$19.99</div>
+      <a href="https://behike.gumroad.com/l/creators-twitter-threads-mastery" class="buy-btn">Get Instant Access</a>
+      <p class="guarantee">30-day money-back guarantee. No questions asked.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>&copy; 2026 Behike. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

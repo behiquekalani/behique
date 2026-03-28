@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Monetization Blueprint — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --surface-2: #1A1A1A;
+      --border: #2A2A2A;
+      --radius: 12px;
+      --max-width: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: var(--radius);
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 19px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .price-tag {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 52px;
+    }
+
+    /* CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* INSIDE LIST */
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .inside-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .inside-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .inside-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+
+    .inside-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      margin-bottom: 4px;
+    }
+
+    .inside-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* STREAM LIST */
+    .streams-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 0;
+    }
+
+    .stream-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .stream-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stream-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .stream-item h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .stream-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* PERSONAS */
+    .personas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .persona-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .persona-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .persona-card h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .persona-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .testimonial.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .testimonial-quote {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .testimonial-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* PRICING */
+    .pricing-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px;
+      max-width: 580px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .pricing-box.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pricing-product {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 36px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .pricing-features li:last-child { border-bottom: none; }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px;
+      border-radius: var(--radius);
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .pricing-cta:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 18px;
+    }
+
+    .final-cta p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .final-cta .btn-primary {
+      font-size: 17px;
+      padding: 16px 40px;
+    }
+
+    .final-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 70px 0 60px; }
+      .section { padding: 60px 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .pricing-box { padding: 32px 24px; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">Behi<span>ke</span></div>
+      <a href="https://behikeai.gumroad.com/l/youtube-monetization-blueprint" class="nav-cta" target="_blank" rel="noopener">
+        Get it for $23.99
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">YouTube Strategy Guide</div>
+      <h1>YouTube pays you 7 ways. Most creators use one.</h1>
+      <p class="hero-sub">
+        The complete guide to all seven YouTube revenue streams. AdSense is just the starting point. The rest require a different approach, and most creators never build them.
+      </p>
+      <div class="hero-actions">
+        <a href="https://behikeai.gumroad.com/l/youtube-monetization-blueprint" class="btn-primary" target="_blank" rel="noopener">
+          Download Now
+        </a>
+        <div>
+          <div class="price-tag">$23.99</div>
+          <div class="price-note">One-time. Instant access.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">AdSense alone is a fragile business</h2>
+      <p class="section-sub">Most YouTube creators build their entire income on a single revenue stream controlled entirely by an algorithm they do not own.</p>
+
+      <div class="cards-grid">
+        <div class="card fade-in">
+          <div class="card-number">01</div>
+          <h3>AdSense fluctuates and you have no control</h3>
+          <p>CPM drops in Q1. YouTube adjusts the revenue split. An algorithm change cuts your views by 40%. If AdSense is your only income, all of that hits you directly.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">02</div>
+          <h3>The other six streams require deliberate setup</h3>
+          <p>Memberships, Super Thanks, sponsorships, affiliate, product sales, and consulting do not appear automatically. Each one requires a specific structure most creators never build.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">03</div>
+          <h3>Views without a stack are views wasted</h3>
+          <p>Every viewer who watches without a path to a second or third revenue stream is a missed conversion. A monetization stack means every view has more than one place to go.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE 7 STREAMS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The 7 streams</div>
+      <h2 class="section-title">All seven. How each one works.</h2>
+      <p class="section-sub">The blueprint covers every stream: the threshold to activate it, the realistic income range, and the channel setup required.</p>
+
+      <div class="streams-grid">
+        <div class="stream-item fade-in">
+          <div class="stream-number">01</div>
+          <h4>AdSense</h4>
+          <p>The baseline. How to optimize CPM through niche selection, video length, and audience targeting without chasing vanity metrics.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">02</div>
+          <h4>Channel Memberships</h4>
+          <p>Recurring revenue from your most engaged viewers. Tier structure, perk strategy, and how to grow membership without burning the free audience.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">03</div>
+          <h4>Super Thanks</h4>
+          <p>Per-video tipping. Often underestimated. How to prompt it without being awkward and which video formats generate the most Super Thanks activity.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">04</div>
+          <h4>Sponsorships</h4>
+          <p>Brand deals. How to pitch before you hit 10K subscribers, what to charge, how to structure deliverables, and how to vet sponsors that fit your audience.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">05</div>
+          <h4>Affiliate Links in Description</h4>
+          <p>The most accessible stream for early creators. Link structure, disclosure, which affiliate programs convert for YouTube audiences, and how to track performance.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">06</div>
+          <h4>Product Sales</h4>
+          <p>Selling your own digital or physical products directly from the channel. How to mention products without the video feeling like an ad, and where to link.</p>
+        </div>
+        <div class="stream-item fade-in">
+          <div class="stream-number">07</div>
+          <h4>Consulting and Service Upsell</h4>
+          <p>YouTube as a top-of-funnel for high-ticket work. How to position the channel so viewers move from watching to booking, without changing your content format.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">What's inside</div>
+      <h2 class="section-title">The complete monetization toolkit</h2>
+      <p class="section-sub">Four components that take you from knowing what the streams are to having the setup and math to build them.</p>
+
+      <div class="inside-grid">
+        <div class="inside-item fade-in">
+          <div class="inside-num">01</div>
+          <div>
+            <h4>7 Monetization Breakdowns</h4>
+            <p>Full write-up on each stream: thresholds, income ranges, setup requirements, and the honest timeline to meaningful revenue from each one.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">02</div>
+          <div>
+            <h4>Threshold and Timeline Data</h4>
+            <p>Specific subscriber and view thresholds for each stream. Realistic timelines based on channel size, not best-case projections.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">03</div>
+          <div>
+            <h4>Channel Setup Checklist</h4>
+            <p>The exact setup steps to activate and optimize each revenue stream. Check off what you have built and see clearly what is still missing.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">04</div>
+          <div>
+            <h4>Monetization Stack Calculator</h4>
+            <p>A calculator to model your income across all seven streams based on your current channel size. See what is realistic at your level right now.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Who this is for</div>
+      <h2 class="section-title">Three YouTube creators who need this</h2>
+      <p class="section-sub">If you are building a channel with revenue intent, this covers the structure you are missing.</p>
+
+      <div class="personas-grid">
+        <div class="persona-card fade-in">
+          <div class="persona-icon">01</div>
+          <h4>The Creator Still Waiting for AdSense</h4>
+          <p>You have not hit 1,000 subscribers yet. Three of the seven streams do not require YouTube Partner status. You can start building revenue before you qualify for AdSense.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">02</div>
+          <h4>The Monetized Creator Running on One Stream</h4>
+          <p>You are in the Partner Program and making AdSense income. You have never set up memberships, affiliate, or product sales. The blueprint shows you what you are leaving behind.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">03</div>
+          <h4>The Business Owner Using YouTube as a Funnel</h4>
+          <p>Your channel exists to drive leads or sales, not just views. The consulting upsell and product sales sections cover exactly how to structure the channel to convert viewers into clients.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">From buyers</div>
+      <h2 class="section-title">What changed after reading it</h2>
+      <p class="section-sub">The most common outcome is setting up streams that were available the whole time but never built.</p>
+
+      <div class="testimonials-grid">
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"I had 4,200 subscribers and was only making AdSense. Within two weeks of reading this I had affiliate links set up and a product in my description. First affiliate sale happened on day 9."</p>
+          <div class="testimonial-author">Chris M.</div>
+          <div class="testimonial-role">Tech review channel, 4.2K subscribers</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"The sponsorship section alone was worth the price. It showed me how to pitch brands at under 10K subscribers with a specific email template I could actually use."</p>
+          <div class="testimonial-author">Priya S.</div>
+          <div class="testimonial-role">Productivity creator, 7.8K subscribers</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"The monetization stack calculator showed me my channel was worth about 3x what I was actually making. The gap was entirely streams I had not set up. This fixed that."</p>
+          <div class="testimonial-author">Jordan L.</div>
+          <div class="testimonial-role">Business content creator</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">One price. Complete guide.</h2>
+      <p class="section-sub">No course portal. No upsell sequence. The full blueprint in one PDF download.</p>
+
+      <div class="pricing-box fade-in">
+        <div class="pricing-product">YouTube Monetization Blueprint</div>
+        <div class="pricing-price">$23.99</div>
+        <div class="pricing-description">Instant download. Everything in one file.</div>
+        <ul class="pricing-features">
+          <li>7 complete monetization stream breakdowns</li>
+          <li>Threshold and timeline data for each stream</li>
+          <li>Channel setup checklist</li>
+          <li>Monetization stack calculator</li>
+          <li>Sponsorship pitch guidance for small channels</li>
+          <li>Affiliate link strategy for YouTube</li>
+          <li>Consulting funnel structure</li>
+          <li>Digital PDF download via Gumroad</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/youtube-monetization-blueprint" class="pricing-cta" target="_blank" rel="noopener">
+          Get the Blueprint for $23.99
+        </a>
+        <p class="pricing-guarantee">One-time payment. Instant access. Refundable via Gumroad if it does not deliver.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>Six revenue streams your channel is not using yet.</h2>
+      <p>The YouTube Monetization Blueprint covers all seven. The setup is documented, the math is honest, and the checklist is specific. Start with the one stream you are missing.</p>
+      <a href="https://behikeai.gumroad.com/l/youtube-monetization-blueprint" class="btn-primary" target="_blank" rel="noopener">
+        Download the Blueprint for $23.99
+      </a>
+      <p class="final-note">Instant PDF download via Gumroad. One-time payment.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2026 Behike.
+        <a href="index.html">All Products</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

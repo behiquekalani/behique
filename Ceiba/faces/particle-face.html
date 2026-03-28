@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Particle cloud face visualization by Behike">
+    <title>Behike - Particle Face</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Inter', sans-serif;
+        }
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        #ui {
+            position: fixed;
+            bottom: 28px;
+            left: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        #brand {
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            letter-spacing: 10px;
+            color: rgba(124, 158, 255, 0.12);
+            text-transform: uppercase;
+            user-select: none;
+        }
+        #hint {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, 0.06);
+            text-transform: uppercase;
+            user-select: none;
+        }
+        #audio-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(124, 158, 255, 0.06);
+            border: 1px solid rgba(124, 158, 255, 0.12);
+            color: rgba(124, 158, 255, 0.4);
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border-radius: 2px;
+        }
+        #audio-btn:hover {
+            background: rgba(124, 158, 255, 0.12);
+            color: rgba(124, 158, 255, 0.7);
+            border-color: rgba(124, 158, 255, 0.25);
+        }
+        #audio-btn.active {
+            background: rgba(124, 158, 255, 0.1);
+            color: rgba(124, 158, 255, 0.6);
+            border-color: rgba(124, 158, 255, 0.35);
+        }
+        #copyright {
+            position: fixed;
+            bottom: 8px;
+            right: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 9px;
+            color: rgba(255,255,255,0.05);
+            z-index: 10;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <button id="audio-btn">Enable Audio</button>
+    <div id="ui">
+        <div id="brand">BEHIKE</div>
+        <div id="hint">Screen record this. Post it. Watch it go viral.</div>
+    </div>
+    <div id="copyright">&copy; 2026 Behike</div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let W, H, centerX, centerY, scale;
+        let mouse = { x: -9999, y: -9999 };
+        let particles = [];
+        let dustParticles = [];
+        let audioEnabled = false;
+        let audioAmplitude = 0;
+        let smoothAmplitude = 0;
+        let analyser, audioCtx, dataArray;
+
+        // --- FACE GEOMETRY ---
+        // Coordinate system: center is (0,0), y increases downward
+        // Proportions based on classical face ratios
+
+        function cubicBezier(p0, p1, p2, p3, t) {
+            const mt = 1 - t;
+            return [
+                mt*mt*mt*p0[0] + 3*mt*mt*t*p1[0] + 3*mt*t*t*p2[0] + t*t*t*p3[0],
+                mt*mt*mt*p0[1] + 3*mt*mt*t*p1[1] + 3*mt*t*t*p2[1] + t*t*t*p3[1]
+            ];
+        }
+
+        function sampleBezier(p0, p1, p2, p3, count, jitter) {
+            const pts = [];
+            jitter = jitter || 0;
+            for (let i = 0; i <= count; i++) {
+                const t = i / count;
+                const [x, y] = cubicBezier(p0, p1, p2, p3, t);
+                pts.push([
+                    x + (Math.random() - 0.5) * jitter,
+                    y + (Math.random() - 0.5) * jitter
+                ]);
+            }
+            return pts;
+        }
+
+        function ellipseEdge(cx, cy, rx, ry, count, jitter) {
+            const pts = [];
+            jitter = jitter || 0;
+            for (let i = 0; i < count; i++) {
+                const a = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.15;
+                pts.push([
+                    cx + Math.cos(a) * rx + (Math.random() - 0.5) * jitter,
+                    cy + Math.sin(a) * ry + (Math.random() - 0.5) * jitter
+                ]);
+            }
+            return pts;
+        }
+
+        function scatterInEllipse(cx, cy, rx, ry, count) {
+            const pts = [];
+            for (let i = 0; i < count; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const r = Math.sqrt(Math.random());
+                pts.push([cx + Math.cos(a) * rx * r, cy + Math.sin(a) * ry * r]);
+            }
+            return pts;
+        }
+
+        function generateFacePoints() {
+            let pts = [];
+
+            // ---- JAWLINE & FACE CONTOUR ----
+            // Right side: temple down to chin
+            pts.push(...sampleBezier([0, -155], [100, -150], [115, -50], [100, 30], 90, 2));
+            pts.push(...sampleBezier([100, 30], [90, 90], [55, 135], [0, 150], 70, 2));
+            // Left side (mirror)
+            pts.push(...sampleBezier([0, -155], [-100, -150], [-115, -50], [-100, 30], 90, 2));
+            pts.push(...sampleBezier([-100, 30], [-90, 90], [-55, 135], [0, 150], 70, 2));
+
+            // Second contour pass (slightly inset, for density on outline)
+            pts.push(...sampleBezier([0, -150], [92, -142], [108, -45], [93, 32], 50, 4));
+            pts.push(...sampleBezier([93, 32], [83, 85], [50, 130], [0, 145], 40, 4));
+            pts.push(...sampleBezier([0, -150], [-92, -142], [-108, -45], [-93, 32], 50, 4));
+            pts.push(...sampleBezier([-93, 32], [-83, 85], [-50, 130], [0, 145], 40, 4));
+
+            // ---- FOREHEAD ----
+            pts.push(...sampleBezier([-85, -135], [-45, -178], [45, -178], [85, -135], 80, 3));
+            pts.push(...sampleBezier([-75, -125], [-35, -165], [35, -165], [75, -125], 50, 4));
+            // Forehead fill
+            for (let i = 0; i < 150; i++) {
+                const x = (Math.random() - 0.5) * 150;
+                const y = -125 - Math.random() * 45;
+                if (Math.abs(x) < 70 + (y + 170) * 0.8) pts.push([x, y]);
+            }
+
+            // ---- EYEBROWS ----
+            // Right
+            pts.push(...sampleBezier([16, -58], [28, -68], [52, -66], [68, -55], 25, 2));
+            pts.push(...sampleBezier([20, -55], [32, -63], [50, -61], [64, -52], 15, 3));
+            // Left
+            pts.push(...sampleBezier([-16, -58], [-28, -68], [-52, -66], [-68, -55], 25, 2));
+            pts.push(...sampleBezier([-20, -55], [-32, -63], [-50, -61], [-64, -52], 15, 3));
+
+            // ---- EYES ----
+            // Minimalist: just enough dots to suggest almond shapes
+            // Right eye - upper arc
+            pts.push(...sampleBezier([22, -34], [32, -43], [46, -43], [56, -34], 10, 3.5));
+            // Right eye - lower arc
+            pts.push(...sampleBezier([24, -34], [32, -27], [46, -27], [54, -34], 8, 3.5));
+
+            // Left eye - upper arc
+            pts.push(...sampleBezier([-22, -34], [-32, -43], [-46, -43], [-56, -34], 10, 3.5));
+            // Left eye - lower arc
+            pts.push(...sampleBezier([-24, -34], [-32, -27], [-46, -27], [-54, -34], 8, 3.5));
+
+            // ---- NOSE ----
+            // Bridge - two thin lines
+            pts.push(...sampleBezier([3, -18], [2, 0], [1, 18], [0, 30], 18, 2));
+            pts.push(...sampleBezier([-3, -18], [-2, 0], [-1, 18], [0, 30], 18, 2));
+            // Nose tip / ball
+            pts.push(...sampleBezier([-12, 28], [-6, 38], [6, 38], [12, 28], 18, 2));
+            // Nostrils
+            pts.push(...sampleBezier([4, 32], [10, 36], [15, 33], [12, 28], 8, 2));
+            pts.push(...sampleBezier([-4, 32], [-10, 36], [-15, 33], [-12, 28], 8, 2));
+
+            // ---- MOUTH ----
+            // Upper lip - cupid's bow
+            pts.push(...sampleBezier([-28, 68], [-14, 60], [-4, 62], [0, 64], 22, 1));
+            pts.push(...sampleBezier([0, 64], [4, 62], [14, 60], [28, 68], 22, 1));
+            // Lower lip
+            pts.push(...sampleBezier([-28, 68], [-16, 80], [16, 80], [28, 68], 30, 1.5));
+            // Lip line
+            pts.push(...sampleBezier([-24, 68], [-10, 70], [10, 70], [24, 68], 18, 1));
+            // Subtle lip fill
+            pts.push(...scatterInEllipse(0, 70, 16, 5, 12));
+
+            // ---- CHEEKBONES (subtle highlight) ----
+            for (let i = 0; i < 70; i++) {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                pts.push([side * (50 + Math.random() * 35), -20 + Math.random() * 45]);
+            }
+
+            // ---- TEMPLES ----
+            for (let i = 0; i < 40; i++) {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                pts.push([side * (75 + Math.random() * 25), -90 + Math.random() * 50]);
+            }
+
+            // ---- UNDER-EYE / MID-FACE ----
+            for (let i = 0; i < 50; i++) {
+                const side = Math.random() > 0.5 ? 1 : -1;
+                pts.push([side * (20 + Math.random() * 40), 0 + Math.random() * 25]);
+            }
+
+            // ---- FACE INTERIOR VOLUME ----
+            // Fill that respects face boundaries and avoids eye region
+            for (let i = 0; i < 1400; i++) {
+                const x = (Math.random() - 0.5) * 210;
+                const y = -165 + Math.random() * 325;
+                const fw = getFaceWidth(y);
+                if (Math.abs(x) < fw * 0.82) {
+                    // Skip eye and eyebrow region to prevent over-density
+                    const rEyeDist = Math.sqrt((x-39)*(x-39) + (y+34)*(y+34));
+                    const lEyeDist = Math.sqrt((x+39)*(x+39) + (y+34)*(y+34));
+                    if (rEyeDist < 20 || lEyeDist < 20) continue;
+                    // Even distribution with slight edge preference
+                    const edgeFactor = Math.abs(x) / (fw * 0.82);
+                    if (Math.random() < 0.35 + edgeFactor * 0.25) {
+                        pts.push([x, y]);
+                    }
+                }
+            }
+
+            // ---- NECK ----
+            pts.push(...sampleBezier([-22, 150], [-20, 170], [-18, 190], [-16, 210], 18, 3));
+            pts.push(...sampleBezier([22, 150], [20, 170], [18, 190], [16, 210], 18, 3));
+            // Faint neck fill
+            for (let i = 0; i < 30; i++) {
+                const x = (Math.random() - 0.5) * 35;
+                const y = 150 + Math.random() * 55;
+                pts.push([x, y]);
+            }
+
+            return pts;
+        }
+
+        function getFaceWidth(y) {
+            if (y < -165) return 10;
+            if (y < -135) return 30 + (y + 165) * 2;
+            if (y < -50) return 90 + (y + 135) * 0.15;
+            if (y < 30) return 103 - (y + 50) * 0.05;
+            if (y < 90) return 99 - (y - 30) * 0.3;
+            if (y < 150) return 81 - (y - 90) * 1.1;
+            return 18;
+        }
+
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            W = window.innerWidth;
+            H = window.innerHeight;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            centerX = W / 2;
+            centerY = H * 0.42;
+            scale = Math.min(W / 360, H / 520) * 0.92;
+        }
+
+        function createParticle(fx, fy, opts) {
+            opts = opts || {};
+            const x = centerX + fx * scale;
+            const y = centerY + fy * scale;
+            // Particles near eyes are rendered smaller and dimmer to prevent clustering
+            const rEyeDist = Math.sqrt((fx-39)*(fx-39) + (fy+34)*(fy+34));
+            const lEyeDist = Math.sqrt((fx+39)*(fx+39) + (fy+34)*(fy+34));
+            const nearEye = Math.min(rEyeDist, lEyeDist) < 22;
+            const eyeDim = nearEye ? 0.6 : 1.0;
+            return {
+                x: x, y: y,
+                homeX: x, homeY: y,
+                faceX: fx, faceY: fy,
+                vx: 0, vy: 0,
+                size: (opts.size || (0.6 + Math.random() * 1.8)) * (nearEye ? 0.7 : 1.0),
+                brightness: (opts.brightness || (0.35 + Math.random() * 0.55)) * eyeDim,
+                blueShift: opts.blueShift || (0.05 + Math.random() * 0.45),
+                phase: Math.random() * Math.PI * 2,
+                driftPhaseX: Math.random() * Math.PI * 2,
+                driftPhaseY: Math.random() * Math.PI * 2,
+                driftSpeedX: 0.15 + Math.random() * 0.4,
+                driftSpeedY: 0.15 + Math.random() * 0.4,
+                driftAmpX: 0.3 + Math.random() * 1.2,
+                driftAmpY: 0.3 + Math.random() * 1.2,
+            };
+        }
+
+        function initParticles() {
+            particles = [];
+            const facePoints = generateFacePoints();
+
+            for (let i = 0; i < facePoints.length; i++) {
+                particles.push(createParticle(facePoints[i][0], facePoints[i][1]));
+            }
+
+            // Ensure minimum particle count with additional fill
+            while (particles.length < 4500) {
+                const fx = (Math.random() - 0.5) * 220;
+                const fy = -170 + Math.random() * 390;
+                const fw = getFaceWidth(fy);
+                if (Math.abs(fx) < fw * 0.85) {
+                    particles.push(createParticle(fx, fy, {
+                        size: 0.5 + Math.random() * 1.2,
+                        brightness: 0.2 + Math.random() * 0.35,
+                        blueShift: 0.5 + Math.random() * 0.5,
+                    }));
+                }
+            }
+
+            // Ambient dust
+            dustParticles = [];
+            for (let i = 0; i < 200; i++) {
+                dustParticles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
+                    size: 0.3 + Math.random() * 0.8,
+                    alpha: 0.02 + Math.random() * 0.06,
+                    phase: Math.random() * Math.PI * 2,
+                });
+            }
+        }
+
+        // Audio
+        const audioBtn = document.getElementById('audio-btn');
+        audioBtn.addEventListener('click', async function() {
+            if (audioEnabled) {
+                audioEnabled = false;
+                audioBtn.textContent = 'Enable Audio';
+                audioBtn.classList.remove('active');
+                return;
+            }
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const source = audioCtx.createMediaStreamSource(stream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                analyser.smoothingTimeConstant = 0.8;
+                source.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                audioEnabled = true;
+                audioBtn.textContent = 'Audio On';
+                audioBtn.classList.add('active');
+            } catch(e) {
+                audioBtn.textContent = 'Mic Denied';
+                setTimeout(function() { audioBtn.textContent = 'Enable Audio'; }, 2000);
+            }
+        });
+
+        // Input
+        function updateMouse(e) {
+            if (e.clientX !== undefined) {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            } else if (e.touches && e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        }
+        canvas.addEventListener('mousemove', updateMouse);
+        canvas.addEventListener('touchmove', function(e) { e.preventDefault(); updateMouse(e); }, { passive: false });
+        canvas.addEventListener('mouseleave', function() { mouse.x = -9999; mouse.y = -9999; });
+        canvas.addEventListener('touchend', function() { mouse.x = -9999; mouse.y = -9999; });
+
+        // Animation
+        let time = 0;
+        let lastTime = 0;
+        const MOUSE_RADIUS = 90;
+        const MOUSE_FORCE = 6;
+        const RETURN_FORCE = 0.035;
+        const DAMPING = 0.91;
+
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+
+            // Delta time for smooth animation
+            const dt = lastTime ? Math.min((timestamp - lastTime) / 16.667, 2) : 1;
+            lastTime = timestamp;
+            time += 0.016 * dt;
+
+            // Audio
+            if (audioEnabled && analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                audioAmplitude = (sum / dataArray.length) / 255;
+            } else {
+                audioAmplitude *= 0.95;
+            }
+            smoothAmplitude += (audioAmplitude - smoothAmplitude) * 0.15;
+
+            // Clear
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, W, H);
+
+            // Breathing
+            const breathe = 0.75 + 0.25 * Math.sin(time * 0.7);
+            const audioPulse = 1 + smoothAmplitude * 1.8;
+
+            // Dust
+            for (let i = 0; i < dustParticles.length; i++) {
+                const d = dustParticles[i];
+                d.x += d.vx * dt;
+                d.y += d.vy * dt;
+                if (d.x < -10) d.x = W + 10;
+                if (d.x > W + 10) d.x = -10;
+                if (d.y < -10) d.y = H + 10;
+                if (d.y > H + 10) d.y = -10;
+
+                const flicker = 0.4 + 0.6 * Math.sin(time * 1.5 + d.phase);
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(124,158,255,' + (d.alpha * flicker).toFixed(4) + ')';
+                ctx.fill();
+            }
+
+            // Face particles
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+
+                // Brownian drift
+                const driftX = Math.sin(time * p.driftSpeedX + p.driftPhaseX) * p.driftAmpX;
+                const driftY = Math.cos(time * p.driftSpeedY + p.driftPhaseY) * p.driftAmpY;
+
+                // Audio: expand outward slightly
+                const audioExpand = smoothAmplitude * 0.8;
+                const expandX = p.faceX * audioExpand * 0.1;
+                const expandY = p.faceY * audioExpand * 0.1;
+
+                const targetX = p.homeX + driftX + expandX;
+                const targetY = p.homeY + driftY + expandY;
+
+                // Mouse repulsion
+                const dx = p.x - mouse.x;
+                const dy = p.y - mouse.y;
+                const distSq = dx * dx + dy * dy;
+                const radiusSq = MOUSE_RADIUS * MOUSE_RADIUS;
+                if (distSq < radiusSq && distSq > 1) {
+                    const dist = Math.sqrt(distSq);
+                    const force = (MOUSE_RADIUS - dist) / MOUSE_RADIUS * MOUSE_FORCE;
+                    p.vx += (dx / dist) * force * dt;
+                    p.vy += (dy / dist) * force * dt;
+                }
+
+                // Spring return
+                p.vx += (targetX - p.x) * RETURN_FORCE * dt;
+                p.vy += (targetY - p.y) * RETURN_FORCE * dt;
+                p.vx *= DAMPING;
+                p.vy *= DAMPING;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+
+                // Color: almost pure white, with very subtle blue-ish warmth variation
+                const b = p.blueShift;
+                const r = Math.round(220 + b * 35);  // 220-255
+                const g = Math.round(225 + b * 30);  // 225-255
+                const bl = 255;
+
+                // Alpha with breathing and individual phase
+                const wave = 0.85 + 0.15 * Math.sin(time * 1.0 + p.phase);
+                const alpha = Math.min(1, p.brightness * breathe * wave * audioPulse);
+
+                // Size
+                const s = p.size * (1 + smoothAmplitude * 0.4);
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + bl + ',' + alpha.toFixed(3) + ')';
+                ctx.fill();
+            }
+
+            // Ambient face glow - soft blue halo
+            const glowRadius = 300 * scale;
+            const glow = ctx.createRadialGradient(centerX, centerY, 20 * scale, centerX, centerY, glowRadius);
+            glow.addColorStop(0, 'rgba(60,90,160,' + (0.012 * audioPulse).toFixed(4) + ')');
+            glow.addColorStop(0.3, 'rgba(50,80,150,' + (0.01 * audioPulse).toFixed(4) + ')');
+            glow.addColorStop(0.7, 'rgba(40,70,140,' + (0.005 * audioPulse).toFixed(4) + ')');
+            glow.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, W, H);
+        }
+
+        // Resize handler
+        window.addEventListener('resize', function() {
+            resize();
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.homeX = centerX + p.faceX * scale;
+                p.homeY = centerY + p.faceY * scale;
+            }
+            for (let i = 0; i < dustParticles.length; i++) {
+                dustParticles[i].x = Math.random() * W;
+                dustParticles[i].y = Math.random() * H;
+            }
+        });
+
+        resize();
+        initParticles();
+        requestAnimationFrame(animate);
+    })();
+    </script>
+</body>
+</html>

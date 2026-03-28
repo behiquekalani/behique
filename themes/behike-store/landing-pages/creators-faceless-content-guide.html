@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Faceless Creator Playbook - Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #28B94E;
+      --border: #1D1D1F;
+      --surface: #111111;
+      --surface-2: #161616;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .nav-price { font-size: 15px; color: var(--text-muted); }
+
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 28px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block { margin-bottom: 36px; }
+    .price-amount {
+      font-size: clamp(52px, 8vw, 80px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .price-label { font-size: 15px; color: var(--text-muted); margin-top: 8px; }
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 48px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .cta-btn:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .hero-note { font-size: 13px; color: var(--text-muted); margin-top: 16px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); }
+
+    .section { padding: 80px 0; }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .section p {
+      color: var(--text-muted);
+      font-size: 18px;
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) { .problem-grid { grid-template-columns: 1fr; } }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+    }
+    .problem-card .icon { font-size: 24px; margin-bottom: 12px; }
+    .problem-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .problem-card p { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
+
+    .chapters { padding: 80px 0; }
+    .chapters h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+      text-align: center;
+    }
+    .chapter-list { display: flex; flex-direction: column; gap: 0; }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .chapter-item:last-child { border-bottom: none; }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-transform: uppercase;
+      min-width: 80px;
+      padding-top: 3px;
+    }
+    .chapter-content h3 { font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+    .chapter-content p { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
+
+    .guarantee {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+      margin: 0 0 80px;
+    }
+    .guarantee-icon { font-size: 40px; margin-bottom: 16px; }
+    .guarantee h3 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+    .guarantee p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .final-cta { padding: 80px 0 100px; text-align: center; }
+    .final-cta h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .final-cta p { color: var(--text-muted); font-size: 18px; margin-bottom: 40px; }
+
+    footer { border-top: 1px solid var(--border); padding: 32px 0; text-align: center; }
+    footer p { font-size: 13px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">Behike</a>
+      <span class="nav-price">$19.99</span>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow">Creator Guide</p>
+      <h1>Build an Audience and Income<br><span>Without Showing Your Face.</span></h1>
+      <p class="hero-sub">The complete playbook for building a real faceless content brand, growing an audience, and generating income entirely behind the camera.</p>
+      <div class="price-block">
+        <div class="price-amount">$19.99</div>
+        <div class="price-label">One-time purchase. Yours forever.</div>
+      </div>
+      <a href="#" class="cta-btn">Get the Playbook</a>
+      <p class="hero-note">PDF download. 30-day money-back guarantee.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Reality</p>
+      <h2>Your audience does not need<br>your face. It needs your signal.</h2>
+      <p>Channels with millions of subscribers and real income streams are built by people nobody has ever seen. The model is legitimate, proven, and underused because most creators do not know how to build it systematically.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">&#128073;</div>
+          <h3>You want to stay private but still build a real audience</h3>
+          <p>Privacy concerns, professional reasons, or personal preference. All are valid. All are solvable.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#128073;</div>
+          <h3>You do not know which niche or format actually works faceless</h3>
+          <p>Not every niche is equally suited. Choosing correctly from the start saves years of wasted effort.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#128073;</div>
+          <h3>You are not sure how to build brand identity without a personality</h3>
+          <p>Voice, aesthetic, and perspective can create a recognizable brand without a face. This guide shows exactly how.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#128073;</div>
+          <h3>You do not have a production system that scales</h3>
+          <p>Faceless content requires tighter systems than conversational content. Get the structure right before you scale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="chapters">
+    <div class="container">
+      <h2>What's Inside</h2>
+      <div class="chapter-list">
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 1</span>
+          <div class="chapter-content">
+            <h3>Choosing Your Faceless Niche and Format</h3>
+            <p>The three types of faceless niches, the four-filter viability test, and how to choose a format that fits your skills and sustains your output long-term.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 2</span>
+          <div class="chapter-content">
+            <h3>Voice, Persona, and Brand Identity Without a Face</h3>
+            <p>How to define a brand voice, choose your voiceover approach, create a visual identity that is recognizable, and build a brand persona your audience attaches to.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 3</span>
+          <div class="chapter-content">
+            <h3>Content Creation Systems for Faceless Channels</h3>
+            <p>The five-stage content pipeline, scripting for clarity and engagement, and the batch production method that doubles your output without doubling your time.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 4</span>
+          <div class="chapter-content">
+            <h3>Growing Your Faceless Audience</h3>
+            <p>YouTube growth mechanics, the platform specialization decision, and how to use retention data as a map for improving every video you make.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 5</span>
+          <div class="chapter-content">
+            <h3>Monetizing a Faceless Brand</h3>
+            <p>All five monetization layers: ad revenue, digital products, sponsorships, affiliate income, and how to sequence them as your audience grows.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Chapter 6</span>
+          <div class="chapter-content">
+            <h3>Scaling With Automation and Delegation</h3>
+            <p>What to automate first, how to build a standard operating procedure library, and the revenue reinvestment rule that funds growth without risk.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Bonus</span>
+          <div class="chapter-content">
+            <h3>10-Item Quick-Start Checklist</h3>
+            <p>The first actions to take before publishing your first piece. Prioritized and ready to use.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section">
+    <div class="container">
+      <div class="guarantee">
+        <div class="guarantee-icon">&#9989;</div>
+        <h3>30-Day Money-Back Guarantee</h3>
+        <p>If this playbook does not give you a clear, actionable system for building a faceless content brand, email us within 30 days for a full refund. No questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="container">
+      <h2>Your audience does not need<br>to see you to trust you.</h2>
+      <p>Millions of people follow faceless channels they can name and return to every week. Your channel can be one of them.</p>
+      <div class="price-block">
+        <div class="price-amount">$19.99</div>
+        <div class="price-label">One-time. Instant download.</div>
+      </div>
+      <br><br>
+      <a href="#" class="cta-btn">Get the Playbook Now</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

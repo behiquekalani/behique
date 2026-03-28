@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Build a list of 1,000 buyers in 90 days. No paid ads. No audience required. The complete email list system for solo builders.">
+    <title>The Email List Blueprint | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --bg-2: #111;
+            --bg-3: #161616;
+            --border: #1e1e1e;
+            --border-light: #2a2a2a;
+            --text: #e8e8e8;
+            --text-muted: #666;
+            --text-dim: #444;
+            --accent: #4ade80;
+            --accent-dim: #166534;
+            --max: 980px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: var(--max);
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* ── Nav ── */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            background: rgba(10,10,10,0.95);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+
+        nav .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .nav-cta {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover { opacity: 0.85; }
+
+        /* ── Hero ── */
+        .hero {
+            padding: 100px 0 80px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border-radius: 4px;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.025em;
+            max-width: 780px;
+            margin-bottom: 28px;
+            color: #fff;
+        }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 560px;
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            padding: 14px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .hero-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .hero-price span {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 4px;
+        }
+
+        /* ── Stats Bar ── */
+        .stats-bar {
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .stat {
+            padding: 16px 24px;
+            border-right: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .stat:last-child { border-right: none; }
+        .stat.visible { opacity: 1; transform: translateY(0); }
+
+        .stat-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ── Problem ── */
+        .section {
+            padding: 80px 0;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: clamp(22px, 3.5vw, 34px);
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 24px;
+            max-width: 700px;
+        }
+
+        .section p {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 660px;
+            margin-bottom: 20px;
+            line-height: 1.75;
+        }
+
+        .section p strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ── Highlight box ── */
+        .highlight-box {
+            background: var(--bg-3);
+            border: 1px solid var(--border-light);
+            border-left: 3px solid var(--accent);
+            padding: 24px 28px;
+            margin: 36px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: var(--text);
+            margin-bottom: 0;
+        }
+
+        /* ── Chapters ── */
+        .chapters-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2px;
+            margin-top: 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chapter-item {
+            background: var(--bg-2);
+            padding: 24px 28px;
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s, transform 0.4s, background 0.2s;
+        }
+
+        .chapter-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chapter-item:hover { background: var(--bg-3); }
+
+        .ch-num {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 600;
+            min-width: 18px;
+            padding-top: 2px;
+        }
+
+        .ch-body {}
+
+        .ch-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .ch-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .bonus-item {
+            grid-column: 1 / -1;
+            border-bottom: none;
+            background: var(--bg-3);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .bonus-tag {
+            display: inline-block;
+            background: var(--accent-dim);
+            color: var(--accent);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-bottom: 6px;
+        }
+
+        /* ── What you get ── */
+        .gets-list {
+            list-style: none;
+            margin-top: 32px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .gets-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 15px;
+            color: var(--text-muted);
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+
+        .gets-list li.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .gets-list li::before {
+            content: '';
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            background: var(--accent-dim);
+            border-radius: 50%;
+            margin-top: 2px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%234ade80'%3E%3Cpath d='M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z'/%3E%3C/svg%3E");
+            background-size: 12px;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* ── CTA Block ── */
+        .cta-block {
+            padding: 80px 0;
+            border-bottom: 1px solid var(--border);
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s, transform 0.6s;
+        }
+
+        .cta-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-card {
+            background: var(--bg-2);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 56px 64px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 48px;
+            align-items: center;
+        }
+
+        .cta-title {
+            font-size: clamp(22px, 3vw, 30px);
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .cta-sub {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .cta-right {
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .price-main {
+            font-size: 48px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .price-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .cta-note {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 12px;
+        }
+
+        /* ── Related ── */
+        .related {
+            padding: 72px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 32px;
+        }
+
+        .related-card {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-decoration: none;
+            transition: border-color 0.2s, background 0.2s;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s, transform 0.4s, border-color 0.2s, background 0.2s;
+        }
+
+        .related-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .related-card:hover {
+            border-color: var(--border-light);
+            background: var(--bg-3);
+        }
+
+        .related-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .related-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #eee;
+            margin-bottom: 6px;
+        }
+
+        .related-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .related-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #eee;
+        }
+
+        /* ── Footer ── */
+        footer {
+            padding: 40px 0;
+        }
+
+        footer .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-brand {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .footer-copy {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat:nth-child(2) { border-right: none; }
+            .stat:nth-child(3) { border-right: 1px solid var(--border); }
+            .chapters-grid { grid-template-columns: 1fr; }
+            .bonus-item { grid-column: 1; }
+            .gets-list { grid-template-columns: 1fr; }
+            .cta-card {
+                grid-template-columns: 1fr;
+                padding: 40px 28px;
+                text-align: center;
+            }
+            .related-grid { grid-template-columns: 1fr; }
+            footer .container { flex-direction: column; gap: 12px; text-align: center; }
+        }
+
+        @media (max-width: 500px) {
+            .hero { padding: 60px 0 60px; }
+            .hero h1 { font-size: 28px; }
+            .hero-actions { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="nav-brand">Behike</a>
+            <a href="https://behikeai.gumroad.com/l/email-list-blueprint" class="nav-cta">Get it for $21.99</a>
+        </div>
+    </nav>
+
+    <!-- ── Hero ── -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-tag">Email Marketing Guide</div>
+            <h1>Build a List of 1,000 Buyers in 90 Days</h1>
+            <p class="hero-sub">No paid ads. No existing audience. No technical background required. A complete system, chapter by chapter, from first subscriber to first sale.</p>
+            <div class="hero-actions">
+                <a href="https://behikeai.gumroad.com/l/email-list-blueprint" class="btn-primary">Get The Blueprint</a>
+                <div class="hero-price">$21.99 <span>one-time. instant download.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Stats Bar ── -->
+    <div class="stats-bar">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-num">8</div>
+                    <div class="stat-label">Complete chapters</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">4,500+</div>
+                    <div class="stat-label">Words of real content</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">90</div>
+                    <div class="stat-label">Day roadmap, week by week</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">10</div>
+                    <div class="stat-label">Subject line formulas (bonus)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Problem ── -->
+    <section class="section" id="problem">
+        <div class="container">
+            <div class="section-label">The Problem</div>
+            <h2>You're building on rented land. That land can be taken away.</h2>
+            <p>You spent two years growing an Instagram following. The algorithm shifted. Reach dropped to 3%. Now you pay to reach people who already followed you.</p>
+            <p>The platform won. You're renting the audience.</p>
+            <p>Email is different. When someone gives you their email address, you own that contact. No algorithm between you and them. No platform deciding whether your message deserves distribution. You send, they receive.</p>
+
+            <div class="highlight-box">
+                <p>A list of 1,000 engaged subscribers will outperform 50,000 social followers for sales. Open rates of 35-55% versus 1-3% organic reach. The math is not close.</p>
+            </div>
+
+            <p>But most people never build that list because they don't know the system. They set up an opt-in form, post it once, get 12 subscribers, and assume email doesn't work for them.</p>
+            <p>The system is what they're missing. This is the system.</p>
+        </div>
+    </section>
+
+    <!-- ── Chapters ── -->
+    <section class="section" id="chapters">
+        <div class="container">
+            <div class="section-label">What's Inside</div>
+            <h2>Eight chapters. Everything you need, nothing you don't.</h2>
+
+            <div class="chapters-grid">
+                <div class="chapter-item">
+                    <span class="ch-num">Intro</span>
+                    <div class="ch-body">
+                        <div class="ch-title">Why email is still the highest-ROI channel in 2026</div>
+                        <div class="ch-desc">The data behind open rates, click rates, and why $36 returned per $1 spent is a conservative number for lists built the right way.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">01</span>
+                    <div class="ch-body">
+                        <div class="ch-title">Choosing your platform</div>
+                        <div class="ch-desc">ConvertKit vs Beehiiv vs MailerLite. One question cuts through the noise. Which platform is right depends on what you're building, not which one has the best landing page.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">02</span>
+                    <div class="ch-body">
+                        <div class="ch-title">The lead magnet that actually converts</div>
+                        <div class="ch-desc">The 3-type framework: fast win, condensed answer, and bridge. How to choose between them based on what your audience actually needs.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">03</span>
+                    <div class="ch-body">
+                        <div class="ch-title">Your welcome sequence</div>
+                        <div class="ch-desc">Five emails that turn new subscribers into buyers. Each one has a specific job. The sequence runs automatically while you do other work.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">04</span>
+                    <div class="ch-body">
+                        <div class="ch-title">The weekly email system</div>
+                        <div class="ch-desc">Format, frequency, and the four content types that keep your list engaged without burning you out. The system that runs for years, not weeks.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">05</span>
+                    <div class="ch-body">
+                        <div class="ch-title">List growth without paid ads</div>
+                        <div class="ch-desc">Six organic channels. Which ones work before you have an audience. How to use each one without coming across as someone spamming their links.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">06</span>
+                    <div class="ch-body">
+                        <div class="ch-title">Segmentation and tagging</div>
+                        <div class="ch-desc">How to send the right email to the right person. Segmented campaigns get 14-20% higher open rates and 100% higher click rates. The setup that makes this possible without a complex system.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">07</span>
+                    <div class="ch-body">
+                        <div class="ch-title">Monetizing your list</div>
+                        <div class="ch-desc">Three revenue models and when to use each: direct product sales, affiliate revenue, and paid subscriptions. How to sequence them and what to expect from each.</div>
+                    </div>
+                </div>
+                <div class="chapter-item">
+                    <span class="ch-num">08</span>
+                    <div class="ch-body">
+                        <div class="ch-title">The 90-day growth roadmap</div>
+                        <div class="ch-desc">Week-by-week milestones from zero to 1,000. What to do in weeks 1-2, weeks 3-8, and the push to 1,000. Built around realistic output, not aspirational goals.</div>
+                    </div>
+                </div>
+                <div class="chapter-item bonus-item">
+                    <span class="ch-num">+</span>
+                    <div class="ch-body">
+                        <div class="bonus-tag">Bonus</div>
+                        <div class="ch-title">10 subject line formulas that consistently get opens</div>
+                        <div class="ch-desc">The contrarian statement. The specific number. The insider access frame. The plain conversational subject. Each formula with examples you can adapt to your niche.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Who It's For ── -->
+    <section class="section" id="for">
+        <div class="container">
+            <div class="section-label">Who This Is For</div>
+            <h2>This guide is for one type of person.</h2>
+            <p>You're building something. A product, a service, a personal brand. You know you need an email list but you haven't built one yet, or you have a small list that isn't performing.</p>
+            <p>You don't want a 40-page theoretical overview of email marketing. You want a concrete system you can start running this week.</p>
+            <p>That's what this is.</p>
+
+            <ul class="gets-list">
+                <li>You're starting from zero subscribers</li>
+                <li>You have a product or you're building one</li>
+                <li>You haven't run a welcome sequence before</li>
+                <li>Your current lead magnet isn't converting</li>
+                <li>You're posting on social but not capturing emails</li>
+                <li>You've built a list but don't know how to monetize it</li>
+                <li>You want a system that runs without daily effort</li>
+                <li>You want 1,000 real buyers, not vanity subscribers</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ── Divider Detail ── -->
+    <section class="section" id="detail">
+        <div class="container">
+            <div class="section-label">The Philosophy</div>
+            <h2>Most email marketing advice is written for enterprises. This isn't.</h2>
+            <p>The average email marketing guide assumes you have a marketing team, a content calendar, an ad budget, and existing brand recognition. It tells you to A/B test subject lines before you have 100 subscribers. It recommends segmentation strategies before you've sent a single sequence.</p>
+            <p>This guide is written for one person building a business alone. The sequence of actions is calibrated for that reality. You do the infrastructure first. Then the list. Then the monetization. In that order, for a reason.</p>
+
+            <div class="highlight-box">
+                <p>The 90-day roadmap in Chapter 8 is not a content calendar. It's a sequenced build plan. Each week adds something that makes the next week more effective. By week 13, you have a system that grows while you sleep.</p>
+            </div>
+
+            <p>There are no frameworks to memorize. No diagrams. No worksheets. Just the decisions you need to make once, so you stop making them every week.</p>
+        </div>
+    </section>
+
+    <!-- ── CTA Block ── -->
+    <div class="cta-block" id="buy">
+        <div class="container">
+            <div class="cta-card">
+                <div class="cta-left">
+                    <div class="cta-title">The Email List Blueprint</div>
+                    <div class="cta-sub">8 chapters. 4,500+ words. The complete system for building a list of 1,000 buyers in 90 days, without paid ads.</div>
+                </div>
+                <div class="cta-right">
+                    <div class="price-main">$21.99</div>
+                    <div class="price-sub">One-time. PDF. Instant download.</div>
+                    <a href="https://behikeai.gumroad.com/l/email-list-blueprint" class="btn-primary">Get The Blueprint</a>
+                    <div class="cta-note">Instant download. Start tonight.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Related ── -->
+    <section class="related">
+        <div class="container">
+            <div class="section-label">Pair It With</div>
+            <div class="related-grid">
+                <a href="behike-method-v2.html" class="related-card">
+                    <div class="related-tag" style="color: #FF9F0A;">Method</div>
+                    <div class="related-title">The Behike Method v2</div>
+                    <div class="related-desc">Stop collecting frameworks and start shipping. 8 chapters for builders with too many ideas and zero revenue.</div>
+                    <div class="related-price">$19.99</div>
+                </a>
+                <a href="content-empire-kit.html" class="related-card">
+                    <div class="related-tag" style="color: #BF5AF2;">Content</div>
+                    <div class="related-title">Content Empire Kit</div>
+                    <div class="related-desc">The full content system. Build the pipeline that feeds your email list with consistent organic traffic.</div>
+                    <div class="related-price">$24.99</div>
+                </a>
+                <a href="solopreneur-os.html" class="related-card">
+                    <div class="related-tag" style="color: #34C759;">System</div>
+                    <div class="related-title">Solopreneur OS</div>
+                    <div class="related-desc">The operating framework for a one-person business. Goes deeper on execution systems this guide introduces.</div>
+                    <div class="related-price">$12.99</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Footer ── -->
+    <footer>
+        <div class="container">
+            <div class="footer-brand">Behike</div>
+            <div class="footer-copy">&copy; 2026 Behike. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // IntersectionObserver for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observe sections
+        document.querySelectorAll('.section, .cta-block').forEach(el => observer.observe(el));
+
+        // Staggered stats
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const stats = entry.target.querySelectorAll('.stat');
+                    stats.forEach((stat, i) => {
+                        setTimeout(() => stat.classList.add('visible'), i * 80);
+                    });
+                }
+            });
+        }, { threshold: 0.2 });
+
+        const statsBar = document.querySelector('.stats-bar');
+        if (statsBar) statObserver.observe(statsBar);
+
+        // Staggered chapter items
+        const chapterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const items = entry.target.querySelectorAll('.chapter-item');
+                    items.forEach((item, i) => {
+                        setTimeout(() => item.classList.add('visible'), i * 60);
+                    });
+                }
+            });
+        }, { threshold: 0.05 });
+
+        const chaptersGrid = document.querySelector('.chapters-grid');
+        if (chaptersGrid) chapterObserver.observe(chaptersGrid);
+
+        // Staggered gets-list items
+        const getsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const items = entry.target.querySelectorAll('li');
+                    items.forEach((item, i) => {
+                        setTimeout(() => item.classList.add('visible'), i * 60);
+                    });
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const getsList = document.querySelector('.gets-list');
+        if (getsList) getsObserver.observe(getsList);
+
+        // Staggered related cards
+        const relatedObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const cards = entry.target.querySelectorAll('.related-card');
+                    cards.forEach((card, i) => {
+                        setTimeout(() => card.classList.add('visible'), i * 80);
+                    });
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const relatedGrid = document.querySelector('.related-grid');
+        if (relatedGrid) relatedObserver.observe(relatedGrid);
+    </script>
+
+</body>
+</html>

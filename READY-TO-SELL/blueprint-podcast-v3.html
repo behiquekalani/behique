@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podcast Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+  .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .stacked-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Podcast Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">Pick your format. Record consistently. Distribute everywhere. Monetize.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and plan your entire podcast operation before recording episode one.</p>
+  </div>
+
+  <!-- MODULE 01: FORMAT SELECTION -->
+  <div class="module">
+    <div class="module-number">01 -- Format Selection</div>
+    <h2 class="module-title">Format Selection</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Solo</div>
+        <h4>One Host</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Full creative control</li>
+          <li>No scheduling conflicts</li>
+          <li>Requires strong delivery</li>
+          <li>Best for education / opinion</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Episodes: 15-30 min</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Interview</div>
+        <h4>Guest-Based</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Built-in guest audience</li>
+          <li>Fresh perspectives each episode</li>
+          <li>Requires guest booking system</li>
+          <li>Best for networking / growth</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Episodes: 45-90 min</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Co-Hosted</div>
+        <h4>Two Hosts</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Natural conversation energy</li>
+          <li>Shared workload</li>
+          <li>Scheduling complexity</li>
+          <li>Best for entertainment / debate</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Episodes: 30-60 min</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Your Format</div>
+        <div class="fill-line" data-placeholder="e.g. Interview-based with solo deep-dives every 4th episode"></div>
+      </div>
+      <div>
+        <div class="label">Niche / Topic</div>
+        <div class="fill-line" data-placeholder="e.g. AI tools for solopreneurs who hate tech"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Show Name</div>
+        <div class="fill-line" data-placeholder="e.g. The Build Show / One-Person Empire Podcast"></div>
+      </div>
+      <div>
+        <div class="label">Release Schedule</div>
+        <div class="fill-line" data-placeholder="e.g. Every Tuesday at 6am EST"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Target Audience (who listens?)</div>
+        <div class="fill-line" data-placeholder="e.g. 25-40 year old creators and freelancers"></div>
+      </div>
+      <div>
+        <div class="label">Episode Length Target</div>
+        <div class="fill-line" data-placeholder="e.g. 25-35 minutes (commute-friendly)"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Your Unique Angle (why listen to YOU?)</div>
+        <div class="fill-line" data-placeholder="e.g. I build live on air and show my actual numbers"></div>
+      </div>
+      <div>
+        <div class="label">First 10 Episode Topics</div>
+        <div class="fill-line" data-placeholder="e.g. 1. Why I started 2. My first $1K 3. Tools I use..."></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 02: EQUIPMENT & SETUP -->
+  <div class="module">
+    <div class="module-number">02 -- Equipment & Setup</div>
+    <h2 class="module-title">Equipment & Setup</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Starter Kit ($100-300)</div>
+        <ul class="checklist">
+          <li>USB mic (ATR2100x / Blue Yeti)</li>
+          <li>Pop filter + boom arm</li>
+          <li>Headphones (closed-back)</li>
+          <li>Free DAW (Audacity / GarageBand)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Pro Kit ($500-1500)</div>
+        <ul class="checklist">
+          <li>XLR mic (Shure SM7B / Rode PodMic)</li>
+          <li>Audio interface (Focusrite Scarlett)</li>
+          <li>Acoustic treatment panels</li>
+          <li>Paid DAW (Logic Pro / Descript)</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Your Equipment List</div>
+    <table class="clean">
+      <tr><th>Item</th><th>Model</th><th>Cost</th><th>Status</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 03: RECORDING WORKFLOW -->
+  <div class="module">
+    <div class="module-number">03 -- Recording Workflow</div>
+    <h2 class="module-title">Recording Workflow</h2>
+
+    <div class="label">Episode Production Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Outline</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Record</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Edit</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Show Notes</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Upload</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Promote</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Pre-Recording Checklist</div>
+        <ul class="checklist">
+          <li>Episode topic and outline ready</li>
+          <li>Research / talking points noted</li>
+          <li>Guest confirmed (if interview)</li>
+          <li>Equipment tested, levels checked</li>
+          <li>Phone on silent, notifications off</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Post-Recording Checklist</div>
+        <ul class="checklist">
+          <li>Raw audio backed up</li>
+          <li>Edited and exported (MP3)</li>
+          <li>Show notes and timestamps written</li>
+          <li>Uploaded to hosting platform</li>
+          <li>Clips cut for social media</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="label">Editing Tools</div>
+    <div class="pills">
+      <span class="pill">Descript</span>
+      <span class="pill">Audacity</span>
+      <span class="pill">Logic Pro</span>
+      <span class="pill">Riverside.fm</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+
+  <!-- MODULE 04: DISTRIBUTION -->
+  <div class="module">
+    <div class="module-number">04 -- Distribution</div>
+    <h2 class="module-title">Distribution</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Audio Platforms</div>
+        <ul class="checklist">
+          <li>Apple Podcasts</li>
+          <li>Spotify</li>
+          <li>Amazon Music / Audible</li>
+          <li>Overcast / Pocket Casts</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Video Platforms</div>
+        <ul class="checklist">
+          <li>YouTube (full episodes)</li>
+          <li>YouTube Shorts (clips)</li>
+          <li>TikTok (clips)</li>
+          <li>Instagram Reels (clips)</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Hosting Platform</div>
+        <div class="fill-line" data-placeholder="e.g. Buzzsprout / Transistor / Anchor"></div>
+      </div>
+      <div>
+        <div class="label">RSS Feed URL</div>
+        <div class="fill-line" data-placeholder="e.g. https://feeds.buzzsprout.com/your-show.rss"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Primary Video Platform</div>
+        <div class="fill-line" data-placeholder="e.g. YouTube (full episodes + shorts)"></div>
+      </div>
+      <div>
+        <div class="label">Clips Strategy (which platforms?)</div>
+        <div class="fill-line" data-placeholder="e.g. TikTok + Reels + YouTube Shorts (3-5 clips per ep)"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Show Notes Location</div>
+        <div class="fill-line" data-placeholder="e.g. Blog on personal site + Notion public page"></div>
+      </div>
+      <div>
+        <div class="label">Email Notification System</div>
+        <div class="fill-line" data-placeholder="e.g. Kit.com automated email on publish day"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 05: MONETIZATION -->
+  <div class="module">
+    <div class="module-number">05 -- Monetization</div>
+    <h2 class="module-title">Monetization</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Sponsorships</div>
+        <h4>Direct Revenue</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Pre-roll ads (15-30 sec)</li>
+          <li>Mid-roll ads (60 sec)</li>
+          <li>Host-read integrations</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Community</div>
+        <h4>Audience Revenue</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Patreon / membership</li>
+          <li>Paid newsletter</li>
+          <li>Tip jar / Buy Me a Coffee</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Your Offers</div>
+        <h4>Product Revenue</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Digital products / courses</li>
+          <li>Coaching / consulting</li>
+          <li>Affiliate commissions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="label">Sponsorship CPM Rates</div>
+    <table class="clean">
+      <tr><th>Ad Type</th><th>CPM Range</th><th>Your Rate</th></tr>
+      <tr><td>Pre-roll (15s)</td><td>$15 - $25</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Mid-roll (60s)</td><td>$20 - $50</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Host-read integration</td><td>$25 - $75</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+
+    <hr class="section-divider">
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Primary Revenue Stream (pick one to start)</div>
+        <div class="fill-line" data-placeholder="e.g. Digital products sold through show notes"></div>
+      </div>
+      <div>
+        <div class="label">Revenue Goal (Month 6)</div>
+        <div class="fill-line" data-placeholder="e.g. $2,000/month from sponsors + products"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Your Product/Offer to Sell on the Show</div>
+        <div class="fill-line" data-placeholder="e.g. $49 template pack mentioned in every episode"></div>
+      </div>
+      <div>
+        <div class="label">Minimum Downloads Before Pitching Sponsors</div>
+        <div class="fill-line" data-placeholder="e.g. 1,000 downloads per episode (industry standard)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 06: GROWTH STRATEGY -->
+  <div class="module">
+    <div class="module-number">06 -- Growth Strategy</div>
+    <h2 class="module-title">Growth Strategy</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Organic Growth</div>
+        <ul class="checklist">
+          <li>SEO-optimized episode titles</li>
+          <li>Cross-promote with other podcasts</li>
+          <li>Clip content for social media</li>
+          <li>Guest on other shows</li>
+          <li>Email list for new episodes</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Paid Growth</div>
+        <ul class="checklist">
+          <li>Overcast ads (podcast listeners)</li>
+          <li>Instagram / Facebook ads to clips</li>
+          <li>YouTube ads on related content</li>
+          <li>Podcast network partnerships</li>
+          <li>Giveaways and contests</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Content Repurposing Flow</div>
+    <div class="h-flow">
+      <div class="step">Full Episode</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">3-5 Short Clips</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Blog Post</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Newsletter</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Social Posts</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2">
+      <div>
+        <div class="label">90-Day Download Goal</div>
+        <div class="fill-line" data-placeholder="e.g. 500 downloads per episode within 7 days"></div>
+      </div>
+      <div>
+        <div class="label">Growth Channel Priority</div>
+        <div class="fill-line" data-placeholder="e.g. YouTube clips first, then guest appearances"></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 16px;">
+      <div>
+        <div class="label">Cross-Promotion Partners (3 shows)</div>
+        <div class="fill-line" data-placeholder="e.g. 1. The Indie Hacker Pod  2. Build in Public  3. ___"></div>
+      </div>
+      <div>
+        <div class="label">Guest Appearance Goal (per month)</div>
+        <div class="fill-line" data-placeholder="e.g. 2 guest spots on other shows per month"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 07: SPONSORSHIP OUTREACH -->
+  <div class="module">
+    <div class="module-number">07 -- Sponsorship Outreach</div>
+    <h2 class="module-title">Sponsorship Outreach</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Media Kit Must-Haves</div>
+        <ul class="checklist">
+          <li>Download numbers per episode</li>
+          <li>Audience demographics</li>
+          <li>Social media following</li>
+          <li>Past sponsor testimonials</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Sponsor Tracker</div>
+        <table class="clean">
+          <tr><th>Brand</th><th>Status</th><th>Rate</th></tr>
+          <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+          <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="label">Sponsor Platforms</div>
+    <div class="pills">
+      <span class="pill">Podcorn</span>
+      <span class="pill">Gumball</span>
+      <span class="pill">AdvertiseCast</span>
+      <span class="pill">Direct outreach</span>
+    </div>
+  </div>
+
+  <!-- MODULE 08: PODCAST TRACKER -->
+  <div class="module">
+    <div class="module-number">08 -- Podcast Tracker</div>
+    <h2 class="module-title">Podcast Tracker</h2>
+
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Episodes Published</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Total episodes live</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Downloads / Episode</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Average per episode (30 days)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Monthly Revenue</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Sponsorships + products</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Email Subscribers</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Newsletter list size</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Episode Log</div>
+    <table class="clean">
+      <tr><th>#</th><th>Title</th><th>Publish Date</th><th>Downloads</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>PODCAST BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+
+</div>
+
+</body>
+</html>

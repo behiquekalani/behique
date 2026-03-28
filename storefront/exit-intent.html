@@ -1,0 +1,232 @@
+<!-- Exit Intent Popup - embed with: <div id="exit-intent-root"></div><script src="/exit-intent.html"></script> -->
+<!-- Or include this file's script/style directly in your page -->
+
+<style>
+  #ei-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    animation: ei-fade 0.3s ease;
+  }
+  #ei-overlay.ei-active { display: flex; }
+
+  @keyframes ei-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes ei-slide {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  #ei-panel {
+    background: rgba(15, 15, 20, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 16px;
+    padding: 40px 36px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    animation: ei-slide 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  #ei-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  #ei-close:hover { color: #fff; }
+
+  #ei-panel h2 {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    line-height: 1.3;
+  }
+
+  #ei-panel .ei-sub {
+    color: #999;
+    font-size: 14px;
+    margin: 0 0 24px;
+    line-height: 1.5;
+  }
+
+  #ei-panel .ei-highlight {
+    color: #00D4FF;
+    font-weight: 600;
+  }
+
+  #ei-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #ei-email {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+  #ei-email:focus {
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+  #ei-email::placeholder { color: #555; }
+
+  #ei-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #00D4FF, #0099bb);
+    border: none;
+    border-radius: 10px;
+    color: #000;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.3px;
+  }
+  #ei-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+  }
+
+  #ei-panel .ei-privacy {
+    color: #555;
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  #ei-success {
+    display: none;
+    color: #6fcf97;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 20px 0;
+  }
+
+  @media (max-width: 480px) {
+    #ei-panel {
+      padding: 32px 24px;
+      margin: 16px;
+    }
+    #ei-panel h2 { font-size: 19px; }
+  }
+</style>
+
+<div id="ei-overlay">
+  <div id="ei-panel">
+    <button id="ei-close">&times;</button>
+    <h2>Wait. Grab your <span class="ei-highlight">free blueprint</span> before you go</h2>
+    <p class="ei-sub">Get the exact system we use to build AI-powered income streams. No fluff, just the framework.</p>
+    <form id="ei-form">
+      <input type="email" id="ei-email" placeholder="Enter your email" required>
+      <button type="submit" id="ei-submit">Get Free Blueprint</button>
+      <p class="ei-privacy">No spam. Unsubscribe anytime.</p>
+    </form>
+    <div id="ei-success">Check your inbox. The blueprint is on its way.</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_KEY = 'ei_shown';
+  if (sessionStorage.getItem(STORAGE_KEY)) return;
+
+  var overlay = document.getElementById('ei-overlay');
+  var triggered = false;
+
+  function showPopup() {
+    if (triggered) return;
+    if (sessionStorage.getItem(STORAGE_KEY)) return;
+    triggered = true;
+    sessionStorage.setItem(STORAGE_KEY, '1');
+    overlay.classList.add('ei-active');
+  }
+
+  function closePopup() {
+    overlay.classList.remove('ei-active');
+  }
+
+  // Desktop: mouse leaves viewport from top
+  document.addEventListener('mouseout', function(e) {
+    if (e.clientY <= 0 && e.relatedTarget === null) {
+      showPopup();
+    }
+  });
+
+  // Mobile: rapid scroll to top pattern
+  var lastScroll = window.scrollY;
+  var scrollUpDistance = 0;
+  var scrollThreshold = 300;
+
+  window.addEventListener('scroll', function() {
+    var current = window.scrollY;
+    if (current < lastScroll) {
+      scrollUpDistance += (lastScroll - current);
+      if (scrollUpDistance > scrollThreshold && current < 100) {
+        showPopup();
+      }
+    } else {
+      scrollUpDistance = 0;
+    }
+    lastScroll = current;
+  }, { passive: true });
+
+  // Close handlers
+  document.getElementById('ei-close').addEventListener('click', closePopup);
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closePopup();
+  });
+
+  // Form submit
+  document.getElementById('ei-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email = document.getElementById('ei-email').value;
+
+    // Send to your backend / Gumroad / email service here
+    // Example: fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email }) });
+
+    console.log('[Exit Intent] Email captured:', email);
+
+    document.getElementById('ei-form').style.display = 'none';
+    document.getElementById('ei-success').style.display = 'block';
+
+    setTimeout(closePopup, 2500);
+  });
+
+  // ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePopup();
+  });
+})();
+</script>

@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike System Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0D1B2A;
+  --bg2: #1B2838;
+  --accent: #00B4D8;
+  --accent-dim: rgba(0, 180, 216, 0.3);
+  --accent-glow: rgba(0, 180, 216, 0.12);
+  --green: #00E676;
+  --yellow: #FFD600;
+  --red: #FF5252;
+  --text: #E0F0FF;
+  --text-dim: #5A7A9A;
+  --surface: rgba(14, 30, 55, 0.85);
+  --border: rgba(0, 180, 216, 0.12);
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow-y: auto; overflow-x: hidden;
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  padding: 16px;
+  background: linear-gradient(135deg, #0D1B2A 0%, #0F2744 50%, #0D1B2A 100%);
+  min-height: 100vh;
+}
+
+.monitor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.monitor-title {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: border-color 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(0, 180, 216, 0.3);
+}
+
+.card.full {
+  grid-column: 1 / -1;
+}
+
+.card-label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Circular Gauge */
+.gauge-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.gauge-svg {
+  width: 110px;
+  height: 110px;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg {
+  fill: none;
+  stroke: var(--bg2);
+  stroke-width: 8;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s;
+}
+
+.gauge-center {
+  position: absolute;
+  text-align: center;
+}
+
+.gauge-value {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.gauge-unit {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.gauge-sub {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* Sparkline */
+.sparkline-wrap {
+  margin-top: 10px;
+  height: 40px;
+  position: relative;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.sparkline-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.sparkline-area {
+  fill: url(#sparkGrad);
+  opacity: 0.3;
+}
+
+/* Storage bar */
+.bar-wrap {
+  margin-top: 8px;
+}
+
+.bar-track {
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.5s;
+  background: linear-gradient(90deg, var(--accent), #0090b0);
+}
+
+.bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.bar-labels span:first-child {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Network stats */
+.net-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.net-row:last-child { border-bottom: none; }
+
+.net-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.net-arrow {
+  font-size: 12px;
+}
+
+.net-arrow.up { color: var(--green); }
+.net-arrow.down { color: var(--accent); }
+
+.net-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Process table */
+.proc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.proc-table th {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 4px 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.proc-table th:nth-child(3),
+.proc-table th:nth-child(4) {
+  text-align: right;
+}
+
+.proc-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.proc-table td:nth-child(3),
+.proc-table td:nth-child(4) {
+  text-align: right;
+  font-weight: 500;
+}
+
+.proc-table td:first-child {
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.proc-table tr:hover td {
+  background: rgba(0, 180, 216, 0.05);
+}
+
+/* Info items */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.info-row:last-child { border-bottom: none; }
+
+.info-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.info-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* GPU card */
+.gpu-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.gpu-detail {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.gpu-detail span {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Footer */
+.monitor-footer {
+  text-align: center;
+  padding: 12px 0 4px;
+  font-size: 8px;
+  color: var(--text-dim);
+  font-family: var(--font-pixel);
+  letter-spacing: 1px;
+}
+
+/* Offline overlay */
+.offline-banner {
+  display: none;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--red);
+}
+
+.offline-banner.show { display: block; }
+
+.offline-banner code {
+  display: block;
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.3);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+/* Color helpers */
+.color-green { color: var(--green) !important; }
+.color-yellow { color: var(--yellow) !important; }
+.color-red { color: var(--red) !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 4px; }
+
+/* Temperature display */
+.temp-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.temp-icon {
+  font-size: 16px;
+}
+
+.temp-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.temp-na {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<div class="monitor-header">
+  <div class="monitor-title">Behike System Monitor</div>
+  <div class="status-dot" id="statusDot"></div>
+</div>
+
+<div class="grid">
+
+  <!-- Offline Banner -->
+  <div class="offline-banner" id="offlineBanner">
+    Stats server not detected. Start the collector:
+    <code>cd ~/behique && python3 tools/system_stats.py &</code>
+  </div>
+
+  <!-- CPU Gauge -->
+  <div class="card" id="cpuCard">
+    <div class="card-label">CPU</div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 120 120">
+        <circle class="gauge-bg" cx="60" cy="60" r="48" />
+        <circle class="gauge-fill" id="cpuGauge" cx="60" cy="60" r="48"
+          stroke-dasharray="301.59" stroke-dashoffset="301.59" />
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-value" id="cpuValue">--</div>
+        <div class="gauge-unit">%</div>
+      </div>
+    </div>
+    <div class="gauge-sub" id="cpuSub">-- cores</div>
+
+    <!-- CPU Sparkline -->
+    <div class="sparkline-wrap">
+      <svg class="sparkline-svg" viewBox="0 0 300 40" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--accent)" />
+            <stop offset="100%" stop-color="transparent" />
+          </linearGradient>
+        </defs>
+        <path class="sparkline-area" id="sparkArea" d="" />
+        <path class="sparkline-line" id="sparkLine" d="" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- RAM Gauge -->
+  <div class="card" id="ramCard">
+    <div class="card-label">Memory</div>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 120 120">
+        <circle class="gauge-bg" cx="60" cy="60" r="48" />
+        <circle class="gauge-fill" id="ramGauge" cx="60" cy="60" r="48"
+          stroke-dasharray="301.59" stroke-dashoffset="301.59" />
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-value" id="ramValue">--</div>
+        <div class="gauge-unit">%</div>
+      </div>
+    </div>
+    <div class="gauge-sub" id="ramSub">-- / -- GB</div>
+  </div>
+
+  <!-- Storage -->
+  <div class="card" id="storageCard">
+    <div class="card-label">Storage</div>
+    <div style="margin-top:4px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <span style="font-size:20px;font-weight:700" id="diskPercent">--%</span>
+        <span style="font-size:11px;color:var(--text-dim)" id="diskLabel">-- / --</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="diskBar" style="width:0%"></div>
+      </div>
+      <div class="bar-labels">
+        <span id="diskUsed">--</span>
+        <span id="diskFree">-- free</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Temperature -->
+  <div class="card" id="tempCard">
+    <div class="card-label">Temperature</div>
+    <div class="temp-display">
+      <span class="temp-icon" id="tempIcon">&#x1F321;&#xFE0F;</span>
+      <span class="temp-value" id="tempValue">--</span>
+    </div>
+    <div style="margin-top:10px">
+      <div class="info-row">
+        <span class="info-label">Uptime</span>
+        <span class="info-value" id="uptimeValue">--</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- GPU -->
+  <div class="card full" id="gpuCard">
+    <div class="card-label">GPU</div>
+    <div class="gpu-name" id="gpuName">--</div>
+    <div class="gpu-detail" id="gpuDetail">
+      Cores: <span id="gpuCores">--</span><br>
+      Metal: <span id="gpuMetal">--</span><br>
+      VRAM: <span id="gpuVram">--</span>
+    </div>
+  </div>
+
+  <!-- Network -->
+  <div class="card" id="networkCard">
+    <div class="card-label">Network</div>
+    <div class="net-row">
+      <span class="net-label"><span class="net-arrow up">&#9650;</span> Upload</span>
+      <span class="net-value" id="netUp">--</span>
+    </div>
+    <div class="net-row">
+      <span class="net-label"><span class="net-arrow down">&#9660;</span> Download</span>
+      <span class="net-value" id="netDown">--</span>
+    </div>
+    <div class="net-row">
+      <span class="net-label">Total Sent</span>
+      <span class="net-value" style="font-size:11px;color:var(--text-dim)" id="netTotalUp">--</span>
+    </div>
+    <div class="net-row">
+      <span class="net-label">Total Recv</span>
+      <span class="net-value" style="font-size:11px;color:var(--text-dim)" id="netTotalDown">--</span>
+    </div>
+  </div>
+
+  <!-- Processes -->
+  <div class="card" id="procCard">
+    <div class="card-label">Top Processes</div>
+    <table class="proc-table">
+      <thead>
+        <tr><th>PID</th><th>Name</th><th>CPU%</th><th>MEM%</th></tr>
+      </thead>
+      <tbody id="procBody">
+        <tr><td colspan="4" style="text-align:center;color:var(--text-dim)">waiting...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="monitor-footer">Copyright 2026 Behike</div>
+
+<script>
+const STATS_URL = 'http://localhost:8083/stats';
+const POLL_MS = 2000;
+const CIRC = 2 * Math.PI * 48; // ~301.59
+
+// Helpers
+function fmt(bytes) {
+  if (bytes >= 1e12) return (bytes / 1e12).toFixed(1) + ' TB';
+  if (bytes >= 1e9) return (bytes / 1e9).toFixed(1) + ' GB';
+  if (bytes >= 1e6) return (bytes / 1e6).toFixed(1) + ' MB';
+  if (bytes >= 1e3) return (bytes / 1e3).toFixed(1) + ' KB';
+  return bytes + ' B';
+}
+
+function fmtSpeed(bps) {
+  if (bps >= 1e6) return (bps / 1e6).toFixed(1) + ' MB/s';
+  if (bps >= 1e3) return (bps / 1e3).toFixed(1) + ' KB/s';
+  return bps + ' B/s';
+}
+
+function gaugeColor(pct) {
+  if (pct >= 90) return 'var(--red)';
+  if (pct >= 70) return 'var(--yellow)';
+  return 'var(--accent)';
+}
+
+function barColor(pct) {
+  if (pct >= 90) return 'linear-gradient(90deg, var(--red), #cc3333)';
+  if (pct >= 75) return 'linear-gradient(90deg, var(--yellow), #ccaa00)';
+  return 'linear-gradient(90deg, var(--accent), #0090b0)';
+}
+
+function setGauge(el, pct) {
+  const offset = CIRC - (pct / 100) * CIRC;
+  el.style.strokeDashoffset = offset;
+  el.style.stroke = gaugeColor(pct);
+}
+
+function buildSparkline(history) {
+  if (!history || history.length < 2) return;
+  const w = 300, h = 40;
+  const step = w / (history.length - 1);
+  let linePath = '';
+  let areaPath = '';
+
+  history.forEach((v, i) => {
+    const x = i * step;
+    const y = h - (v / 100) * h;
+    if (i === 0) {
+      linePath += `M${x},${y}`;
+      areaPath += `M${x},${h} L${x},${y}`;
+    } else {
+      linePath += ` L${x},${y}`;
+      areaPath += ` L${x},${y}`;
+    }
+  });
+  areaPath += ` L${(history.length - 1) * step},${h} Z`;
+
+  document.getElementById('sparkLine').setAttribute('d', linePath);
+  document.getElementById('sparkArea').setAttribute('d', areaPath);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+let offline = false;
+let failCount = 0;
+
+async function fetchStats() {
+  try {
+    const res = await fetch(STATS_URL);
+    if (!res.ok) throw new Error('bad status');
+    const d = await res.json();
+    failCount = 0;
+
+    if (offline) {
+      offline = false;
+      document.getElementById('offlineBanner').classList.remove('show');
+      document.getElementById('statusDot').style.background = 'var(--green)';
+      document.getElementById('statusDot').style.boxShadow = '0 0 8px var(--green)';
+    }
+
+    // CPU
+    const cpuPct = d.cpu?.percent ?? 0;
+    setGauge(document.getElementById('cpuGauge'), cpuPct);
+    document.getElementById('cpuValue').textContent = Math.round(cpuPct);
+    const freqStr = d.cpu?.freq_current ? ` @ ${d.cpu.freq_current} MHz` : '';
+    document.getElementById('cpuSub').textContent = `${d.cpu?.cores ?? '--'} cores${freqStr}`;
+    buildSparkline(d.cpu?.history);
+
+    // RAM
+    const ramPct = d.ram?.percent ?? 0;
+    setGauge(document.getElementById('ramGauge'), ramPct);
+    document.getElementById('ramValue').textContent = Math.round(ramPct);
+    const ramUsed = d.ram?.used ? fmt(d.ram.used) : '--';
+    const ramTotal = d.ram?.total ? fmt(d.ram.total) : '--';
+    document.getElementById('ramSub').textContent = `${ramUsed} / ${ramTotal}`;
+
+    // Disk
+    const diskPct = d.disk?.percent ?? 0;
+    document.getElementById('diskPercent').textContent = Math.round(diskPct) + '%';
+    document.getElementById('diskBar').style.width = diskPct + '%';
+    document.getElementById('diskBar').style.background = barColor(diskPct);
+    document.getElementById('diskUsed').textContent = d.disk?.used ? fmt(d.disk.used) + ' used' : '--';
+    document.getElementById('diskFree').textContent = d.disk?.free ? fmt(d.disk.free) + ' free' : '--';
+    document.getElementById('diskLabel').textContent = d.disk?.total ? fmt(d.disk.total) + ' total' : '--';
+
+    // Temperature
+    if (d.cpu_temp != null) {
+      const t = d.cpu_temp;
+      const tc = t >= 80 ? 'color-red' : t >= 60 ? 'color-yellow' : 'color-green';
+      document.getElementById('tempValue').innerHTML = `<span class="${tc}">${t.toFixed(1)}&#176;C</span>`;
+    } else {
+      document.getElementById('tempValue').innerHTML = '<span class="temp-na">N/A (install osx-cpu-temp)</span>';
+    }
+
+    // Uptime
+    document.getElementById('uptimeValue').textContent = d.uptime ?? '--';
+
+    // GPU
+    if (d.gpu) {
+      document.getElementById('gpuName').textContent = d.gpu.name ?? '--';
+      document.getElementById('gpuCores').textContent = d.gpu.cores ?? '--';
+      document.getElementById('gpuMetal').textContent = d.gpu.metal ?? '--';
+      document.getElementById('gpuVram').textContent = d.gpu.vram ?? '--';
+    }
+
+    // Network
+    document.getElementById('netUp').textContent = fmtSpeed(d.network?.sent_speed ?? 0);
+    document.getElementById('netDown').textContent = fmtSpeed(d.network?.recv_speed ?? 0);
+    document.getElementById('netTotalUp').textContent = fmt(d.network?.total_sent ?? 0);
+    document.getElementById('netTotalDown').textContent = fmt(d.network?.total_recv ?? 0);
+
+    // Processes
+    const tbody = document.getElementById('procBody');
+    if (d.processes && d.processes.length > 0) {
+      tbody.innerHTML = d.processes.map(p => `
+        <tr>
+          <td>${p.pid}</td>
+          <td>${escHtml(p.name)}</td>
+          <td>${p.cpu.toFixed(1)}</td>
+          <td>${p.mem.toFixed(1)}</td>
+        </tr>
+      `).join('');
+    }
+
+  } catch (e) {
+    failCount++;
+    if (failCount >= 2 && !offline) {
+      offline = true;
+      document.getElementById('offlineBanner').classList.add('show');
+      document.getElementById('statusDot').style.background = 'var(--red)';
+      document.getElementById('statusDot').style.boxShadow = '0 0 8px var(--red)';
+    }
+  }
+}
+
+// Initial fetch + interval
+fetchStats();
+setInterval(fetchStats, POLL_MS);
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<section class="pricing-table section-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="pricing-table__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="pricing-table__grid">
+      {%- for block in section.blocks -%}
+        <div class="pricing-card {% if block.settings.featured %}pricing-card--featured{% endif %}" {{ block.shopify_attributes }}>
+          <h3 class="pricing-card__name">{{ block.settings.name }}</h3>
+          <p class="pricing-card__price">{{ block.settings.price }}</p>
+          <ul class="pricing-card__features">
+            {%- assign features = block.settings.features | split: '|' -%}
+            {%- for feature in features -%}
+              <li>{{ feature | strip }}</li>
+            {%- endfor -%}
+          </ul>
+          <a href="{{ block.settings.button_link }}" class="button {% unless block.settings.featured %}button--secondary{% endunless %}">
+            {{ block.settings.button_label | default: "Get Started" }}
+          </a>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Pricing Table",
+  "tag": "section",
+  "class": "section-pricing-table",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Choose Your Plan"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "plan",
+      "name": "Pricing plan",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Plan name",
+          "default": "Pro"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price",
+          "default": "$29/mo"
+        },
+        {
+          "type": "text",
+          "id": "features",
+          "label": "Features (separate with |)",
+          "default": "Unlimited access | Priority support | Monthly updates"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Get Started"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Featured plan",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pricing Table",
+      "blocks": [
+        { "type": "plan", "settings": { "name": "Basic", "price": "$19/mo", "features": "Core features | Email support | Monthly updates", "featured": false } },
+        { "type": "plan", "settings": { "name": "Pro", "price": "$39/mo", "features": "Everything in Basic | Priority support | Advanced analytics | Custom integrations", "featured": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

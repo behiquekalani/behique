@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="How I cut my AI costs from $200/month to $0 using old laptops. A step-by-step system guide from a comp-sci student in Puerto Rico.">
+    <title>How I Built an AI Employee | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0A0F0A;
+            --green: #34C759;
+            --green-dim: rgba(52, 199, 89, 0.1);
+            --green-glow: rgba(52, 199, 89, 0.25);
+            --light: #E8E8E8;
+            --muted: #8A8A8A;
+            --terminal-bg: #111611;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+            --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Minimal top bar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 14px 24px;
+            background: rgba(10, 15, 10, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(52, 199, 89, 0.08);
+        }
+
+        .topbar-logo {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--green);
+            letter-spacing: -0.02em;
+        }
+
+        .topbar-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .topbar-link:hover { color: var(--green); }
+
+        /* Story section */
+        .story {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 140px 24px 80px;
+        }
+
+        .story-label {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--green);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 32px;
+        }
+
+        .story h1 {
+            font-size: clamp(28px, 5vw, 42px);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+
+        .story p {
+            font-size: 17px;
+            color: var(--light);
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+
+        .story p.muted {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .cost-comparison {
+            display: flex;
+            gap: 24px;
+            margin: 48px 0;
+            flex-wrap: wrap;
+        }
+
+        .cost-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 28px 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .cost-card.before {
+            background: rgba(255, 69, 58, 0.08);
+            border: 1px solid rgba(255, 69, 58, 0.2);
+        }
+
+        .cost-card.after {
+            background: var(--green-dim);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+        }
+
+        .cost-card .label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .cost-card.before .label { color: #FF453A; }
+        .cost-card.after .label { color: var(--green); }
+
+        .cost-card .amount {
+            font-size: 36px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .cost-card .detail {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        /* Terminal mockup */
+        .terminal-section {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 40px 24px 100px;
+        }
+
+        .terminal {
+            background: var(--terminal-bg);
+            border: 1px solid rgba(52, 199, 89, 0.12);
+            border-radius: 10px;
+            overflow: hidden;
+            font-family: var(--mono);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background: #FF5F56; }
+        .terminal-dot.yellow { background: #FFBD2E; }
+        .terminal-dot.green { background: #27C93F; }
+
+        .terminal-title {
+            color: var(--muted);
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .terminal-body {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .terminal-line {
+            white-space: pre;
+            margin-bottom: 2px;
+        }
+
+        .t-prompt { color: var(--green); }
+        .t-cmd { color: #fff; }
+        .t-output { color: var(--muted); }
+        .t-success { color: var(--green); }
+        .t-info { color: #5AC8FA; }
+        .t-dim { color: #555; }
+
+        /* What you get */
+        .contents {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .contents h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: -0.02em;
+        }
+
+        .chapter-list {
+            list-style: none;
+        }
+
+        .chapter-list li {
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            gap: 16px;
+            align-items: baseline;
+        }
+
+        .chapter-num {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--green);
+            min-width: 24px;
+        }
+
+        .chapter-title {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .chapter-desc {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Anti-sell section */
+        .anti-sell {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .anti-sell h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            color: #FF453A;
+        }
+
+        .anti-sell .subtext {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 36px;
+        }
+
+        .anti-list {
+            list-style: none;
+        }
+
+        .anti-list li {
+            padding: 14px 0;
+            font-size: 16px;
+            color: var(--light);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .anti-list li::before {
+            content: "x";
+            font-family: var(--mono);
+            color: #FF453A;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* CTA */
+        .cta-section {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 80px 24px 120px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .cta-price {
+            font-size: 48px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .cta-format {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--green);
+            color: #000;
+            padding: 14px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .cta-button:hover { opacity: 0.85; }
+
+        .cta-note {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            font-size: 13px;
+            color: var(--muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .cost-comparison { flex-direction: column; }
+            .terminal { font-size: 11px; }
+            .story h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <span class="topbar-logo">behike</span>
+        <a href="#get" class="topbar-link">Get the guide</a>
+    </div>
+
+    <!-- STORY FIRST: Why this exists -->
+    <section class="story">
+        <div class="story-label">The backstory</div>
+        <h1>I was paying $200/month for cloud AI. Then I looked at the old laptop in my closet.</h1>
+
+        <p>February 2026. I'm a comp-sci student in Puerto Rico. I had three AI subscriptions running, two cloud API bills, and a growing feeling that I was doing this wrong.</p>
+
+        <p>$200 a month. For what? Running the same models I could run locally on hardware I already owned.</p>
+
+        <p>So I pulled out a 2018 desktop with a GTX 1080 Ti, set up Ollama, connected it to my M4 MacBook over SSH, and built a system where both machines work together. One thinks. One delegates. Both run 24/7.</p>
+
+        <p>Total monthly cost after the switch: $0.</p>
+
+        <div class="cost-comparison">
+            <div class="cost-card before">
+                <div class="label">Before</div>
+                <div class="amount">$200/mo</div>
+                <div class="detail">3 subscriptions + API costs</div>
+            </div>
+            <div class="cost-card after">
+                <div class="label">After</div>
+                <div class="amount">$0/mo</div>
+                <div class="detail">Same models. Own hardware.</div>
+            </div>
+        </div>
+
+        <p>I wrote down every step. Every config file, every SSH tunnel, every mistake I made along the way. That document became this guide.</p>
+
+        <p class="muted">It's not theory. It's the exact system I use every day.</p>
+    </section>
+
+    <!-- Terminal mockup -->
+    <section class="terminal-section">
+        <div class="terminal reveal">
+            <div class="terminal-header">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <span class="terminal-title">ceiba-system :: status</span>
+            </div>
+            <div class="terminal-body">
+<div class="terminal-line"><span class="t-prompt">kalani@ceiba</span> <span class="t-cmd">~ % behike status</span></div>
+<div class="terminal-line"><span class="t-dim">───────────────────────────────────────</span></div>
+<div class="terminal-line"><span class="t-info">SYSTEM</span>  <span class="t-output">Behike Multi-Machine Agent v2.1</span></div>
+<div class="terminal-line"><span class="t-dim">───────────────────────────────────────</span></div>
+<div class="terminal-line"><span class="t-output">  Node 1:  </span><span class="t-success">Ceiba (M4 MacBook)</span><span class="t-output">    online</span></div>
+<div class="terminal-line"><span class="t-output">  Node 2:  </span><span class="t-success">Cobo  (GTX 1080 Ti)</span><span class="t-output">   online</span></div>
+<div class="terminal-line"><span class="t-output">  Bridge:  </span><span class="t-success">SSH tunnel active</span><span class="t-output">      port 9876</span></div>
+<div class="terminal-line"><span class="t-output">  Models:  </span><span class="t-output">llama3.1 8B, mistral 7B, codellama</span></div>
+<div class="terminal-line"><span class="t-output">  Tasks:   </span><span class="t-success">3 running</span><span class="t-output">, 12 completed today</span></div>
+<div class="terminal-line"><span class="t-dim">───────────────────────────────────────</span></div>
+<div class="terminal-line"><span class="t-output">  API cost this month: </span><span class="t-success">$0.00</span></div>
+<div class="terminal-line"><span class="t-output">  Uptime:              </span><span class="t-output">14 days, 7 hours</span></div>
+<div class="terminal-line"><span class="t-dim">───────────────────────────────────────</span></div>
+<div class="terminal-line"><span class="t-prompt">kalani@ceiba</span> <span class="t-cmd">~ % _</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's in the guide -->
+    <section class="contents reveal">
+        <h2>What's in the guide</h2>
+        <ul class="chapter-list">
+            <li>
+                <span class="chapter-num">01</span>
+                <div>
+                    <div class="chapter-title">Hardware audit</div>
+                    <div class="chapter-desc">How to figure out what you already own and whether it's enough.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">02</span>
+                <div>
+                    <div class="chapter-title">Ollama setup (GPU and CPU)</div>
+                    <div class="chapter-desc">Install, configure, pick the right model for your VRAM.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">03</span>
+                <div>
+                    <div class="chapter-title">SSH tunnels and networking</div>
+                    <div class="chapter-desc">Connect two machines so they act like one. Persistent tunnels that survive reboots.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">04</span>
+                <div>
+                    <div class="chapter-title">The bridge architecture</div>
+                    <div class="chapter-desc">How tasks get routed between nodes. Which machine handles what and why.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">05</span>
+                <div>
+                    <div class="chapter-title">Agent framework</div>
+                    <div class="chapter-desc">Giving the system autonomy. Task queues, decision loops, tool use.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">06</span>
+                <div>
+                    <div class="chapter-title">Memory and context</div>
+                    <div class="chapter-desc">How the system remembers what it did yesterday. File-based memory that actually works.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">07</span>
+                <div>
+                    <div class="chapter-title">Monitoring and recovery</div>
+                    <div class="chapter-desc">What breaks, how to know, and how to fix it without babysitting.</div>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">08</span>
+                <div>
+                    <div class="chapter-title">Cost breakdown</div>
+                    <div class="chapter-desc">Electricity, hardware depreciation, and the honest math on whether this saves you money.</div>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Anti-sell: What this WON'T do -->
+    <section class="anti-sell reveal">
+        <h2>What this won't do</h2>
+        <p class="subtext">Honesty saves us both time.</p>
+        <ul class="anti-list">
+            <li>It won't match GPT-4 quality. Local models are good. They're not frontier-tier. The guide is honest about where they fall short.</li>
+            <li>It won't work without a GPU. If your only computer is a MacBook Air, you'll need to buy something. The guide covers what to look for under $200.</li>
+            <li>It won't set itself up. You're going to open a terminal, type commands, and debug errors. That's the point. You learn the system by building it.</li>
+            <li>It won't replace your cloud tools overnight. I still use Claude for some things. The goal is reducing dependency, not religious purity.</li>
+            <li>It won't teach you machine learning. This is systems engineering. Connecting things, routing tasks, making hardware useful. Not training models.</li>
+        </ul>
+    </section>
+
+    <!-- Value Stack -->
+    <section style="padding: 80px 24px; max-width: 680px; margin: 0 auto; text-align: center;">
+        <div style="font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #34C759; margin-bottom: 24px; font-weight: 600;">What you're getting</div>
+        <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 40px; line-height: 1.3;">$19.99 for $511 worth of systems.</h2>
+        <div style="border: 1px solid rgba(52,199,89,0.2); border-radius: 16px; overflow: hidden; text-align: left;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
+                <thead>
+                    <tr style="background: rgba(52,199,89,0.08);">
+                        <th style="padding: 14px 20px; color: #34C759; font-weight: 600; text-align: left;">What's included</th>
+                        <th style="padding: 14px 20px; color: #34C759; font-weight: 600; text-align: right;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">20-chapter system guide</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$197</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">Architecture blueprint (3-machine setup)</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$97</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">Bridge server code (copy-paste)</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$47</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">Fleet management scripts</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$47</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">Troubleshooting guide + common errors</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$27</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+                        <td style="padding: 14px 20px; color: #E8E8E8;">Lifetime updates</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right;">$97</td>
+                    </tr>
+                    <tr style="border-top: 2px solid rgba(52,199,89,0.3);">
+                        <td style="padding: 14px 20px; color: #E8E8E8; font-weight: 600;">Total value</td>
+                        <td style="padding: 14px 20px; color: #8A8A8A; text-align: right; font-weight: 600; text-decoration: line-through;">$512</td>
+                    </tr>
+                    <tr style="border-top: 1px solid rgba(52,199,89,0.2); background: rgba(52,199,89,0.05);">
+                        <td style="padding: 16px 20px; color: #34C759; font-weight: 700; font-size: 18px;">Your price</td>
+                        <td style="padding: 16px 20px; color: #34C759; font-weight: 700; font-size: 18px; text-align: right;">$19.99</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="get">
+        <div class="cta-price reveal">$19.99</div>
+        <div class="cta-format reveal">PDF + config files. 20 chapters. ~8,000 words.</div>
+        <a href="https://behikeai.gumroad.com/l/ai-employee-guide" class="cta-button reveal">Get the Guide</a>
+        <div class="cta-note reveal">Instant download. No account required.</div>
+    </section>
+
+    <!-- Cross-sell -->
+    <section style="padding: 60px 24px 80px; max-width: 800px; margin: 0 auto;">
+        <div style="font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: #86868B; margin-bottom: 24px; font-weight: 600; text-align: center;">Complete your toolkit</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+            <a href="behike-method-v2.html" style="display: block; background: #1D1D1F; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; text-decoration: none; transition: border-color 0.2s;">
+                <div style="font-size: 12px; color: #0A84FF; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Guide</div>
+                <div style="font-size: 16px; font-weight: 600; color: #F5F5F7; margin-bottom: 6px;">Behike Method v2</div>
+                <div style="font-size: 13px; color: #86868B; margin-bottom: 14px;">The AI business blueprint. 8 chapters on going from idea to revenue.</div>
+                <div style="font-size: 15px; font-weight: 700; color: #F5F5F7;">$19.99</div>
+            </a>
+            <a href="ai-security-guide.html" style="display: block; background: #1D1D1F; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; text-decoration: none; transition: border-color 0.2s;">
+                <div style="font-size: 12px; color: #FF453A; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Security</div>
+                <div style="font-size: 16px; font-weight: 600; color: #F5F5F7; margin-bottom: 6px;">AI Security Guide</div>
+                <div style="font-size: 13px; color: #86868B; margin-bottom: 14px;">Protect your AI setup. The 5 real threats and how to defend against each.</div>
+                <div style="font-size: 15px; font-weight: 700; color: #F5F5F7;">$14.99</div>
+            </a>
+            <a href="solopreneur-os.html" style="display: block; background: #1D1D1F; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px; text-decoration: none; transition: border-color 0.2s;">
+                <div style="font-size: 12px; color: #FF9F0A; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Workbook</div>
+                <div style="font-size: 16px; font-weight: 600; color: #F5F5F7; margin-bottom: 6px;">Solopreneur OS</div>
+                <div style="font-size: 13px; color: #86868B; margin-bottom: 14px;">The operating system for a one-person business. 8 modules, all exercises.</div>
+                <div style="font-size: 15px; font-weight: 700; color: #F5F5F7;">$12.99</div>
+            </a>
+        </div>
+    </section>
+
+    <footer>&copy; 2026 Behike</footer>
+
+    <script>
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+        reveals.forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>

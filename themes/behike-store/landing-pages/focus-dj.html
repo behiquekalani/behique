@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus DJ — Beat-Powered Productivity for ADHD Brains</title>
+<meta name="description" content="A drum machine, Pomodoro timer, and focus environment in one app. Built for people who need rhythm to think. $9.99 one-time.">
+<meta name="robots" content="noai, noimageai">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000000;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --border: #2A2A2A;
+    --accent: #FF6B35;
+    --accent-dim: rgba(255, 107, 53, 0.12);
+    --accent-glow: rgba(255, 107, 53, 0.25);
+    --cyan: #00D4AA;
+    --cyan-dim: rgba(0, 212, 170, 0.12);
+    --text: #FFFFFF;
+    --text-muted: #888888;
+    --text-dim: #444444;
+    --radius-card: 8px;
+    --radius-btn: 4px;
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* NAV */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .nav-cta {
+    background: var(--cyan);
+    color: #000;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: var(--radius-btn);
+    transition: opacity 0.15s;
+  }
+
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    padding: 96px 0 80px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--text-muted);
+    max-width: 560px;
+    margin: 0 auto 40px;
+    line-height: 1.65;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--cyan);
+    color: #000000;
+    font-size: 17px;
+    font-weight: 800;
+    padding: 16px 36px;
+    border-radius: var(--radius-btn);
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 212, 170, 0.3);
+  }
+
+  .hero-footnote {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* BPM VISUALIZER (decorative) */
+  .bpm-visual {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    margin: 48px auto 0;
+    height: 48px;
+  }
+
+  .bpm-bar {
+    width: 6px;
+    background: var(--accent);
+    border-radius: 2px;
+    opacity: 0.6;
+    animation: bpm-pulse 0.8s ease-in-out infinite alternate;
+  }
+
+  .bpm-bar:nth-child(1)  { height: 30%; animation-delay: 0.0s; }
+  .bpm-bar:nth-child(2)  { height: 70%; animation-delay: 0.1s; }
+  .bpm-bar:nth-child(3)  { height: 45%; animation-delay: 0.2s; }
+  .bpm-bar:nth-child(4)  { height: 90%; animation-delay: 0.05s; }
+  .bpm-bar:nth-child(5)  { height: 55%; animation-delay: 0.15s; }
+  .bpm-bar:nth-child(6)  { height: 100%; animation-delay: 0.25s; }
+  .bpm-bar:nth-child(7)  { height: 65%; animation-delay: 0.35s; }
+  .bpm-bar:nth-child(8)  { height: 40%; animation-delay: 0.4s; }
+  .bpm-bar:nth-child(9)  { height: 80%; animation-delay: 0.3s; }
+  .bpm-bar:nth-child(10) { height: 50%; animation-delay: 0.45s; }
+  .bpm-bar:nth-child(11) { height: 95%; animation-delay: 0.1s; }
+  .bpm-bar:nth-child(12) { height: 35%; animation-delay: 0.5s; }
+  .bpm-bar:nth-child(13) { height: 75%; animation-delay: 0.2s; }
+  .bpm-bar:nth-child(14) { height: 55%; animation-delay: 0.38s; }
+  .bpm-bar:nth-child(15) { height: 85%; animation-delay: 0.12s; }
+  .bpm-bar:nth-child(16) { height: 42%; animation-delay: 0.28s; }
+
+  @keyframes bpm-pulse {
+    from { opacity: 0.35; transform: scaleY(0.7); }
+    to   { opacity: 0.9;  transform: scaleY(1); }
+  }
+
+  /* SECTION BASE */
+  section { padding: 80px 0; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+
+  /* PROBLEM */
+  .problem-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .problem-section .section-title { text-align: center; margin-bottom: 48px; }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .problem-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 28px 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .problem-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .problem-card:nth-child(2) { transition-delay: 0.1s; }
+  .problem-card:nth-child(3) { transition-delay: 0.2s; }
+
+  .problem-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .problem-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .problem-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  @media (max-width: 600px) {
+    .features-grid { grid-template-columns: 1fr; }
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 28px 24px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.2s;
+  }
+
+  .feature-card:hover { border-color: var(--accent); }
+  .feature-card.visible { opacity: 1; transform: translateY(0); }
+  .feature-card:nth-child(2) { transition-delay: 0.1s; }
+  .feature-card:nth-child(3) { transition-delay: 0.2s; }
+  .feature-card:nth-child(4) { transition-delay: 0.3s; }
+
+  .feature-icon-wrap {
+    width: 44px;
+    height: 44px;
+    background: var(--accent-dim);
+    border-radius: var(--radius-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .feature-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-family: monospace;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-top: 12px;
+  }
+
+  /* PERSONAS */
+  .personas-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  .persona-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 28px 24px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .persona-card.visible { opacity: 1; transform: translateY(0); }
+  .persona-card:nth-child(2) { transition-delay: 0.12s; }
+  .persona-card:nth-child(3) { transition-delay: 0.24s; }
+
+  .persona-avatar {
+    font-size: 32px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .persona-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--cyan);
+  }
+
+  .persona-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* HOW IT WORKS */
+  .steps-list {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    opacity: 0;
+    transform: translateX(-16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .step:last-child { border-bottom: none; }
+  .step.visible { opacity: 1; transform: translateX(0); }
+  .step:nth-child(2) { transition-delay: 0.12s; }
+  .step:nth-child(3) { transition-delay: 0.24s; }
+
+  .step-num {
+    font-family: monospace;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    min-width: 48px;
+    padding-top: 2px;
+    opacity: 0.5;
+  }
+
+  .step-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .step-content p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* PRICING */
+  .pricing-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pricing-card {
+    max-width: 480px;
+    margin: 48px auto 0;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-card);
+    padding: 40px 36px;
+    text-align: center;
+    box-shadow: 0 0 60px var(--accent-glow);
+  }
+
+  .pricing-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .pricing-price {
+    font-family: monospace;
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .pricing-price sup {
+    font-size: 28px;
+    vertical-align: top;
+    margin-top: 14px;
+    display: inline-block;
+    color: var(--text-muted);
+  }
+
+  .pricing-note {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .pricing-features {
+    list-style: none;
+    margin-bottom: 36px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pricing-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--text);
+  }
+
+  .check-icon {
+    width: 18px;
+    height: 18px;
+    background: var(--cyan-dim);
+    border: 1px solid var(--cyan);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan);
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .btn-pricing {
+    display: block;
+    background: var(--cyan);
+    color: #000;
+    font-size: 18px;
+    font-weight: 800;
+    padding: 18px 36px;
+    border-radius: var(--radius-btn);
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-pricing:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 212, 170, 0.35);
+  }
+
+  .pricing-guarantee {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* FAQ */
+  .faq-list {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .faq-item.visible { opacity: 1; transform: translateY(0); }
+  .faq-item:nth-child(2) { transition-delay: 0.08s; }
+  .faq-item:nth-child(3) { transition-delay: 0.16s; }
+  .faq-item:nth-child(4) { transition-delay: 0.24s; }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+
+  .faq-q {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .faq-a {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    padding: 96px 0;
+    background: radial-gradient(ellipse at center top, rgba(255,107,53,0.08) 0%, transparent 60%);
+  }
+
+  .final-cta h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+
+  .final-cta p {
+    font-size: 17px;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+  }
+
+  footer .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-brand {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy {
+    width: 100%;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .hero { padding: 72px 0 60px; }
+    .pricing-card { padding: 32px 24px; }
+    .step { gap: 16px; }
+    .step-num { font-size: 24px; min-width: 36px; }
+    footer .container { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <span class="nav-brand">Focus DJ</span>
+    <a href="https://behike.gumroad.com/l/focus-dj" class="nav-cta" target="_blank" rel="noopener">Get Focus DJ $9.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Beat-Powered Productivity App</div>
+    <h1>The <span>Beat-Powered</span> Productivity App for ADHD Brains</h1>
+    <p class="hero-sub">A drum machine, Pomodoro timer, and focus environment in one app. Built for people who need rhythm to think.</p>
+    <a href="https://behike.gumroad.com/l/focus-dj" class="btn-primary" target="_blank" rel="noopener">Get Focus DJ $9.99</a>
+    <p class="hero-footnote">One-time payment. No subscription.</p>
+    <div class="bpm-visual" aria-hidden="true">
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+      <div class="bpm-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem-section">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">The Problem</p>
+    <h2 class="section-title" style="text-align:center;">Other focus apps were not built for your brain</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <span class="problem-icon">🔇</span>
+        <h3>White noise does not work for you. You need rhythm.</h3>
+        <p>Rain sounds and ambient noise are fine for some people. You need a beat. Something your brain can lock onto and ride.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">🔀</span>
+        <h3>Your focus app and your music app do not talk to each other.</h3>
+        <p>You are switching between a timer, a playlist, and a mood board. Three tabs open, none of them synced. That friction kills momentum.</p>
+      </div>
+      <div class="problem-card">
+        <span class="problem-icon">🤖</span>
+        <h3>Pomodoros feel robotic without something to lock into.</h3>
+        <p>A plain countdown timer does nothing for your nervous system. You need a session that starts with intention and moves with rhythm.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="container">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+    <p class="section-sub">Four tools that work together, not against each other.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon-wrap">🥁</div>
+        <h3>Beat Sequencer</h3>
+        <p>Build custom 8-step drum patterns with 4 instruments: kick, snare, hi-hat, and percussion. Adjust BPM to match your energy level. Save your favorite patterns for quick recall.</p>
+        <span class="feature-tag">8 STEPS / 4 INSTRUMENTS</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">&#9201;</div>
+        <h3>Focus Timer</h3>
+        <p>Pomodoro timer synced directly to your beat. The rhythm does not stop when the session ends, it shifts. Animated countdown so your eyes have something to track while your brain works.</p>
+        <span class="feature-tag">25 / 50 / 90 MIN</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">&#127917;</div>
+        <h3>Vibe Modes</h3>
+        <p>Four pre-built environments for four kinds of work. Lo-Fi for steady output, Deep Work for high-focus tasks, Hype for creative sprints, Night Mode for late sessions. Pick one and go.</p>
+        <span class="feature-tag">4 PRESET ENVIRONMENTS</span>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap">&#128202;</div>
+        <h3>Session Tracker</h3>
+        <p>See your streaks, total focus hours, and today's completed sessions at a glance. Not to pressure you. To show you what you already built. Momentum compounds.</p>
+        <span class="feature-tag">STREAKS + STATS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERSONAS -->
+<section class="personas-section">
+  <div class="container">
+    <p class="section-label">Who It's For</p>
+    <h2 class="section-title">If this is you, Focus DJ was built for you.</h2>
+    <div class="personas-grid">
+      <div class="persona-card">
+        <span class="persona-avatar">&#127911;</span>
+        <h3>Students who can't study without music</h3>
+        <p>You have tried every study playlist on YouTube. You need the beat to be yours, tuned to your session length, not someone else's three-hour lo-fi stream.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-avatar">&#128187;</span>
+        <h3>Remote workers who need to zone in</h3>
+        <p>The home environment has no natural rhythm. No commute, no office sounds, no coworkers moving around. Focus DJ gives you a pace to match your work to.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-avatar">&#128296;</span>
+        <h3>Builders who use beats as a productivity cue</h3>
+        <p>You already know that a certain BPM puts you in the zone. Focus DJ lets you build that exact beat, tie it to your timer, and condition your brain to start working when it plays.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works-section">
+  <div class="container">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">Three steps. Then you're in the zone.</h2>
+    <div class="steps-list">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Pick your vibe or build your beat</h3>
+          <p>Choose one of four Vibe Mode presets for instant setup, or open the Beat Sequencer and build something that belongs to you. Adjust BPM, activate steps, layer your four instruments. It takes about 90 seconds.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Set your session length</h3>
+          <p>Select 25, 50, or 90 minutes. The timer syncs to your beat automatically. When the session starts, the rhythm starts with it. No separate setup, no tab switching.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Let the rhythm carry you through</h3>
+          <p>The beat runs while you work. The animated timer keeps time without demanding your attention. When the session ends, your tracker logs it. Show up again tomorrow.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">Pricing</p>
+    <h2 class="section-title" style="text-align:center;">Simple. No subscriptions. No tiers.</h2>
+    <div class="pricing-card">
+      <p class="pricing-label">Focus DJ</p>
+      <div class="pricing-price"><sup>$</sup>9<span style="font-size:42px;vertical-align:middle;">.99</span></div>
+      <p class="pricing-note">One-time payment. Yours forever.</p>
+      <ul class="pricing-features">
+        <li><span class="check-icon">&#10003;</span>Beat Sequencer with 4 instruments and adjustable BPM</li>
+        <li><span class="check-icon">&#10003;</span>Pomodoro timer synced to your beat (25, 50, 90 min)</li>
+        <li><span class="check-icon">&#10003;</span>Lo-Fi, Deep Work, Hype, and Night Mode presets</li>
+        <li><span class="check-icon">&#10003;</span>Session tracker with streaks and focus hours</li>
+        <li><span class="check-icon">&#10003;</span>Animated countdown display</li>
+        <li><span class="check-icon">&#10003;</span>Works in-browser, no install required</li>
+        <li><span class="check-icon">&#10003;</span>All future updates included</li>
+      </ul>
+      <a href="https://behike.gumroad.com/l/focus-dj" class="btn-pricing" target="_blank" rel="noopener">Get Focus DJ $9.99</a>
+      <p class="pricing-guarantee">One-time payment. Instant access. No subscription ever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="container">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <p class="faq-q">Does Focus DJ require an internet connection after purchase?</p>
+        <p class="faq-a">No. Once you have access to the app file, it runs entirely in your browser with no network required. You can open it offline anytime.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Is this actually useful if I do not have ADHD?</p>
+        <p class="faq-a">Yes. The rhythm-to-focus connection is not exclusive to ADHD. A lot of people, from developers to writers to students, already use music as a productivity tool. Focus DJ just makes it intentional and integrated with your timer.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">What if the preset Vibe Modes do not work for me?</p>
+        <p class="faq-a">The Beat Sequencer is there for exactly that reason. Build your own pattern from scratch, set your own BPM, activate the steps that feel right. You can have a custom beat ready in under two minutes.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">What do I actually get when I purchase?</p>
+        <p class="faq-a">You get immediate access to the Focus DJ app through Gumroad. It runs in any modern browser on desktop or mobile. No install, no account required to use it after download.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2>Your brain runs on rhythm.<br>Start using that.</h2>
+    <p>One-time $9.99. No subscription. No upsell. Just a tool that fits how you actually think.</p>
+    <a href="https://behike.gumroad.com/l/focus-dj" class="btn-primary" target="_blank" rel="noopener">Get Focus DJ $9.99</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <span class="footer-brand">Behike</span>
+    <div class="footer-links">
+      <a href="https://behike.shop" target="_blank" rel="noopener">behike.shop</a>
+      <a href="https://instagram.com/behikeai" target="_blank" rel="noopener">@behikeai</a>
+      <a href="index.html">All Products</a>
+    </div>
+    <p class="footer-copy">Built in Puerto Rico. 2026 Behike.</p>
+  </div>
+</footer>
+
+<script>
+  const revealTargets = document.querySelectorAll(
+    '.problem-card, .feature-card, .persona-card, .step, .faq-item'
+  );
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12 }
+  );
+
+  revealTargets.forEach((el) => observer.observe(el));
+</script>
+
+</body>
+</html>

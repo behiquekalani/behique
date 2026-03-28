@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Productivity Rituals Guide — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card: #0A0A0A;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-price {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .nav-price span {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 100px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      max-width: 780px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.55;
+    }
+    .hero-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .hero-cta:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .problem-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* SOLUTION */
+    .solution-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-top: 56px;
+    }
+    @media (max-width: 680px) {
+      .solution-body { grid-template-columns: 1fr; gap: 40px; }
+    }
+    .solution-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .stat-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* TOC */
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 56px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.45s, transform 0.45s;
+    }
+    .toc-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toc-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 24px;
+      padding-top: 2px;
+    }
+    .toc-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .toc-content p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* RITUALS PREVIEW */
+    .rituals-list {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .ritual-row {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 32px;
+      align-items: start;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .ritual-row.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .ritual-time {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding-top: 2px;
+    }
+    .ritual-desc h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .ritual-desc p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    @media (max-width: 560px) {
+      .ritual-row { grid-template-columns: 1fr; gap: 8px; }
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 120px 0;
+    }
+    .cta-section .section-title {
+      max-width: 620px;
+      margin: 0 auto 20px;
+    }
+    .cta-section .section-body {
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+    .cta-box {
+      display: inline-block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 56px;
+      text-align: center;
+      max-width: 480px;
+      width: 100%;
+    }
+    .cta-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+    .cta-price-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .btn-buy {
+      display: block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      margin-bottom: 16px;
+    }
+    .btn-buy:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .cta-includes {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .cta-includes span {
+      display: inline-block;
+      margin: 0 6px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ANIMATION */
+    .animate {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .animate.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/storefront" class="nav-brand">Behike</a>
+    <div class="nav-price">Digital Guide <span>$16.99</span></div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-tag animate visible">Solopreneur Systems</div>
+    <h1 class="animate visible">Your rituals are the business. <em>Build them deliberately.</em></h1>
+    <p class="hero-sub animate visible">Daily and weekly systems for solo operators who need to protect creative energy, maintain momentum, and actually close the workday.</p>
+    <a href="https://behike.gumroad.com/l/solopreneurs-productivity-rituals-guide" class="hero-cta animate visible">Get the Guide — $16.99</a>
+    <p class="hero-meta animate visible">PDF download. 5,000+ words. 28 chapters across 7 parts.</p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <div class="section-label animate">The problem</div>
+    <h2 class="section-title animate">Autonomy without structure is a trap</h2>
+    <p class="section-body animate">Solo operators have more freedom than almost anyone. They also have no external scaffolding. No office signaling work mode. No manager creating deadlines. No team creating social accountability. Without designed rituals to replace that structure, every workday starts with a negotiation between you and your own resistance.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>Reactive mornings</h3>
+        <p>Email and notifications first means you spend the highest-quality cognitive hours of your day on other people's agendas. The work that matters most gets the mental energy left over.</p>
+      </div>
+      <div class="problem-card">
+        <h3>Work never closes</h3>
+        <p>Without a shutdown protocol, the workday technically never ends. You stop producing but keep thinking about work, which means you never fully recover. Degraded recovery produces degraded output.</p>
+      </div>
+      <div class="problem-card">
+        <h3>Weekly drift goes unnoticed</h3>
+        <p>You can be busy for three months while your actual objectives stagnate. Without a weekly review that asks strategic questions, not just task audit questions, you will not catch the drift until it is compounded.</p>
+      </div>
+      <div class="problem-card">
+        <h3>Momentum breaks become crises</h3>
+        <p>Without a designed return protocol, a two-day disruption becomes a two-week spiral. Most solopreneurs treat this as a motivation problem when it is an architecture problem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section>
+  <div class="container">
+    <div class="section-label animate">The framework</div>
+    <h2 class="section-title animate">Architecture replaces willpower</h2>
+    <div class="solution-body">
+      <div>
+        <p class="section-body animate">The solopreneurs who sustain high output over years are not more disciplined than the ones who burn out. They have better architecture. Their system is designed so that showing up is the path of least resistance rather than a daily act of will.</p>
+        <p class="section-body animate" style="margin-top:16px;">This guide covers morning rituals designed around orientation, not busyness; shutdown protocols that create real cognitive detachment; weekly reviews that catch strategic drift; recovery protocols for momentum breaks; and rituals that specifically protect creative energy as a distinct resource.</p>
+      </div>
+      <div class="solution-stats">
+        <div class="stat-card">
+          <span class="stat-num">28</span>
+          <span class="stat-label">Chapters</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">7</span>
+          <span class="stat-label">Ritual systems</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">5K+</span>
+          <span class="stat-label">Words</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num">0</span>
+          <span class="stat-label">Hacks. Zero.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RITUAL PREVIEW -->
+<section>
+  <div class="container">
+    <div class="section-label animate">The daily architecture</div>
+    <h2 class="section-title animate">What the system looks like assembled</h2>
+    <p class="section-body animate">Not a schedule. A sequence. The timing adapts to your chronotype. The structure does not.</p>
+
+    <div class="rituals-list">
+      <div class="ritual-row">
+        <div class="ritual-time">Morning</div>
+        <div class="ritual-desc">
+          <h4>Physical transition + orientation block</h4>
+          <p>A physical signal that work mode begins, followed by identifying the one priority that makes today a success. No email yet. No metrics. Just the question that matters.</p>
+        </div>
+      </div>
+      <div class="ritual-row">
+        <div class="ritual-time">Deep block</div>
+        <div class="ritual-desc">
+          <h4>60-120 minutes of protected creation</h4>
+          <p>The only work that happens in this block is your one priority. Phone off. Email closed. No exceptions that are not genuine emergencies. This block is where your business actually advances.</p>
+        </div>
+      </div>
+      <div class="ritual-row">
+        <div class="ritual-time">Midday</div>
+        <div class="ritual-desc">
+          <h4>Shallow work and maintenance</h4>
+          <p>Communications, administrative tasks, logistics, and recovery. These run on lower cognitive energy so the high-energy window is not spent on them.</p>
+        </div>
+      </div>
+      <div class="ritual-row">
+        <div class="ritual-time">End of day</div>
+        <div class="ritual-desc">
+          <h4>Shutdown protocol</h4>
+          <p>Capture open loops. Record daily output. Set tomorrow's one priority. Close everything. Speak the shutdown phrase. The workday is closed. Not paused. Closed.</p>
+        </div>
+      </div>
+      <div class="ritual-row">
+        <div class="ritual-time">Weekly</div>
+        <div class="ritual-desc">
+          <h4>Strategic review, not task audit</h4>
+          <p>A 45-90 minute review that asks whether your activities are actually moving your objectives, not just whether you completed your list. Drift gets caught here before it becomes a month of wasted effort.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section>
+  <div class="container">
+    <div class="section-label animate">What is inside</div>
+    <h2 class="section-title animate">Seven complete systems</h2>
+    <p class="section-body animate">From the mechanics of a functional morning through building accountability without a team.</p>
+
+    <div class="toc-grid">
+      <div class="toc-item">
+        <span class="toc-num">01</span>
+        <div class="toc-content">
+          <h4>The morning ritual</h4>
+          <p>What morning rituals are actually for, the orientation problem, physical transitions, designing the morning block, what to remove</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">02</span>
+        <div class="toc-content">
+          <h4>The shutdown protocol</h4>
+          <p>Why shutdown matters more than startup, components of an effective close, managing the one-more-thing impulse, evening transitions</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">03</span>
+        <div class="toc-content">
+          <h4>The weekly review</h4>
+          <p>Why most reviews fail, four-section structure that works, the review environment, the annual trajectory check</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">04</span>
+        <div class="toc-content">
+          <h4>Recovery when momentum breaks</h4>
+          <p>Anatomy of a momentum break, the structured return protocol, building break resilience into your system</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">05</span>
+        <div class="toc-content">
+          <h4>Protecting creative energy</h4>
+          <p>What creative energy actually is, structuring by energy not hours, rituals that generate creative states, the input obligation</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">06</span>
+        <div class="toc-content">
+          <h4>Advanced ritual architecture</h4>
+          <p>Theme days, the monthly reset, quarterly off-sites, rituals for specific energy states including disrupted days</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">07</span>
+        <div class="toc-content">
+          <h4>Ritual maintenance</h4>
+          <p>Why systems drift, the minimum viable system, building accountability without a team, the long game</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <span class="toc-num">+</span>
+        <div class="toc-content">
+          <h4>28 chapters total</h4>
+          <p>Every system covered in full, with specific frameworks, failure modes, and implementation steps throughout</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="section-label animate">Get the guide</div>
+    <h2 class="section-title animate">Build the system. Let it compound.</h2>
+    <p class="section-body animate">One-time payment. Instant PDF download. No subscriptions, no upsells.</p>
+
+    <div style="display:flex;justify-content:center;margin-top:48px;">
+      <div class="cta-box animate">
+        <div class="cta-price">$16.99</div>
+        <div class="cta-price-sub">One-time. Instant download.</div>
+        <a href="https://behike.gumroad.com/l/solopreneurs-productivity-rituals-guide" class="btn-buy">Get the Guide</a>
+        <div class="cta-includes">
+          <span>5,000+ word PDF</span>
+          <span>·</span>
+          <span>28 chapters</span>
+          <span>·</span>
+          <span>7 systems</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Behike — Digital products for serious builders. <a href="/storefront" style="color:var(--accent);text-decoration:none;">Browse all products</a></p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate, .problem-card, .stat-card, .toc-item, .ritual-row').forEach(el => {
+    if (!el.classList.contains('visible')) {
+      observer.observe(el);
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEHIKE</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a1a;font-family:'Press Start 2P',monospace;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center}
+
+/* CRT TV Frame */
+.tv-frame{width:90vw;max-width:900px;height:80vh;background:linear-gradient(145deg,#8a8275,#6b6459,#7a7268);border-radius:40px;padding:40px;position:relative;box-shadow:inset 0 2px 4px rgba(255,255,255,0.2),0 20px 60px rgba(0,0,0,0.8)}
+.tv-frame::before{content:'';position:absolute;top:15px;left:15px;right:15px;bottom:15px;border-radius:30px;background:linear-gradient(145deg,#5a5549,#4a4439);z-index:0}
+.tv-screen{position:relative;z-index:1;width:100%;height:100%;border-radius:20px;overflow:hidden;background:#111;border:3px solid #333}
+
+/* VHS Static overlay */
+.vhs-static{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0px,transparent 1px,transparent 2px);z-index:10;pointer-events:none;animation:static-scroll 0.5s steps(4) infinite}
+.vhs-lines{position:absolute;inset:0;z-index:11;pointer-events:none;overflow:hidden}
+.vhs-lines::before{content:'';position:absolute;width:100%;height:30%;background:linear-gradient(transparent,rgba(255,255,255,0.03),transparent);animation:vhs-line 4s linear infinite;top:-30%}
+@keyframes static-scroll{0%{background-position:0 0}100%{background-position:0 4px}}
+@keyframes vhs-line{0%{top:-30%}100%{top:130%}}
+
+/* Enter screen */
+#enter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:20;background:#d4d0c8;cursor:pointer}
+#enter.gone{display:none}
+#enter h1{font-size:clamp(32px,8vw,72px);color:#111;letter-spacing:8px;margin-bottom:40px;text-shadow:3px 3px 0 rgba(0,0,0,0.1)}
+#enter .start{font-size:14px;color:#333;animation:blink 1.5s step-end infinite}
+#enter .start::before{content:'> '}
+#enter .copy{position:absolute;bottom:30px;font-size:9px;color:#999}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Main menu */
+#menu{position:absolute;inset:0;display:none;flex-direction:column;z-index:15;background:#d4d0c8}
+#menu.active{display:flex}
+.menu-header{padding:20px 24px;border-bottom:2px solid #bbb;display:flex;justify-content:space-between;align-items:center}
+.menu-header h2{font-size:14px;color:#111}
+.menu-nav{display:flex;flex-wrap:wrap;padding:20px;gap:16px;justify-content:center;flex:1;align-content:center}
+.menu-item{width:140px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform 0.2s}
+.menu-item:hover{transform:scale(1.1)}
+.menu-item .icon{width:80px;height:80px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:36px;perspective:200px}
+.menu-item .label{font-size:10px;letter-spacing:2px}
+
+/* 3D CSS cubes */
+.cube{width:60px;height:60px;position:relative;transform-style:preserve-3d;animation:spin 6s linear infinite}
+.cube div{position:absolute;width:60px;height:60px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;border:2px solid rgba(0,0,0,0.2)}
+.cube .front{transform:translateZ(30px)}
+.cube .back{transform:rotateY(180deg) translateZ(30px)}
+.cube .left{transform:rotateY(-90deg) translateZ(30px)}
+.cube .right{transform:rotateY(90deg) translateZ(30px)}
+.cube .top{transform:rotateX(90deg) translateZ(30px)}
+.cube .bottom{transform:rotateX(-90deg) translateZ(30px)}
+@keyframes spin{0%{transform:rotateY(0) rotateX(10deg)}100%{transform:rotateY(360deg) rotateX(10deg)}}
+
+.cube.teal div{background:rgba(0,128,128,0.8)}
+.cube.orange div{background:rgba(255,140,0,0.85)}
+.cube.red div{background:rgba(220,20,20,0.85);color:#fff}
+.cube.black div{background:rgba(40,40,40,0.9);color:#888}
+.cube.purple div{background:rgba(100,20,180,0.85);color:#fff}
+.cube.cyan div{background:rgba(0,200,220,0.85)}
+
+.menu-item:nth-child(1) .label{color:teal}
+.menu-item:nth-child(2) .label{color:orangered}
+.menu-item:nth-child(3) .label{color:red}
+.menu-item:nth-child(4) .label{color:#555}
+.menu-item:nth-child(5) .label{color:purple}
+.menu-item:nth-child(6) .label{color:darkcyan}
+
+/* Media panel */
+.media-panel{position:absolute;top:0;right:0;width:45%;height:40%;overflow:hidden;border-left:2px solid #bbb;border-bottom:2px solid #bbb}
+.media-panel .noise{width:100%;height:100%;background:linear-gradient(transparent 50%,rgba(0,0,0,0.05) 50%);background-size:100% 4px;animation:noise 0.3s steps(3) infinite}
+.media-panel .media-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:16px;color:rgba(0,200,200,0.6);mix-blend-mode:screen;letter-spacing:4px}
+@keyframes noise{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+
+/* Shop page */
+#shop{position:absolute;inset:0;display:none;flex-direction:column;z-index:15;background:#fff;overflow-y:auto}
+#shop.active{display:flex}
+.shop-header{padding:24px;text-align:center;border-bottom:2px solid #ddd}
+.shop-header h2{font-size:24px;color:#111;margin-bottom:8px}
+.shop-header p{font-size:10px;color:#666;letter-spacing:3px}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0;padding:0}
+.shop-card{border:1px solid #eee;padding:20px;text-align:center;transition:background 0.2s}
+.shop-card:hover{background:#f5f5f5}
+.shop-card .img{width:100%;height:140px;background:#f0f0f0;margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#ccc}
+.shop-card h3{font-size:10px;color:#111;margin-bottom:4px;letter-spacing:1px}
+.shop-card .sprice{font-size:12px;color:#111}
+.shop-back{position:fixed;top:20px;left:20px;font-size:10px;color:#111;cursor:pointer;z-index:20;background:#fff;padding:8px 16px;border:2px solid #111}
+.shop-back:hover{background:#111;color:#fff}
+
+.menu-footer{position:absolute;bottom:0;left:0;right:0;padding:12px;text-align:center;border-top:2px solid #bbb;font-size:8px;color:#999}
+.menu-footer a{color:#666;text-decoration:none;margin:0 8px}
+
+@media(max-width:600px){.tv-frame{width:95vw;height:85vh;padding:20px;border-radius:24px}.menu-item{width:100px;height:100px}.cube{width:40px;height:40px}.cube div{width:40px;height:40px}.cube .front{transform:translateZ(20px)}.cube .back{transform:rotateY(180deg) translateZ(20px)}.cube .left{transform:rotateY(-90deg) translateZ(20px)}.cube .right{transform:rotateY(90deg) translateZ(20px)}.cube .top{transform:rotateX(90deg) translateZ(20px)}.cube .bottom{transform:rotateX(-90deg) translateZ(20px)}}
+</style>
+</head>
+<body>
+<div class="tv-frame">
+<div class="tv-screen">
+<div class="vhs-static"></div>
+<div class="vhs-lines"></div>
+
+<!-- Enter Screen -->
+<div id="enter" onclick="enterSite()">
+<h1>BEHIKE</h1>
+<div class="start">PRESS START</div>
+<div class="copy">&copy; 2026 BEHIKE</div>
+</div>
+
+<!-- Main Menu -->
+<div id="menu">
+<div class="menu-header"><h2>BEHIKE</h2></div>
+<div class="media-panel"><div class="noise"></div><div class="media-text">MEDIA</div></div>
+<div class="menu-nav">
+<div class="menu-item" onclick="showShop()">
+<div class="icon"><div class="cube teal"><div class="front"></div><div class="back"></div><div class="left"></div><div class="right"></div><div class="top"></div><div class="bottom"></div></div></div>
+<div class="label">SHOP</div>
+</div>
+<div class="menu-item" onclick="window.open('https://behike.gumroad.com','_blank')">
+<div class="icon"><div class="cube orange"><div class="front">B</div><div class="back">B</div><div class="left">B</div><div class="right">B</div><div class="top">B</div><div class="bottom">B</div></div></div>
+<div class="label">GUMROAD</div>
+</div>
+<div class="menu-item" onclick="window.open('../behike-co/','_blank')">
+<div class="icon"><div class="cube red"><div class="front">?</div><div class="back">?</div><div class="left">?</div><div class="right">?</div><div class="top">?</div><div class="bottom">?</div></div></div>
+<div class="label">ABOUT</div>
+</div>
+<div class="menu-item" onclick="window.open('mailto:hello@behike.co')">
+<div class="icon"><div class="cube black"><div class="front"></div><div class="back"></div><div class="left"></div><div class="right"></div><div class="top"></div><div class="bottom"></div></div></div>
+<div class="label">CONTACT</div>
+</div>
+<div class="menu-item" onclick="window.open('https://instagram.com/behikeai','_blank')">
+<div class="icon"><div class="cube purple"><div class="front">IG</div><div class="back">IG</div><div class="left">IG</div><div class="right">IG</div><div class="top">IG</div><div class="bottom">IG</div></div></div>
+<div class="label">SOCIAL</div>
+</div>
+<div class="menu-item" onclick="window.open('index.html')">
+<div class="icon"><div class="cube cyan"><div class="front"></div><div class="back"></div><div class="left"></div><div class="right"></div><div class="top"></div><div class="bottom"></div></div></div>
+<div class="label">CLEAN</div>
+</div>
+</div>
+<div class="menu-footer">&copy; 2026 BEHIKE &middot; <a href="../behike-co/privacy.html">Privacy</a> <a href="../behike-co/terms.html">Terms</a> &middot; Built in Puerto Rico</div>
+</div>
+
+<!-- Shop Page -->
+<div id="shop">
+<div class="shop-back" onclick="backToMenu()">&lt; BACK</div>
+<div class="shop-header">
+<h2>DON'T SLEEP ON IT</h2>
+<p>DIGITAL PRODUCTS FOR BUILDERS</p>
+</div>
+<div class="shop-grid" id="shop-grid"></div>
+</div>
+</div>
+</div>
+
+<script>
+function enterSite(){document.getElementById('enter').classList.add('gone');document.getElementById('menu').classList.add('active')}
+function showShop(){document.getElementById('menu').classList.remove('active');document.getElementById('shop').classList.add('active');loadProducts()}
+function backToMenu(){document.getElementById('shop').classList.remove('active');document.getElementById('menu').classList.add('active')}
+function loadProducts(){
+fetch('../products.json').then(r=>r.json()).then(products=>{
+const grid=document.getElementById('shop-grid');
+if(grid.children.length>0)return;
+products.forEach(p=>{
+const card=document.createElement('div');
+card.className='shop-card';
+card.innerHTML=`<div class="img">${(p.category||'?').charAt(0).toUpperCase()}</div><h3>${p.title.toUpperCase()}</h3><div class="sprice">${p.price>0?'$'+p.price:'FREE'}</div>`;
+card.onclick=()=>window.open(p.gumroad_url||'#','_blank');
+card.style.cursor='pointer';
+grid.appendChild(card);
+});
+}).catch(()=>{})}
+</script>
+</body>
+</html>

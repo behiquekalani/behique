@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="A budgeting system built for ADHD brains. Five categories. No app required. One 10-minute weekly check-in. By Behike.">
+    <title>ADHD Budget Playbook | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0C0C0C;
+            --surface: #111111;
+            --surface-2: #161616;
+            --amber: #F59E0B;
+            --amber-dim: rgba(245, 158, 11, 0.08);
+            --amber-border: rgba(245, 158, 11, 0.2);
+            --amber-glow: rgba(245, 158, 11, 0.15);
+            --light: #E8E8E8;
+            --muted: #8e8e93;
+            --border: #2a2a2a;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 14px 24px;
+            background: rgba(12, 12, 12, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.08);
+        }
+
+        .topbar-logo {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--amber);
+            letter-spacing: -0.02em;
+        }
+
+        .topbar-nav {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .topbar-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .topbar-link:hover { color: var(--amber); }
+
+        .topbar-cta {
+            background: var(--amber);
+            color: #000;
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .topbar-cta:hover { opacity: 0.85; }
+
+        /* Hero */
+        .hero {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 140px 24px 80px;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 28px;
+            font-weight: 600;
+        }
+
+        .hero h1 {
+            font-size: clamp(30px, 5.5vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        .hero-sub {
+            font-size: 19px;
+            color: var(--muted);
+            max-width: 560px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--amber);
+            color: #000;
+            padding: 14px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            transition: opacity 0.2s;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-primary:hover { opacity: 0.85; }
+
+        .hero-price-note {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .hero-price-note strong {
+            color: var(--amber);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Proof bar */
+        .proof-bar {
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 24px;
+            margin: 0 0 80px;
+        }
+
+        .proof-bar-inner {
+            max-width: 740px;
+            margin: 0 auto;
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .proof-stat {
+            text-align: center;
+        }
+
+        .proof-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--amber);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .proof-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* The problem section */
+        .section {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .section h2 {
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #fff;
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+
+        .section p {
+            font-size: 16px;
+            color: #c0c0c0;
+            margin-bottom: 16px;
+            max-width: 620px;
+        }
+
+        /* Social proof quote */
+        .quote-block {
+            background: var(--amber-dim);
+            border: 1px solid var(--amber-border);
+            border-left: 3px solid var(--amber);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin: 48px 0;
+            max-width: 740px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .quote-text {
+            font-size: 17px;
+            color: var(--light);
+            line-height: 1.65;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        .quote-source {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* Features grid */
+        .features {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .features-header .section-label {
+            display: block;
+        }
+
+        .features-header h2 {
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #fff;
+            line-height: 1.25;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px 24px;
+            transition: border-color 0.2s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--amber-border);
+        }
+
+        .feature-icon {
+            font-size: 22px;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* What's inside */
+        .inside {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .chapters-list {
+            list-style: none;
+            margin-top: 32px;
+        }
+
+        .chapters-list li {
+            display: flex;
+            gap: 16px;
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: flex-start;
+        }
+
+        .chapters-list li:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        .chapter-num {
+            font-size: 12px;
+            color: var(--amber);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            min-width: 60px;
+            padding-top: 3px;
+        }
+
+        .chapter-title {
+            font-size: 15px;
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        .chapter-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Pricing */
+        .pricing {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .pricing-card {
+            background: var(--surface);
+            border: 1px solid var(--amber-border);
+            border-radius: 20px;
+            padding: 40px 36px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--amber);
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: var(--amber-dim);
+            border: 1px solid var(--amber-border);
+            color: var(--amber);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .pricing-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .pricing-sub {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .pricing-amount {
+            font-size: 56px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .pricing-amount span {
+            font-size: 28px;
+            font-weight: 600;
+            vertical-align: top;
+            padding-top: 10px;
+            display: inline-block;
+            color: var(--muted);
+        }
+
+        .pricing-format {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .pricing-includes {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 32px;
+        }
+
+        .pricing-includes li {
+            font-size: 14px;
+            color: #c0c0c0;
+            padding: 8px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pricing-includes li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-includes li::before {
+            content: "+";
+            color: var(--amber);
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .btn-buy {
+            display: block;
+            background: var(--amber);
+            color: #000;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 700;
+            transition: opacity 0.2s;
+            letter-spacing: -0.01em;
+            margin-bottom: 12px;
+        }
+
+        .btn-buy:hover { opacity: 0.85; }
+
+        .pricing-guarantee {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* FAQ */
+        .faq {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .faq h2 {
+            font-size: clamp(22px, 3.5vw, 30px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #fff;
+            margin-bottom: 40px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 24px 0;
+        }
+
+        .faq-item:first-of-type {
+            border-top: 1px solid var(--border);
+        }
+
+        .faq-q {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .faq-a {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.65;
+        }
+
+        /* Cross-sell */
+        .crosssell {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .crosssell-label {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+        }
+
+        .crosssell h2 {
+            text-align: center;
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #e8e8e8;
+            margin-bottom: 40px;
+        }
+
+        .crosssell-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .crosssell-card {
+            text-decoration: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            display: block;
+            transition: border-color 0.2s;
+        }
+
+        .crosssell-card:hover { border-color: var(--amber-border); }
+
+        .crosssell-type {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .crosssell-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: #e8e8e8;
+            margin-bottom: 8px;
+        }
+
+        .crosssell-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+
+        .crosssell-price {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--amber);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 740px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--amber);
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            font-size: 13px;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover { color: var(--amber); }
+
+        .footer-copy {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero { padding-top: 100px; }
+            .topbar-nav { gap: 12px; }
+            .proof-bar-inner { gap: 24px; justify-content: center; }
+            .pricing-card { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">behike</a>
+        <nav class="topbar-nav">
+            <a href="index.html" class="topbar-link">Store</a>
+            <a href="#get" class="topbar-cta">Get it. $9.99</a>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <p class="hero-label">Digital Guide / ADHD Finance</p>
+        <h1>A budget system for brains that hate budgeting.</h1>
+        <p class="hero-sub">Most budget apps assume you'll check them daily. This one doesn't.</p>
+        <div class="hero-actions">
+            <a href="https://behikeai.gumroad.com/l/adhd-budget-guide" class="btn-primary">Get it for $9.99</a>
+            <p class="hero-price-note">One-time. No subscription. Keep it forever.</p>
+        </div>
+    </section>
+
+    <!-- Proof bar -->
+    <div class="proof-bar">
+        <div class="proof-bar-inner">
+            <div class="proof-stat">
+                <div class="proof-number">5</div>
+                <div class="proof-label">Budget categories</div>
+            </div>
+            <div class="proof-stat">
+                <div class="proof-number">10 min</div>
+                <div class="proof-label">Weekly check-in</div>
+            </div>
+            <div class="proof-stat">
+                <div class="proof-number">0</div>
+                <div class="proof-label">Apps required</div>
+            </div>
+            <div class="proof-stat">
+                <div class="proof-number">$1,200+</div>
+                <div class="proof-label">Avg. subscription savings</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The problem -->
+    <section class="section">
+        <p class="section-label">The problem</p>
+        <h2>Every budget you've tried was built for a different brain.</h2>
+        <p>Traditional budgeting tools are built on a set of assumptions. They assume you'll remember to log every transaction. That you can sit through weekly review sessions. That 47 spending categories will feel like control rather than overwhelm. That willpower is enough to stop impulse purchases.</p>
+        <p>None of those assumptions hold for an ADHD brain. The problem is not your character. It is that the systems were not designed for how your brain actually works.</p>
+        <p>ADHD creates impulsive spending, because your reward system is wired to prioritize immediate gratification. It makes tracking hard to sustain, because maintaining low-stimulation routines requires exactly the executive function ADHD impairs. It creates "out of sight, out of mind" problems with subscriptions and bills. And it makes complicated systems collapse within weeks.</p>
+        <p>This guide is built around the constraints of an ADHD brain, not against them.</p>
+    </section>
+
+    <!-- Social proof -->
+    <div class="section" style="padding-top: 0; padding-bottom: 60px;">
+        <div class="quote-block">
+            <p class="quote-text">"Adults with ADHD are significantly more likely to report financial problems, including difficulty paying bills on time, impulsive spending, and failure to maintain a budget. Research consistently shows these are not motivational failures. They are direct consequences of ADHD's impact on executive function, working memory, and impulse control."</p>
+            <p class="quote-source">Based on research published in the Journal of Attention Disorders and ADHD financial behavior studies (2015-2022)</p>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="features-header">
+            <span class="section-label">What's different</span>
+            <h2>Built around five principles.</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <span class="feature-icon">&#9632;</span>
+                <p class="feature-title">The 5-Category Rule</p>
+                <p class="feature-desc">Instead of 47 budget categories: Needs, Wants, Savings, Debt, Fun. Five numbers your brain can actually hold and use.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#9679;</span>
+                <p class="feature-title">Impulse Cooldown Protocol</p>
+                <p class="feature-desc">A 24-hour pause system for purchases above your threshold. One habit that saves most people hundreds of dollars per month.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#9651;</span>
+                <p class="feature-title">No-App Tracking</p>
+                <p class="feature-desc">Two inputs, one weekly 10-minute review. No YNAB. No Mint. No daily data entry. The system works from your bank statement.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#9671;</span>
+                <p class="feature-title">The Dopamine Budget</p>
+                <p class="feature-desc">A guilt-free spending category that gets allocated first, not last. Because deprivation budgets always fail for ADHD brains.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#9632;</span>
+                <p class="feature-title">10-Minute Weekly Check-In</p>
+                <p class="feature-desc">Three questions. Ten minutes. No grading yourself. Just a weekly connection to reality that takes less time than a coffee run.</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">&#9679;</span>
+                <p class="feature-title">Templates in Plain Text</p>
+                <p class="feature-desc">Every template works in any notes app, Google Docs, Notion, or a physical notebook. No special software. No learning curve.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's inside -->
+    <section class="inside">
+        <p class="section-label">Contents</p>
+        <h2>Seven chapters and five templates.</h2>
+        <ul class="chapters-list">
+            <li>
+                <span class="chapter-num">Intro</span>
+                <div>
+                    <p class="chapter-title">Why Every Budget You've Tried Has Failed</p>
+                    <p class="chapter-desc">The neuroscience of ADHD and money. Why the systems are the problem, not you.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 1</span>
+                <div>
+                    <p class="chapter-title">The Five-Category Rule</p>
+                    <p class="chapter-desc">How to map your entire financial life to five numbers. Why simplicity is necessary, not lazy.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 2</span>
+                <div>
+                    <p class="chapter-title">The Impulse Cooldown Protocol</p>
+                    <p class="chapter-desc">The 24-hour pause system. The math on what this saves you annually.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 3</span>
+                <div>
+                    <p class="chapter-title">Tracking Without Apps</p>
+                    <p class="chapter-desc">Why YNAB and Mint fail ADHD users. The two-input method and the anchor habit technique.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 4</span>
+                <div>
+                    <p class="chapter-title">Subscription Autopsy</p>
+                    <p class="chapter-desc">How to find every recurring charge in one sitting. The Keep/Cut/Review process.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 5</span>
+                <div>
+                    <p class="chapter-title">The Dopamine Budget</p>
+                    <p class="chapter-desc">Building a guilt-free spending category. Why it gets allocated first, not last.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 6</span>
+                <div>
+                    <p class="chapter-title">Emergency Fund for Impulsive Brains</p>
+                    <p class="chapter-desc">A smaller target. A separate account with friction. A written definition of what counts as an emergency.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Ch. 7</span>
+                <div>
+                    <p class="chapter-title">The Weekly Money Check-In</p>
+                    <p class="chapter-desc">Three questions. Ten minutes. How to build it as an anchor habit so it actually sticks.</p>
+                </div>
+            </li>
+            <li>
+                <span class="chapter-num">Appendix</span>
+                <div>
+                    <p class="chapter-title">Templates and Trackers</p>
+                    <p class="chapter-desc">Monthly budget template, impulse list, subscription audit worksheet, weekly check-in, emergency fund tracker. All in plain text.</p>
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Pricing -->
+    <section class="pricing" id="get">
+        <div class="pricing-card">
+            <span class="pricing-badge">Digital Guide</span>
+            <p class="pricing-title">The ADHD Budget Playbook</p>
+            <p class="pricing-sub">A budgeting system built for your brain.</p>
+            <div class="pricing-amount"><span>$</span>9.99</div>
+            <p class="pricing-format">PDF guide. Instant download via Gumroad.</p>
+            <ul class="pricing-includes">
+                <li>7 chapters, 6,000+ words</li>
+                <li>5 plain-text templates (budget, impulse list, subscription audit, check-in, emergency fund)</li>
+                <li>The Impulse Cooldown Protocol</li>
+                <li>The Dopamine Budget framework</li>
+                <li>10-Minute Weekly Check-In system</li>
+            </ul>
+            <a href="https://behikeai.gumroad.com/l/adhd-budget-guide" class="btn-buy">Get the guide. $9.99</a>
+            <p class="pricing-guarantee">One-time purchase. Instant access. 30-day refund if it does not work for you.</p>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+        <h2>Questions.</h2>
+
+        <div class="faq-item">
+            <p class="faq-q">Is this an app?</p>
+            <p class="faq-a">No. It is a PDF guide with plain-text templates. There is nothing to install, no account to create, and no recurring subscription. You download it once and keep it.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-q">Do I need special software to use the templates?</p>
+            <p class="faq-a">No. The templates are written in plain text. They work in any notes app, Google Docs, Notion, a spreadsheet, or a physical notebook. The goal was to remove every possible barrier to actually using them.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-q">Will this work if I have ADHD-PI (primarily inattentive)?</p>
+            <p class="faq-a">Yes. The system was designed for the inattentive presentation specifically. The core problems it addresses are forgetting to track, avoiding financial tasks, losing track of subscriptions, and maintaining habits that require consistent attention. Those are primarily inattentive symptoms.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-q">What is included in the download?</p>
+            <p class="faq-a">A full PDF guide with seven chapters and an appendix containing five templates. The templates are also available as plain text so you can copy them into any tool you already use.</p>
+        </div>
+
+        <div class="faq-item">
+            <p class="faq-q">What is the refund policy?</p>
+            <p class="faq-a">30 days. If you read it, try the system, and it does not work for you, email the address on the Gumroad receipt and you will get a full refund. No hoops.</p>
+        </div>
+    </section>
+
+    <!-- Cross-sell -->
+    <section class="crosssell">
+        <p class="crosssell-label">Pair it with</p>
+        <h2>Complete your financial stack.</h2>
+        <div class="crosssell-grid">
+            <a href="budget-template.html" class="crosssell-card">
+                <p class="crosssell-type">Template</p>
+                <p class="crosssell-title">Personal Budget Template</p>
+                <p class="crosssell-desc">12-month tracking spreadsheet. Category breakdown, savings goals, CSV export. Works in Google Sheets or Excel.</p>
+                <p class="crosssell-price">$4.99</p>
+            </a>
+            <a href="cash-flow-dashboard.html" class="crosssell-card">
+                <p class="crosssell-type">Dashboard</p>
+                <p class="crosssell-title">Cash Flow Dashboard</p>
+                <p class="crosssell-desc">8-tab financial command center. Income, expenses, forecast, savings rate. All automated.</p>
+                <p class="crosssell-price">$14.99</p>
+            </a>
+            <a href="solopreneur-os.html" class="crosssell-card">
+                <p class="crosssell-type">Workbook</p>
+                <p class="crosssell-title">Solopreneur OS</p>
+                <p class="crosssell-desc">5-module business workbook. Monetization map, financial runway calculator, and a system for running a one-person business.</p>
+                <p class="crosssell-price">$12.99</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <p class="footer-logo">behike</p>
+            <nav class="footer-links">
+                <a href="index.html">Store</a>
+                <a href="about.html">About</a>
+                <a href="refund.html">Refunds</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </nav>
+            <p class="footer-copy">&copy; 2026 Behike. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

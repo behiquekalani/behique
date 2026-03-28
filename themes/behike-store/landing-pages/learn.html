@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Learn AI from scratch. Free lessons on prompting, tools, automation, and building your own AI stack. No hype, no jargon, just what works.">
+    <title>Learn AI for Free | Behike</title>
+    <style>
+        *, *::before, *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        }
+
+        :root {
+        --bg: #0A0F14;
+        --bg2: #111920;
+        --teal: #0D9488;
+        --teal-dim: rgba(13, 148, 136, 0.1);
+        --teal-glow: rgba(13, 148, 136, 0.25);
+        --teal-bright: #14B8A6;
+        --light: #E8ECF0;
+        --muted: #8A9AAA;
+        --surface: #151D27;
+        --surface-hover: #1A2535;
+        --border: rgba(13, 148, 136, 0.12);
+        --border-subtle: rgba(255, 255, 255, 0.06);
+        --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+        background: var(--bg);
+        color: var(--light);
+        font-family: var(--font);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top bar */
+        .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 12px 24px;
+        background: rgba(10, 15, 20, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .topbar-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        }
+
+        .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        }
+
+        .topbar-logo {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal);
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        }
+
+        .topbar-logo span {
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 6px;
+        font-size: 14px;
+        }
+
+        .topbar-link {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s;
+        }
+
+        .topbar-link:hover { color: var(--teal); }
+
+        /* Progress bar (fixed under topbar) */
+        .progress-bar-container {
+        position: fixed;
+        top: 48px;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        height: 3px;
+        background: var(--bg2);
+        }
+
+        .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--teal), var(--teal-bright));
+        transition: width 0.4s ease;
+        box-shadow: 0 0 8px var(--teal-glow);
+        }
+
+        .progress-label {
+        position: fixed;
+        top: 54px;
+        right: 24px;
+        z-index: 99;
+        font-size: 11px;
+        color: var(--muted);
+        font-family: var(--mono);
+        letter-spacing: 0.5px;
+        }
+
+        /* Track selector */
+        .track-selector {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 80px 24px 0;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        }
+
+        .track-tab {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid var(--border-subtle);
+        background: transparent;
+        color: var(--muted);
+        transition: all 0.2s;
+        }
+
+        .track-tab:hover {
+        border-color: var(--teal);
+        color: var(--light);
+        }
+
+        .track-tab.active {
+        background: var(--teal-dim);
+        border-color: var(--teal);
+        color: var(--teal-bright);
+        }
+
+        .track-tab .coming-badge {
+        font-size: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px;
+        color: var(--muted);
+        }
+
+        /* Track panels */
+        .track-panel {
+        display: none;
+        }
+
+        .track-panel.active {
+        display: block;
+        }
+
+        /* Hero */
+        .hero {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px 40px;
+        }
+
+        .hero h1 {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.03em;
+        margin-bottom: 16px;
+        }
+
+        .hero p {
+        font-size: 17px;
+        color: var(--muted);
+        line-height: 1.6;
+        max-width: 560px;
+        }
+
+        /* Lessons container */
+        .lessons {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 24px 60px;
+        }
+
+        /* Lesson card */
+        .lesson {
+        border: 1px solid var(--border-subtle);
+        border-radius: 12px;
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: border-color 0.2s;
+        }
+
+        .lesson:hover {
+        border-color: var(--border);
+        }
+
+        .lesson.completed {
+        border-color: rgba(13, 148, 136, 0.2);
+        }
+
+        .lesson-header {
+        padding: 20px 24px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        user-select: none;
+        -webkit-user-select: none;
+        }
+
+        .lesson-check {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 2px solid var(--border-subtle);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        }
+
+        .lesson-check:hover {
+        border-color: var(--teal);
+        }
+
+        .lesson.completed .lesson-check {
+        background: var(--teal);
+        border-color: var(--teal);
+        }
+
+        .lesson-check svg {
+        width: 14px;
+        height: 14px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        }
+
+        .lesson.completed .lesson-check svg {
+        opacity: 1;
+        }
+
+        .lesson-info {
+        flex: 1;
+        }
+
+        .lesson-number {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--teal);
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        }
+
+        .lesson-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--light);
+        letter-spacing: -0.01em;
+        }
+
+        .lesson.completed .lesson-title {
+        color: var(--muted);
+        }
+
+        .lesson-meta {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 4px;
+        }
+
+        .lesson-expand {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        color: var(--muted);
+        transition: transform 0.3s ease;
+        }
+
+        .lesson.open .lesson-expand {
+        transform: rotate(180deg);
+        }
+
+        /* Lesson body */
+        .lesson-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        }
+
+        .lesson.open .lesson-body {
+        max-height: 8000px;
+        }
+
+        .lesson-content {
+        padding: 0 24px 32px;
+        border-top: 1px solid var(--border-subtle);
+        }
+
+        .lesson-content h2 {
+        font-size: 22px;
+        font-weight: 600;
+        margin: 32px 0 16px;
+        letter-spacing: -0.02em;
+        }
+
+        .lesson-content h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 28px 0 12px;
+        color: var(--teal-bright);
+        }
+
+        .lesson-content p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--light);
+        margin-bottom: 16px;
+        max-width: 100%;
+        }
+
+        .lesson-content ul, .lesson-content ol {
+        margin: 0 0 16px 20px;
+        font-size: 16px;
+        line-height: 1.7;
+        }
+
+        .lesson-content li {
+        margin-bottom: 8px;
+        color: var(--light);
+        }
+
+        .lesson-content strong {
+        color: var(--teal-bright);
+        font-weight: 600;
+        }
+
+        .lesson-content code {
+        font-family: var(--mono);
+        font-size: 14px;
+        background: var(--bg2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: var(--teal-bright);
+        }
+
+        /* Callout boxes */
+        .callout {
+        background: var(--teal-dim);
+        border-left: 3px solid var(--teal);
+        border-radius: 0 8px 8px 0;
+        padding: 16px 20px;
+        margin: 20px 0;
+        font-size: 15px;
+        line-height: 1.6;
+        }
+
+        .callout-title {
+        font-weight: 600;
+        color: var(--teal-bright);
+        margin-bottom: 6px;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        }
+
+        .callout p {
+        margin-bottom: 0;
+        font-size: 15px;
+        }
+
+        /* Exercise box */
+        .exercise {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin: 24px 0;
+        }
+
+        .exercise-label {
+        font-size: 12px;
+        font-family: var(--mono);
+        color: var(--teal);
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        }
+
+        .exercise p, .exercise ol {
+        font-size: 15px;
+        color: var(--light);
+        }
+
+        /* Summary box */
+        .summary {
+        background: var(--bg2);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin: 24px 0;
+        }
+
+        .summary-label {
+        font-size: 12px;
+        font-family: var(--mono);
+        color: var(--muted);
+        letter-spacing: 1px;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        }
+
+        .summary ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        }
+
+        .summary li {
+        padding: 6px 0;
+        font-size: 15px;
+        color: var(--light);
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        }
+
+        .summary li::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        background: var(--teal);
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 6px;
+        }
+
+        /* Go deeper link */
+        .go-deeper {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--teal);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        margin-top: 8px;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: all 0.2s;
+        }
+
+        .go-deeper:hover {
+        background: var(--teal-dim);
+        border-color: var(--teal);
+        }
+
+        .go-deeper svg {
+        width: 14px;
+        height: 14px;
+        }
+
+        /* Locked lesson */
+        .lesson.locked {
+        opacity: 0.5;
+        }
+
+        .lesson.locked .lesson-header {
+        cursor: default;
+        }
+
+        .locked-badge {
+        font-size: 11px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-family: var(--mono);
+        }
+
+        /* Coming soon track */
+        .coming-soon-track {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px 60px;
+        }
+
+        .coming-soon-track h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+        }
+
+        .coming-soon-track .track-desc {
+        font-size: 16px;
+        color: var(--muted);
+        margin-bottom: 32px;
+        line-height: 1.6;
+        }
+
+        .coming-lesson {
+        padding: 16px 20px;
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        opacity: 0.5;
+        }
+
+        .coming-lesson-num {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--teal);
+        min-width: 24px;
+        }
+
+        .coming-lesson-title {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--light);
+        }
+
+        .coming-lesson-desc {
+        font-size: 13px;
+        color: var(--muted);
+        margin-top: 2px;
+        }
+
+        /* Sidebar / footer section */
+        .bottom-section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 60px 24px 40px;
+        border-top: 1px solid var(--border-subtle);
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 40px;
+        }
+
+        .bottom-card h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--light);
+        }
+
+        .bottom-card p {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 16px;
+        }
+
+        /* Email capture */
+        .email-form {
+        display: flex;
+        gap: 8px;
+        }
+
+        .email-input {
+        flex: 1;
+        padding: 10px 14px;
+        background: var(--surface);
+        border: 1px solid var(--border-subtle);
+        border-radius: 8px;
+        color: var(--light);
+        font-size: 14px;
+        font-family: var(--font);
+        outline: none;
+        transition: border-color 0.2s;
+        }
+
+        .email-input:focus {
+        border-color: var(--teal);
+        }
+
+        .email-input::placeholder {
+        color: var(--muted);
+        }
+
+        .email-btn {
+        padding: 10px 18px;
+        background: var(--teal);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: var(--font);
+        transition: background 0.2s;
+        white-space: nowrap;
+        }
+
+        .email-btn:hover {
+        background: var(--teal-bright);
+        }
+
+        .email-success {
+        display: none;
+        font-size: 14px;
+        color: var(--teal);
+        padding: 10px 0;
+        }
+
+        /* Free tools links */
+        .tool-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        }
+
+        .tool-links li {
+        margin-bottom: 8px;
+        }
+
+        .tool-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        }
+
+        .tool-links a:hover {
+        color: var(--teal);
+        }
+
+        .tool-links .dot {
+        width: 4px;
+        height: 4px;
+        background: var(--teal);
+        border-radius: 50%;
+        flex-shrink: 0;
+        }
+
+        /* Product spotlight */
+        .spotlight {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        }
+
+        .spotlight-tag {
+        font-size: 11px;
+        font-family: var(--mono);
+        color: var(--teal);
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        }
+
+        .spotlight-name {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        }
+
+        .spotlight-desc {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 12px;
+        }
+
+        .spotlight-link {
+        color: var(--teal);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        }
+
+        .spotlight-link:hover {
+        text-decoration: underline;
+        }
+
+        footer {
+        text-align: center;
+        padding: 40px 24px;
+        font-size: 13px;
+        color: var(--muted);
+        }
+
+        footer a {
+        color: var(--muted);
+        text-decoration: none;
+        }
+
+        footer a:hover {
+        color: var(--teal);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+        .hero h1 { font-size: 26px; }
+        .lesson-header { padding: 16px 18px; }
+        .lesson-content { padding: 0 18px 24px; }
+        .lesson-content h2 { font-size: 20px; }
+        .lesson-content h3 { font-size: 16px; }
+        .bottom-section {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+        .email-form {
+            flex-direction: column;
+        }
+        .progress-label { display: none; }
+        .track-selector { padding-top: 70px; }
+        }
+
+        /* Reveal animation */
+        .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top bar -->
+    <div class="topbar">
+        <div class="topbar-inner">
+        <div class="topbar-left">
+            <a href="index.html" class="topbar-logo">Behike <span>Learn</span></a>
+        </div>
+        <a href="index.html" class="topbar-link">Store</a>
+        </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 / 5 complete</div>
+
+    <!-- Track selector -->
+    <div class="track-selector">
+        <button class="track-tab active" data-track="basics">AI Basics</button>
+        <button class="track-tab" data-track="creators">AI for Creators <span class="coming-badge">Soon</span></button>
+        <button class="track-tab" data-track="business">AI for Business <span class="coming-badge">Soon</span></button>
+    </div>
+
+    <!-- TRACK 1: AI BASICS -->
+    <div class="track-panel active" id="track-basics">
+
+        <div class="hero">
+        <h1>Learn AI. For real.</h1>
+        <p>No fluff. No "AI will change everything" speeches. Just practical lessons that teach you what AI actually does and how to use it. Free. Start wherever you want.</p>
+        </div>
+
+        <div class="lessons">
+
+        <!-- LESSON 1 -->
+        <div class="lesson reveal" data-lesson="1">
+            <div class="lesson-header">
+                <div class="lesson-check" onclick="event.stopPropagation(); toggleComplete(1)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 01</div>
+                    <div class="lesson-title">What AI Actually Is (And What It Isn't)</div>
+                    <div class="lesson-meta">12 min read</div>
+                </div>
+                <svg class="lesson-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="lesson-body">
+                <div class="lesson-content">
+
+                    <p>You've heard the noise. AI is going to take your job. AI is going to save the world. AI is sentient. AI is stupid.</p>
+
+                    <p>Most of it is wrong.</p>
+
+                    <p>If you want to actually use AI instead of just reading headlines about it, you need to understand what it does under the hood. Not the math (you don't need that). The concept.</p>
+
+                    <h2>AI is pattern matching at scale</h2>
+
+                    <p>That's it. That's the core idea. Every AI system you've ever interacted with, from Siri to ChatGPT to your email spam filter, is doing one thing: looking at data, finding patterns, and using those patterns to make predictions.</p>
+
+                    <p>Your spam filter learned that emails containing "Nigerian prince" and "wire transfer" usually aren't legit. It didn't understand the email. It recognized a pattern.</p>
+
+                    <p>ChatGPT learned that after the words "the capital of France is," the word "Paris" almost always comes next. It didn't learn geography. It learned which words follow which words.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Key concept</div>
+                        <p>AI doesn't understand anything. It recognizes patterns in data and predicts what comes next. The predictions are so good that it looks like understanding. It isn't.</p>
+                    </div>
+
+                    <h2>AI vs. ML vs. LLMs: three things people confuse</h2>
+
+                    <p><strong>AI (Artificial Intelligence)</strong> is the umbrella term. It means any system that can do tasks that normally require human thinking. Your calculator is technically AI by the 1950s definition. The bar keeps moving.</p>
+
+                    <p><strong>ML (Machine Learning)</strong> is a subset of AI. Instead of programming explicit rules ("if email contains X, mark as spam"), you feed the system examples and let it figure out the rules itself. You give it 10,000 spam emails and 10,000 real emails, and it learns to tell the difference.</p>
+
+                    <p><strong>LLMs (Large Language Models)</strong> are a specific type of ML. They're trained on massive amounts of text. Billions of web pages, books, code repositories. They learn the statistical relationships between words and use that to generate text. ChatGPT, Claude, Gemini, Llama. These are all LLMs.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Think of it like this</div>
+                        <p>AI is "sports." ML is "ball sports." LLMs are "basketball." Knowing the difference helps you pick the right tool for the job instead of trying to play basketball with a tennis racket.</p>
+                    </div>
+
+                    <h2>What AI is good at</h2>
+
+                    <p>AI excels at things humans find tedious but do by pattern recognition:</p>
+
+                    <ul>
+                        <li><strong>Summarizing.</strong> Give it a 50-page PDF and ask for the key points. It's genuinely faster and often more thorough than doing it yourself.</li>
+                        <li><strong>Drafting.</strong> First drafts of emails, blog posts, product descriptions. Not perfect, but 70% of the way there in seconds.</li>
+                        <li><strong>Translating.</strong> Between languages, between technical and plain English, between formats. It's very good at this.</li>
+                        <li><strong>Coding.</strong> Writing boilerplate, debugging errors, explaining what a function does. It won't architect your system, but it'll write the parts.</li>
+                        <li><strong>Research synthesis.</strong> Pulling together information from multiple sources and organizing it. Perplexity does this especially well.</li>
+                        <li><strong>Classification.</strong> "Is this email spam?" "Is this review positive or negative?" "What category does this product belong in?" Fast and accurate.</li>
+                    </ul>
+
+                    <h2>What AI is bad at</h2>
+
+                    <p>Here's where the hype breaks down:</p>
+
+                    <ul>
+                        <li><strong>Facts.</strong> LLMs make things up. Confidently. They'll cite studies that don't exist, invent statistics, and present fiction as fact. This is called hallucination and it's not a bug they're fixing. It's fundamental to how the technology works.</li>
+                        <li><strong>Math.</strong> Ask an LLM to multiply two large numbers. It will probably get it wrong. It doesn't calculate. It predicts what a correct-looking answer would be.</li>
+                        <li><strong>Reasoning about new problems.</strong> If a problem requires genuine novel reasoning (not pattern matching against similar problems it's seen), AI struggles. It's very good at recombining existing patterns. It's not good at inventing new ones.</li>
+                        <li><strong>Understanding context you haven't given it.</strong> AI doesn't know your business, your audience, or your specific situation unless you tell it. "Write me a marketing email" produces garbage because you didn't give it enough context.</li>
+                        <li><strong>Being current.</strong> Most LLMs have a training cutoff date. They don't know what happened yesterday unless they have internet access.</li>
+                    </ul>
+
+                    <div class="callout">
+                        <div class="callout-title">The honest take</div>
+                        <p>AI is a very fast, very tireless assistant that's good at pattern-based tasks and terrible at anything requiring genuine understanding. Use it where it's strong. Don't trust it where it's weak. That's the whole game.</p>
+                    </div>
+
+                    <h2>Why this matters for you</h2>
+
+                    <p>If you understand what AI actually does, you stop being scared of it and start being useful with it. You stop asking it to do things it can't. You start giving it tasks it's great at.</p>
+
+                    <p>The people who get the most out of AI aren't the ones who think it's magic. They're the ones who know exactly what it is: a pattern-matching engine that's really, really fast. They give it the right inputs and get good outputs.</p>
+
+                    <p>That's what the rest of this course teaches you to do.</p>
+
+                    <div class="exercise">
+                        <div class="exercise-label">Hands-on exercise</div>
+                        <p>Open ChatGPT (or Claude, or any LLM you have access to). Try these two prompts:</p>
+                        <ol>
+                            <li><strong>Something it's good at:</strong> "Summarize the plot of The Great Gatsby in 3 sentences." Notice how fast and accurate it is.</li>
+                            <li><strong>Something it's bad at:</strong> "What is 4,827 x 3,691?" Check the answer with a calculator. It probably got it wrong.</li>
+                        </ol>
+                        <p>This is the gap. Understanding where that gap is makes you better at using AI than 95% of people.</p>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-label">What you learned</div>
+                        <ul>
+                            <li>AI is pattern matching at scale, not thinking or understanding</li>
+                            <li>AI, ML, and LLMs are nested categories (broad to specific), not synonyms</li>
+                            <li>AI is strong at summarizing, drafting, and classifying. Weak at facts, math, and novel reasoning</li>
+                        </ul>
+                    </div>
+
+                    <a href="ai-employee-guide.html" class="go-deeper">
+                        Go deeper: AI Employee Guide
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- LESSON 2 -->
+        <div class="lesson reveal" data-lesson="2">
+            <div class="lesson-header">
+                <div class="lesson-check" onclick="event.stopPropagation(); toggleComplete(2)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 02</div>
+                    <div class="lesson-title">How to Talk to AI (Prompting That Works)</div>
+                    <div class="lesson-meta">14 min read</div>
+                </div>
+                <svg class="lesson-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="lesson-body">
+                <div class="lesson-content">
+
+                    <p>You type "write me a blog post" into ChatGPT. You get something that reads like it was written by a committee of robots who've never met a human. You think: "AI is overrated."</p>
+
+                    <p>The AI isn't the problem. Your prompt is.</p>
+
+                    <p>Prompting is how you communicate with AI. And like any communication, being vague gets you vague results. Being specific gets you exactly what you need.</p>
+
+                    <h2>Why most prompts fail</h2>
+
+                    <p>When you say "write me a blog post," the AI has to guess everything. What topic? What length? What tone? Who's reading it? What's the goal? It fills in all those blanks with the most generic possible answers.</p>
+
+                    <p>Think about it like ordering food. "Give me food" gets you whatever the kitchen feels like making. "A medium-rare ribeye with roasted vegetables, no mushrooms" gets you exactly what you want.</p>
+
+                    <p>Same principle. Same fix.</p>
+
+                    <h2>The STAR framework</h2>
+
+                    <p>Here's a simple system that works for any prompt. Four letters, four questions:</p>
+
+                    <div class="callout">
+                        <div class="callout-title">STAR Framework</div>
+                        <p><strong>S - Specific:</strong> What exactly do you want?<br>
+                        <strong>T - Task:</strong> What format should the output be?<br>
+                        <strong>A - Audience:</strong> Who is this for?<br>
+                        <strong>R - Result:</strong> What should the reader do or feel after?</p>
+                    </div>
+
+                    <p>Bad prompt: "Write me a blog post about AI."</p>
+
+                    <p>STAR prompt: "Write a 500-word blog post explaining why small businesses should start using AI for customer service. The audience is restaurant owners who aren't technical. The tone should be casual and practical. End with 3 specific tools they can try this week."</p>
+
+                    <p>The second prompt gives the AI everything it needs. No guessing. The output will be dramatically better.</p>
+
+                    <h2>5 prompt templates that work for any task</h2>
+
+                    <h3>1. The expert prompt</h3>
+                    <p>"You are a [specific expert]. I need you to [specific task]. The audience is [specific audience]. Keep it [tone/length constraints]."</p>
+                    <p>Example: "You are a senior copywriter. I need you to write 5 subject lines for an email promoting a 20% off sale on vintage sneakers. The audience is collectors aged 25-40. Keep each under 50 characters."</p>
+
+                    <h3>2. The comparison prompt</h3>
+                    <p>"Compare [thing A] and [thing B] for someone who needs to [specific use case]. Include pros, cons, and your recommendation."</p>
+                    <p>Example: "Compare Shopify and WooCommerce for someone selling 20-50 handmade jewelry pieces per month. Include monthly costs, ease of setup, and your recommendation."</p>
+
+                    <h3>3. The rewrite prompt</h3>
+                    <p>"Here's my draft: [paste text]. Rewrite it to be [more concise / more casual / more professional / clearer]. Keep the main points but [specific change]."</p>
+                    <p>Example: "Here's my product description: [text]. Rewrite it to be half the length. Keep the features but make it sound less corporate and more like a friend recommending something."</p>
+
+                    <h3>4. The step-by-step prompt</h3>
+                    <p>"Walk me through [process] step by step. Assume I'm [experience level]. Include [specific details you need]."</p>
+                    <p>Example: "Walk me through setting up a Shopify store step by step. Assume I've never built a website. Include what each setting does and which ones I can skip for now."</p>
+
+                    <h3>5. The extract prompt</h3>
+                    <p>"Read this [text/document]. Extract [specific information] and organize it as [format]."</p>
+                    <p>Example: "Read this research paper abstract. Extract the key finding, the methodology, the sample size, and any limitations. Organize it as bullet points."</p>
+
+                    <h2>The prompting mistake everyone makes</h2>
+
+                    <p>People write one prompt, get a mediocre result, and give up. That's like writing one draft of an essay and submitting it.</p>
+
+                    <p>Good prompting is iterative. You send a prompt, read the output, and then follow up:</p>
+
+                    <ul>
+                        <li>"Good, but make it shorter."</li>
+                        <li>"The tone is too formal. Make it sound like a text message."</li>
+                        <li>"Point 3 is wrong. Here's what actually happened: [correction]. Rewrite with that."</li>
+                        <li>"Now turn this into a tweet thread."</li>
+                    </ul>
+
+                    <p>The conversation IS the prompt. Your first message sets the direction. Your follow-ups steer it where you need.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Pro tip</div>
+                        <p>If you're getting bad outputs, add constraints. Length limits, format requirements, specific examples of what you want. Constraints don't limit AI. They focus it. The more specific your boundaries, the better the result.</p>
+                    </div>
+
+                    <h2>Context is everything</h2>
+
+                    <p>The biggest difference between someone who's "good at AI" and someone who thinks it's useless: context.</p>
+
+                    <p>Don't just ask for a marketing email. Paste in your previous emails that worked. Tell it your brand voice. Share who your customers are. Give it the product details.</p>
+
+                    <p>AI is only as good as the information you give it. You wouldn't hire a freelancer and say "just do marketing." You'd brief them. Brief the AI.</p>
+
+                    <div class="exercise">
+                        <div class="exercise-label">Hands-on exercise</div>
+                        <p>Take this bad prompt and rewrite it using the STAR framework:</p>
+                        <p>"Write me a social media post about my business."</p>
+                        <ol>
+                            <li>Add specifics: what business, what platform, what product/service</li>
+                            <li>Define the task: post format (carousel, single image caption, thread)</li>
+                            <li>Name your audience: age, interests, pain points</li>
+                            <li>State the result: what should someone do after reading (visit site, DM you, share)</li>
+                        </ol>
+                        <p>Run both prompts. Compare the outputs. Save this framework somewhere you'll see it.</p>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-label">What you learned</div>
+                        <ul>
+                            <li>Vague prompts get vague results. Specificity is the fix.</li>
+                            <li>The STAR framework (Specific, Task, Audience, Result) works for any prompt</li>
+                            <li>Prompting is a conversation, not a single message. Iterate on outputs.</li>
+                        </ul>
+                    </div>
+
+                    <a href="claude-code-course.html" class="go-deeper">
+                        Go deeper: Claude Code Course
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- LESSON 3 -->
+        <div class="lesson reveal" data-lesson="3">
+            <div class="lesson-header">
+                <div class="lesson-check" onclick="event.stopPropagation(); toggleComplete(3)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 03</div>
+                    <div class="lesson-title">The 5 AI Tools Everyone Should Know</div>
+                    <div class="lesson-meta">11 min read</div>
+                </div>
+                <svg class="lesson-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="lesson-body">
+                <div class="lesson-content">
+
+                    <p>There are hundreds of AI tools. New ones launch every day. Most of them are wrappers around the same technology with a different logo.</p>
+
+                    <p>You don't need hundreds. You need five. These are the ones that actually matter, what they're each best at, and when to use which.</p>
+
+                    <h2>1. ChatGPT: the generalist</h2>
+
+                    <p><strong>What it does:</strong> General-purpose text AI. Answers questions, writes drafts, brainstorms ideas, analyzes data, generates code. The Swiss Army knife.</p>
+
+                    <p><strong>Best at:</strong> Quick answers, creative brainstorming, conversational tasks, and anything where you need speed over precision. It has a huge context window and can handle images, files, and web browsing.</p>
+
+                    <p><strong>Honest take:</strong> ChatGPT is the default for a reason. It's fast, it's available everywhere, and it handles 80% of tasks well enough. But "well enough" is the key phrase. For specialized work, the other tools on this list often do better.</p>
+
+                    <p><strong>When to use it:</strong> Quick questions, first drafts, brainstorming, "I just need an answer fast."</p>
+
+                    <h2>2. Claude: the deep thinker</h2>
+
+                    <p><strong>What it does:</strong> Similar to ChatGPT but built differently. Made by Anthropic. Handles very long documents (entire books), writes more natural-sounding text, and follows complex instructions more carefully.</p>
+
+                    <p><strong>Best at:</strong> Long document analysis, nuanced writing, coding (especially with Claude Code for terminal access), and tasks that require following detailed instructions precisely. When you paste in a 40-page contract and say "find every clause about liability," Claude handles that well.</p>
+
+                    <p><strong>Honest take:</strong> Claude tends to produce writing that sounds less "AI" than other tools. It's also better at saying "I don't know" instead of making things up. The tradeoff is it can be more cautious, sometimes refusing tasks that other models will attempt.</p>
+
+                    <p><strong>When to use it:</strong> Long documents, careful analysis, coding projects, anything where you need the output to sound human.</p>
+
+                    <h2>3. Perplexity: the researcher</h2>
+
+                    <p><strong>What it does:</strong> AI-powered search engine. Instead of giving you a list of links, it reads the sources for you and gives you a synthesized answer with citations.</p>
+
+                    <p><strong>Best at:</strong> Research. Product comparisons. Finding current information. Fact-checking claims. Anything where you need real, sourced information instead of an LLM's best guess.</p>
+
+                    <p><strong>Honest take:</strong> This is the tool people sleep on the most. When you need actual facts (not AI-generated facts), Perplexity is the answer. It cites its sources so you can verify. ChatGPT and Claude will confidently give you outdated or wrong information. Perplexity checks.</p>
+
+                    <p><strong>When to use it:</strong> Research, fact-checking, "what's the best X for Y," current events, anything where accuracy matters more than creativity.</p>
+
+                    <h2>4. Midjourney / FLUX: the visual creators</h2>
+
+                    <p><strong>What they do:</strong> Generate images from text descriptions. Midjourney produces polished, artistic images. FLUX (open-source) creates realistic images and runs locally if you have the hardware.</p>
+
+                    <p><strong>Best at:</strong> Product mockups, social media visuals, concept art, brand imagery. Midjourney is the quality leader for artistic work. FLUX is the pick when you want free, local, and private.</p>
+
+                    <p><strong>Honest take:</strong> Image AI has gotten genuinely good. You can create product photos, social media graphics, and marketing visuals without hiring a designer for every small task. The limitation: hands still look weird, text in images is unreliable, and it can't perfectly replicate a specific style on command.</p>
+
+                    <p><strong>When to use it:</strong> Visual content, mockups, social media, any time you need an image and don't have one.</p>
+
+                    <h2>5. ElevenLabs / Kokoro: the voice</h2>
+
+                    <p><strong>What they do:</strong> Convert text to realistic-sounding speech. ElevenLabs is the quality leader (paid). Kokoro is open-source and runs locally for free.</p>
+
+                    <p><strong>Best at:</strong> Voiceovers for videos, audiobook creation, podcast intros, accessibility features. The voices sound human. Not perfect, but close enough that most listeners won't notice.</p>
+
+                    <p><strong>Honest take:</strong> ElevenLabs is expensive if you're doing high volume. Kokoro is free but requires some technical setup. For most people starting out, Kokoro is the move. You can generate hours of audio without paying anything.</p>
+
+                    <p><strong>When to use it:</strong> Video narration, content repurposing (turn blog posts into audio), any time you need a voice and don't want to record one.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">The real framework</div>
+                        <p>Don't pick a tool first and then find a use for it. Start with what you need to do, then pick the tool that does it best. Need research? Perplexity. Need a first draft? ChatGPT. Need to analyze a long document? Claude. Need visuals? Midjourney/FLUX. Need voice? ElevenLabs/Kokoro.</p>
+                    </div>
+
+                    <h2>What about everything else?</h2>
+
+                    <p>New AI tools launch daily. Most of them do one of these five things with a different interface. Some add value. Most don't. Before signing up for a new tool, ask: "Does this do something my current five tools can't?" If the answer is no, skip it.</p>
+
+                    <p>Your time is worth more than trying every new thing. Build skill with these five first. Branch out when you actually hit a limitation.</p>
+
+                    <div class="exercise">
+                        <div class="exercise-label">Hands-on exercise</div>
+                        <p>Pick one tool from this list that you haven't used yet. Not all five. One.</p>
+                        <ol>
+                            <li>Sign up (all have free tiers)</li>
+                            <li>Give it a real task. Not a test. Something you actually need to get done today.</li>
+                            <li>Spend 15 minutes with it. Use the STAR framework from Lesson 2 for your prompts.</li>
+                            <li>Rate the output honestly: Was it faster than doing it yourself? Was the quality good enough?</li>
+                        </ol>
+                        <p>That's how you learn tools. Not by reading about them. By using them for real work.</p>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-label">What you learned</div>
+                        <ul>
+                            <li>Five tools cover 90% of AI use cases: ChatGPT, Claude, Perplexity, Midjourney/FLUX, ElevenLabs/Kokoro</li>
+                            <li>Each tool has a specific strength. Use the right one for the task, not your default for everything.</li>
+                            <li>New tools are usually repackaged versions of these core capabilities. Don't chase every launch.</li>
+                        </ul>
+                    </div>
+
+                    <a href="starter-pack.html" class="go-deeper">
+                        Go deeper: The $0 AI Stack
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- LESSON 4 -->
+        <div class="lesson reveal" data-lesson="4">
+            <div class="lesson-header">
+                <div class="lesson-check" onclick="event.stopPropagation(); toggleComplete(4)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 04</div>
+                    <div class="lesson-title">Automate Your First Task in 15 Minutes</div>
+                    <div class="lesson-meta">10 min read</div>
+                </div>
+                <svg class="lesson-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="lesson-body">
+                <div class="lesson-content">
+
+                    <p>Automation sounds complicated. People hear the word and imagine writing code, setting up servers, connecting APIs. Sometimes it is that. But your first automation shouldn't be.</p>
+
+                    <p>Your first automation should take 15 minutes and save you time every single day.</p>
+
+                    <h2>Step 1: Find the repetitive task</h2>
+
+                    <p>Think about your day yesterday. What did you do more than once that felt mindless? Some common ones:</p>
+
+                    <ul>
+                        <li>Summarizing long emails or messages</li>
+                        <li>Writing similar replies to customers or clients</li>
+                        <li>Organizing files into folders</li>
+                        <li>Researching products or competitors</li>
+                        <li>Converting content from one format to another</li>
+                        <li>Posting the same update across multiple platforms</li>
+                    </ul>
+
+                    <p>Pick one. Just one. The smallest, most annoying one.</p>
+
+                    <h2>Step 2: Automate it with AI (the simple way)</h2>
+
+                    <p>The easiest automation doesn't require any code. It's a saved prompt. Seriously.</p>
+
+                    <p>Let's say you spend 10 minutes every morning reading through long emails and figuring out what needs your attention. Here's how to automate that:</p>
+
+                    <h3>The email summary automation</h3>
+
+                    <p>Open Claude or ChatGPT. Create a new conversation. Paste this prompt:</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Your saved prompt</div>
+                        <p>"I'm going to paste a batch of emails. For each one, give me: (1) who it's from, (2) what they want in one sentence, (3) urgency level (reply today / reply this week / no reply needed), (4) a suggested one-line reply if needed. Format as a table."</p>
+                    </div>
+
+                    <p>Now paste your emails. In 30 seconds, you get a prioritized list with draft replies. What used to take 10 minutes takes 1.</p>
+
+                    <p>That's 9 minutes saved daily. 45 minutes per week. 39 hours per year. From one saved prompt.</p>
+
+                    <h2>Step 3: Level up with real automation tools</h2>
+
+                    <p>Once you've tasted the saved-prompt method, you'll want the next level: automations that run without you opening a chat window.</p>
+
+                    <p>Two tools to know:</p>
+
+                    <p><strong>Apple Shortcuts / Android Routines:</strong> Already on your phone. You can create a shortcut that takes selected text, sends it to an AI API, and returns the result. No coding. Drag and drop.</p>
+
+                    <p><strong>n8n (free, self-hosted):</strong> This is the real thing. A visual automation builder where you connect triggers to actions. "When I get an email from a client, summarize it and send the summary to my Telegram." You build this by dragging boxes and connecting them. It runs on your own computer, free, forever.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Why n8n over Zapier</div>
+                        <p>Zapier charges per automation and per run. n8n is open-source. You host it yourself and run unlimited automations. For someone starting out, that difference is hundreds of dollars per year.</p>
+                    </div>
+
+                    <h2>Real examples that take 15 minutes</h2>
+
+                    <p>Here are automations real people set up in under 15 minutes:</p>
+
+                    <ul>
+                        <li><strong>Daily news digest:</strong> n8n checks 5 news sources every morning, AI summarizes the top stories, sends you a Telegram message with the highlights.</li>
+                        <li><strong>Customer FAQ bot:</strong> Paste your FAQ into a prompt template. When a customer asks a question, run it through the template. Get a personalized answer in seconds.</li>
+                        <li><strong>Content repurposing:</strong> Write a blog post. One prompt turns it into 5 tweet-sized posts, 1 LinkedIn post, and 3 Instagram captions. One piece of content becomes eight.</li>
+                        <li><strong>Meeting notes:</strong> Record a voice memo after every meeting. Whisper transcribes it. AI extracts action items and deadlines. Saves 15 minutes of note-writing per meeting.</li>
+                    </ul>
+
+                    <h2>The math that matters</h2>
+
+                    <p>People dismiss small automations because each one saves "only" a few minutes. But they compound.</p>
+
+                    <p>5 automations saving 10 minutes each = 50 minutes per day. That's over 4 hours per week. Over 200 hours per year. That's 5 full work weeks you get back.</p>
+
+                    <p>Start with one. Add another next week. In a month, you'll wonder how you ever worked without them.</p>
+
+                    <div class="exercise">
+                        <div class="exercise-label">Hands-on exercise</div>
+                        <ol>
+                            <li>Pick your most repetitive daily task (the one you just thought of while reading this).</li>
+                            <li>Write a saved prompt that handles it. Use the STAR framework from Lesson 2.</li>
+                            <li>Use it for real tomorrow morning. Time yourself: how long did the task take before vs. after?</li>
+                            <li>Calculate: if you save X minutes per day, how many hours is that per year?</li>
+                        </ol>
+                        <p>Write down that number. That's your motivation to keep going.</p>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-label">What you learned</div>
+                        <ul>
+                            <li>Your first automation is a saved prompt, not a coded system. Start simple.</li>
+                            <li>n8n lets you build real automations (visual, free, self-hosted) without writing code</li>
+                            <li>Small time savings compound. 5 automations x 10 minutes = 200+ hours per year.</li>
+                        </ul>
+                    </div>
+
+                    <a href="ai-chatbot-guide.html" class="go-deeper">
+                        Go deeper: AI Chatbot Setup Guide
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- LESSON 5 -->
+        <div class="lesson reveal" data-lesson="5">
+            <div class="lesson-header">
+                <div class="lesson-check" onclick="event.stopPropagation(); toggleComplete(5)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 05</div>
+                    <div class="lesson-title">Building Your AI Toolkit ($0/Month)</div>
+                    <div class="lesson-meta">13 min read</div>
+                </div>
+                <svg class="lesson-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="lesson-body">
+                <div class="lesson-content">
+
+                    <p>Most AI tutorials assume you're going to pay for everything. $20/month for ChatGPT Plus. $20/month for Claude Pro. $10/month for Midjourney. $30/month for ElevenLabs. Before you've done anything useful, you're spending $80/month.</p>
+
+                    <p>You don't need to spend a dollar.</p>
+
+                    <p>I run most of my AI stack on old laptops. The entire setup costs $0/month. Here's every tool, what it does, and how to set it up.</p>
+
+                    <h2>Ollama: your local AI brain</h2>
+
+                    <p><strong>What it is:</strong> An app that lets you run AI models on your own computer. No internet required. No API costs. No data sent to anyone.</p>
+
+                    <p><strong>Why it matters:</strong> When you run models locally, you're not paying per token. You're not waiting for servers. Your data stays on your machine. And you can run it 24/7 without watching a bill climb.</p>
+
+                    <p><strong>How to install it:</strong></p>
+
+                    <ol>
+                        <li>Go to <code>ollama.com</code></li>
+                        <li>Download the installer for your OS (Mac, Windows, or Linux)</li>
+                        <li>Install it. Takes about 2 minutes.</li>
+                        <li>Open your terminal and type: <code>ollama run llama3.2</code></li>
+                        <li>Wait for the model to download (about 2-4 GB depending on the model)</li>
+                        <li>Start chatting. Right there in your terminal.</li>
+                    </ol>
+
+                    <p>That's it. You now have an AI running locally on your machine. No account. No API key. No credit card.</p>
+
+                    <div class="callout">
+                        <div class="callout-title">Which model to pick</div>
+                        <p>Start with <code>llama3.2</code> (3B parameters). It runs on almost any modern computer. If you have a decent GPU (8GB+ VRAM), try <code>llama3.1:8b</code> for better quality. If you have a Mac with Apple Silicon (M1/M2/M3/M4), you're in luck. These chips handle local AI really well.</p>
+                    </div>
+
+                    <h2>n8n: your automation engine</h2>
+
+                    <p><strong>What it is:</strong> A visual workflow automation tool. Think Zapier, but free and self-hosted. You build automations by connecting blocks: triggers, actions, AI nodes, database reads, HTTP requests.</p>
+
+                    <p><strong>Why it matters:</strong> This is what turns AI from "a thing you chat with" into "a thing that works for you while you sleep." Email summaries that run every morning. Content that gets rewritten and posted automatically. Data that gets scraped, processed, and organized without you touching it.</p>
+
+                    <p><strong>How to install it:</strong></p>
+
+                    <ol>
+                        <li>Make sure you have Node.js installed (download from <code>nodejs.org</code>)</li>
+                        <li>Open your terminal</li>
+                        <li>Run: <code>npx n8n</code></li>
+                        <li>Open your browser to <code>localhost:5678</code></li>
+                        <li>You're in. Start building workflows.</li>
+                    </ol>
+
+                    <p>n8n connects to everything: Gmail, Telegram, Slack, Google Sheets, databases, AI models, APIs. The free version has zero limitations on functionality. You just host it yourself.</p>
+
+                    <h2>Obsidian: your knowledge base</h2>
+
+                    <p><strong>What it is:</strong> A note-taking app that stores everything as plain text files on your computer. No cloud lock-in. Your notes are yours forever.</p>
+
+                    <p><strong>Why it matters:</strong> Every AI session generates useful information. Prompts that worked. Outputs you want to keep. Templates you built. Research findings. If you don't capture it, you'll re-do the same work next month. Obsidian is where you store everything AI-related so you can find it later.</p>
+
+                    <p><strong>The AI connection:</strong> Obsidian has community plugins that let you chat with AI directly in your notes. You can highlight text, right-click, and get a summary, translation, or rewrite without leaving the app. Your notes become an AI-powered workspace.</p>
+
+                    <p><strong>How to install it:</strong></p>
+
+                    <ol>
+                        <li>Go to <code>obsidian.md</code></li>
+                        <li>Download and install</li>
+                        <li>Create a vault (that's just a folder on your computer)</li>
+                        <li>Start writing in Markdown. If you don't know Markdown, it takes 5 minutes to learn the basics.</li>
+                    </ol>
+
+                    <div class="callout">
+                        <div class="callout-title">Pro setup</div>
+                        <p>Create a folder structure: <code>/prompts</code> for saved prompts, <code>/outputs</code> for AI-generated content worth keeping, <code>/research</code> for findings, <code>/templates</code> for reusable formats. In a month, you'll have a personal AI library that's more useful than any course.</p>
+                    </div>
+
+                    <h2>Kokoro: your free voice engine</h2>
+
+                    <p><strong>What it is:</strong> An open-source text-to-speech model. You give it text, it gives you natural-sounding audio. Runs locally. Sounds better than you'd expect from something free.</p>
+
+                    <p><strong>Why it matters:</strong> Content repurposing. Turn your blog posts into audio. Add narration to videos. Create podcast-style content without recording anything. If you're building content, voice output turns one piece into many formats.</p>
+
+                    <p><strong>How it fits:</strong> Kokoro runs through Python or through a web interface. You can connect it to n8n so your automations have voice output. Write a blog post, n8n reformats it for audio, Kokoro generates the voice, and you have a ready-to-upload podcast episode. All automatic.</p>
+
+                    <h2>The complete $0 stack</h2>
+
+                    <p>Here's what you have when you put it all together:</p>
+
+                    <ul>
+                        <li><strong>Ollama</strong> for AI conversations and processing (replaces ChatGPT/Claude API costs)</li>
+                        <li><strong>n8n</strong> for automation (replaces Zapier at $0)</li>
+                        <li><strong>Obsidian</strong> for knowledge management (replaces Notion at $0)</li>
+                        <li><strong>Kokoro</strong> for text-to-speech (replaces ElevenLabs at $0)</li>
+                    </ul>
+
+                    <p>Total monthly cost: $0. Total capability: you can chat with AI, automate workflows, manage knowledge, and generate voice. That covers about 80% of what most people pay $100+/month for.</p>
+
+                    <h2>The tradeoffs (being honest)</h2>
+
+                    <p>Free doesn't mean no tradeoffs. Here's what you give up:</p>
+
+                    <ul>
+                        <li><strong>Quality gap:</strong> Local models (Ollama) are good but not as good as GPT-4o or Claude Opus. For most tasks, the difference doesn't matter. For complex coding or nuanced writing, it does.</li>
+                        <li><strong>Setup time:</strong> Each tool takes 15-30 minutes to install and configure. Paid tools are instant. But you do this setup once.</li>
+                        <li><strong>Hardware requirements:</strong> Running AI locally needs a decent computer. If your laptop is 10 years old, local models will be slow or won't run. Most computers from 2020+ work fine.</li>
+                        <li><strong>No phone apps:</strong> These are desktop tools. You can set up remote access, but it's not as simple as opening the ChatGPT app on your phone.</li>
+                    </ul>
+
+                    <p>The solution: use the free stack for 80% of your work. Keep a free ChatGPT/Claude account for the remaining 20% where you need maximum quality. Best of both worlds.</p>
+
+                    <div class="exercise">
+                        <div class="exercise-label">Hands-on exercise</div>
+                        <ol>
+                            <li>Install Ollama from <code>ollama.com</code> (2 minutes)</li>
+                            <li>Open your terminal and run: <code>ollama run llama3.2</code></li>
+                            <li>Wait for the download, then ask it something: "Explain how email works in 3 sentences."</li>
+                            <li>Now ask it something harder: "Write a Python script that renames all files in a folder to lowercase."</li>
+                            <li>Compare the responses to what ChatGPT gives you for the same prompts. Note where the local model does well and where it falls short.</li>
+                        </ol>
+                        <p>You just ran AI on your own hardware. No one else saw your data. No one charged you. That's the foundation of everything else in this course.</p>
+                    </div>
+
+                    <div class="summary">
+                        <div class="summary-label">What you learned</div>
+                        <ul>
+                            <li>A complete AI stack (chat, automation, notes, voice) can run at $0/month using Ollama, n8n, Obsidian, and Kokoro</li>
+                            <li>Local AI keeps your data private and eliminates API costs, with tradeoffs in quality and setup time</li>
+                            <li>The best approach: free stack for daily work, free tiers of paid tools for the 20% that needs maximum quality</li>
+                        </ul>
+                    </div>
+
+                    <a href="ai-employee-guide.html" class="go-deeper">
+                        Go deeper: AI Employee Guide
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- LOCKED LESSONS 6-10 -->
+        <div class="lesson locked reveal" data-lesson="6">
+            <div class="lesson-header">
+                <div class="lesson-check" style="opacity: 0.3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 06</div>
+                    <div class="lesson-title">Understanding AI Models (When to Use Which)</div>
+                    <div class="lesson-meta">Model sizes, parameters, context windows. How to pick the right model for the task.</div>
+                </div>
+                <span class="locked-badge">Coming soon</span>
+            </div>
+        </div>
+
+        <div class="lesson locked reveal" data-lesson="7">
+            <div class="lesson-header">
+                <div class="lesson-check" style="opacity: 0.3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 07</div>
+                    <div class="lesson-title">AI Ethics and Limitations (The Honest Version)</div>
+                    <div class="lesson-meta">Bias, privacy, environmental cost, job displacement. No corporate talking points.</div>
+                </div>
+                <span class="locked-badge">Coming soon</span>
+            </div>
+        </div>
+
+        <div class="lesson locked reveal" data-lesson="8">
+            <div class="lesson-header">
+                <div class="lesson-check" style="opacity: 0.3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 08</div>
+                    <div class="lesson-title">Setting Up Local AI on Any Computer</div>
+                    <div class="lesson-meta">Full walkthrough: GPU detection, model selection, web UI setup, connecting to other tools.</div>
+                </div>
+                <span class="locked-badge">Coming soon</span>
+            </div>
+        </div>
+
+        <div class="lesson locked reveal" data-lesson="9">
+            <div class="lesson-header">
+                <div class="lesson-check" style="opacity: 0.3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 09</div>
+                    <div class="lesson-title">Your First AI Project (Step by Step)</div>
+                    <div class="lesson-meta">Build a complete project from scratch: choose a problem, pick tools, ship something real.</div>
+                </div>
+                <span class="locked-badge">Coming soon</span>
+            </div>
+        </div>
+
+        <div class="lesson locked reveal" data-lesson="10">
+            <div class="lesson-header">
+                <div class="lesson-check" style="opacity: 0.3;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <div class="lesson-info">
+                    <div class="lesson-number">LESSON 10</div>
+                    <div class="lesson-title">Where to Go Next (Choosing Your Path)</div>
+                    <div class="lesson-meta">Creator track, business track, or technical track. Which one fits you and what to learn next.</div>
+                </div>
+                <span class="locked-badge">Coming soon</span>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <!-- TRACK 2: CREATORS -->
+    <div class="track-panel" id="track-creators">
+        <div class="coming-soon-track">
+        <h2>AI for Creators</h2>
+        <p class="track-desc">How to use AI for content creation, video, design, and building an audience. Coming soon.</p>
+
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">01</span>
+            <div>
+                <div class="coming-lesson-title">AI-Powered Content Workflow</div>
+                <div class="coming-lesson-desc">From idea to published post in 30 minutes using AI at every step.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">02</span>
+            <div>
+                <div class="coming-lesson-title">AI Video: From Script to Screen</div>
+                <div class="coming-lesson-desc">Veo3, Kling, CapCut. What works, what doesn't, and how to make it look professional.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">03</span>
+            <div>
+                <div class="coming-lesson-title">AI Image Generation for Non-Designers</div>
+                <div class="coming-lesson-desc">Midjourney, FLUX, and prompt techniques that produce usable brand visuals.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">04</span>
+            <div>
+                <div class="coming-lesson-title">Repurposing: One Piece, Eight Formats</div>
+                <div class="coming-lesson-desc">Turn a blog post into tweets, reels, carousels, audio, and email using AI.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">05</span>
+            <div>
+                <div class="coming-lesson-title">Building a Content System That Runs Without You</div>
+                <div class="coming-lesson-desc">Automation workflows for scheduling, formatting, and publishing content.</div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- TRACK 3: BUSINESS -->
+    <div class="track-panel" id="track-business">
+        <div class="coming-soon-track">
+        <h2>AI for Business</h2>
+        <p class="track-desc">Using AI to run a business: customer service, operations, sales, and making money with AI tools. Coming soon.</p>
+
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">01</span>
+            <div>
+                <div class="coming-lesson-title">AI Customer Service That Doesn't Suck</div>
+                <div class="coming-lesson-desc">Build a chatbot that actually answers questions instead of frustrating people.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">02</span>
+            <div>
+                <div class="coming-lesson-title">Product Research With AI</div>
+                <div class="coming-lesson-desc">Find winning products using AI-powered scraping and trend analysis.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">03</span>
+            <div>
+                <div class="coming-lesson-title">Selling AI Services to Local Businesses</div>
+                <div class="coming-lesson-desc">Chatbots, automation, content. What businesses will pay for and how to pitch it.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">04</span>
+            <div>
+                <div class="coming-lesson-title">AI-Powered Email and Sales Funnels</div>
+                <div class="coming-lesson-desc">Write sequences, segment audiences, and personalize at scale. Free tools only.</div>
+            </div>
+        </div>
+        <div class="coming-lesson">
+            <span class="coming-lesson-num">05</span>
+            <div>
+                <div class="coming-lesson-title">Building Digital Products With AI</div>
+                <div class="coming-lesson-desc">Ebooks, courses, templates, tools. How to create and sell digital products using AI.</div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Bottom section -->
+    <div class="bottom-section">
+
+        <!-- Email capture -->
+        <div class="bottom-card">
+        <h3>Get the $0 AI Stack checklist</h3>
+        <p>Every free tool from Lesson 5, organized into a one-page checklist with install links. Sent to your inbox.</p>
+        <div id="emailForm">
+            <div class="email-form">
+                <input type="email" class="email-input" id="emailInput" placeholder="your@email.com">
+                <button class="email-btn" onclick="captureEmail()">Send</button>
+            </div>
+        </div>
+        <div class="email-success" id="emailSuccess">Sent. Check your inbox.</div>
+        </div>
+
+        <!-- Free tools -->
+        <div class="bottom-card">
+        <h3>Free tools</h3>
+        <p>Things we built that cost nothing to use.</p>
+        <ul class="tool-links">
+            <li><a href="lumina.html"><span class="dot"></span>Music Studio</a></li>
+            <li><a href="budget-template.html"><span class="dot"></span>Budget Calculator</a></li>
+            <li><a href="starter-pack.html"><span class="dot"></span>AI Starter Pack</a></li>
+        </ul>
+        </div>
+
+        <!-- Product spotlight -->
+        <div class="bottom-card">
+        <h3>Just launched</h3>
+        <div class="spotlight" id="spotlight">
+            <div class="spotlight-tag">NEW PRODUCT</div>
+            <div class="spotlight-name">Claude Code Course</div>
+            <div class="spotlight-desc">Terminal-first AI development. Build real projects with Claude as your copilot.</div>
+            <a href="claude-code-course.html" class="spotlight-link">Check it out</a>
+        </div>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 Behike &nbsp;&middot;&nbsp; <a href="terms.html">Terms</a> &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy</a> &nbsp;&middot;&nbsp; <a href="index.html">Store</a>
+    </footer>
+
+    <script>
+        // ── State ──
+        const TOTAL_LESSONS = 5;
+        let completed = JSON.parse(localStorage.getItem('behike-learn-completed') || '[]');
+
+        // ── Init ──
+        function init() {
+        completed.forEach(n => {
+            const el = document.querySelector(`.lesson[data-lesson="${n}"]`);
+            if (el) el.classList.add('completed');
+        });
+        updateProgress();
+
+        // Check email capture status
+        if (localStorage.getItem('behike-learn-email')) {
+            document.getElementById('emailForm').style.display = 'none';
+            document.getElementById('emailSuccess').style.display = 'block';
+        }
+        }
+
+        // ── Toggle lesson expand ──
+        document.querySelectorAll('.lesson-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const lesson = this.closest('.lesson');
+            if (lesson.classList.contains('locked')) return;
+            lesson.classList.toggle('open');
+        });
+        });
+
+        // ── Toggle complete ──
+        function toggleComplete(n) {
+        const idx = completed.indexOf(n);
+        if (idx > -1) {
+            completed.splice(idx, 1);
+        } else {
+            completed.push(n);
+        }
+        localStorage.setItem('behike-learn-completed', JSON.stringify(completed));
+
+        const el = document.querySelector(`.lesson[data-lesson="${n}"]`);
+        if (el) el.classList.toggle('completed');
+        updateProgress();
+        }
+
+        // ── Progress bar ──
+        function updateProgress() {
+        const pct = (completed.length / TOTAL_LESSONS) * 100;
+        document.getElementById('progressBar').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = completed.length + ' / ' + TOTAL_LESSONS + ' complete';
+        }
+
+        // ── Track switching ──
+        document.querySelectorAll('.track-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.track-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.track-panel').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('track-' + this.dataset.track).classList.add('active');
+        });
+        });
+
+        // ── Email capture ──
+        function captureEmail() {
+        const email = document.getElementById('emailInput').value.trim();
+        if (!email || !email.includes('@')) return;
+        localStorage.setItem('behike-learn-email', email);
+        document.getElementById('emailForm').style.display = 'none';
+        document.getElementById('emailSuccess').style.display = 'block';
+        }
+
+        // ── Scroll reveal ──
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => observer.observe(el));
+
+        // ── Product spotlight rotation ──
+        const spotlights = [
+        { tag: 'NEW PRODUCT', name: 'Claude Code Course', desc: 'Terminal-first AI development. Build real projects with Claude as your copilot.', link: 'claude-code-course.html' },
+        { tag: 'POPULAR', name: 'AI Employee Guide', desc: 'Run AI on old laptops. Cut your API costs from $200/month to $0.', link: 'ai-employee-guide.html' },
+        { tag: 'GUIDE', name: 'AI Chatbot Setup', desc: 'Build and deploy a custom AI chatbot for your business. Step by step.', link: 'ai-chatbot-guide.html' },
+        { tag: 'BUNDLE', name: 'Content Empire Kit', desc: 'Templates, scripts, and workflows for AI-powered content creation.', link: 'content-empire-kit.html' }
+        ];
+
+        let spotlightIdx = 0;
+        setInterval(() => {
+        spotlightIdx = (spotlightIdx + 1) % spotlights.length;
+        const s = spotlights[spotlightIdx];
+        const el = document.getElementById('spotlight');
+        el.style.opacity = 0;
+        setTimeout(() => {
+            el.innerHTML = `
+                <div class="spotlight-tag">${s.tag}</div>
+                <div class="spotlight-name">${s.name}</div>
+                <div class="spotlight-desc">${s.desc}</div>
+                <a href="${s.link}" class="spotlight-link">Check it out</a>
+            `;
+            el.style.opacity = 1;
+        }, 300);
+        }, 8000);
+
+        init();
+    </script>
+
+    <script src="settings-widget.js"></script>
+
+</body>
+</html>

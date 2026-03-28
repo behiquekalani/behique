@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Calendar - Behike Command</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#666;--accent:#0066ff;--success:#00c853;--warn:#ff9800;--danger:#ff4444;--ig:#e1306c;--yt:#ff0000;--x:#1da1f2;--tk:#000;--email:#c9a84c}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+@media(max-width:800px){.app{grid-template-columns:1fr}}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:20px;overflow-y:auto}
+@media(max-width:800px){.sidebar{display:none}}
+.sidebar h2{font-size:1em;font-weight:700;margin-bottom:16px;letter-spacing:-0.5px}
+.sidebar h2 span{color:var(--accent)}
+
+.platform-filter{margin-bottom:20px}
+.pf-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:.85em;transition:background .15s;margin-bottom:2px}
+.pf-item:hover{background:rgba(255,255,255,.05)}
+.pf-item.active{background:rgba(0,102,255,.1)}
+.pf-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pf-item .count{margin-left:auto;color:var(--muted);font-size:.75em}
+
+.stats-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:16px}
+.stats-box h3{font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.stat-line{display:flex;justify-content:space-between;font-size:.8em;padding:4px 0}
+.stat-line .val{font-weight:600}
+
+.add-btn{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:.9em;font-weight:600;cursor:pointer;margin-top:16px}
+
+/* Main */
+.main{padding:20px;overflow-y:auto}
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.main-header h1{font-size:1.4em;font-weight:700}
+.view-toggle{display:flex;gap:4px}
+.view-toggle button{padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:.8em;font-family:inherit}
+.view-toggle button.active{border-color:var(--accent);color:var(--accent)}
+
+/* Calendar grid */
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px}
+.cal-header span{text-align:center;font-size:.7em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:8px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day{background:var(--surface);border:1px solid var(--border);border-radius:8px;min-height:100px;padding:8px;cursor:pointer;transition:border-color .15s}
+.cal-day:hover{border-color:var(--accent)}
+.cal-day.today{border-color:var(--accent);background:rgba(0,102,255,.03)}
+.cal-day.empty{background:transparent;border-color:transparent;cursor:default}
+.cal-day .day-num{font-size:.75em;color:var(--muted);margin-bottom:4px}
+.cal-day.today .day-num{color:var(--accent);font-weight:700}
+.cal-day .posts{display:flex;flex-direction:column;gap:2px}
+.cal-post{font-size:.65em;padding:3px 6px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.cal-post.ig{background:rgba(225,48,108,.15);color:var(--ig)}
+.cal-post.yt{background:rgba(255,0,0,.15);color:var(--yt)}
+.cal-post.x{background:rgba(29,161,242,.15);color:var(--x)}
+.cal-post.tk{background:rgba(255,255,255,.08);color:var(--text)}
+.cal-post.email{background:rgba(201,168,76,.15);color:var(--email)}
+.cal-post.done{opacity:.5;text-decoration:line-through}
+
+/* List view */
+.list-view{display:none}
+.list-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;transition:all .15s}
+.list-item:hover{border-color:var(--accent)}
+.list-item .platform-badge{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.7em;font-weight:700;flex-shrink:0}
+.list-item .platform-badge.ig{background:var(--ig);color:#fff}
+.list-item .platform-badge.yt{background:var(--yt);color:#fff}
+.list-item .platform-badge.x{background:var(--x);color:#fff}
+.list-item .platform-badge.tk{background:#333;color:#fff}
+.list-item .platform-badge.email{background:var(--email);color:#000}
+.list-item .info{flex:1;min-width:0}
+.list-item .info .title{font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .info .meta{font-size:.7em;color:var(--muted);margin-top:2px}
+.list-item .status{font-size:.65em;padding:3px 8px;border-radius:8px;text-transform:uppercase;letter-spacing:.5px}
+.list-item .status.draft{background:rgba(255,152,0,.15);color:var(--warn)}
+.list-item .status.ready{background:rgba(0,200,83,.15);color:var(--success)}
+.list-item .status.posted{background:rgba(0,102,255,.15);color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <h2>Content <span>Calendar</span></h2>
+    <div class="platform-filter" id="filters"></div>
+    <div class="stats-box">
+      <h3>This Week</h3>
+      <div id="weekStats"></div>
+    </div>
+    <div class="stats-box" style="margin-top:10px">
+      <h3>This Month</h3>
+      <div id="monthStats"></div>
+    </div>
+    <button class="add-btn" onclick="addPost()">+ Add Content</button>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <h1 id="monthTitle">March 2026</h1>
+      <div class="view-toggle">
+        <button class="active" onclick="setView('calendar',this)">Calendar</button>
+        <button onclick="setView('list',this)">List</button>
+      </div>
+    </div>
+    <div id="calendarView">
+      <div class="cal-header"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <div class="list-view" id="listView"></div>
+  </div>
+</div>
+
+<script>
+const PLATFORMS={
+  ig:{name:'Instagram',color:'#e1306c',label:'IG'},
+  yt:{name:'YouTube',color:'#ff0000',label:'YT'},
+  x:{name:'X / Twitter',color:'#1da1f2',label:'X'},
+  tk:{name:'TikTok',color:'#fff',label:'TK'},
+  email:{name:'Email',color:'#c9a84c',label:'EM'}
+};
+
+// Content data (from master-content-calendar.md)
+let posts=JSON.parse(localStorage.getItem('behike_calendar')||'null')||[
+  // Week 1
+  {date:'2026-03-24',platform:'ig',title:'The $0 AI Employee (how I replaced 3 tasks)',status:'ready',type:'carousel'},
+  {date:'2026-03-24',platform:'x',title:'Thread: 5 AI tools I use daily (all free)',status:'ready',type:'thread'},
+  {date:'2026-03-25',platform:'ig',title:'Behind the scenes: My 3-computer AI setup',status:'ready',type:'reel'},
+  {date:'2026-03-25',platform:'yt',title:'I Built an AI Employee for $0/Month',status:'ready',type:'video'},
+  {date:'2026-03-26',platform:'ig',title:'Budget template launch post',status:'ready',type:'single'},
+  {date:'2026-03-26',platform:'email',title:'Welcome email sequence starts',status:'ready',type:'email'},
+  {date:'2026-03-27',platform:'ig',title:'Why I left my engineering degree for this',status:'ready',type:'carousel'},
+  {date:'2026-03-27',platform:'tk',title:'POV: Your AI agent works while you sleep',status:'draft',type:'reel'},
+  {date:'2026-03-28',platform:'ig',title:'FREE: AI Safety Checklist (link in bio)',status:'ready',type:'single'},
+  {date:'2026-03-28',platform:'x',title:'Thread: The real cost of AI tools in 2026',status:'ready',type:'thread'},
+  {date:'2026-03-29',platform:'ig',title:'Your data is not safe (here is how to fix it)',status:'ready',type:'carousel'},
+  {date:'2026-03-30',platform:'ig',title:'Sunday reset: weekly review post',status:'draft',type:'single'},
+  // Week 2
+  {date:'2026-03-31',platform:'ig',title:'Product launch: AI Employee Guide ($19.99)',status:'ready',type:'carousel'},
+  {date:'2026-03-31',platform:'yt',title:'5 AI Tools That Will Replace Your Team',status:'ready',type:'video'},
+  {date:'2026-04-01',platform:'ig',title:'Student builds AI business from dorm room',status:'ready',type:'reel'},
+  {date:'2026-04-01',platform:'x',title:'Thread: From $0 to $10K with AI products',status:'ready',type:'thread'},
+  {date:'2026-04-02',platform:'ig',title:'The prompt that changed everything',status:'ready',type:'carousel'},
+  {date:'2026-04-02',platform:'email',title:'Email 2: The wall (soap opera sequence)',status:'ready',type:'email'},
+  {date:'2026-04-03',platform:'ig',title:'Cash Flow Dashboard demo video',status:'draft',type:'reel'},
+  {date:'2026-04-03',platform:'tk',title:'How to automate your entire business',status:'draft',type:'reel'},
+  {date:'2026-04-04',platform:'ig',title:'Friday wins: what we shipped this week',status:'draft',type:'single'},
+  {date:'2026-04-04',platform:'yt',title:'I Made $X This Week Selling Digital Products',status:'draft',type:'video'},
+  {date:'2026-04-05',platform:'ig',title:'Automation audit: find your 3 biggest time wasters',status:'ready',type:'carousel'},
+  {date:'2026-04-06',platform:'ig',title:'Sunday motivation: builder mindset',status:'draft',type:'single'},
+];
+
+function save(){localStorage.setItem('behike_calendar',JSON.stringify(posts))}
+
+let activeFilter='all';
+let currentView='calendar';
+
+function renderFilters(){
+  const el=document.getElementById('filters');
+  const counts={all:posts.length};
+  Object.keys(PLATFORMS).forEach(p=>counts[p]=posts.filter(x=>x.platform===p).length);
+
+  el.innerHTML=`<div class="pf-item ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">
+    <span class="dot" style="background:var(--accent)"></span>All Platforms<span class="count">${counts.all}</span></div>`;
+  Object.entries(PLATFORMS).forEach(([key,p])=>{
+    el.innerHTML+=`<div class="pf-item ${activeFilter===key?'active':''}" onclick="setFilter('${key}')">
+      <span class="dot" style="background:${p.color}"></span>${p.name}<span class="count">${counts[key]||0}</span></div>`;
+  });
+}
+
+function setFilter(f){activeFilter=f;renderFilters();renderCalendar();renderList()}
+
+function renderStats(){
+  const now=new Date();
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const monthEnd=new Date(now.getFullYear(),now.getMonth()+1,0);
+
+  function statsFor(start,end,el){
+    const filtered=posts.filter(p=>{
+      const d=new Date(p.date+'T12:00:00');
+      return d>=start&&d<=end;
+    });
+    const ready=filtered.filter(p=>p.status==='ready').length;
+    const draft=filtered.filter(p=>p.status==='draft').length;
+    const posted=filtered.filter(p=>p.status==='posted').length;
+    el.innerHTML=`
+      <div class="stat-line"><span>Total</span><span class="val">${filtered.length}</span></div>
+      <div class="stat-line"><span>Ready</span><span class="val" style="color:var(--success)">${ready}</span></div>
+      <div class="stat-line"><span>Draft</span><span class="val" style="color:var(--warn)">${draft}</span></div>
+      <div class="stat-line"><span>Posted</span><span class="val" style="color:var(--accent)">${posted}</span></div>`;
+  }
+  statsFor(weekStart,weekEnd,document.getElementById('weekStats'));
+  statsFor(monthStart,monthEnd,document.getElementById('monthStats'));
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  const now=new Date();
+  const year=2026,month=2; // March 2026
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const today=now.getDate();
+
+  // Empty cells
+  for(let i=0;i<firstDay;i++){
+    grid.innerHTML+='<div class="cal-day empty"></div>';
+  }
+
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`2026-03-${String(d).padStart(2,'0')}`;
+    const dayPosts=posts.filter(p=>p.date===dateStr&&(activeFilter==='all'||p.platform===activeFilter));
+    const isToday=d===today&&now.getMonth()===month;
+
+    const div=document.createElement('div');
+    div.className=`cal-day${isToday?' today':''}`;
+    div.innerHTML=`<div class="day-num">${d}</div><div class="posts">${
+      dayPosts.map(p=>`<div class="cal-post ${p.platform} ${p.status==='posted'?'done':''}" title="${p.title}">${PLATFORMS[p.platform]?.label||'?'} ${p.title.substring(0,20)}</div>`).join('')
+    }</div>`;
+    grid.appendChild(div);
+  }
+
+  // April overflow
+  const aprilPosts=posts.filter(p=>p.date.startsWith('2026-04'));
+  if(aprilPosts.length>0){
+    document.getElementById('monthTitle').textContent='March - April 2026';
+    const remaining=42-(firstDay+daysInMonth);
+    for(let d=1;d<=Math.min(remaining,6);d++){
+      const dateStr=`2026-04-${String(d).padStart(2,'0')}`;
+      const dayPosts2=posts.filter(p=>p.date===dateStr&&(activeFilter==='all'||p.platform===activeFilter));
+      const div=document.createElement('div');
+      div.className='cal-day';
+      div.innerHTML=`<div class="day-num" style="color:#444">Apr ${d}</div><div class="posts">${
+        dayPosts2.map(p=>`<div class="cal-post ${p.platform}">${PLATFORMS[p.platform]?.label||'?'} ${p.title.substring(0,20)}</div>`).join('')
+      }</div>`;
+      grid.appendChild(div);
+    }
+  }
+}
+
+function renderList(){
+  const el=document.getElementById('listView');
+  const filtered=activeFilter==='all'?posts:posts.filter(p=>p.platform===activeFilter);
+  const sorted=[...filtered].sort((a,b)=>a.date.localeCompare(b.date));
+
+  el.innerHTML=sorted.map(p=>`
+    <div class="list-item" onclick="toggleStatus(${posts.indexOf(p)})">
+      <div class="platform-badge ${p.platform}">${PLATFORMS[p.platform]?.label||'?'}</div>
+      <div class="info">
+        <div class="title">${p.title}</div>
+        <div class="meta">${p.date} | ${p.type}</div>
+      </div>
+      <span class="status ${p.status}">${p.status}</span>
+    </div>`).join('');
+}
+
+function toggleStatus(idx){
+  const states=['draft','ready','posted'];
+  const current=states.indexOf(posts[idx].status);
+  posts[idx].status=states[(current+1)%states.length];
+  save();render();
+}
+
+function setView(v,btn){
+  currentView=v;
+  document.getElementById('calendarView').style.display=v==='calendar'?'block':'none';
+  document.getElementById('listView').style.display=v==='list'?'block':'none';
+  document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function addPost(){
+  const title=prompt('Content title:');
+  if(!title)return;
+  const platform=prompt('Platform (ig/yt/x/tk/email):','ig');
+  const date=prompt('Date (YYYY-MM-DD):','2026-03-24');
+  if(title&&platform&&date){
+    posts.push({date,platform,title,status:'draft',type:'post'});
+    save();render();
+  }
+}
+
+function render(){renderFilters();renderCalendar();renderList();renderStats()}
+render();
+</script>
+</body>
+</html>

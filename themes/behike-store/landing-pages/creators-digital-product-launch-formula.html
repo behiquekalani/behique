@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Creator's Digital Product Launch Formula — $24.99</title>
+  <meta name="description" content="The complete sequence for launching a digital product to an audience. Pre-launch, waitlist strategy, email sequences, objection handling, post-launch analysis.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Animations */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+
+    /* ======= NAV ======= */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* ======= HERO ======= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(10, 132, 255, 0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      max-width: 780px;
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .hero-price strong {
+      color: var(--text);
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ======= SECTION BASE ======= */
+    section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* ======= PROBLEM ======= */
+    #problem .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) {
+      #problem .problem-grid { grid-template-columns: 1fr; }
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .problem-card .icon {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ======= SOLUTION ======= */
+    #solution .solution-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 56px;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      #solution .solution-body { grid-template-columns: 1fr; }
+    }
+    .solution-copy p {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .solution-copy p strong {
+      color: var(--text);
+    }
+    .solution-points {
+      list-style: none;
+    }
+    .solution-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+    }
+    .solution-points li:last-child { border-bottom: none; }
+    .solution-points li .check {
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ======= TOC ======= */
+    #toc {
+      background: var(--card-bg);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) {
+      .toc-grid { grid-template-columns: 1fr; }
+    }
+    .toc-item {
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .toc-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .toc-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .toc-item p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ======= CTA FINAL ======= */
+    #cta-final {
+      text-align: center;
+      padding: 120px 0;
+    }
+    #cta-final h2 {
+      max-width: 640px;
+      margin: 0 auto 20px;
+    }
+    #cta-final .section-body {
+      margin: 0 auto 40px;
+    }
+    .price-block {
+      margin-bottom: 32px;
+    }
+    .price-block .amount {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .price-block .currency {
+      font-size: 24px;
+      vertical-align: super;
+      color: var(--text-muted);
+    }
+    .price-block .note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .guarantee {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ======= FOOTER ======= */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-brand"><span>Behike</span> Store</div>
+      <a href="https://behike.gumroad.com/l/creators-digital-product-launch-formula" class="nav-cta" target="_blank">Get it for $24.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-label fade-up">Digital Product Guide</div>
+      <h1 class="fade-up delay-1">The Creator's Digital<br>Product Launch Formula</h1>
+      <p class="hero-sub fade-up delay-2">The complete sequence for launching a digital product to an audience. Pre-launch content, waitlist strategy, open cart timing, email sequences, objection handling, and post-launch analysis.</p>
+      <div class="hero-price fade-up delay-3">One-time payment. <strong>$24.99</strong></div>
+      <a href="https://behike.gumroad.com/l/creators-digital-product-launch-formula" class="cta-btn fade-up delay-3" target="_blank">Get the Formula</a>
+      <p class="hero-note fade-up delay-4">Instant PDF download. 5,700+ words. 12 chapters.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="section-label fade-up">The Problem</div>
+      <h2 class="fade-up">Most launches fail before the cart opens.</h2>
+      <p class="section-body fade-up">The creator who builds a product and announces it to a cold audience is doing the hardest version of this. Not because their product is bad. Because they skipped the mechanics that determine whether a launch works.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card fade-up">
+          <div class="icon">01</div>
+          <h3>No pre-launch content strategy</h3>
+          <p>You built in isolation, then announced. Your audience has not been thinking about this problem for weeks. They are cold.</p>
+        </div>
+        <div class="problem-card fade-up delay-1">
+          <div class="icon">02</div>
+          <h3>No waitlist</h3>
+          <p>You launched to your full audience at once, with no confirmed interest segment. Conversion rates are the same as sending to strangers.</p>
+        </div>
+        <div class="problem-card fade-up delay-2">
+          <div class="icon">03</div>
+          <h3>The email sequence is wrong</h3>
+          <p>Most launch email sequences either say too little or too much. The sequence in this guide does specific work at each stage.</p>
+        </div>
+        <div class="problem-card fade-up delay-3">
+          <div class="icon">04</div>
+          <h3>Objections were never addressed</h3>
+          <p>The buyer who was almost ready stopped because the hesitation they had was never named and answered directly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="container">
+      <div class="section-label fade-up">The Solution</div>
+      <h2 class="fade-up">A launch is a sequence. Follow it.</h2>
+
+      <div class="solution-body">
+        <div class="solution-copy fade-up">
+          <p>This guide gives you the <strong>complete mechanics of a digital product launch</strong>, in order. Each chapter covers a specific phase and the decisions that phase requires.</p>
+          <p>The pre-launch chapter tells you exactly what content to create and when, so your audience is primed before you say a single word about the product.</p>
+          <p>The waitlist chapter gives you the nurture sequence to run between opt-in and launch, so subscribers are warm when the cart opens.</p>
+          <p>The email sequence chapter gives you the 5-day structure, email by email, with subject line guidance and the specific job each email does.</p>
+          <p>This is not general advice about "being consistent" or "providing value." It is the specific mechanics, in the correct order, with the reasoning behind each decision.</p>
+        </div>
+        <ul class="solution-points fade-up delay-1">
+          <li><span class="check">+</span> Pre-launch content strategy (60-day breakdown)</li>
+          <li><span class="check">+</span> Waitlist page structure and nurture sequence</li>
+          <li><span class="check">+</span> Open cart timing and optimal launch windows</li>
+          <li><span class="check">+</span> Complete 5-day email sequence with subject lines</li>
+          <li><span class="check">+</span> The 4 buyer objections and how to address them</li>
+          <li><span class="check">+</span> Post-launch analytics framework</li>
+          <li><span class="check">+</span> Evergreen vs. launch model decision guide</li>
+          <li><span class="check">+</span> Pricing as positioning strategy</li>
+          <li><span class="check">+</span> Launch retrospective format</li>
+          <li><span class="check">+</span> 60-day pre-launch checklist</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section id="toc">
+    <div class="container">
+      <div class="section-label fade-up">What's Inside</div>
+      <h2 class="fade-up">12 chapters. Every phase of a launch.</h2>
+      <p class="section-body fade-up">Each chapter addresses a specific decision or moment in the launch sequence, with the mechanics and reasoning behind it.</p>
+
+      <div class="toc-grid">
+        <div class="toc-item fade-up">
+          <div class="toc-num">01</div>
+          <div>
+            <h4>The Pre-Launch Principle</h4>
+            <p>Why launches succeed or fail before the cart opens.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">02</div>
+          <div>
+            <h4>The Waitlist System</h4>
+            <p>Building a confirmed interest list before the launch.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-num">03</div>
+          <div>
+            <h4>Open Cart Timing</h4>
+            <p>When to open, how long to stay open, and why.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-num">04</div>
+          <div>
+            <h4>The Sales Email Sequence</h4>
+            <p>5-day structure with subject lines and email-by-email breakdown.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up">
+          <div class="toc-num">05</div>
+          <div>
+            <h4>Handling Objections</h4>
+            <p>The 4 objections every digital product faces and direct answers.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">06</div>
+          <div>
+            <h4>Post-Launch Analysis</h4>
+            <p>What to measure, how to interpret it, and the debrief format.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-num">07</div>
+          <div>
+            <h4>Evergreen vs. Launch Model</h4>
+            <p>Which model to start with and how to transition.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-num">08</div>
+          <div>
+            <h4>The Complete Launch Checklist</h4>
+            <p>60-day, 30-day, launch week, and post-launch checklists.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up">
+          <div class="toc-num">09</div>
+          <div>
+            <h4>Launch Psychology</h4>
+            <p>The buyer's decision window and why people buy again.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">10</div>
+          <div>
+            <h4>Common Launch Mistakes</h4>
+            <p>The mistakes that actually kill launches, with specific fixes.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-num">11</div>
+          <div>
+            <h4>Pricing Strategy</h4>
+            <p>Pricing as positioning. Three models and when to raise.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-num">12</div>
+          <div>
+            <h4>The Launch Retrospective</h4>
+            <p>The post-launch format that makes every next launch better.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta-final">
+    <div class="container">
+      <div class="section-label fade-up">Get It Now</div>
+      <h2 class="fade-up">The mechanics are the formula.<br>Follow the sequence.</h2>
+      <p class="section-body fade-up">The creator who runs this sequence three times will know more about their audience, their market, and their product than most creators accumulate in three years of posting without intention.</p>
+
+      <div class="price-block fade-up">
+        <div><span class="currency">$</span><span class="amount">24.99</span></div>
+        <div class="note">One-time. Instant PDF download.</div>
+      </div>
+
+      <a href="https://behike.gumroad.com/l/creators-digital-product-launch-formula" class="cta-btn fade-up delay-1" target="_blank">Get the Launch Formula</a>
+      <p class="guarantee fade-up delay-2">5,700+ words. 12 chapters. Instant download.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike Store &mdash; <a href="../storefront/index.html">Browse all products</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

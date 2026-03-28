@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIOS Control Panel</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:'Courier New',monospace;font-size:14px;padding:20px}
+h1{color:#00e5ff;font-size:22px;margin-bottom:4px}
+.subtitle{color:#555;font-size:12px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.card{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px}
+.card h2{color:#00e5ff;font-size:14px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;border-bottom:1px solid #1a1a1a;padding-bottom:8px}
+.full{grid-column:1/-1}
+button{background:#111;color:#00e5ff;border:1px solid #00e5ff;padding:6px 14px;border-radius:4px;cursor:pointer;font-family:inherit;font-size:12px;transition:all .15s}
+button:hover{background:#00e5ff;color:#0a0a0a}
+button.danger{border-color:#ff4444;color:#ff4444}
+button.danger:hover{background:#ff4444;color:#0a0a0a}
+button.success{border-color:#00ff88;color:#00ff88}
+button.success:hover{background:#00ff88;color:#0a0a0a}
+button:disabled{opacity:.3;cursor:not-allowed}
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0f0f0f}
+.svc-row:last-child{border-bottom:none}
+.svc-name{flex:1}
+.svc-port{color:#666;width:70px;text-align:center}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
+.dot.on{background:#00ff88;box-shadow:0 0 6px #00ff88}
+.dot.off{background:#ff4444;box-shadow:0 0 6px #ff4444}
+.dot.unknown{background:#666}
+.pipe-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0f0f0f}
+.pipe-row:last-child{border-bottom:none}
+.pipe-meta{color:#555;font-size:11px}
+.cron-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+.cron-item{display:flex;align-items:center;padding:4px 0;font-size:12px}
+.cron-item .name{flex:1}
+.cron-item .status{width:60px;text-align:center;font-size:11px}
+.active{color:#00ff88}
+.inactive{color:#ff4444}
+.fleet-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.fleet-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;padding:12px;text-align:center}
+.fleet-card h3{color:#00e5ff;font-size:13px;margin-bottom:6px}
+.fleet-card .role{color:#666;font-size:11px;text-transform:uppercase}
+.fleet-card .ip{color:#444;font-size:11px;margin-top:4px}
+.fleet-card .tasks{color:#888;font-size:11px;margin-top:6px}
+.quick-bar{display:flex;flex-wrap:wrap;gap:8px}
+.log-box{background:#050505;border:1px solid #1a1a1a;border-radius:4px;padding:10px;font-size:11px;line-height:1.6;max-height:320px;overflow-y:auto;white-space:pre-wrap;color:#888}
+.log-box .ts{color:#00e5ff}
+.log-box .err{color:#ff4444}
+.log-box .ok{color:#00ff88}
+.log-select{background:#111;color:#e0e0e0;border:1px solid #1a1a1a;padding:4px 8px;border-radius:4px;font-family:inherit;font-size:12px;margin-bottom:8px}
+footer{text-align:center;color:#333;font-size:11px;margin-top:20px;padding-top:12px;border-top:1px solid #111}
+.refresh-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.refresh-bar span{color:#333;font-size:11px}
+#countdown{color:#00e5ff}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.fleet-cards{grid-template-columns:1fr}.cron-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="refresh-bar">
+  <div><h1>BIOS Control Panel</h1><div class="subtitle">behike.co infrastructure command</div></div>
+  <span>Auto-refresh in <span id="countdown">30</span>s</span>
+</div>
+
+<div class="grid">
+
+  <!-- SERVICE CONTROL -->
+  <div class="card">
+    <h2>Service Control</h2>
+    <div id="services">
+      <div class="svc-row"><span class="dot unknown"></span><span class="svc-name">Loading...</span></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px">
+      <button class="success" onclick="svcAction('start-all')">Start All</button>
+      <button class="danger" onclick="svcAction('stop-all')">Stop All</button>
+      <button onclick="refreshStatus()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- PIPELINE RUNNER -->
+  <div class="card">
+    <h2>Pipeline Runner</h2>
+    <div id="pipelines"></div>
+  </div>
+
+  <!-- CRON STATUS -->
+  <div class="card">
+    <h2>Cron Status</h2>
+    <div class="cron-grid" id="crons"></div>
+  </div>
+
+  <!-- FLEET OVERVIEW -->
+  <div class="card">
+    <h2>Fleet Overview</h2>
+    <div class="fleet-cards" id="fleet"></div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="card full">
+    <h2>Quick Actions</h2>
+    <div class="quick-bar">
+      <button class="success" onclick="quickAction('full-pipeline')">Run Full Pipeline</button>
+      <button onclick="quickAction('briefing')">Generate Briefing</button>
+      <button onclick="quickAction('sync')">Sync Fleet</button>
+      <button onclick="quickAction('backup')">Backup Now</button>
+      <button onclick="quickAction('health')">Health Check</button>
+    </div>
+    <div id="quick-result" style="margin-top:8px;font-size:12px;color:#888"></div>
+  </div>
+
+  <!-- SYSTEM LOG -->
+  <div class="card full">
+    <h2>System Log</h2>
+    <select class="log-select" id="log-select" onchange="loadLog(this.value)">
+      <option value="daily">daily.log</option>
+      <option value="news">news.log</option>
+      <option value="social">social.log</option>
+      <option value="pr">pr.log</option>
+      <option value="conviction">conviction.log</option>
+      <option value="health">health.log</option>
+      <option value="cron">cron.log</option>
+      <option value="sync">sync.log</option>
+      <option value="market">market.log</option>
+      <option value="briefing">briefing.log</option>
+      <option value="backup">backup.log</option>
+      <option value="sales_digest">sales_digest.log</option>
+    </select>
+    <div class="log-box" id="log-output">Waiting for log data...</div>
+  </div>
+
+</div>
+
+<footer>BIOS Control Panel v1.0 | behike.co</footer>
+
+<script>
+const SERVICES = [
+  { name: 'Faces', port: 8091, type: 'http' },
+  { name: 'BIOS Dashboard', port: 8093, type: 'http' },
+  { name: 'VR War Room', port: 8092, type: 'http' },
+  { name: 'Storefront', port: 8080, type: 'http' },
+  { name: 'Webhook Server', port: 8097, type: 'script' }
+];
+
+const PIPELINES = [
+  { name: 'News Scraper', cmd: 'news_scraper', log: 'news' },
+  { name: 'Social Scraper', cmd: 'social_scraper', log: 'social' },
+  { name: 'PR Scraper', cmd: 'pr_scraper', log: 'pr' },
+  { name: 'Conviction Engine', cmd: 'conviction_engine', log: 'conviction' },
+  { name: 'Content Wiring', cmd: 'content_wiring', log: 'conviction' },
+  { name: 'Daily Briefing', cmd: 'daily_briefing', log: 'briefing' }
+];
+
+const CRON_JOBS = [
+  'news_fetcher.py', 'news_scraper.py', 'social_scraper.py', 'pr_scraper.py',
+  'polymarket_fetcher.py', 'reddit_signal.py', 'conviction_engine.py',
+  'content_wiring.py', 'run_all.py', 'daily_briefing.py', 'daily_report.py',
+  'health_check.py', 'fleet_sync.py', 'backup.py', 'sales_digest.py', 'scheduler.py'
+];
+
+const FLEET = {
+  ceiba:   { ip: '192.168.0.145', role: 'Command', jobs: ['dashboard', 'reports'], enabled: true },
+  cobo:    { ip: '192.168.0.151', role: 'Heavy Compute', jobs: ['reddit', 'twitter', 'polymarket', 'trends'], enabled: true },
+  naboria: { ip: '192.168.0.152', role: 'Processing', jobs: ['news', 'signals', 'daily report'], enabled: false }
+};
+
+let svcStatus = {};
+let cronData = {};
+let refreshTimer = 30;
+
+// --- Service Control ---
+function renderServices() {
+  const el = document.getElementById('services');
+  el.innerHTML = SERVICES.map(s => {
+    const st = svcStatus[s.port];
+    const dot = st === true ? 'on' : st === false ? 'off' : 'unknown';
+    return `<div class="svc-row">
+      <span class="dot ${dot}"></span>
+      <span class="svc-name">${s.name}</span>
+      <span class="svc-port">:${s.port}</span>
+      <button onclick="svcAction('start',${s.port})" ${st===true?'disabled':''}>Start</button>
+      <button class="danger" onclick="svcAction('stop',${s.port})" ${st!==true?'disabled':''} style="margin-left:4px">Stop</button>
+    </div>`;
+  }).join('');
+}
+
+async function checkPort(port) {
+  try {
+    const r = await fetch(`http://localhost:${port}/`, { mode: 'no-cors', signal: AbortSignal.timeout(2000) });
+    return true;
+  } catch { return false; }
+}
+
+async function refreshStatus() {
+  const checks = SERVICES.map(async s => {
+    svcStatus[s.port] = await checkPort(s.port);
+  });
+  await Promise.all(checks);
+  renderServices();
+}
+
+function svcAction(action, port) {
+  const msg = port ? `${action} service on :${port}` : action;
+  notify(`Sent: ${msg}. Connect launch.py API for live control.`);
+}
+
+// --- Pipeline ---
+function renderPipelines() {
+  const el = document.getElementById('pipelines');
+  el.innerHTML = PIPELINES.map((p, i) => {
+    const lastRun = localStorage.getItem(`pipe_${p.cmd}_time`) || 'never';
+    const lastResult = localStorage.getItem(`pipe_${p.cmd}_result`) || '-';
+    return `<div class="pipe-row">
+      <span>${p.name}</span>
+      <span class="pipe-meta">Last: ${lastRun} | ${lastResult}</span>
+      <button onclick="runPipeline(${i})">Run</button>
+    </div>`;
+  }).join('');
+}
+
+function runPipeline(idx) {
+  const p = PIPELINES[idx];
+  const now = new Date().toLocaleTimeString();
+  localStorage.setItem(`pipe_${p.cmd}_time`, now);
+  localStorage.setItem(`pipe_${p.cmd}_result`, 'triggered');
+  renderPipelines();
+  notify(`Triggered: ${p.name}. Check ${p.log}.log for output.`);
+}
+
+// --- Crons ---
+function renderCrons() {
+  const el = document.getElementById('crons');
+  el.innerHTML = CRON_JOBS.map(c => {
+    const st = cronData[c];
+    const cls = st === 'active' ? 'active' : st === 'inactive' ? 'inactive' : '';
+    const label = st || 'checking...';
+    return `<div class="cron-item">
+      <span class="dot ${st === 'active' ? 'on' : st === 'inactive' ? 'off' : 'unknown'}"></span>
+      <span class="name">${c}</span>
+      <span class="status ${cls}">${label}</span>
+    </div>`;
+  }).join('');
+}
+
+async function checkCrons() {
+  // Try to fetch cron status from a local data file
+  try {
+    const r = await fetch('./data/cron_status.json', { signal: AbortSignal.timeout(2000) });
+    if (r.ok) {
+      const data = await r.json();
+      CRON_JOBS.forEach(c => {
+        const entry = data[c] || data[c.replace('.py', '')];
+        cronData[c] = entry ? (entry.active ? 'active' : 'inactive') : 'inactive';
+      });
+      renderCrons();
+      return;
+    }
+  } catch {}
+  // Fallback: mark based on expected list
+  CRON_JOBS.forEach(c => { cronData[c] = 'unknown'; });
+  renderCrons();
+}
+
+// --- Fleet ---
+function renderFleet() {
+  const el = document.getElementById('fleet');
+  el.innerHTML = Object.entries(FLEET).map(([name, f]) => {
+    const ping = f.enabled ? 'checking...' : 'disabled';
+    return `<div class="fleet-card">
+      <span class="dot ${f.enabled ? 'unknown' : 'off'}" id="fleet-dot-${name}"></span>
+      <h3>${name}</h3>
+      <div class="role">${f.role}</div>
+      <div class="ip">${f.ip}</div>
+      <div class="tasks">${f.jobs.join(', ')}</div>
+      <div class="pipe-meta" id="fleet-ping-${name}">${ping}</div>
+    </div>`;
+  }).join('');
+  // Ping enabled machines
+  Object.entries(FLEET).forEach(async ([name, f]) => {
+    if (!f.enabled) return;
+    const ok = await checkPort(f === FLEET.ceiba ? 8093 : 9876);
+    const dot = document.getElementById(`fleet-dot-${name}`);
+    const label = document.getElementById(`fleet-ping-${name}`);
+    if (dot) dot.className = `dot ${ok ? 'on' : 'off'}`;
+    if (label) label.textContent = ok ? 'online' : 'unreachable';
+  });
+}
+
+// --- Quick Actions ---
+function quickAction(action) {
+  const el = document.getElementById('quick-result');
+  const now = new Date().toLocaleTimeString();
+  const messages = {
+    'full-pipeline': 'Full pipeline triggered. Monitor logs for progress.',
+    'briefing': 'Generating daily briefing...',
+    'sync': 'Fleet sync initiated across all nodes.',
+    'backup': 'Backup process started.',
+    'health': 'Running health check on all services...'
+  };
+  el.innerHTML = `<span style="color:#00e5ff">[${now}]</span> ${messages[action] || action}`;
+  // Attempt to call launch.py API endpoint
+  fetch(`./data/${action}.json`, { signal: AbortSignal.timeout(3000) }).catch(() => {});
+}
+
+// --- Logs ---
+async function loadLog(name) {
+  const el = document.getElementById('log-output');
+  el.textContent = 'Loading...';
+  try {
+    const r = await fetch(`../logs/${name}.log`, { signal: AbortSignal.timeout(3000) });
+    if (!r.ok) throw new Error(r.status);
+    const text = await r.text();
+    const lines = text.trim().split('\n');
+    const last20 = lines.slice(-20);
+    el.innerHTML = last20.map(line => {
+      let cls = '';
+      if (/error|fail|exception/i.test(line)) cls = 'err';
+      else if (/success|complete|ok|done/i.test(line)) cls = 'ok';
+      const tsMatch = line.match(/^(\[?\d{4}[-/]\d{2}[-/]\d{2}[T ]\d{2}:\d{2}[:\d]*\]?)/);
+      if (tsMatch) {
+        return `<span class="ts">${tsMatch[1]}</span><span class="${cls}">${line.slice(tsMatch[1].length)}</span>`;
+      }
+      return `<span class="${cls}">${line}</span>`;
+    }).join('\n');
+  } catch (e) {
+    el.textContent = `Could not load ${name}.log (${e.message}). Serve via launch.py to enable.`;
+  }
+}
+
+// --- Notify ---
+function notify(msg) {
+  const el = document.getElementById('quick-result');
+  const now = new Date().toLocaleTimeString();
+  el.innerHTML = `<span style="color:#00e5ff">[${now}]</span> ${msg}`;
+}
+
+// --- Auto-refresh ---
+function tick() {
+  refreshTimer--;
+  document.getElementById('countdown').textContent = refreshTimer;
+  if (refreshTimer <= 0) {
+    refreshTimer = 30;
+    refreshAll();
+  }
+}
+
+async function refreshAll() {
+  await refreshStatus();
+  checkCrons();
+  renderFleet();
+  renderPipelines();
+  loadLog(document.getElementById('log-select').value);
+}
+
+// --- Init ---
+renderServices();
+renderPipelines();
+renderCrons();
+renderFleet();
+refreshStatus();
+checkCrons();
+loadLog('daily');
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Digital Product Testing Framework — Behike</title>
+  <meta name="description" content="Stop building products nobody buys. A five-stage validation system for solopreneurs who want to test demand before spending weeks building.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid #1d1d1f;
+      padding: 16px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F5F5F7;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-tag {
+      font-size: 13px;
+      color: #6e6e73;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .product-badge {
+      display: inline-block;
+      background: #0A84FF20;
+      color: #0A84FF;
+      border: 1px solid #0A84FF40;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      margin-bottom: 32px;
+      letter-spacing: 0.3px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: #F5F5F7;
+    }
+    .hero h1 span {
+      color: #0A84FF;
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: #ababab;
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+    .price-label {
+      font-size: 13px;
+      color: #6e6e73;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .price-amount {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #F5F5F7;
+    }
+    .price-format {
+      font-size: 14px;
+      color: #6e6e73;
+    }
+    .cta-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      letter-spacing: -0.2px;
+    }
+    .cta-primary:hover { opacity: 0.88; }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #6e6e73;
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid #1d1d1f;
+      margin: 0;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .section p {
+      font-size: 18px;
+      color: #ababab;
+      line-height: 1.65;
+      max-width: 680px;
+    }
+    .section p + p {
+      margin-top: 16px;
+    }
+
+    /* STAGES */
+    .stages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2px;
+      background: #1d1d1f;
+      border: 1px solid #1d1d1f;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 40px;
+    }
+    .stage-item {
+      background: #0a0a0a;
+      padding: 32px;
+    }
+    .stage-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stage-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+    .stage-item p {
+      font-size: 14px;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+
+    /* OUTCOMES */
+    .outcomes-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid #1d1d1f;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .outcome-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 32px;
+      border-bottom: 1px solid #1d1d1f;
+    }
+    .outcome-row:last-child { border-bottom: none; }
+    .outcome-check {
+      color: #30D158;
+      font-size: 16px;
+      min-width: 20px;
+      padding-top: 2px;
+    }
+    .outcome-row p {
+      font-size: 16px;
+      color: #ababab;
+    }
+
+    /* CHAPTERS */
+    .chapters-section {
+      padding: 80px 0;
+      background: #050505;
+    }
+    .chapter-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid #1d1d1f;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 28px 32px;
+      border-bottom: 1px solid #1d1d1f;
+      transition: background 0.15s;
+    }
+    .chapter-item:last-child { border-bottom: none; }
+    .chapter-item:hover { background: #0a0a0a; }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      min-width: 24px;
+      padding-top: 2px;
+    }
+    .chapter-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+    .chapter-content p {
+      font-size: 14px;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+
+    /* FINAL CTA */
+    .cta-section {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .cta-section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .cta-section p {
+      font-size: 18px;
+      color: #ababab;
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid #1d1d1f;
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #6e6e73;
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 56px 0; }
+      .chapter-item { padding: 20px; }
+      .stage-item { padding: 24px; }
+      .outcome-row { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <span class="nav-tag">Digital Products</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="product-badge">PDF Guide, ~40 Pages</div>
+      <h1>Stop building products<br><span>nobody buys</span></h1>
+      <p class="hero-sub">
+        A five-stage validation system that tells you whether your product idea will earn money before you spend weeks building it.
+      </p>
+      <div class="price-block">
+        <span class="price-label">One-time purchase</span>
+        <span class="price-amount">$18.99</span>
+        <span class="price-format">PDF download, instant access</span>
+      </div>
+      <br>
+      <a href="#" class="cta-primary">Get the Framework</a>
+      <p class="hero-meta">Instant download. No subscription. No upsell.</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>The digital product graveyard<br>is full of good ideas.</h2>
+      <p>
+        Building before testing is how solopreneurs lose months. The product gets built, the launch email goes out, three people buy. Then it sits there. Most creators assume the idea was wrong and start a new one. Usually the idea was fine. The mistake was building without validating demand first.
+      </p>
+      <p>
+        Testing before building is not procrastination. It is the only practice that consistently produces products that earn. This framework makes the testing process explicit, fast, and repeatable.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- WHAT YOU GET -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">What You'll Walk Away With</div>
+      <h2>Everything you need to validate<br>before you build.</h2>
+      <div class="outcomes-list">
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>A five-stage testing system that moves from cheap fast signals to high-confidence validation.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>Clear criteria for what counts as validated demand versus wishful thinking.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>A presale process you can run in under a week, without a finished product.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>Signal analysis: how to read what your audience is telling you, even when they are not saying it directly.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>A decision framework for killing ideas cleanly, without emotional attachment and without losing momentum.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>The validation sprint structure: two weeks per idea, one decision at the end, repeat until you find what earns.</p>
+        </div>
+        <div class="outcome-row">
+          <span class="outcome-check">+</span>
+          <p>A 30-day plan for running your first validation sprint start to finish.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAGES -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="section-label">The System</div>
+      <h2>Five stages. One clear answer<br>before you build anything.</h2>
+      <div class="stages-grid">
+        <div class="stage-item">
+          <div class="stage-num">Stage 1</div>
+          <h3>Market Signal Audit</h3>
+          <p>Two to four hours. Check if existing products, communities, and spending behavior confirm the market exists.</p>
+        </div>
+        <div class="stage-item">
+          <div class="stage-num">Stage 2</div>
+          <h3>Problem Interviews</h3>
+          <p>Five to ten conversations with real potential buyers. Listen for specificity, not affirmation.</p>
+        </div>
+        <div class="stage-item">
+          <div class="stage-num">Stage 3</div>
+          <h3>Content Testing</h3>
+          <p>Publish one piece of content on the topic. Measure the response against your baseline.</p>
+        </div>
+        <div class="stage-item">
+          <div class="stage-num">Stage 4</div>
+          <h3>Survey with Price Testing</h3>
+          <p>Three to five questions. Measure urgency, prior spending behavior, and price sensitivity.</p>
+        </div>
+        <div class="stage-item">
+          <div class="stage-num">Stage 5</div>
+          <h3>Presale</h3>
+          <p>Offer the product before it is built. If people buy, demand is confirmed. If nobody buys, you have data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section class="chapters-section">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>Seven chapters. Built for decisions,<br>not for reading.</h2>
+      <div class="chapter-list">
+        <div class="chapter-item">
+          <span class="chapter-num">01</span>
+          <div class="chapter-content">
+            <h3>Why Most Product Ideas Fail Before Launch</h3>
+            <p>The difference between a problem people have and a problem they are actively paying to solve. Why inaction is the real competition.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">02</span>
+          <div class="chapter-content">
+            <h3>The Five Stages of Product Validation</h3>
+            <p>The full staged process from market audit through presale. When to stop and what each stage tells you.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">03</span>
+          <div class="chapter-content">
+            <h3>Reading Market Signals Without Overthinking Them</h3>
+            <p>The difference between strong signals, weak signals, and false signals. How to avoid confirmation bias in your own validation data.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">04</span>
+          <div class="chapter-content">
+            <h3>The Presale Playbook</h3>
+            <p>How to structure a presale, what pricing to use, what conversion rate counts as confirmation, and what to do when the presale fails.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">05</span>
+          <div class="chapter-content">
+            <h3>Killing Ideas Without Losing Momentum</h3>
+            <p>The kill criteria, the pivot questions to ask before killing, and how to document dead ideas so you stop revisiting them.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">06</span>
+          <div class="chapter-content">
+            <h3>Running Validation Sprints</h3>
+            <p>The two-week sprint structure. Day-by-day breakdown. How to run multiple sprints and build only the products that validate.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">07</span>
+          <div class="chapter-content">
+            <h3>Building Only What Already Wants to Exist</h3>
+            <p>The four dimensions of product-market fit for digital products. How testing compounds over time into faster, more accurate decisions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Test first.<br>Build what already wants to exist.</h2>
+      <p>Every hour spent testing before building is an hour you did not waste building the wrong thing.</p>
+      <div class="price-block">
+        <span class="price-label">One-time purchase</span>
+        <span class="price-amount">$18.99</span>
+        <span class="price-format">PDF, ~40 pages, instant download</span>
+      </div>
+      <br>
+      <a href="#" class="cta-primary">Get the Framework — $18.99</a>
+      <p class="hero-meta" style="margin-top:20px;">Instant download. No subscription.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026. Digital products for builders.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

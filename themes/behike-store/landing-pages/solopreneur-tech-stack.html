@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur's Tech Stack — Behike</title>
+  <meta name="description" content="The exact tools a one-person digital business needs. $0, $50, and $100/month tiers. No tool overload. Just what works.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a644;
+      --border: #1d1d1f;
+      --card-bg: #0a0a0a;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    .hero {
+      padding: 140px 0 100px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #F5F5F7 0%, #A1A1A6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+
+    .hero-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .hero-price span { color: var(--cta); }
+
+    .hero-price-note {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      padding: 18px 44px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--cta-hover); transform: translateY(-1px); }
+
+    .hero-guarantee {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    section { padding: 100px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 680px;
+      line-height: 1.65;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    .fade-in-delay-1 { transition-delay: 0.1s; }
+    .fade-in-delay-2 { transition-delay: 0.2s; }
+    .fade-in-delay-3 { transition-delay: 0.3s; }
+    .fade-in-delay-4 { transition-delay: 0.4s; }
+
+    .thesis-block {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-top: 48px;
+      max-width: 760px;
+    }
+
+    .thesis-block p {
+      font-size: 20px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.55;
+      letter-spacing: -0.2px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-item .stat-number {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-item .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .problem-card .icon {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.3px;
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 700px) {
+      .tier-grid { grid-template-columns: 1fr; }
+    }
+
+    .tier-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tier-card.featured {
+      border-color: var(--accent);
+    }
+
+    .tier-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .tier-card.t1::before { background: #636366; }
+    .tier-card.t2::before { background: var(--accent); }
+    .tier-card.t3::before { background: var(--cta); }
+
+    .tier-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .t1 .tier-label { color: #636366; }
+    .t2 .tier-label { color: var(--accent); }
+    .t3 .tier-label { color: var(--cta); }
+
+    .tier-price {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .tier-period {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 28px;
+    }
+
+    .tier-items {
+      list-style: none;
+    }
+
+    .tier-items li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tier-items li:last-child { border-bottom: none; }
+
+    .tier-items li strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .chapters-list {
+      margin-top: 60px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .chapters-list { grid-template-columns: 1fr; }
+    }
+
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      transition: border-color 0.2s;
+    }
+
+    .chapter-item:hover { border-color: #333; }
+
+    .chapter-number {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      min-width: 28px;
+      padding-top: 3px;
+    }
+
+    .chapter-content h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.2px;
+    }
+
+    .chapter-content p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .avoid-list {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .avoid-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid #FF453A;
+      border-radius: 12px;
+      padding: 24px 28px;
+    }
+
+    .avoid-item h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #FF453A;
+    }
+
+    .avoid-item p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .cta-section {
+      padding: 120px 0;
+      text-align: center;
+    }
+
+    .cta-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 80px 60px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 600px) {
+      .cta-box { padding: 48px 24px; }
+    }
+
+    .cta-box h2 {
+      font-size: clamp(32px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .cta-box p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .cta-price {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      margin-bottom: 8px;
+      color: var(--cta);
+    }
+
+    .cta-note {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 16px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer p { font-size: 13px; color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">Behike</a>
+      <a href="#buy" class="nav-cta">Get the Guide — $17.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="fade-in">
+        <span class="hero-eyebrow">Behike Digital Products</span>
+        <h1>The Solopreneur's<br>Tech Stack</h1>
+        <p class="hero-subtitle">The exact tools a one-person digital business needs. Nothing more. Built for the $0, $50, and $100 per month stages of growth.</p>
+        <div class="hero-price"><span>$17.99</span></div>
+        <p class="hero-price-note">PDF guide. Instant download. No subscription.</p>
+        <a href="#buy" class="btn-primary">Get Instant Access</a>
+        <p class="hero-guarantee">Instant download after purchase.</p>
+      </div>
+
+      <div class="thesis-block fade-in fade-in-delay-2">
+        <p>The goal of a solopreneur's tech stack is not to feel equipped. It is to remove friction between a good idea and a paying customer.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">What is inside</p>
+      <h2 class="section-title fade-in">Every tool category, every tier,<br>every decision explained.</h2>
+      <div class="stats-row">
+        <div class="stat-item fade-in fade-in-delay-1">
+          <div class="stat-number">10</div>
+          <div class="stat-label">Chapters covering every stack layer</div>
+        </div>
+        <div class="stat-item fade-in fade-in-delay-2">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Complete monthly budget tiers</div>
+        </div>
+        <div class="stat-item fade-in fade-in-delay-3">
+          <div class="stat-number">5K+</div>
+          <div class="stat-label">Words of framework and analysis</div>
+        </div>
+        <div class="stat-item fade-in fade-in-delay-4">
+          <div class="stat-number">$0</div>
+          <div class="stat-label">Minimum viable stack cost</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">The tool overload problem</p>
+      <h2 class="section-title fade-in">Adding tools is not the same as building a business.</h2>
+      <p class="section-body fade-in">Most solopreneurs have a tool problem that looks like a productivity problem. The fix is not a better system. It is fewer tools, chosen for the right reasons.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card fade-in fade-in-delay-1">
+          <div class="icon">01</div>
+          <h3>You are maintaining, not building</h3>
+          <p>When your stack has more tools than your business requires, you spend hours maintaining integrations instead of producing content or selling products.</p>
+        </div>
+        <div class="problem-card fade-in fade-in-delay-2">
+          <div class="icon">02</div>
+          <h3>You borrowed someone else's stack</h3>
+          <p>The tools a creator uses at $50K per month are not appropriate for a creator at $500 per month. Oversizing the stack creates overhead that does not match the stage.</p>
+        </div>
+        <div class="problem-card fade-in fade-in-delay-3">
+          <div class="icon">03</div>
+          <h3>You are optimizing before validating</h3>
+          <p>Spending two weeks evaluating email platforms before you have 100 subscribers is a form of procrastination that feels like preparation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">Table of contents</p>
+      <h2 class="section-title fade-in">What you get.</h2>
+      <p class="section-body fade-in">Ten chapters that cover every layer of the stack with specific tool recommendations, decision frameworks, and clear upgrade triggers.</p>
+
+      <div class="chapters-list">
+        <div class="chapter-item fade-in fade-in-delay-1">
+          <div class="chapter-number">01</div>
+          <div class="chapter-content">
+            <h4>The Tool Overload Problem</h4>
+            <p>Why tool FOMO is the most expensive form of procrastination, and how to audit your current stack in ten minutes.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-2">
+          <div class="chapter-number">02</div>
+          <div class="chapter-content">
+            <h4>The Minimal Viable Stack</h4>
+            <p>Five functions. Five tools. What every one-person digital business actually needs to operate.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-3">
+          <div class="chapter-number">03</div>
+          <div class="chapter-content">
+            <h4>Content Creation Tools</h4>
+            <p>Notion vs. Obsidian vs. Google Docs. CapCut vs. DaVinci Resolve. A clear decision framework for each.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-4">
+          <div class="chapter-number">04</div>
+          <div class="chapter-content">
+            <h4>Distribution Tools</h4>
+            <p>Why email is the only non-negotiable. ConvertKit vs. Beehiiv vs. Mailchimp. The platform decision matrix.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-1">
+          <div class="chapter-number">05</div>
+          <div class="chapter-content">
+            <h4>Product Delivery and Payment</h4>
+            <p>Gumroad, Lemon Squeezy, and Payhip compared. When to use Stripe direct. What the buyer experience looks like.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-2">
+          <div class="chapter-number">06</div>
+          <div class="chapter-content">
+            <h4>Automation and AI Tools</h4>
+            <p>Make vs. Zapier vs. n8n. Claude vs. ChatGPT. ElevenLabs, Midjourney, Perplexity. What each one actually does for you.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-3">
+          <div class="chapter-number">07</div>
+          <div class="chapter-content">
+            <h4>The $0, $50, and $100 Stack Tiers</h4>
+            <p>A complete stack recommendation for each revenue stage. What to use now and what to add when the business earns it.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-4">
+          <div class="chapter-number">08</div>
+          <div class="chapter-content">
+            <h4>What to Avoid and Why</h4>
+            <p>Tools with steep onboarding costs, lifetime deal traps, multiple tools doing the same job, and platforms that own your audience.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-1">
+          <div class="chapter-number">09</div>
+          <div class="chapter-content">
+            <h4>Building Your Stack Incrementally</h4>
+            <p>The decision trigger framework. When to upgrade vs. switch. How to integrate tools without becoming a full-time systems manager.</p>
+          </div>
+        </div>
+        <div class="chapter-item fade-in fade-in-delay-2">
+          <div class="chapter-number">10</div>
+          <div class="chapter-content">
+            <h4>The Long-Term Stack Philosophy</h4>
+            <p>Tools are rented infrastructure. The business you build using them is yours. How to think about the stack as it evolves.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIER COMPARISON -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">Stack tiers</p>
+      <h2 class="section-title fade-in">The right stack for where you are now.</h2>
+      <p class="section-body fade-in">Every tier is fully specified in the guide. This is a summary. The full version includes tool-by-tool rationale and upgrade triggers.</p>
+
+      <div class="tier-grid">
+        <div class="tier-card t1 fade-in fade-in-delay-1">
+          <div class="tier-label">Free Tier</div>
+          <div class="tier-price">$0</div>
+          <div class="tier-period">per month, for months 0-3</div>
+          <ul class="tier-items">
+            <li><strong>Writing:</strong> Google Docs</li>
+            <li><strong>Email:</strong> ConvertKit free</li>
+            <li><strong>Product:</strong> Gumroad (10% fee)</li>
+            <li><strong>Automation:</strong> Zapier free tier</li>
+            <li><strong>AI:</strong> Claude or ChatGPT free</li>
+            <li><strong>Social:</strong> Manual, one platform</li>
+          </ul>
+        </div>
+        <div class="tier-card t2 featured fade-in fade-in-delay-2">
+          <div class="tier-label">Growth Tier</div>
+          <div class="tier-price">$50-75</div>
+          <div class="tier-period">per month, for months 3-12</div>
+          <ul class="tier-items">
+            <li><strong>Writing:</strong> Notion or Obsidian</li>
+            <li><strong>Email:</strong> ConvertKit Creator or Beehiiv</li>
+            <li><strong>Product:</strong> Payhip Plus or Lemon Squeezy</li>
+            <li><strong>Automation:</strong> Make Starter ($9/mo)</li>
+            <li><strong>AI:</strong> Claude Pro or ChatGPT Plus</li>
+            <li><strong>Social:</strong> Buffer free or manual</li>
+          </ul>
+        </div>
+        <div class="tier-card t3 fade-in fade-in-delay-3">
+          <div class="tier-label">Scale Tier</div>
+          <div class="tier-price">$100</div>
+          <div class="tier-period">per month, for month 12+</div>
+          <ul class="tier-items">
+            <li><strong>Writing:</strong> Notion Plus</li>
+            <li><strong>Email:</strong> ConvertKit or Beehiiv Scale</li>
+            <li><strong>Product:</strong> Lemon Squeezy or Payhip</li>
+            <li><strong>Automation:</strong> Make Core ($16/mo)</li>
+            <li><strong>AI:</strong> Claude Pro + Perplexity Pro</li>
+            <li><strong>Images:</strong> Midjourney Basic</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT TO AVOID -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-in">What to avoid</p>
+      <h2 class="section-title fade-in">The tools that cost more than they earn.</h2>
+      <p class="section-body fade-in">The guide has a full chapter on what not to add to your stack and why. Here is the short version.</p>
+
+      <div class="avoid-list fade-in fade-in-delay-1">
+        <div class="avoid-item">
+          <h4>Steep onboarding tools</h4>
+          <p>Any tool requiring more than three hours to set up before providing value will sit unused. The opportunity cost is too high in the early stages.</p>
+        </div>
+        <div class="avoid-item">
+          <h4>Multiple tools, same job</h4>
+          <p>Two email platforms. Two note-taking apps. Two schedulers. Pick one and commit for 90 days before evaluating alternatives.</p>
+        </div>
+        <div class="avoid-item">
+          <h4>Platforms that own your audience</h4>
+          <p>Social platforms can shadow-ban, de-prioritize, or remove you at any time. Email is the only distribution channel you fully control.</p>
+        </div>
+        <div class="avoid-item">
+          <h4>Lifetime deal trap</h4>
+          <p>A $200 lifetime deal for a tool that shuts down in 18 months is a loss, not a deal. Reserve lifetime purchases for proven products.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="buy">
+    <div class="container">
+      <div class="cta-box fade-in">
+        <p class="section-label" style="text-align:center;">Get the guide</p>
+        <h2>The Solopreneur's<br>Tech Stack</h2>
+        <p>Every tool you need, organized by revenue stage. No tool FOMO. No oversized setups. Just what works for where you actually are.</p>
+        <div class="cta-price">$17.99</div>
+        <a href="https://behike.gumroad.com/l/solopreneur-tech-stack" class="btn-primary">Get Instant Access</a>
+        <p class="cta-note">PDF download. No subscription. Yours forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <p>Behike, 2026. All rights reserved.</p>
+      <p>behikeai.com</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

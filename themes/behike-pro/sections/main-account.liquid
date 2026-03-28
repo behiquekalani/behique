@@ -1,0 +1,36 @@
+<section class="section-padding">
+  <div class="page-width">
+    <h1>My Account</h1>
+    <p>{{ customer.name }} ({{ customer.email }})</p>
+    <h2 style="margin-top: 3.2rem;">Order History</h2>
+    {%- if customer.orders.size > 0 -%}
+      <table style="width: 100%; border-collapse: collapse; margin-top: 1.6rem;">
+        <thead>
+          <tr>
+            <th style="text-align: left; padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Order</th>
+            <th style="text-align: left; padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Date</th>
+            <th style="text-align: right; padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {%- for order in customer.orders -%}
+            <tr>
+              <td style="padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);"><a href="{{ order.customer_url }}">{{ order.name }}</a></td>
+              <td style="padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">{{ order.created_at | date: '%B %d, %Y' }}</td>
+              <td style="text-align: right; padding: 1rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">{{ order.total_price | money }}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    {%- else -%}
+      <p>No orders yet.</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Account",
+  "tag": "section"
+}
+{% endschema %}

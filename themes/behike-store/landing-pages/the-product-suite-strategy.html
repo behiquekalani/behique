@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Product Suite Strategy — Behike</title>
+  <meta name="description" content="How to build a logical progression of products that moves customers from free to $9.99 to $99 to $499. The value ladder for solo digital product creators. $23.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --border: #1D1D1F;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    nav {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    .hero-tagline {
+      font-size: clamp(17px, 2.2vw, 21px);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      border-radius: 980px;
+      padding: 8px 20px;
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero-trust {
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 3.8vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 56px;
+      line-height: 1.6;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Value ladder specific styles */
+    .ladder-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 720px;
+    }
+    .ladder-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      align-items: center;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ladder-step::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .ladder-step:nth-child(1)::before { background: var(--muted); }
+    .ladder-step:nth-child(2)::before { background: var(--accent); }
+    .ladder-step:nth-child(3)::before { background: #FF9F0A; }
+    .ladder-step:nth-child(4)::before { background: var(--cta); }
+    .ladder-level {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .ladder-step:nth-child(2) .ladder-level { color: var(--accent); }
+    .ladder-step:nth-child(3) .ladder-level { color: #FF9F0A; }
+    .ladder-step:nth-child(4) .ladder-level { color: var(--cta); }
+    .ladder-content h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .ladder-content p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .ladder-price {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .ladder-step:nth-child(1) .ladder-price { color: var(--muted); }
+    .ladder-step:nth-child(2) .ladder-price { color: var(--accent); }
+    .ladder-step:nth-child(3) .ladder-price { color: #FF9F0A; }
+    .ladder-step:nth-child(4) .ladder-price { color: var(--cta); }
+    @media (max-width: 600px) {
+      .ladder-step { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .appendix-banner {
+      margin-top: 20px;
+      background: rgba(10, 132, 255, 0.06);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .appendix-banner .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .appendix-banner p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .testimonial-stars {
+      color: #FF9F0A;
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .testimonial-text {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .author-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .author-info .role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 600px) { .for-grid { grid-template-columns: 1fr; } }
+    .for-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .for-block h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .for-block.is-for h3 { color: var(--cta); }
+    .for-block.not-for h3 { color: var(--muted); }
+    .for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .for-list li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .for-list li span.check { color: var(--cta); font-weight: 700; }
+    .for-list li span.cross { color: #FF453A; font-weight: 700; }
+
+    .price-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 56px 48px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    @media (max-width: 640px) { .price-block { padding: 40px 24px; } }
+    .price-block .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .price-display {
+      font-size: clamp(52px, 8vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-compare {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .price-includes {
+      list-style: none;
+      text-align: left;
+      margin: 0 auto 36px;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .price-includes li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .price-includes li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cta);
+      flex-shrink: 0;
+    }
+    .guarantee-strip {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .guarantee-strip strong { color: var(--text); }
+
+    .final-cta {
+      padding: 120px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 64px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="#buy" class="nav-cta">Get it — $23.99</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <span class="hero-eyebrow">Digital Product by Behike</span>
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        One product is a transaction.<br>A product suite is a business.
+      </h1>
+      <p class="hero-tagline reveal reveal-delay-2">
+        How to build a logical progression of products that moves customers from free to $9.99 to $99 to $499. The value ladder architecture for solo digital product creators.
+      </p>
+      <div class="hero-cta-group reveal reveal-delay-3">
+        <a href="#buy" class="btn-primary">
+          Get the Strategy
+          <span style="opacity:0.7; font-weight:400;">$23.99</span>
+        </a>
+        <div class="price-badge">
+          <span>Instant PDF download</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>4-level value ladder</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>Launch sequence inside</span>
+        </div>
+      </div>
+      <p class="hero-trust reveal reveal-delay-4">
+        30-day money-back guarantee. No questions asked.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="container">
+      <p class="section-label reveal">The single-product ceiling</p>
+      <h2 class="section-title reveal reveal-delay-1">One product means one type of customer.<br>That is a ceiling, not a business.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        A single product captures one slice of demand. The customers who want less are not served. The customers who want more have nowhere to go. A product suite solves both problems at the same time.
+      </p>
+      <div class="problem-grid">
+        <div class="problem-card reveal reveal-delay-1">
+          <div class="icon">&#128179;</div>
+          <h3>You only capture one willingness-to-pay</h3>
+          <p>A $49 product is invisible to the person who will spend $499. It is also inaccessible to the person who only has $9.99 right now. A suite serves the entire demand curve, not one point on it.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-2">
+          <div class="icon">&#128101;</div>
+          <h3>No natural path for buyers</h3>
+          <p>A customer who buys your $27 product and loves it has nowhere to go next. Without a logical next step, they leave instead of staying in your ecosystem. You lose the relationship at the moment it peaks.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3">
+          <div class="icon">&#128200;</div>
+          <h3>Revenue ceiling without more launches</h3>
+          <p>Growing a single-product business means constantly acquiring new customers. A suite means the same customer can generate 10x or 50x the initial purchase value through a designed progression.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUE LADDER -->
+  <section class="section" id="ladder">
+    <div class="container">
+      <p class="section-label reveal">The four levels</p>
+      <h2 class="section-title reveal reveal-delay-1">Free to $499.<br>One architecture, four products.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        Each level serves a different stage of buyer trust and commitment. The architecture is designed so each product naturally points to the next one.
+      </p>
+      <div class="ladder-container">
+        <div class="ladder-step reveal reveal-delay-1">
+          <div class="ladder-level">Level 01 — Entry</div>
+          <div class="ladder-content">
+            <h3>Lead Magnet</h3>
+            <p>A free, high-value resource that solves one specific problem and demonstrates your competence. The entry point into the suite for your audience.</p>
+          </div>
+          <div class="ladder-price">Free</div>
+        </div>
+        <div class="ladder-step reveal reveal-delay-2">
+          <div class="ladder-level">Level 02 — Entry Paid</div>
+          <div class="ladder-content">
+            <h3>Intro Product</h3>
+            <p>A low-barrier paid offer that converts trust into a purchase. Removes the risk from buying while establishing the commercial relationship.</p>
+          </div>
+          <div class="ladder-price">$9.99</div>
+        </div>
+        <div class="ladder-step reveal reveal-delay-3">
+          <div class="ladder-level">Level 03 — Core</div>
+          <div class="ladder-content">
+            <h3>Core Product</h3>
+            <p>Your flagship offer. The comprehensive guide, system, or resource that delivers the full transformation you are known for.</p>
+          </div>
+          <div class="ladder-price">$99</div>
+        </div>
+        <div class="ladder-step reveal reveal-delay-4">
+          <div class="ladder-level">Level 04 — Premium</div>
+          <div class="ladder-content">
+            <h3>Premium Offer</h3>
+            <p>A high-commitment product for the buyer who wants maximum depth, personalization, or implementation support. Serves the 10% who want everything.</p>
+          </div>
+          <div class="ladder-price">$499</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section" id="inside">
+    <div class="container">
+      <p class="section-label reveal">What is inside</p>
+      <h2 class="section-title reveal reveal-delay-1">The full strategy.<br>Design, sequence, and launch.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        From designing your suite architecture to launching it in the right order to connecting the products so buyers move naturally through all four levels.
+      </p>
+      <div class="chapters-grid">
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">01</span>
+          <div class="chapter-text">
+            <h4>The 4-Level Value Ladder</h4>
+            <p>The architecture behind a complete product suite: what belongs at each level, how to price each tier, and how the levels connect to each other.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">02</span>
+          <div class="chapter-text">
+            <h4>The Lead Magnet Formula</h4>
+            <p>How to design a free resource that is valuable enough to build trust but specific enough to naturally point toward your paid intro product.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">03</span>
+          <div class="chapter-text">
+            <h4>The Product Suite Design Process</h4>
+            <p>A step-by-step framework for identifying what products to build, in what order, and how to position each relative to the others.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">04</span>
+          <div class="chapter-text">
+            <h4>The Upsell and Cross-Sell Strategy</h4>
+            <p>The exact moments in the customer journey to introduce the next product, and how to frame each offer so it feels like a natural next step.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">05</span>
+          <div class="chapter-text">
+            <h4>The Suite Launch Sequence</h4>
+            <p>The order in which to build and release your suite products: which to launch first, how to use each launch to set up the next, and how long to wait between launches.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-banner reveal">
+        <span class="label">Appendix</span>
+        <p>Product suite planning worksheet, pricing decision matrix by niche, and a 90-day suite launch calendar template.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="proof">
+    <div class="container">
+      <p class="section-label reveal">Social proof</p>
+      <h2 class="section-title reveal reveal-delay-1">Creators who built beyond<br>the single-product ceiling.</h2>
+      <div class="testimonials-grid" style="margin-top: 48px;">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I had been selling one $47 product for two years and hitting the same revenue ceiling every month. The suite design process in this guide showed me I had two years of customer data pointing at exactly what level two and level three products to build. Launched level two six weeks later. Revenue up 140% in 90 days."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">K</div>
+            <div class="author-info">
+              <p class="name">Kenji A.</p>
+              <p class="role">Digital product creator, productivity niche</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The upsell strategy chapter is worth reading three times. I had been treating my products as separate offers with no connection between them. Redesigned the email sequences to move buyers from my $12 product to my $97 product. Conversion rate on the upsell path is now 22%. That is money I was leaving behind for two years."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">B</div>
+            <div class="author-info">
+              <p class="name">Bianca R.</p>
+              <p class="role">Online educator, design skills</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I was skeptical about the $499 tier. My audience felt like a $29 to $49 crowd. The premium offer section explained why that perception is usually wrong and how to position it. Launched a $497 cohort-based product to 800 subscribers. Sold 11 spots in the first week. Nothing in my business has ever converted like that."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">O</div>
+            <div class="author-info">
+              <p class="name">Omar T.</p>
+              <p class="role">Creator and consultant, marketing niche</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR / NOT FOR -->
+  <section class="section" id="fit">
+    <div class="container">
+      <p class="section-label reveal">Who this is for</p>
+      <h2 class="section-title reveal reveal-delay-1">This is for creators ready to build<br>a catalog, not just a product.</h2>
+      <div class="for-grid" style="margin-top: 48px;">
+        <div class="for-block is-for reveal reveal-delay-1">
+          <h3>This is for you if:</h3>
+          <ul class="for-list">
+            <li><span class="check">+</span> You already have at least one paid digital product with buyers</li>
+            <li><span class="check">+</span> You want to increase revenue per customer, not just acquire more customers</li>
+            <li><span class="check">+</span> You want a logical plan for which products to build in which order</li>
+            <li><span class="check">+</span> You are willing to build 2 to 4 products over 6 to 12 months</li>
+            <li><span class="check">+</span> You want real architecture, not vague "build a funnel" advice</li>
+          </ul>
+        </div>
+        <div class="for-block not-for reveal reveal-delay-2">
+          <h3>This is not for you if:</h3>
+          <ul class="for-list">
+            <li><span class="cross">-</span> You have no existing product or audience to build the suite from</li>
+            <li><span class="cross">-</span> You want a tech stack tutorial or a Gumroad setup guide</li>
+            <li><span class="cross">-</span> You are looking for copywriting formulas or marketing scripts</li>
+            <li><span class="cross">-</span> You want to build all four levels in a weekend without existing demand signals</li>
+            <li><span class="cross">-</span> You are not willing to think about customer journey before product decisions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE + GUARANTEE -->
+  <section class="section" id="buy">
+    <div class="container">
+      <div class="price-block reveal">
+        <p class="product-name">The Product Suite Strategy</p>
+        <div class="price-display">$23.99</div>
+        <p class="price-compare">One-time payment. No subscription. Yours forever.</p>
+        <ul class="price-includes">
+          <li>The 4-level value ladder architecture</li>
+          <li>Lead magnet formula</li>
+          <li>Product suite design process</li>
+          <li>Upsell and cross-sell strategy</li>
+          <li>Suite launch sequence</li>
+          <li>Product suite planning worksheet</li>
+          <li>Pricing decision matrix</li>
+          <li>90-day launch calendar template</li>
+          <li>Instant download</li>
+        </ul>
+        <a href="#" class="btn-primary" style="width: 100%; justify-content: center; font-size: 18px; padding: 18px 0;">
+          Get Instant Access
+        </a>
+        <div class="guarantee-strip">
+          <strong>30-day money-back guarantee.</strong> If this does not deliver value, email Behike and you get a full refund. No forms, no friction.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2 class="reveal">Design the progression.<br>Let buyers climb it on their own.</h2>
+      <p class="reveal reveal-delay-1">
+        The strategy shows you what to build, in what order, and how to connect each product to the next one.
+      </p>
+      <a href="#buy" class="btn-primary reveal reveal-delay-2" style="font-size: 18px; padding: 18px 40px;">
+        Get The Product Suite Strategy for $23.99
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      &copy; 2026 Behike. All rights reserved.
+      &nbsp;&nbsp;
+      <a href="/privacy.html">Privacy</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/terms.html">Terms</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/refund.html">Refund Policy</a>
+    </p>
+  </footer>
+
+  <!-- INTERSECTION OBSERVER ANIMATIONS -->
+  <script>
+    (function () {
+      const elements = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      elements.forEach(function (el) { observer.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>

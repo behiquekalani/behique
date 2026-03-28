@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Build AI-powered plugins for FL Studio. Melody generators, mixing assistants, mastering helpers. Python code included. No music degree required.">
+    <title>FL Studio AI Plugin Guide | Behike</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --green: #30D158;
+            --amber: #FF9F0A;
+            --purple: #BF5AF2;
+            --purple-dim: rgba(191, 90, 242, 0.10);
+            --purple-border: rgba(191, 90, 242, 0.20);
+            --light: #F5F5F7;
+            --muted: #86868B;
+            --secondary-bg: #1D1D1F;
+            --card-bg: #111114;
+            --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: 56px;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(191, 90, 242, 0.10);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--purple);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        .nav-links a {
+            font-size: 14px;
+            color: var(--muted);
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--light); }
+
+        /* Hero */
+        .hero {
+            padding: 130px 24px 80px;
+            max-width: 760px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-label {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--purple);
+            background: var(--purple-dim);
+            border: 1px solid var(--purple-border);
+            padding: 5px 14px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 5.5vw, 56px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 span { color: var(--purple); }
+
+        .hero-sub {
+            font-size: 18px;
+            color: var(--muted);
+            max-width: 520px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 36px;
+            flex-wrap: wrap;
+            margin-bottom: 44px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--purple);
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+            margin-top: 2px;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--purple);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 14px 36px;
+            border-radius: 100px;
+            transition: opacity 0.2s;
+            letter-spacing: -0.01em;
+        }
+
+        .hero-cta:hover { opacity: 0.88; }
+
+        .hero-note {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 14px;
+        }
+
+        /* Section base */
+        section {
+            padding: 80px 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--purple);
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: clamp(22px, 3.5vw, 32px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .section-body {
+            font-size: 16px;
+            color: var(--muted);
+            line-height: 1.75;
+            max-width: 600px;
+        }
+
+        .section-body p { margin-bottom: 18px; }
+
+        /* Divider */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Market gap */
+        .market-stat-row {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-top: 36px;
+        }
+
+        .market-stat {
+            flex: 1;
+            min-width: 180px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 24px;
+        }
+
+        .market-stat-num {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--purple);
+            letter-spacing: -0.03em;
+            margin-bottom: 6px;
+        }
+
+        .market-stat-text {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Plugin cards */
+        .plugin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 36px;
+        }
+
+        .plugin-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 28px;
+            transition: border-color 0.2s;
+        }
+
+        .plugin-card:hover {
+            border-color: var(--purple-border);
+        }
+
+        .plugin-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--purple-dim);
+            border: 1px solid var(--purple-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .plugin-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .plugin-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .plugin-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--purple);
+            background: var(--purple-dim);
+            padding: 3px 10px;
+            border-radius: 6px;
+            margin-top: 14px;
+        }
+
+        /* Stack */
+        .stack-list {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stack-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+
+        .stack-item-label {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--purple);
+            min-width: 120px;
+            padding-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .stack-item-desc {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* Revenue */
+        .revenue-box {
+            background: var(--card-bg);
+            border: 1px solid var(--purple-border);
+            border-radius: 18px;
+            padding: 36px;
+            margin-top: 36px;
+        }
+
+        .revenue-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .revenue-line:last-child { border-bottom: none; }
+
+        .revenue-label { font-size: 14px; color: var(--muted); }
+
+        .revenue-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--green);
+        }
+
+        .revenue-total .revenue-label {
+            font-size: 16px;
+            color: var(--light);
+            font-weight: 600;
+        }
+
+        .revenue-total .revenue-value {
+            font-size: 22px;
+            color: var(--purple);
+        }
+
+        .platform-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        .platform-card {
+            flex: 1;
+            min-width: 160px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .platform-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .platform-price {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+
+        .platform-note {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Chapters */
+        .chapter-list {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chapter-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .chapter-item:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+
+        .ch-num {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--purple);
+            min-width: 28px;
+            padding-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .ch-title {
+            font-size: 15px;
+            color: var(--light);
+            line-height: 1.5;
+        }
+
+        .ch-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Pricing */
+        .pricing-box {
+            background: var(--card-bg);
+            border: 1px solid var(--purple-border);
+            border-radius: 20px;
+            padding: 44px 40px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .pricing-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--purple);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .pricing-price {
+            font-size: 56px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .pricing-note {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 32px;
+        }
+
+        .pricing-includes {
+            list-style: none;
+            text-align: left;
+            max-width: 380px;
+            margin: 0 auto 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pricing-includes li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .pricing-includes li::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--purple);
+            margin-top: 7px;
+            flex-shrink: 0;
+        }
+
+        .pricing-btn {
+            display: inline-block;
+            background: var(--purple);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 16px 48px;
+            border-radius: 100px;
+            transition: opacity 0.2s;
+            letter-spacing: -0.01em;
+        }
+
+        .pricing-btn:hover { opacity: 0.88; }
+
+        .pricing-guarantee {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 16px;
+        }
+
+        /* Cross-sell */
+        .cross-sell-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .cross-sell-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 24px;
+            transition: border-color 0.2s;
+            display: block;
+        }
+
+        .cross-sell-card:hover { border-color: var(--purple-border); }
+
+        .cross-sell-type {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .cross-sell-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .cross-sell-desc {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .cross-sell-price {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--purple);
+        }
+
+        /* FAQ */
+        .faq-list {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .faq-q {
+            padding: 20px 24px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--light);
+            cursor: default;
+        }
+
+        .faq-a {
+            padding: 0 24px 20px;
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 24px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        footer a { color: var(--muted); }
+        footer a:hover { color: var(--light); }
+
+        @media (max-width: 600px) {
+            .hero { padding: 110px 20px 60px; }
+            section { padding: 60px 20px; }
+            .pricing-box { padding: 32px 24px; }
+            .hero-stats { gap: 24px; }
+            .market-stat-row { gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="nav-logo">behike</span>
+    <div class="nav-links">
+        <a href="index.html">Store</a>
+        <a href="#pricing" style="color: var(--purple); font-weight: 600;">Get the Guide</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="hero-label">FL Studio AI Plugin Guide</div>
+    <h1>Build <span>AI Plugins</span> for FL Studio.<br>Without a Music Degree.</h1>
+    <p class="hero-sub">Four plugin types. Python and the FL Studio MIDI API. Real code you can sell on Plugin Boutique starting this month.</p>
+    <div class="hero-stats">
+        <div class="stat">
+            <div class="stat-num">4</div>
+            <div class="stat-label">Plugin types</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">Python</div>
+            <div class="stat-label">+ FL MIDI API</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">Plugin Boutique</div>
+            <div class="stat-label">Sell on day one</div>
+        </div>
+    </div>
+    <a href="#pricing" class="hero-cta">Get the Guide, $24.99</a>
+    <p class="hero-note">Instant download. Python 3.10+. Works on Windows and Mac.</p>
+</div>
+
+<div class="divider"></div>
+
+<!-- Market Gap -->
+<section>
+    <div class="section-label">The Opportunity</div>
+    <h2 class="section-title">FL Studio has 30 million users. The AI plugin market is two years behind.</h2>
+    <div class="section-body">
+        <p>AI tools took over writing, images, and code. Music production got left out. Most producers are still doing everything manually: picking chords by ear, mixing by feel, mastering by guessing.</p>
+        <p>That gap is an opening. You are not competing with Native Instruments or iZotope. You are building workflow tools. Small, specific, useful. The kind that sell for $29 on Plugin Boutique and generate $1,400 a month on autopilot.</p>
+        <p>FL Studio supports Python MIDI scripting natively. That means you can build and ship a plugin without touching C++, VST SDKs, or audio engineering degrees. The barrier to entry is lower than it looks.</p>
+    </div>
+    <div class="market-stat-row">
+        <div class="market-stat">
+            <div class="market-stat-num">30M+</div>
+            <div class="market-stat-text">FL Studio users worldwide, according to Image-Line</div>
+        </div>
+        <div class="market-stat">
+            <div class="market-stat-num">$6.8B</div>
+            <div class="market-stat-text">Global music software market by 2027</div>
+        </div>
+        <div class="market-stat">
+            <div class="market-stat-num">2 years</div>
+            <div class="market-stat-text">How far AI plugin development lags behind AI tools</div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- What this guide covers -->
+<section>
+    <div class="section-label">What You Build</div>
+    <h2 class="section-title">Four plugins. Complete blueprints for each.</h2>
+    <div class="section-body">
+        <p>Not concepts. Not mockups. Working code you can deploy, package, and sell.</p>
+    </div>
+    <div class="plugin-grid">
+        <div class="plugin-card">
+            <div class="plugin-icon">M</div>
+            <h3>AI Melody Generator</h3>
+            <p>Takes a key and scale input. Uses pattern recognition and optional LLM integration to output MIDI note sequences directly into FL Studio.</p>
+            <span class="plugin-tag">Python + MIDI + ML</span>
+        </div>
+        <div class="plugin-card">
+            <div class="plugin-icon">EQ</div>
+            <h3>AI Mixing Assistant</h3>
+            <p>Analyzes frequency spectrum and channel levels. Flags masking issues. Suggests gain staging corrections. Output formatted for FL Studio's mixer.</p>
+            <span class="plugin-tag">Frequency Analysis</span>
+        </div>
+        <div class="plugin-card">
+            <div class="plugin-icon">M</div>
+            <h3>AI Mastering Helper</h3>
+            <p>Checks loudness against streaming targets, flags stereo width problems, and recommends EQ moves. Integrates with the FL Studio API's render pipeline.</p>
+            <span class="plugin-tag">Loudness + EQ</span>
+        </div>
+        <div class="plugin-card">
+            <div class="plugin-icon">C</div>
+            <h3>AI Chord Progression Generator</h3>
+            <p>Music theory rules plus LLM generation. Input a mood or genre. Output MIDI-ready chord voicings that drop directly into the piano roll.</p>
+            <span class="plugin-tag">Music Theory + LLM</span>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- The Stack -->
+<section>
+    <div class="section-label">The Stack</div>
+    <h2 class="section-title">What you actually use. No mystery tools.</h2>
+    <div class="section-body">
+        <p>No music degree required. Pattern recognition and an API key get you most of the way there.</p>
+    </div>
+    <div class="stack-list">
+        <div class="stack-item">
+            <div class="stack-item-label">Python 3.10+</div>
+            <div class="stack-item-desc">FL Studio's native scripting language for MIDI plugins. No C++ required. Runs inside FL Studio's Python interpreter.</div>
+        </div>
+        <div class="stack-item">
+            <div class="stack-item-label">FL MIDI Scripting API</div>
+            <div class="stack-item-desc">Image-Line's documented API for controlling FL Studio: piano roll, mixer, patterns, transport. Covered in Chapter 1.</div>
+        </div>
+        <div class="stack-item">
+            <div class="stack-item-label">MIDI Protocol</div>
+            <div class="stack-item-desc">Note on/off, velocity, CC messages. The lingua franca between your plugin and FL Studio's engine. Explained from scratch.</div>
+        </div>
+        <div class="stack-item">
+            <div class="stack-item-label">OpenAI / Claude API</div>
+            <div class="stack-item-desc">Used for chord progression and melody generation where music theory rules need creative variation. Optional, not required for core functionality.</div>
+        </div>
+        <div class="stack-item">
+            <div class="stack-item-label">mido / python-rtmidi</div>
+            <div class="stack-item-desc">Python libraries for MIDI message parsing and routing. Lightweight, well-documented, cross-platform.</div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Revenue -->
+<section>
+    <div class="section-label">The Revenue Math</div>
+    <h2 class="section-title">Where to sell. What to charge. What it adds up to.</h2>
+    <div class="section-body">
+        <p>Plugin Boutique is the primary market. Splice is subscription-based and pays per stream. Gumroad works for direct sales and bundling.</p>
+    </div>
+    <div class="platform-row">
+        <div class="platform-card">
+            <div class="platform-name">Plugin Boutique</div>
+            <div class="platform-price">$29-99 per plugin</div>
+            <div class="platform-note">Largest dedicated plugin marketplace. 70% revenue share.</div>
+        </div>
+        <div class="platform-card">
+            <div class="platform-name">Splice</div>
+            <div class="platform-price">$9.99-19.99/mo sub</div>
+            <div class="platform-note">Subscription model. Revenue share per stream or download.</div>
+        </div>
+        <div class="platform-card">
+            <div class="platform-name">Gumroad</div>
+            <div class="platform-price">$19-49 one-time</div>
+            <div class="platform-note">Direct sales. Full control. Stack with email list building.</div>
+        </div>
+    </div>
+    <div class="revenue-box">
+        <div class="revenue-line">
+            <span class="revenue-label">One plugin at $29</span>
+            <span class="revenue-value">$29</span>
+        </div>
+        <div class="revenue-line">
+            <span class="revenue-label">50 sales per month</span>
+            <span class="revenue-value">$1,450/mo</span>
+        </div>
+        <div class="revenue-line">
+            <span class="revenue-label">Four plugins, same rate</span>
+            <span class="revenue-value">$5,800/mo</span>
+        </div>
+        <div class="revenue-line revenue-total">
+            <span class="revenue-label">Four plugins, 100 sales each</span>
+            <span class="revenue-value">$11,600/mo</span>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Chapter preview -->
+<section>
+    <div class="section-label">What's Inside</div>
+    <h2 class="section-title">Eight chapters. From zero to shipped.</h2>
+    <div class="chapter-list">
+        <div class="chapter-item">
+            <span class="ch-num">Intro</span>
+            <div>
+                <div class="ch-title">The FL Studio Plugin Opportunity</div>
+                <div class="ch-sub">Market size, the gap, why this moment is the right one</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">01</span>
+            <div>
+                <div class="ch-title">FL Studio's Scripting Architecture</div>
+                <div class="ch-sub">MIDI vs VST, how Python runs inside FL Studio, what the API can and cannot do</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">02</span>
+            <div>
+                <div class="ch-title">Setting Up Your Dev Environment</div>
+                <div class="ch-sub">Python setup, FL API installation, testing your first script, debugging workflow</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">03</span>
+            <div>
+                <div class="ch-title">Building an AI Melody Generator</div>
+                <div class="ch-sub">Note pattern logic, scale mapping, LLM integration, MIDI output to piano roll</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">04</span>
+            <div>
+                <div class="ch-title">Building an AI Mixing Assistant</div>
+                <div class="ch-sub">Frequency analysis, channel level detection, recommendation engine, FL mixer integration</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">05</span>
+            <div>
+                <div class="ch-title">Building an AI Chord Progression Tool</div>
+                <div class="ch-sub">Music theory foundations, LLM prompting for chord generation, MIDI voicing output</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">06</span>
+            <div>
+                <div class="ch-title">Building an AI Mastering Helper</div>
+                <div class="ch-sub">LUFS targets, EQ suggestions, stereo width analysis, render pipeline hooks</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">07</span>
+            <div>
+                <div class="ch-title">Packaging and Selling Your Plugin</div>
+                <div class="ch-sub">Plugin Boutique submission, Splice onboarding, Gumroad setup, pricing strategy</div>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <span class="ch-num">08</span>
+            <div>
+                <div class="ch-title">What Comes Next</div>
+                <div class="ch-sub">VST3 with JUCE, standalone apps, mobile, building a plugin catalog business</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Pricing -->
+<section id="pricing">
+    <div class="section-label">Get the Guide</div>
+    <h2 class="section-title">Everything you need to build and sell your first AI plugin.</h2>
+    <div class="pricing-box">
+        <div class="pricing-label">FL Studio AI Plugin Guide</div>
+        <div class="pricing-price">$24.99</div>
+        <div class="pricing-note">One-time payment. Instant download.</div>
+        <ul class="pricing-includes">
+            <li>4 plugin blueprints with complete Python code for each</li>
+            <li>FL Studio MIDI Scripting API walkthrough</li>
+            <li>Deployment guides for Plugin Boutique, Splice, and Gumroad</li>
+            <li>Plugin Boutique submission checklist</li>
+            <li>MIDI protocol cheat sheet</li>
+            <li>8 chapters, 50+ pages</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/fl-studio-ai-guide" class="pricing-btn">Get the FL Studio AI Plugin Guide</a>
+        <p class="pricing-guarantee">Instant download. PDF format. No subscription.</p>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- Cross-sell -->
+<section>
+    <div class="section-label">Pair It With</div>
+    <h2 class="section-title">Build the complete automation layer.</h2>
+    <div class="cross-sell-grid">
+        <a href="ai-employee-guide.html" class="cross-sell-card">
+            <div class="cross-sell-type">Guide</div>
+            <div class="cross-sell-name">AI Employee Guide</div>
+            <div class="cross-sell-desc">Build agents that handle product research, customer replies, and delivery automation without daily input from you.</div>
+            <div class="cross-sell-price">$19.99</div>
+        </a>
+        <a href="ai-news-tracker-guide.html" class="cross-sell-card">
+            <div class="cross-sell-type">Guide</div>
+            <div class="cross-sell-name">AI News Tracker Guide</div>
+            <div class="cross-sell-desc">Monitor the plugin market, track competitors, and surface trends automatically every morning. Built in Python.</div>
+            <div class="cross-sell-price">$4.99</div>
+        </a>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- FAQ -->
+<section>
+    <div class="section-label">Questions</div>
+    <h2 class="section-title">Common questions answered directly.</h2>
+    <div class="faq-list">
+        <div class="faq-item">
+            <div class="faq-q">Do I need FL Studio to use this guide?</div>
+            <div class="faq-a">Yes for testing and deployment. FL Studio has a free trial with full feature access for a limited time. You need it running locally to load and test your Python MIDI scripts. The guide covers the setup in Chapter 2.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Can this work with other DAWs?</div>
+            <div class="faq-a">The core Python and MIDI concepts apply to any DAW. But this guide is built specifically around the FL Studio MIDI Scripting API, which is FL Studio's native integration layer. Adapting to Ableton or Logic would require learning those DAWs' extension systems separately.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Do I need to know music theory?</div>
+            <div class="faq-a">No. The guide explains every music concept you need: scales, chords, LUFS, frequency ranges. The plugins are built on pattern logic, not musical intuition. You are a programmer building tools. The music theory is just data.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What Python version does this require?</div>
+            <div class="faq-a">Python 3.10 or newer. FL Studio ships with its own Python 3.11 interpreter for MIDI scripts. You do not need a separate Python installation for plugin deployment, only for development and testing.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Can I actually sell what I build from this guide?</div>
+            <div class="faq-a">Yes. The code you write is yours. The guide includes a Plugin Boutique submission checklist and Gumroad setup steps. You own the IP. Behike does not take a cut. The only platforms that take a share are Plugin Boutique and Gumroad at their standard rates.</div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 Behike. Built in Puerto Rico.</p>
+    <p style="margin-top: 8px;"><a href="index.html">Store</a> &nbsp;&middot;&nbsp; <a href="privacy.html">Privacy</a> &nbsp;&middot;&nbsp; <a href="refund.html">Refunds</a></p>
+</footer>
+
+</body>
+</html>

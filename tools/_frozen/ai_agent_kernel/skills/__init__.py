@@ -1,0 +1,1 @@
+# Agent Kernel skills directory

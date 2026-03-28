@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CallBuddy - We call. You don't have to.</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;color:#fff;font-family:'Courier New',monospace;line-height:1.6;-webkit-font-smoothing:antialiased}
+.container{max-width:640px;margin:0 auto;padding:0 24px}
+section{padding:80px 0;border-bottom:1px solid #222}
+section:last-of-type{border-bottom:none}
+
+/* Hero */
+.hero h1{font-size:clamp(28px,6vw,48px);font-weight:700;letter-spacing:-1px;margin-bottom:24px}
+.hero p{color:#999;font-size:14px;max-width:480px}
+
+/* How it works */
+h2{font-size:20px;margin-bottom:40px;text-transform:uppercase;letter-spacing:2px}
+.step{margin-bottom:32px}
+.step-num{color:#555;font-size:12px;margin-bottom:4px}
+.step-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.step-desc{color:#999;font-size:14px}
+
+/* Features */
+.feature-grid{display:grid;gap:24px}
+.feature{padding:20px;border:1px solid #222}
+.feature-title{font-weight:700;margin-bottom:4px}
+.feature-desc{color:#999;font-size:13px}
+
+/* Pricing */
+.pricing-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{border:1px solid #333;padding:24px;text-align:center}
+.card.primary{border-color:#fff}
+.card-price{font-size:28px;font-weight:700;margin:12px 0 4px}
+.card-detail{color:#999;font-size:12px}
+.card-label{font-size:14px;color:#999}
+
+/* Waitlist */
+.waitlist-form{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+.waitlist-form input{flex:1;min-width:200px;padding:12px;background:#111;border:1px solid #333;color:#fff;font-family:'Courier New',monospace;font-size:14px;outline:none}
+.waitlist-form input:focus{border-color:#fff}
+.waitlist-form button{padding:12px 24px;background:#fff;color:#000;border:none;font-family:'Courier New',monospace;font-size:14px;font-weight:700;cursor:pointer}
+.waitlist-form button:hover{background:#ccc}
+.msg{margin-top:12px;font-size:13px;color:#999}
+.msg.ok{color:#0f0}
+.msg.err{color:#f33}
+.waitlist p{color:#999;font-size:14px}
+
+/* Footer */
+footer{padding:40px 0;text-align:center;color:#555;font-size:12px}
+footer span{display:block;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<section class="hero">
+<h1>We call.<br>You don't have to.</h1>
+<p>Social anxiety affects 15 million+ Americans. Phone calls shouldn't stand between you and the things you need. CallBuddy makes the call so you never have to.</p>
+</section>
+
+<section>
+<h2>How it works</h2>
+<div class="step">
+<div class="step-num">01</div>
+<div class="step-title">Tell us who to call</div>
+<div class="step-desc">Enter the number, what you need, and any details. Doctor's office, insurance, restaurant, whatever.</div>
+</div>
+<div class="step">
+<div class="step-num">02</div>
+<div class="step-title">AI handles everything</div>
+<div class="step-desc">Our AI calls, navigates phone menus, waits on hold, and talks to the person on the other end.</div>
+</div>
+<div class="step">
+<div class="step-num">03</div>
+<div class="step-title">Get your confirmation</div>
+<div class="step-desc">You get a summary of what happened, what was booked, and what to know next. Done.</div>
+</div>
+</section>
+
+<section>
+<h2>Features</h2>
+<div class="feature-grid">
+<div class="feature">
+<div class="feature-title">Handles hold music</div>
+<div class="feature-desc">AI waits on hold for as long as it takes. You get your time back.</div>
+</div>
+<div class="feature">
+<div class="feature-title">Bilingual EN/ES</div>
+<div class="feature-desc">Calls in English or Spanish. Native-level fluency in both.</div>
+</div>
+<div class="feature">
+<div class="feature-title">Books appointments</div>
+<div class="feature-desc">Schedules with doctors, dentists, salons, government offices, anything.</div>
+</div>
+<div class="feature">
+<div class="feature-title">Navigates IVR menus</div>
+<div class="feature-desc">Press 1 for this, press 3 for that. The AI handles all automated phone trees.</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>Pricing</h2>
+<div class="pricing-cards">
+<div class="card primary">
+<div class="card-label">Monthly</div>
+<div class="card-price">$14.99</div>
+<div class="card-detail">20 calls / month</div>
+</div>
+<div class="card">
+<div class="card-label">Pay per call</div>
+<div class="card-price">$1.99</div>
+<div class="card-detail">per call, no commitment</div>
+</div>
+</div>
+</section>
+
+<section class="waitlist">
+<h2>Join the waitlist</h2>
+<p>Be the first to know when CallBuddy launches.</p>
+<form class="waitlist-form" id="waitlistForm">
+<input type="email" id="email" placeholder="your@email.com" required>
+<button type="submit">Join</button>
+</form>
+<div class="msg" id="msg"></div>
+</section>
+
+<footer>
+<span>Built in Puerto Rico</span>
+<span>behike.co</span>
+</footer>
+
+</div>
+<script>
+document.getElementById('waitlistForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var email=document.getElementById('email').value.trim();
+  var msg=document.getElementById('msg');
+  if(!email){msg.textContent='Enter an email.';msg.className='msg err';return;}
+  var list=JSON.parse(localStorage.getItem('callbuddy_waitlist')||'[]');
+  if(list.indexOf(email)!==-1){msg.textContent='You are already on the list.';msg.className='msg ok';return;}
+  list.push(email);
+  localStorage.setItem('callbuddy_waitlist',JSON.stringify(list));
+  msg.textContent='You are in. We will reach out when we launch.';
+  msg.className='msg ok';
+  document.getElementById('email').value='';
+});
+</script>
+</body>
+</html>

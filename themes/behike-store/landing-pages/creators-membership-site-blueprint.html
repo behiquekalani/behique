@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Membership Site Blueprint — Behike</title>
+  <meta name="description" content="A complete operating manual for building a membership site that retains members for years, not months. Pricing, content cadence, retention mechanics, and community structure.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .hero-label.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      max-width: 800px;
+      margin: 0 auto 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+    }
+
+    .hero-title.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-subtitle {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+
+    .hero-subtitle.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+    }
+
+    .hero-actions.visible { opacity: 1; transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { opacity: 0.88; transform: scale(1.02); }
+
+    .price-note {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 680px;
+    }
+
+    /* ANIMATE ON SCROLL */
+    .animate {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate.visible { opacity: 1; transform: translateY(0); }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .problem-item {
+      background: var(--surface);
+      padding: 32px;
+    }
+
+    .problem-icon {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .problem-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .problem-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* SOLUTION */
+    .solution-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .solution-item {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+
+    .solution-item:last-child { border-bottom: none; }
+
+    .solution-num {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .solution-content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .solution-content p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* TOC */
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .toc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .toc-card:hover { border-color: #333; }
+
+    .toc-part {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .toc-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .toc-chapters {
+      list-style: none;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 64px 48px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-price {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+
+    .cta-price-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .cta-features {
+      list-style: none;
+      text-align: left;
+      margin: 32px 0 40px;
+      font-size: 15px;
+      line-height: 1.9;
+    }
+
+    .cta-features li::before {
+      content: "- ";
+      color: var(--cta);
+    }
+
+    .cta-guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 64px 0 48px; }
+      section { padding: 56px 0; }
+      .cta-box { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/index.html" class="nav-brand">Behike</a>
+    <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="nav-cta">Get It — $25.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">Digital Guide</div>
+    <h1 class="hero-title">Creator's Membership Site Blueprint</h1>
+    <p class="hero-subtitle">A complete operating manual for building a membership site that retains members for years, not months.</p>
+    <div class="hero-actions">
+      <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="btn-primary">Get the Blueprint — $25.99</a>
+      <span class="price-note">PDF + Markdown. Instant download.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <p class="section-label animate">The Problem</p>
+    <h2 class="section-title animate">Most membership sites close before year two.</h2>
+    <p class="section-body animate">Not because the creator ran out of content. Because they built a membership around producing instead of around a system. They set unsustainable cadences, priced on instinct, and built community by accident.</p>
+
+    <div class="problem-grid">
+      <div class="problem-item animate">
+        <div class="problem-icon">01</div>
+        <div class="problem-title">No transformation statement</div>
+        <p class="problem-desc">The membership exists, but nobody, including the creator, can clearly state what it actually produces for members. Churn follows.</p>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-icon">02</div>
+        <div class="problem-title">Burnout content cadence</div>
+        <p class="problem-desc">Five pieces in launch week because the energy is high. Three months later, the energy is gone and the expectation remains. Creators abandon what they built.</p>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-icon">03</div>
+        <div class="problem-title">Price set by feel</div>
+        <p class="problem-desc">No understanding of LTV, churn math, or how price signals filter member quality. Most memberships are either too cheap to be taken seriously or too expensive without the retention mechanics to justify it.</p>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-icon">04</div>
+        <div class="problem-title">Community dies in month two</div>
+        <p class="problem-desc">No structure, no norms, no facilitation system. The community channel becomes a ghost town. Members who joined for the community cancel. The content-only members follow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section>
+  <div class="container">
+    <p class="section-label animate">What This Blueprint Covers</p>
+    <h2 class="section-title animate">Every decision, in the right order.</h2>
+    <p class="section-body animate">This is not an overview. It is an operating manual. Each section addresses a specific decision with a specific framework, so you build the right structure from the start instead of rebuilding it twelve months in.</p>
+
+    <div class="solution-list">
+      <div class="solution-item animate">
+        <div class="solution-num">1</div>
+        <div class="solution-content">
+          <h3>The Foundation</h3>
+          <p>How to write a transformation statement with enough specificity to filter the right members and repel the wrong ones. The three characteristics of your ideal member. The four membership models and which one matches your capacity and goals.</p>
+        </div>
+      </div>
+      <div class="solution-item animate">
+        <div class="solution-num">2</div>
+        <div class="solution-content">
+          <h3>Pricing Architecture</h3>
+          <p>The full economics of retention, LTV math, and the cost of churn. Flat monthly versus annual with discount versus founding member pricing. The three psychological principles that govern how buyers process membership prices.</p>
+        </div>
+      </div>
+      <div class="solution-item animate">
+        <div class="solution-num">3</div>
+        <div class="solution-content">
+          <h3>Content Architecture</h3>
+          <p>The difference between acquisition content and retention content, and why confusing them kills memberships. How to build content pillars and the depth stack. The minimum viable cadence that is sustainable without burnout. The batch-and-release system.</p>
+        </div>
+      </div>
+      <div class="solution-item animate">
+        <div class="solution-num">4</div>
+        <div class="solution-content">
+          <h3>Community Architecture</h3>
+          <p>The three norms that determine whether a community holds or degrades. Minimum viable community structure. Your role as architect, not customer service. The facilitation moves that build culture in months one through six.</p>
+        </div>
+      </div>
+      <div class="solution-item animate">
+        <div class="solution-num">5</div>
+        <div class="solution-content">
+          <h3>Retention Mechanics</h3>
+          <p>The five reasons members cancel and the specific response to each. The first thirty days experience that determines whether someone becomes a long-term subscriber. Re-engagement sequences, renewal rituals, and the milestone system.</p>
+        </div>
+      </div>
+      <div class="solution-item animate">
+        <div class="solution-num">6</div>
+        <div class="solution-content">
+          <h3>Growth and Scale</h3>
+          <p>Three organic growth mechanisms that work without paid ads. The five metrics that actually matter. What year three looks like compared to year one. When and how to raise prices without losing members.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOC PREVIEW -->
+<section>
+  <div class="container">
+    <p class="section-label animate">Contents</p>
+    <h2 class="section-title animate">Eight parts, nineteen chapters.</h2>
+    <p class="section-body animate">5,000+ words covering every major decision a membership creator will face. Written in plain language with specific frameworks, not vague principles.</p>
+
+    <div class="toc-grid">
+      <div class="toc-card animate">
+        <div class="toc-part">Part One</div>
+        <div class="toc-title">The Foundation</div>
+        <ul class="toc-chapters">
+          <li>The core question nobody asks</li>
+          <li>Who your membership is actually for</li>
+          <li>The membership model decision</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Two</div>
+        <div class="toc-title">Pricing Architecture</div>
+        <ul class="toc-chapters">
+          <li>The economics of retention</li>
+          <li>Pricing models that work</li>
+          <li>Pricing psychology for memberships</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Three</div>
+        <div class="toc-title">Content Architecture</div>
+        <ul class="toc-chapters">
+          <li>The content engine</li>
+          <li>Content cadence without burnout</li>
+          <li>The first 30 days experience</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Four</div>
+        <div class="toc-title">Community Architecture</div>
+        <ul class="toc-chapters">
+          <li>Building a community that holds</li>
+          <li>Your role as community architect</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Five</div>
+        <div class="toc-title">Retention Mechanics</div>
+        <ul class="toc-chapters">
+          <li>Why members cancel</li>
+          <li>Retention mechanics that actually work</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Parts Six - Eight</div>
+        <div class="toc-title">Growth, Operations, and the Long Game</div>
+        <ul class="toc-chapters">
+          <li>Growing without ads</li>
+          <li>Platform selection</li>
+          <li>Legal and financial infrastructure</li>
+          <li>Year one vs. year three</li>
+          <li>When to raise prices</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box animate">
+      <p class="section-label" style="text-align:center;">Creator's Membership Site Blueprint</p>
+      <div class="cta-price">$25.99</div>
+      <p class="cta-price-sub">One-time payment. Instant download.</p>
+      <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="btn-primary" style="font-size:18px; padding:18px 48px;">Get the Blueprint</a>
+      <ul class="cta-features">
+        <li>5,000+ word operating manual (PDF + Markdown)</li>
+        <li>Eight parts covering foundation through scale</li>
+        <li>Pricing models with actual LTV and churn math</li>
+        <li>Minimum viable content cadence framework</li>
+        <li>Community structure and facilitation system</li>
+        <li>Retention mechanics with specific response protocols</li>
+        <li>Launch checklist, monthly ops checklist, quarterly review framework</li>
+      </ul>
+      <p class="cta-guarantee">14-day money-back guarantee. No questions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>
+      <a href="/index.html">Behike</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/terms.html">Terms</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/privacy.html">Privacy</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/refund.html">Refunds</a>
+    </p>
+    <p style="margin-top:12px;">Behike Digital. Puerto Rico.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate, .hero-label, .hero-title, .hero-subtitle, .hero-actions').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Trigger hero immediately
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.hero-label, .hero-title, .hero-subtitle, .hero-actions').forEach(el => {
+        el.classList.add('visible');
+      });
+    }, 80);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur's Product Suite Architecture — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      line-height: 1.6;
+      font-size: 17px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1d1d1f;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: #F5F5F7;
+      letter-spacing: -0.3px;
+      text-decoration: none;
+    }
+    .brand span { color: #0A84FF; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.15);
+      color: #0A84FF;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      margin-bottom: 32px;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span { color: #0A84FF; }
+    .hero-sub {
+      font-size: 21px;
+      color: #a1a1a6;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #F5F5F7;
+    }
+    .price-note {
+      font-size: 14px;
+      color: #6e6e73;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.2px;
+      transition: opacity 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.88; }
+    .cta-caption {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #6e6e73;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+      border-top: 1px solid #1d1d1f;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #0A84FF;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .section p {
+      color: #a1a1a6;
+      font-size: 18px;
+      max-width: 680px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+    .section p strong { color: #F5F5F7; }
+    .callout {
+      background: #0d0d0f;
+      border: 1px solid #2a2a2e;
+      border-left: 3px solid #0A84FF;
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-top: 32px;
+      font-size: 18px;
+      color: #F5F5F7;
+      font-style: italic;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    /* TIER CARDS */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+    @media (max-width: 640px) { .tier-grid { grid-template-columns: 1fr; } }
+    .tier-card {
+      background: #0d0d0f;
+      border: 1px solid #2a2a2e;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .tier-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: #0A84FF;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .tier-card h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .tier-price {
+      font-size: 14px;
+      color: #30D158;
+      font-weight: 500;
+      margin-bottom: 14px;
+    }
+    .tier-card p {
+      font-size: 15px;
+      color: #6e6e73;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* INSIDE LIST */
+    .inside-list {
+      list-style: none;
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .inside-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .inside-num {
+      width: 32px;
+      height: 32px;
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      flex-shrink: 0;
+    }
+    .inside-body h4 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 4px;
+    }
+    .inside-body p {
+      font-size: 15px;
+      color: #6e6e73;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      list-style: none;
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 17px;
+      color: #a1a1a6;
+      line-height: 1.5;
+    }
+    .for-list li::before {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #30D158;
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    .for-list li strong { color: #F5F5F7; }
+
+    /* MATH BLOCK */
+    .math-block {
+      background: #0d0d0f;
+      border: 1px solid #2a2a2e;
+      border-radius: 16px;
+      padding: 36px;
+      margin-top: 36px;
+      max-width: 680px;
+    }
+    .math-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #1d1d1f;
+      font-size: 16px;
+    }
+    .math-row:last-child { border-bottom: none; }
+    .math-row .label { color: #a1a1a6; }
+    .math-row .value { color: #F5F5F7; font-weight: 600; }
+    .math-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0 0;
+      margin-top: 4px;
+    }
+    .math-total .label { color: #F5F5F7; font-weight: 600; font-size: 18px; }
+    .math-total .value { color: #30D158; font-size: 24px; font-weight: 700; }
+
+    /* CTA FOOTER */
+    .cta-footer {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid #1d1d1f;
+    }
+    .cta-footer h2 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+    .cta-footer p {
+      font-size: 19px;
+      color: #a1a1a6;
+      max-width: 520px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1d1d1f;
+      text-align: center;
+      font-size: 14px;
+      color: #6e6e73;
+    }
+    footer a { color: #6e6e73; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="brand">Behike<span>.</span></a>
+      <a href="#buy" class="cta-btn" style="font-size:15px; padding: 10px 24px;">Get it — $23.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge">Product Architecture</div>
+      <h1>The Solopreneur's <span>Product Suite</span> Architecture</h1>
+      <p class="hero-sub">How one-person businesses design a product ecosystem that generates revenue at multiple price points from the same audience.</p>
+      <div class="price-block">
+        <div class="price">$23.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <a id="buy" href="#" class="cta-btn">Get Instant Access</a>
+      <p class="cta-caption">3,500+ words. Complete frameworks. No outlines — full content.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Core Problem</p>
+      <h2>A single product is a door with no hallway.</h2>
+      <p>Most solopreneurs who plateau are not failing at marketing. They are failing at architecture. One product forces every potential customer to make a binary decision: buy this specific thing at this price, or buy nothing.</p>
+      <p>There is no step for the person who is interested but not ready. No upgrade for the person who loved it and wants more. No path for the customer who has moved past the problem you solve.</p>
+      <p><strong>The fix is not more products piled randomly on top of each other.</strong> It is a product suite designed as a system, where each product serves a specific role and points naturally toward the next one.</p>
+      <div class="callout">
+        "A well-designed product suite captures buyers at multiple readiness levels, increases the lifetime value of every customer, and creates recurring revenue from an existing audience rather than constant new acquisition."
+      </div>
+    </div>
+  </section>
+
+  <!-- 4-TIER ARCHITECTURE -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Framework</p>
+      <h2>The 4-Tier Product Architecture.</h2>
+      <p>Every durable product suite for a one-person business is built around four tiers. The tiers exist because your potential customers are not all at the same place in their journey.</p>
+      <div class="tier-grid">
+        <div class="tier-card">
+          <p class="tier-num">Tier 1</p>
+          <h3>Entry Product</h3>
+          <p class="tier-price">$7 — $27</p>
+          <p>The trust transaction. Converts audience members to customers for the first time. Solves one specific, urgent problem completely. Sets the expectation for your work quality.</p>
+        </div>
+        <div class="tier-card">
+          <p class="tier-num">Tier 2</p>
+          <h3>Core Product</h3>
+          <p class="tier-price">$47 — $197</p>
+          <p>The center of your business. Delivers comprehensive transformation. Where your philosophy, system, and full expertise live. Addresses the deeper underlying problem.</p>
+        </div>
+        <div class="tier-card">
+          <p class="tier-num">Tier 3</p>
+          <h3>Premium Product</h3>
+          <p class="tier-price">$297 — $997</p>
+          <p>For customers who got results and want to go deeper, faster, or with more support. The most underused tier in most solopreneur businesses. Where implementation support lives.</p>
+        </div>
+        <div class="tier-card">
+          <p class="tier-num">Tier 4</p>
+          <h3>High-Ticket Offer</h3>
+          <p class="tier-price">$1,500+</p>
+          <p>Access, not information. One-on-one consulting, done-for-you, mastermind, retainer. You are selling your judgment and direct attention. The ROI calculus is completely different.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <h2>Eight complete frameworks, zero filler.</h2>
+      <ul class="inside-list">
+        <li>
+          <div class="inside-num">01</div>
+          <div class="inside-body">
+            <h4>Why Single-Product Businesses Plateau</h4>
+            <p>The architecture problem most solopreneurs mistake for a marketing problem. Why more traffic does not fix a broken funnel.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">02</div>
+          <div class="inside-body">
+            <h4>The 4-Tier Product Architecture</h4>
+            <p>Entry, core, premium, high-ticket. What each tier does, how to price it, and what format works best at each level.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">03</div>
+          <div class="inside-body">
+            <h4>Designing Products That Lead to Each Other</h4>
+            <p>The mechanism that creates natural progression. How to end every product so customers immediately want the next one.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">04</div>
+          <div class="inside-body">
+            <h4>Pricing Gaps That Guide Buyers Up the Ladder</h4>
+            <p>The 3-to-5x ratio. Round-number clustering. Annual pricing. How to price so each tier feels like a clear step forward.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">05</div>
+          <div class="inside-body">
+            <h4>Creating Bundles That Convert</h4>
+            <p>What a real bundle is versus a clearance sale. Bundle construction formula. What bundles must never do to your solo pricing.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">06</div>
+          <div class="inside-body">
+            <h4>The Product Ecosystem Map</h4>
+            <p>Lead magnets, upsell moments, re-entry points. How to trace every path a customer might take through your products.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">07</div>
+          <div class="inside-body">
+            <h4>When to Add vs. When to Optimize</h4>
+            <p>The full checklist before you build anything new. The four specific conditions that justify adding a product.</p>
+          </div>
+        </li>
+        <li>
+          <div class="inside-num">08</div>
+          <div class="inside-body">
+            <h4>Building Toward $10K/Month with 3 Products</h4>
+            <p>The reverse-engineered math. A realistic model. The 90-day build plan for getting the system running.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- THE MATH -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Math</p>
+      <h2>$10,000/month. Reverse-engineered.</h2>
+      <p>This is what a 3-product suite looks like when it is working. Achievable with an engaged audience of 5,000 and consistent content.</p>
+      <div class="math-block">
+        <div class="math-row">
+          <span class="label">Entry product at $27 — 50 sales/mo</span>
+          <span class="value">$1,350</span>
+        </div>
+        <div class="math-row">
+          <span class="label">Core product at $197 — 30 sales/mo</span>
+          <span class="value">$5,910</span>
+        </div>
+        <div class="math-row">
+          <span class="label">Premium product at $497 — 6 sales/mo</span>
+          <span class="value">$2,982</span>
+        </div>
+        <div class="math-total">
+          <span class="label">86 total sales per month</span>
+          <span class="value">$10,242/mo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Who It's For</p>
+      <h2>One type of builder.</h2>
+      <ul class="for-list">
+        <li><strong>Solopreneurs with one product</strong> who are generating sales but cannot scale without burning out or constantly acquiring new customers.</li>
+        <li><strong>Creators building their first product suite</strong> who want a framework before they build so they do not have to redesign from scratch later.</li>
+        <li><strong>Coaches and consultants</strong> who want to move some of their income from time-for-money into products that earn without them present.</li>
+        <li><strong>Anyone stuck at a revenue plateau</strong> who has tried more marketing but has not yet examined whether the architecture of their business is the actual constraint.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA FOOTER -->
+  <section class="cta-footer">
+    <div class="container">
+      <h2>Build the architecture.<br>Let the system earn.</h2>
+      <p>3,500+ words. Eight complete frameworks. A 90-day build plan. One system for designing a product suite that compounds.</p>
+      <div class="price-block" style="justify-content:center; margin-bottom: 32px;">
+        <div class="price">$23.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <a href="#" class="cta-btn">Get Instant Access — $23.99</a>
+      <p class="cta-caption" style="margin-top: 16px;">Instant download after purchase. No subscription.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved. &nbsp;|&nbsp; <a href="/landing-pages/about.html">About</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

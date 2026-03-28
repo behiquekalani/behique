@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tutor</title>
+<style>
+:root{--blue:#0A84FF;--green:#30D158;--amber:#FF9F0A;--purple:#BF5AF2}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#000;color:#fff;font-family:system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.c{max-width:960px;margin:0 auto;padding:0 24px}
+section{padding:96px 0}
+nav{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto}
+.logo{font-size:17px;font-weight:600;color:#fff;text-decoration:none;letter-spacing:-.02em}
+.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{color:rgba(255,255,255,.55);text-decoration:none;font-size:14px}
+.nav-links a:hover{color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 24px;border-radius:980px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;border:none;transition:opacity .2s;font-family:inherit;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-p{background:var(--blue);color:#fff}
+.btn-o{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.2)}
+.btn-lg{padding:16px 32px;font-size:16px}
+.hero{padding:80px 0 96px;text-align:center}
+.eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:24px;padding:6px 14px;border-radius:980px;border:1px solid rgba(10,132,255,.3);background:rgba(10,132,255,.08)}
+h1{font-size:clamp(36px,6vw,64px);font-weight:700;letter-spacing:-.04em;line-height:1.05;margin-bottom:24px;max-width:720px;margin-left:auto;margin-right:auto}
+h1 .hl{color:var(--blue)}
+.hero p{font-size:clamp(17px,2.5vw,20px);color:rgba(255,255,255,.55);max-width:560px;margin:0 auto 40px;line-height:1.5}
+.ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.proof{margin-top:48px;color:rgba(255,255,255,.55);font-size:13px}
+.proof strong{color:#fff}
+.sl{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:12px}
+.st{font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
+.ss{font-size:17px;color:rgba(255,255,255,.55);max-width:520px;line-height:1.5}
+.hd{margin-bottom:56px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:32px}
+.picon{width:40px;height:40px;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;justify-content:center}
+.pa{background:rgba(255,159,10,.15)}
+.pp{background:rgba(191,90,242,.15)}
+.pb{background:rgba(10,132,255,.15)}
+.ib{width:16px;height:20px;border:2px solid var(--amber);border-radius:2px;position:relative}
+.ib::before{content:'';position:absolute;left:2px;top:3px;width:8px;height:2px;background:var(--amber);box-shadow:0 4px 0 var(--amber),0 8px 0 var(--amber)}
+.it{width:20px;height:20px;border-radius:50%;border:2px solid var(--purple);display:flex;align-items:center;justify-content:center}
+.it::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--purple)}
+.ibr{width:20px;height:18px;display:flex;align-items:flex-end;gap:3px}
+.ibar{flex:1;background:var(--blue);border-radius:2px 2px 0 0}
+.card h3{font-size:18px;font-weight:600;letter-spacing:-.02em;margin-bottom:10px}
+.card p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65}
+.how-bg{background:rgba(255,255,255,.015);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:40px}
+.step{display:flex;flex-direction:column;gap:14px}
+.snum{width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center}
+.stag{display:inline-block;font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--green);padding:3px 10px;border-radius:980px;background:rgba(48,209,88,.1);border:1px solid rgba(48,209,88,.2);width:fit-content}
+.step h3{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.step p{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.fc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:28px;transition:border-color .2s}
+.fc:hover{border-color:rgba(255,255,255,.14)}
+.fi{width:36px;height:36px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:center}
+.fib{background:rgba(10,132,255,.12)}
+.fig{background:rgba(48,209,88,.12)}
+.fia{background:rgba(255,159,10,.12)}
+.fip{background:rgba(191,90,242,.12)}
+.ilk{width:13px;height:14px;border:2px solid var(--blue);border-radius:3px;position:relative;margin-top:3px}
+.ilk::before{content:'';position:absolute;top:-7px;left:1px;width:7px;height:7px;border:2px solid var(--blue);border-radius:4px 4px 0 0;border-bottom:none}
+.icq{width:15px;height:15px;border:2px solid var(--green);border-radius:3px;position:relative}
+.icq::before{content:'';position:absolute;top:3px;left:2px;width:7px;height:4px;border-left:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(-45deg)}
+.ist{width:18px;height:17px;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:var(--amber)}
+.iclk{width:18px;height:18px;border:2px solid var(--purple);border-radius:50%;position:relative}
+.iclk::before{content:'';position:absolute;top:2px;left:6px;width:2px;height:5px;background:var(--purple)}
+.iclk::after{content:'';position:absolute;top:7px;left:6px;width:4px;height:2px;background:var(--purple)}
+.ilns{width:18px;display:flex;flex-direction:column;gap:3px}
+.iln{height:2px;border-radius:1px;background:var(--blue)}
+.iau{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid var(--green);position:relative}
+.iau::before{content:'';position:absolute;top:5px;left:-4px;width:8px;height:3px;background:var(--green)}
+.fc h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+.fc p{font-size:13px;color:rgba(255,255,255,.55);line-height:1.65}
+.pr-bg{background:rgba(255,255,255,.015);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.pg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:start}
+.pc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:32px;position:relative}
+.pc.ft{border-color:var(--blue);background:rgba(10,132,255,.05)}
+.fb{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--blue);padding:4px 14px;border-radius:980px;white-space:nowrap}
+.ptier{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:12px}
+.pprice{font-size:42px;font-weight:700;letter-spacing:-.04em;line-height:1;margin-bottom:4px}
+.pprice sup{font-size:20px;font-weight:500;vertical-align:top;margin-top:8px}
+.pper{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:28px}
+.pdiv{height:1px;background:rgba(255,255,255,.08);margin-bottom:24px}
+.pfl{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.pfl li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.55)}
+.pfl li.on{color:#fff}
+.ci{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:2px;position:relative}
+.cck{background:rgba(48,209,88,.2)}
+.cck::before{content:'';position:absolute;top:5px;left:3px;width:7px;height:4px;border-left:1.5px solid var(--green);border-bottom:1.5px solid var(--green);transform:rotate(-45deg)}
+.cxx{background:rgba(255,255,255,.06)}
+.cxx::before,.cxx::after{content:'';position:absolute;top:7px;left:4px;width:8px;height:1.5px;background:rgba(255,255,255,.22)}
+.cxx::before{transform:rotate(45deg)}
+.cxx::after{transform:rotate(-45deg)}
+.faq-list{display:flex;flex-direction:column;gap:2px}
+.faq-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+.faq-q{width:100%;background:none;border:none;color:#fff;font-size:16px;font-weight:500;text-align:left;padding:22px 24px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;font-family:inherit}
+.chev{width:20px;height:20px;flex-shrink:0;border:1.5px solid rgba(255,255,255,.2);border-radius:50%;position:relative;transition:transform .2s}
+.chev::before{content:'';position:absolute;top:5px;left:5px;width:7px;height:7px;border-right:1.5px solid rgba(255,255,255,.5);border-bottom:1.5px solid rgba(255,255,255,.5);transform:rotate(45deg)}
+.faq-item.open .chev{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.faq-item.open .faq-a{max-height:400px}
+.faq-a p{padding:0 24px 22px;font-size:14px;color:rgba(255,255,255,.55);line-height:1.7}
+.fcta{text-align:center;padding:96px 0}
+.fcta h2{font-size:clamp(28px,4vw,48px);font-weight:700;letter-spacing:-.03em;margin-bottom:16px}
+.fcta p{font-size:16px;color:rgba(255,255,255,.55);margin-bottom:40px}
+footer{border-top:1px solid rgba(255,255,255,.08);padding:28px 0}
+.fbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.fbar p{font-size:13px;color:rgba(255,255,255,.28)}
+.flinks{display:flex;gap:20px}
+.flinks a{font-size:13px;color:rgba(255,255,255,.28);text-decoration:none}
+.flinks a:hover{color:rgba(255,255,255,.6)}
+@media(max-width:600px){section{padding:64px 0}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+<nav>
+  <a href="#" class="logo">AI<span>Tutor</span></a>
+  <ul class="nav-links">
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#" class="btn btn-p" style="padding:8px 18px;font-size:14px">Start free</a></li>
+  </ul>
+</nav>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+<div class="c">
+  <div class="eyebrow">Source-locked AI tutoring</div>
+  <h1>Turn any document into an AI tutor that <span class="hl">teaches you</span></h1>
+  <p>Upload a PDF. Get a personalized learning path with quizzes, XP, and an AI that only answers from your material.</p>
+  <div class="ctas">
+    <a href="#" class="btn btn-p btn-lg">Start free</a>
+    <a href="#how" class="btn btn-o btn-lg">See how it works</a>
+  </div>
+  <p class="proof">Free to start. No credit card required. <strong>Your document. Your tutor.</strong></p>
+</div>
+</section>
+
+<!-- Problem -->
+<section id="problem">
+<div class="c">
+  <div class="hd">
+    <p class="sl">The problem</p>
+    <h2 class="st">The problem with most studying</h2>
+    <p class="ss">Most tools treat reading as learning. It is not.</p>
+  </div>
+  <div class="grid3">
+    <div class="card">
+      <div class="picon pa"><div class="ib"></div></div>
+      <h3>Too passive</h3>
+      <p>Reading a document gives you the illusion of learning. Retention without active recall drops to near zero within 48 hours. Highlighting does not fix that.</p>
+    </div>
+    <div class="card">
+      <div class="picon pp"><div class="it"></div></div>
+      <h3>Too generic</h3>
+      <p>ChatGPT and general AI tools do not know your textbook, your notes, or your course materials. They answer from the whole internet, not your source.</p>
+    </div>
+    <div class="card">
+      <div class="picon pb">
+        <div class="ibr">
+          <div class="ibar" style="height:8px"></div>
+          <div class="ibar" style="height:13px"></div>
+          <div class="ibar" style="height:10px"></div>
+          <div class="ibar" style="height:18px"></div>
+        </div>
+      </div>
+      <h3>No accountability</h3>
+      <p>No XP. No streaks. No reason to come back tomorrow. Without a system that rewards progress, most study sessions are one-and-done.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- How it works -->
+<section id="how" class="how-bg">
+<div class="c">
+  <div class="hd">
+    <p class="sl">How it works</p>
+    <h2 class="st">Three steps from document to learning</h2>
+    <p class="ss">No setup. No course design. Upload and start in under a minute.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="snum">1</div>
+      <div class="stag">Any format</div>
+      <h3>Upload any document</h3>
+      <p>PDF, plain text, lecture notes, a book chapter. Up to 100 pages on the free tier, unlimited on Solo and Team plans.</p>
+    </div>
+    <div class="step">
+      <div class="snum">2</div>
+      <div class="stag">Auto-generated</div>
+      <h3>AI builds your learning path</h3>
+      <p>The system reads your document and generates chapters, identifies key concepts, and writes quiz questions. You get a structured learning path from raw material in seconds.</p>
+    </div>
+    <div class="step">
+      <div class="snum">3</div>
+      <div class="stag">Start earning XP</div>
+      <h3>Study with your personal tutor</h3>
+      <p>Ask questions and get answers that come only from your document. Take quizzes, earn XP for each lesson completed, and build a daily study streak.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Features -->
+<section id="features">
+<div class="c">
+  <div class="hd">
+    <p class="sl">Features</p>
+    <h2 class="st">Built for real studying</h2>
+    <p class="ss">Every feature solves a specific problem students and professionals run into.</p>
+  </div>
+  <div class="fg">
+    <div class="fc">
+      <div class="fi fib"><div class="ilk"></div></div>
+      <h3>Source-locked AI</h3>
+      <p>The AI only answers from your uploaded document. No hallucinations. No mixing with outside information.</p>
+    </div>
+    <div class="fc">
+      <div class="fi fig"><div class="icq"></div></div>
+      <h3>Auto-quiz generation</h3>
+      <p>Key concepts become multiple choice and short answer questions automatically. No need to write your own practice tests.</p>
+    </div>
+    <div class="fc">
+      <div class="fi fia"><div class="ist"></div></div>
+      <h3>XP and streak system</h3>
+      <p>Earn XP for completing lessons and quizzes. Build a daily streak. Consistent behavior gets rewarded, not just final scores.</p>
+    </div>
+    <div class="fc">
+      <div class="fi fip"><div class="iclk"></div></div>
+      <h3>Study break reminders</h3>
+      <p>Timed prompts between study blocks. Short breaks between sessions improve retention. The system tracks them so you do not have to.</p>
+    </div>
+    <div class="fc">
+      <div class="fi fib">
+        <div class="ilns">
+          <div class="iln" style="width:100%"></div>
+          <div class="iln" style="width:70%"></div>
+          <div class="iln" style="width:45%"></div>
+        </div>
+      </div>
+      <h3>Progress history</h3>
+      <p>Every session is logged. See which lessons you completed, which quiz questions you missed, and how your score improved over time.</p>
+    </div>
+    <div class="fc">
+      <div class="fi fig"><div class="iau"></div></div>
+      <h3>Export your notes</h3>
+      <p>Export a clean summary of your learning session. Includes the AI answers you found most useful and your quiz results.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="pr-bg">
+<div class="c">
+  <div class="hd">
+    <p class="sl">Pricing</p>
+    <h2 class="st">Start free. Upgrade when you need more.</h2>
+    <p class="ss">No annual lock-in. Cancel any month.</p>
+  </div>
+  <div class="pg">
+
+    <div class="pc">
+      <p class="ptier">Free</p>
+      <div class="pprice">$0</div>
+      <p class="pper">No credit card needed</p>
+      <div class="pdiv"></div>
+      <ul class="pfl">
+        <li class="on"><span class="ci cck"></span>1 document at a time</li>
+        <li class="on"><span class="ci cck"></span>Basic AI chat (source-locked)</li>
+        <li class="on"><span class="ci cck"></span>Up to 100 pages per document</li>
+        <li><span class="ci cxx"></span>Quiz generation</li>
+        <li><span class="ci cxx"></span>XP and streak system</li>
+        <li><span class="ci cxx"></span>Progress history</li>
+        <li><span class="ci cxx"></span>Note export</li>
+      </ul>
+      <a href="#" class="btn btn-o" style="width:100%;justify-content:center">Get started free</a>
+    </div>
+
+    <div class="pc ft">
+      <div class="fb">Most popular</div>
+      <p class="ptier">Solo</p>
+      <div class="pprice"><sup>$</sup>9.99</div>
+      <p class="pper">per month</p>
+      <div class="pdiv"></div>
+      <ul class="pfl">
+        <li class="on"><span class="ci cck"></span>Unlimited documents</li>
+        <li class="on"><span class="ci cck"></span>Full AI tutor mode</li>
+        <li class="on"><span class="ci cck"></span>Auto-quiz generation</li>
+        <li class="on"><span class="ci cck"></span>XP and streak system</li>
+        <li class="on"><span class="ci cck"></span>Progress history</li>
+        <li class="on"><span class="ci cck"></span>Note export</li>
+        <li class="on"><span class="ci cck"></span>Study break reminders</li>
+      </ul>
+      <a href="#" class="btn btn-p" style="width:100%;justify-content:center">Start Solo</a>
+    </div>
+
+    <div class="pc">
+      <p class="ptier">Team</p>
+      <div class="pprice"><sup>$</sup>19.99</div>
+      <p class="pper">per month</p>
+      <div class="pdiv"></div>
+      <ul class="pfl">
+        <li class="on"><span class="ci cck"></span>Everything in Solo</li>
+        <li class="on"><span class="ci cck"></span>Share document libraries</li>
+        <li class="on"><span class="ci cck"></span>Up to 5 teammates</li>
+        <li class="on"><span class="ci cck"></span>Team leaderboard</li>
+        <li class="on"><span class="ci cck"></span>Shared progress view</li>
+        <li class="on"><span class="ci cck"></span>Admin controls</li>
+        <li class="on"><span class="ci cck"></span>Priority support</li>
+      </ul>
+      <a href="#" class="btn btn-o" style="width:100%;justify-content:center">Start Team</a>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+<div class="c">
+  <div class="hd">
+    <p class="sl">Questions</p>
+    <h2 class="st">Frequently asked</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="tf(this)">How does the AI stay limited to my document?<span class="chev"></span></button>
+      <div class="faq-a"><p>When you upload a document, the system indexes only that content and uses it as the exclusive reference for every answer. The AI is instructed not to draw from outside knowledge. If you ask something that is not in the document, it will tell you rather than guessing.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="tf(this)">What file types are supported?<span class="chev"></span></button>
+      <div class="faq-a"><p>Currently PDF and plain text (.txt) files. Support for Word documents (.docx) and markdown is on the roadmap. If your document is in another format, exporting it as PDF first will work in almost every case.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="tf(this)">Is my document stored on your servers?<span class="chev"></span></button>
+      <div class="faq-a"><p>Yes, documents are stored securely so the tutor can answer questions across sessions. Your data is not used to train any AI model. You can delete your documents at any time from account settings and they are permanently removed within 24 hours.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="tf(this)">How is this different from ChatPDF or just asking ChatGPT?<span class="chev"></span></button>
+      <div class="faq-a"><p>ChatPDF is a chatbot over a document. ChatGPT answers from general training data. AI Tutor is a learning system. The difference is what gets built around the document: a structured lesson path, auto-generated quizzes, an XP system that rewards consistent study, and progress tracking across sessions. The goal is retention, not just answers.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="tf(this)">Can I use this for professional certifications or continuing education?<span class="chev"></span></button>
+      <div class="faq-a"><p>Yes. Upload the official study guide or exam prep material for your certification and the system generates quiz questions directly from it. Professionals studying for CPA, PMP, security certifications, and similar exams use it to practice retrieval from the exact source material that will appear on the test.</p></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Footer CTA -->
+<section class="fcta">
+<div class="c">
+  <h2>Start studying smarter today</h2>
+  <p>One document. A structured learning path. No generic AI answers.</p>
+  <a href="#" class="btn btn-p btn-lg">Start free</a>
+</div>
+</section>
+
+<footer>
+<div class="c">
+  <div class="fbar">
+    <p>Built by Behike. 2026.</p>
+    <div class="flinks">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+function tf(btn){
+  var item=btn.closest('.faq-item');
+  var open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open')});
+  if(!open)item.classList.add('open');
+}
+</script>
+</body>
+</html>

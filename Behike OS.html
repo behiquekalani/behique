@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)file:///Users/kalani/behique/Ceiba/faces/behike-os.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>Behike OS</title>
+<link href="./Behike OS_files/css2" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000000;
+  --accent: #0A84FF;
+  --text: #F5F5F7;
+  --text-dim: #86868B;
+  --surface: rgba(28, 28, 30, 0.85);
+  --surface-solid: #1C1C1E;
+  --border: rgba(255,255,255,0.08);
+  --window-bg: rgba(22, 22, 24, 0.92);
+  --dock-bg: rgba(40, 40, 44, 0.65);
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-size-base: 14px;
+  --radius: 12px;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--text);
+  background: var(--bg);
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cline x1='10' y1='0' x2='10' y2='20' stroke='%23F5F5F7' stroke-width='1'/%3E%3Cline x1='0' y1='10' x2='20' y2='10' stroke='%23F5F5F7' stroke-width='1'/%3E%3Ccircle cx='10' cy='10' r='3' fill='none' stroke='%230A84FF' stroke-width='1'/%3E%3C/svg%3E") 10 10, crosshair;
+  user-select: none;
+}
+
+/* BOOT SCREEN */
+#boot-screen {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #000; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 24px;
+  transition: opacity 0.6s ease;
+}
+#boot-screen.fade-out { opacity: 0; pointer-events: none; }
+#boot-screen h1 {
+  font-family: var(--font-pixel); font-size: 28px;
+  color: var(--text); letter-spacing: 4px;
+}
+#boot-screen .boot-sub {
+  font-family: var(--font-pixel); font-size: 10px;
+  color: var(--text-dim);
+}
+.progress-bar {
+  width: 300px; height: 4px; background: rgba(255,255,255,0.1);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; width: 0%; background: var(--accent);
+  border-radius: 2px; transition: width 1.8s ease-in-out;
+}
+
+/* MENU BAR */
+#menu-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 32px;
+  background: rgba(0,0,0,0.75); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; z-index: 9000;
+  font-size: 13px;
+}
+#menu-bar .left { display: flex; align-items: center; gap: 16px; }
+#menu-bar .logo {
+  font-family: var(--font-pixel); font-size: 10px;
+  color: var(--accent); cursor: pointer;
+}
+#menu-bar .menu-item {
+  color: var(--text); cursor: pointer; font-weight: 500;
+  position: relative;
+}
+#menu-bar .menu-item:hover { color: var(--accent); }
+#menu-bar .right { display: flex; align-items: center; gap: 14px; color: var(--text-dim); font-size: 12px; }
+.menu-dropdown {
+  display: none; position: absolute; top: 28px; left: 0;
+  background: var(--surface-solid); border: 1px solid var(--border);
+  border-radius: 8px; padding: 4px 0; min-width: 180px; z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.menu-dropdown.show { display: block; }
+.menu-dropdown .dd-item {
+  padding: 8px 16px; cursor: pointer; font-size: 13px; color: var(--text);
+}
+.menu-dropdown .dd-item:hover { background: var(--accent); color: #fff; }
+.menu-dropdown .dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+/* DESKTOP */
+#desktop {
+  position: fixed; top: 32px; left: 0; right: 0; bottom: 72px;
+  background:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  overflow: hidden;
+}
+
+/* DESKTOP ICONS */
+#desktop-icons {
+  display: grid; grid-template-columns: repeat(auto-fill, 90px);
+  gap: 8px; padding: 24px;
+  position: absolute; top: 0; left: 0;
+}
+.desktop-icon {
+  width: 90px; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; padding: 8px 4px;
+  border-radius: 8px; cursor: pointer; transition: background 0.15s;
+}
+.desktop-icon:hover { background: rgba(255,255,255,0.06); }
+.desktop-icon:active { transform: scale(0.92); }
+.desktop-icon .icon-img {
+  width: 56px; height: 56px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 36px; background: rgba(255,255,255,0.04);
+  border-radius: 14px; border: 1px solid var(--border);
+  transition: transform 0.2s;
+}
+.desktop-icon:active .icon-img { transform: scale(0.88); }
+.desktop-icon .icon-label {
+  font-family: var(--font-pixel); font-size: 7px;
+  color: var(--text); text-align: center; line-height: 1.4;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+/* WINDOWS */
+.os-window {
+  position: absolute; background: var(--window-bg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+  display: flex; flex-direction: column;
+  min-width: 320px; min-height: 200px;
+  animation: windowOpen 0.25s ease-out;
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+}
+@keyframes windowOpen {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+.os-window.minimizing {
+  animation: windowMin 0.25s ease-in forwards;
+}
+@keyframes windowMin {
+  to { opacity: 0; transform: scale(0.5) translateY(100px); }
+}
+.window-titlebar {
+  height: 40px; display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  cursor: grab; flex-shrink: 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.window-titlebar:active { cursor: grabbing; }
+.window-controls { display: flex; gap: 7px; }
+.window-controls span {
+  width: 12px; height: 12px; border-radius: 50%;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.window-controls span:hover { opacity: 0.8; }
+.btn-close { background: #FF5F57; }
+.btn-minimize { background: #FEBC2E; }
+.btn-maximize { background: #28C840; }
+.window-title {
+  font-family: var(--font-pixel); font-size: 9px;
+  color: var(--text-dim); flex: 1; text-align: center;
+  pointer-events: none;
+}
+.window-body {
+  flex: 1; overflow: auto; padding: 16px;
+  font-family: var(--font-body);
+}
+.window-body::-webkit-scrollbar { width: 6px; }
+.window-body::-webkit-scrollbar-track { background: transparent; }
+.window-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+
+/* DOCK */
+#dock {
+  position: fixed; bottom: 8px; left: 50%; transform: translateX(-50%);
+  height: 60px; display: flex; align-items: center; gap: 4px;
+  padding: 4px 12px;
+  background: var(--dock-bg);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px; z-index: 8000;
+}
+.dock-icon {
+  width: 48px; height: 48px; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 28px; border-radius: 12px; cursor: pointer;
+  transition: transform 0.15s ease;
+  position: relative;
+}
+.dock-icon:hover { transform: scale(1.25) translateY(-6px); }
+.dock-icon .dock-dot {
+  position: absolute; bottom: -2px; width: 4px; height: 4px;
+  background: var(--accent); border-radius: 50%;
+}
+.dock-sep {
+  width: 1px; height: 36px; background: rgba(255,255,255,0.12);
+  margin: 0 4px;
+}
+
+/* ABOUT DIALOG */
+#about-overlay {
+  display: none; position: fixed; inset: 0; z-index: 99990;
+  background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+}
+#about-overlay.show { display: flex; }
+#about-box {
+  background: var(--surface-solid); border: 1px solid var(--border);
+  border-radius: 16px; padding: 32px; text-align: center;
+  max-width: 360px; box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+#about-box h2 { font-family: var(--font-pixel); font-size: 14px; color: var(--accent); margin-bottom: 12px; }
+#about-box p { font-size: 13px; color: var(--text-dim); line-height: 1.6; margin-bottom: 8px; }
+#about-box .close-about {
+  margin-top: 16px; padding: 8px 24px; background: var(--accent);
+  color: #fff; border: none; border-radius: 8px; cursor: pointer;
+  font-family: var(--font-body); font-size: 13px;
+}
+
+/* ===== APP STYLES ===== */
+
+/* Projects file browser */
+.file-browser { display: flex; height: 100%; gap: 0; margin: -16px; }
+.file-sidebar {
+  width: 180px; border-right: 1px solid var(--border);
+  padding: 12px; overflow-y: auto; flex-shrink: 0;
+}
+.file-sidebar .folder {
+  padding: 6px 8px; cursor: pointer; font-size: 13px;
+  border-radius: 6px; margin-bottom: 2px; color: var(--text-dim);
+}
+.file-sidebar .folder:hover, .file-sidebar .folder.active {
+  background: rgba(10,132,255,0.15); color: var(--accent);
+}
+.file-list { flex: 1; padding: 12px; overflow-y: auto; }
+.file-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 10px; border-radius: 6px; margin-bottom: 2px;
+  font-size: 13px; cursor: default;
+}
+.file-item:hover { background: rgba(255,255,255,0.04); }
+.file-item .fname { color: var(--text); }
+.file-item .fmeta { color: var(--text-dim); font-size: 11px; }
+
+/* Journal */
+.journal-entry { margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+.journal-entry h3 {
+  font-family: var(--font-pixel); font-size: 10px; color: var(--accent);
+  margin-bottom: 6px; cursor: pointer;
+}
+.journal-entry .jdate { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
+.journal-entry .jbody { font-size: 13px; color: var(--text); line-height: 1.7; display: none; }
+.journal-entry.open .jbody { display: block; }
+
+/* Store */
+.product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.product-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+.product-card h4 { font-size: 13px; margin-bottom: 6px; color: var(--text); }
+.product-card .price { font-family: var(--font-pixel); font-size: 12px; color: var(--accent); margin-bottom: 10px; }
+.product-card .buy-btn {
+  padding: 6px 20px; background: var(--accent); color: #fff;
+  border: none; border-radius: 6px; cursor: pointer; font-size: 12px;
+  font-family: var(--font-body);
+}
+.product-card .buy-btn:hover { opacity: 0.85; }
+
+/* Chat */
+.chat-container { display: flex; flex-direction: column; height: 100%; margin: -16px; }
+.chat-messages { flex: 1; padding: 16px; overflow-y: auto; }
+.chat-msg { margin-bottom: 12px; }
+.chat-msg .bubble {
+  display: inline-block; padding: 10px 14px; border-radius: 14px;
+  font-size: 13px; max-width: 80%; line-height: 1.5;
+}
+.chat-msg.bot .bubble { background: rgba(255,255,255,0.06); color: var(--text); }
+.chat-msg.user .bubble { background: var(--accent); color: #fff; margin-left: auto; display: block; text-align: right; }
+.chat-input-row {
+  display: flex; gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.chat-input-row input {
+  flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border); border-radius: 10px;
+  color: var(--text); font-size: 13px; outline: none;
+  font-family: var(--font-body);
+}
+.chat-input-row input:focus { border-color: var(--accent); }
+.chat-input-row button {
+  padding: 10px 18px; background: var(--accent); color: #fff;
+  border: none; border-radius: 10px; cursor: pointer; font-size: 13px;
+  font-family: var(--font-body);
+}
+
+/* Music */
+.music-player { text-align: center; padding: 20px; }
+.music-player .album-art {
+  width: 160px; height: 160px; margin: 0 auto 20px;
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  font-size: 64px;
+}
+.music-player .track-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.music-player .track-artist { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+.music-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 16px; }
+.music-controls button {
+  background: none; border: none; color: var(--text); cursor: pointer; font-size: 20px;
+}
+.music-controls .play-btn {
+  width: 48px; height: 48px; background: var(--accent); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff;
+}
+.progress-track {
+  width: 100%; height: 4px; background: rgba(255,255,255,0.1);
+  border-radius: 2px; margin-bottom: 8px; cursor: pointer;
+}
+.progress-track .progress-current { height: 100%; width: 35%; background: var(--accent); border-radius: 2px; }
+.time-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 16px; }
+.volume-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.volume-row input[type=range] { width: 100px; accent-color: var(--accent); }
+
+/* Settings */
+.settings-panel h3 { font-family: var(--font-pixel); font-size: 9px; color: var(--text-dim); margin-bottom: 12px; }
+.theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+.theme-swatch {
+  height: 48px; border-radius: 10px; cursor: pointer; border: 2px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
+  display: flex; align-items: flex-end; padding: 6px;
+  font-family: var(--font-pixel); font-size: 7px; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+.theme-swatch:hover { transform: scale(1.04); }
+.theme-swatch.active { border-color: var(--accent); }
+.font-sizes { display: flex; gap: 8px; }
+.font-sizes button {
+  padding: 8px 16px; background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); cursor: pointer; font-family: var(--font-body);
+}
+.font-sizes button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Dashboard */
+.dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.dash-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; text-align: center;
+}
+.dash-card .dash-num {
+  font-family: var(--font-pixel); font-size: 24px; color: var(--accent);
+  margin-bottom: 6px;
+}
+.dash-card .dash-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+/* Minecraft */
+.mc-container { margin: -16px; display: flex; flex-direction: column; height: calc(100% + 32px); }
+.mc-canvas { flex: 1; cursor: crosshair; display: block; width: 100%; background: #87CEEB; }
+.mc-hud {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 4px; border-radius: 4px;
+}
+.mc-slot {
+  width: 40px; height: 40px; border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #fff; font-family: var(--font-pixel);
+  background: rgba(0,0,0,0.3);
+}
+.mc-slot.active { border-color: #fff; }
+.mc-crosshair {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  color: #fff; font-size: 24px; pointer-events: none; opacity: 0.7;
+}
+.mc-info {
+  position: absolute; top: 8px; left: 8px;
+  font-family: var(--font-pixel); font-size: 8px; color: #fff;
+  text-shadow: 1px 1px 0 #000; pointer-events: none;
+}
+
+/* Trash */
+.trash-empty { text-align: center; padding: 40px; color: var(--text-dim); }
+.trash-empty .trash-icon { font-size: 64px; margin-bottom: 16px; }
+.trash-empty p { font-size: 13px; }
+
+/* Lab */
+.lab-tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.lab-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.lab-card:hover { border-color: var(--accent); }
+.lab-card h4 { font-size: 13px; margin-bottom: 4px; }
+.lab-card p { font-size: 11px; color: var(--text-dim); }
+.lab-card .lab-icon { font-size: 28px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen" class="fade-out" style="display: none;">
+  <h1>BEHIKE OS</h1>
+  <div class="boot-sub">v1.0 // built from puerto rico</div>
+  <div class="progress-bar"><div class="progress-fill" id="boot-progress" style="width: 100%;"></div></div>
+  <div class="boot-sub" id="boot-status">Ready.</div>
+</div>
+
+<!-- ABOUT OVERLAY -->
+<div id="about-overlay">
+  <div id="about-box">
+    <h2>BEHIKE OS</h2>
+    <p>A virtual operating system built entirely in the browser. No frameworks. No backend. Just code.</p>
+    <p style="font-size:11px;">Created by Kalani Gomez Padin.<br>Powered by Ceiba AI infrastructure.</p>
+    <p style="font-size:10px; color: var(--text-dim);">© 2026 Behike. All rights reserved.</p>
+    <button class="close-about" onclick="document.getElementById(&#39;about-overlay&#39;).classList.remove(&#39;show&#39;)">Close</button>
+  </div>
+</div>
+
+<!-- MENU BAR -->
+<div id="menu-bar">
+  <div class="left">
+    <span class="logo" id="logo-btn">BEHIKE OS</span>
+    <span class="menu-item" id="file-menu">File
+      <div class="menu-dropdown" id="file-dropdown">
+        <div class="dd-item" onclick="openApp(&#39;projects&#39;)">Open Projects</div>
+        <div class="dd-sep"></div>
+        <div class="dd-item" onclick="closeAllWindows()">Close All Windows</div>
+      </div>
+    </span>
+    <span class="menu-item" id="view-menu">View
+      <div class="menu-dropdown" id="view-dropdown">
+        <div class="dd-item" onclick="tileWindows()">Tile Windows</div>
+        <div class="dd-item" onclick="minimizeAll()">Minimize All</div>
+      </div>
+    </span>
+    <span class="menu-item" id="help-menu">Help
+      <div class="menu-dropdown" id="help-dropdown">
+        <div class="dd-item" onclick="document.getElementById(&#39;about-overlay&#39;).classList.add(&#39;show&#39;)">About Behike OS</div>
+      </div>
+    </span>
+  </div>
+  <div class="right">
+    <span>◑</span>
+    <span id="battery-icon" title="Battery">🔋 100%</span>
+    <span id="clock">03:22 AM</span>
+  </div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div id="desktop-icons"><div class="desktop-icon"><div class="icon-img">🎮</div><div class="icon-label">Minecraft</div></div><div class="desktop-icon"><div class="icon-img">📁</div><div class="icon-label">Projects</div></div><div class="desktop-icon"><div class="icon-img">📝</div><div class="icon-label">Journal</div></div><div class="desktop-icon"><div class="icon-img">🛒</div><div class="icon-label">Store</div></div><div class="desktop-icon"><div class="icon-img">🧪</div><div class="icon-label">Lab</div></div><div class="desktop-icon"><div class="icon-img">💬</div><div class="icon-label">Chat</div></div><div class="desktop-icon"><div class="icon-img">🎵</div><div class="icon-label">Music</div></div><div class="desktop-icon"><div class="icon-img">⚙</div><div class="icon-label">Settings</div></div><div class="desktop-icon"><div class="icon-img">📊</div><div class="icon-label">Dashboard</div></div><div class="desktop-icon"><div class="icon-img">🗑</div><div class="icon-label">Trash</div></div></div>
+<div class="os-window" id="win-minecraft" style="z-index: 104; width: 800px; height: 600px; left: 443.821px; top: 105.379px;">
+    <div class="window-titlebar" data-win="minecraft">
+      <div class="window-controls">
+        <span class="btn-close" data-action="close" data-win="minecraft"></span>
+        <span class="btn-minimize" data-action="minimize" data-win="minecraft"></span>
+        <span class="btn-maximize" data-action="maximize" data-win="minecraft"></span>
+      </div>
+      <div class="window-title">Minecraft</div>
+    </div>
+    <div class="window-body" id="body-minecraft" style="padding: 0px; position: relative; overflow: hidden;">
+    <div class="mc-container">
+      <canvas class="mc-canvas" id="mc-canvas" width="763" height="542"></canvas>
+    </div>
+    <div class="mc-crosshair">+</div>
+    <div class="mc-info" id="mc-info">WASD move | LMB break | RMB place | 1-5 select | ESC exit</div>
+    <div class="mc-hud" id="mc-hud"><div class="mc-slot active" style="background: rgba(0, 0, 0, 0.3);"><div style="width: 20px; height: 20px; border-radius: 3px; background: rgb(76, 175, 80);"></div></div><div class="mc-slot" style="background: rgba(0, 0, 0, 0.3);"><div style="width: 20px; height: 20px; border-radius: 3px; background: rgb(141, 110, 99);"></div></div><div class="mc-slot" style="background: rgba(0, 0, 0, 0.3);"><div style="width: 20px; height: 20px; border-radius: 3px; background: rgb(158, 158, 158);"></div></div><div class="mc-slot" style="background: rgba(0, 0, 0, 0.3);"><div style="width: 20px; height: 20px; border-radius: 3px; background: rgb(161, 136, 127);"></div></div><div class="mc-slot" style="background: rgba(0, 0, 0, 0.3);"><div style="width: 20px; height: 20px; border-radius: 3px; background: rgb(66, 165, 245);"></div></div></div>
+  </div>
+  </div><div class="os-window" id="win-projects" style="z-index: 155; width: 700px; height: 500px; left: 280px; top: 96px;">
+    <div class="window-titlebar" data-win="projects">
+      <div class="window-controls">
+        <span class="btn-close" data-action="close" data-win="projects"></span>
+        <span class="btn-minimize" data-action="minimize" data-win="projects"></span>
+        <span class="btn-maximize" data-action="maximize" data-win="projects"></span>
+      </div>
+      <div class="window-title">Projects</div>
+    </div>
+    <div class="window-body" id="body-projects"><div class="file-browser">
+      <div class="file-sidebar">
+        <div class="folder" data-folder="AI-Systems">📁 AI-Systems</div><div class="folder" data-folder="Products">📁 Products</div><div class="folder" data-folder="Content">📁 Content</div><div class="folder" data-folder="Tools">📁 Tools</div><div class="folder active" data-folder="Legal">📁 Legal</div>
+      </div>
+      <div class="file-list">
+        <div class="file-item"><span class="fname">Terms of Service.md</span><span class="fmeta">18 KB / 2026-03-05</span></div><div class="file-item"><span class="fname">Privacy Policy.md</span><span class="fmeta">22 KB / 2026-03-05</span></div><div class="file-item"><span class="fname">Refund Policy.md</span><span class="fmeta">8 KB / 2026-03-05</span></div>
+      </div>
+    </div></div>
+  </div><div class="os-window" id="win-store" style="z-index: 136; width: 700px; height: 500px; left: 980px; top: 241px;">
+    <div class="window-titlebar" data-win="store">
+      <div class="window-controls">
+        <span class="btn-close" data-action="close" data-win="store"></span>
+        <span class="btn-minimize" data-action="minimize" data-win="store"></span>
+        <span class="btn-maximize" data-action="maximize" data-win="store"></span>
+      </div>
+      <div class="window-title">Store</div>
+    </div>
+    <div class="window-body" id="body-store"><div class="product-grid">
+    
+      <div class="product-card">
+        <h4>AI Employee Playbook</h4>
+        <div class="price">$29</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+      <div class="product-card">
+        <h4>Budget Tracker Template</h4>
+        <div class="price">$9</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+      <div class="product-card">
+        <h4>Ecommerce Launch Guide</h4>
+        <div class="price">$19</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+      <div class="product-card">
+        <h4>The Behike Method</h4>
+        <div class="price">$39</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+      <div class="product-card">
+        <h4>Carousel Template Pack</h4>
+        <div class="price">$14</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+      <div class="product-card">
+        <h4>AI Automation Kit</h4>
+        <div class="price">$49</div>
+        <button class="buy-btn" onclick="window.open(&#39;#&#39;,&#39;_blank&#39;)">Buy Now</button>
+      </div>
+    
+  </div></div>
+  </div></div>
+
+<!-- DOCK -->
+<div id="dock" style="display: flex;"><div class="dock-icon" title="Minecraft">🎮<div class="dock-dot"></div></div><div class="dock-icon" title="Projects">📁<div class="dock-dot"></div></div><div class="dock-icon" title="Journal">📝</div><div class="dock-icon" title="Store">🛒<div class="dock-dot"></div></div><div class="dock-icon" title="Chat">💬</div><div class="dock-icon" title="Music">🎵</div><div class="dock-icon" title="Settings">⚙</div></div>
+
+<script>
+// ===== GLOBAL STATE =====
+const STATE = {
+  windows: {},
+  zIndex: 100,
+  openApps: new Set(),
+  minimizedApps: new Set(),
+  dragState: null,
+  activeMenu: null,
+};
+
+const APPS = [
+  { id: 'minecraft', icon: '&#127918;', label: 'Minecraft', emoji: '\uD83C\uDFAE' },
+  { id: 'projects', icon: '&#128193;', label: 'Projects', emoji: '\uD83D\uDCC1' },
+  { id: 'journal', icon: '&#128221;', label: 'Journal', emoji: '\uD83D\uDCDD' },
+  { id: 'store', icon: '&#128722;', label: 'Store', emoji: '\uD83D\uDED2' },
+  { id: 'lab', icon: '&#129514;', label: 'Lab', emoji: '\uD83E\uDDEA' },
+  { id: 'chat', icon: '&#128172;', label: 'Chat', emoji: '\uD83D\uDCAC' },
+  { id: 'music', icon: '&#127925;', label: 'Music', emoji: '\uD83C\uDFB5' },
+  { id: 'settings', icon: '&#9881;', label: 'Settings', emoji: '\u2699\uFE0F' },
+  { id: 'dashboard', icon: '&#128202;', label: 'Dashboard', emoji: '\uD83D\uDCCA' },
+  { id: 'trash', icon: '&#128465;', label: 'Trash', emoji: '\uD83D\uDDD1\uFE0F' },
+];
+
+const PINNED_DOCK = ['minecraft','projects','journal','store','chat','music','settings'];
+
+// ===== BOOT SEQUENCE =====
+(function boot() {
+  if (sessionStorage.getItem('behike-booted')) {
+    document.getElementById('boot-screen').style.display = 'none';
+    initDesktop();
+    return;
+  }
+  const progress = document.getElementById('boot-progress');
+  const status = document.getElementById('boot-status');
+  const msgs = ['Loading kernel...', 'Mounting filesystem...', 'Starting window manager...', 'Ready.'];
+  let i = 0;
+  setTimeout(() => { progress.style.width = '100%'; }, 100);
+  const interval = setInterval(() => {
+    if (i < msgs.length) { status.textContent = msgs[i]; i++; }
+  }, 450);
+  setTimeout(() => {
+    clearInterval(interval);
+    document.getElementById('boot-screen').classList.add('fade-out');
+    sessionStorage.setItem('behike-booted', '1');
+    setTimeout(() => {
+      document.getElementById('boot-screen').style.display = 'none';
+      initDesktop();
+    }, 600);
+  }, 2200);
+})();
+
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  const h = now.getHours(); const m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hh = h % 12 || 12;
+  document.getElementById('clock').textContent =
+    `${String(hh).padStart(2,'0')}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+updateClock(); setInterval(updateClock, 10000);
+
+// ===== MENU BAR =====
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', e => {
+    e.stopPropagation();
+    const dd = item.querySelector('.menu-dropdown');
+    if (!dd) return;
+    const isOpen = dd.classList.contains('show');
+    document.querySelectorAll('.menu-dropdown').forEach(d => d.classList.remove('show'));
+    if (!isOpen) dd.classList.add('show');
+  });
+});
+document.getElementById('logo-btn').addEventListener('click', () => {
+  document.getElementById('about-overlay').classList.add('show');
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-dropdown').forEach(d => d.classList.remove('show'));
+});
+
+// ===== INIT DESKTOP =====
+function initDesktop() {
+  const container = document.getElementById('desktop-icons');
+  APPS.forEach(app => {
+    const el = document.createElement('div');
+    el.className = 'desktop-icon';
+    el.innerHTML = `<div class="icon-img">${app.icon}</div><div class="icon-label">${app.label}</div>`;
+    el.addEventListener('dblclick', () => openApp(app.id));
+    el.addEventListener('click', () => openApp(app.id));
+    container.appendChild(el);
+  });
+  renderDock();
+  document.getElementById('dock').style.display = 'flex';
+}
+
+// ===== DOCK =====
+function renderDock() {
+  const dock = document.getElementById('dock');
+  dock.innerHTML = '';
+  PINNED_DOCK.forEach(id => {
+    const app = APPS.find(a => a.id === id);
+    const el = document.createElement('div');
+    el.className = 'dock-icon';
+    el.innerHTML = app.icon + (STATE.openApps.has(id) ? '<div class="dock-dot"></div>' : '');
+    el.title = app.label;
+    el.addEventListener('click', () => {
+      if (STATE.minimizedApps.has(id)) { restoreWindow(id); }
+      else if (STATE.openApps.has(id)) { bringToFront(id); }
+      else { openApp(id); }
+    });
+    dock.appendChild(el);
+  });
+
+  // Add separator + extra open apps not in pinned
+  const extras = [...STATE.openApps].filter(id => !PINNED_DOCK.includes(id));
+  if (extras.length > 0) {
+    const sep = document.createElement('div');
+    sep.className = 'dock-sep';
+    dock.appendChild(sep);
+    extras.forEach(id => {
+      const app = APPS.find(a => a.id === id);
+      if (!app) return;
+      const el = document.createElement('div');
+      el.className = 'dock-icon';
+      el.innerHTML = app.icon + '<div class="dock-dot"></div>';
+      el.title = app.label;
+      el.addEventListener('click', () => {
+        if (STATE.minimizedApps.has(id)) restoreWindow(id);
+        else bringToFront(id);
+      });
+      dock.appendChild(el);
+    });
+  }
+}
+
+// ===== WINDOW MANAGER =====
+function openApp(id) {
+  if (STATE.openApps.has(id)) {
+    if (STATE.minimizedApps.has(id)) restoreWindow(id);
+    else bringToFront(id);
+    return;
+  }
+  const app = APPS.find(a => a.id === id);
+  if (!app) return;
+
+  STATE.zIndex++;
+  const w = document.createElement('div');
+  w.className = 'os-window';
+  w.id = 'win-' + id;
+  w.style.zIndex = STATE.zIndex;
+
+  // Size + position
+  let ww = 700, wh = 500;
+  if (id === 'minecraft') { ww = 800; wh = 600; }
+  if (id === 'chat') { ww = 420; wh = 520; }
+  if (id === 'music') { ww = 380; wh = 460; }
+  if (id === 'settings') { ww = 480; wh = 380; }
+  if (id === 'trash') { ww = 360; wh = 280; }
+  if (id === 'dashboard') { ww = 600; wh = 400; }
+
+  const desktop = document.getElementById('desktop');
+  const maxW = desktop.clientWidth - 40;
+  const maxH = desktop.clientHeight - 40;
+  ww = Math.min(ww, maxW); wh = Math.min(wh, maxH);
+  const left = Math.max(20, (maxW - ww) / 2 + Math.random() * 40 - 20);
+  const top = Math.max(20, (maxH - wh) / 2 + Math.random() * 40 - 20);
+
+  w.style.width = ww + 'px'; w.style.height = wh + 'px';
+  w.style.left = left + 'px'; w.style.top = top + 'px';
+
+  w.innerHTML = `
+    <div class="window-titlebar" data-win="${id}">
+      <div class="window-controls">
+        <span class="btn-close" data-action="close" data-win="${id}"></span>
+        <span class="btn-minimize" data-action="minimize" data-win="${id}"></span>
+        <span class="btn-maximize" data-action="maximize" data-win="${id}"></span>
+      </div>
+      <div class="window-title">${app.label}</div>
+    </div>
+    <div class="window-body" id="body-${id}"></div>
+  `;
+
+  // Window controls
+  w.querySelector('.btn-close').addEventListener('click', e => { e.stopPropagation(); closeWindow(id); });
+  w.querySelector('.btn-minimize').addEventListener('click', e => { e.stopPropagation(); minimizeWindow(id); });
+  w.querySelector('.btn-maximize').addEventListener('click', e => {
+    e.stopPropagation();
+    if (w.dataset.maximized === '1') {
+      w.style.left = w.dataset.prevL; w.style.top = w.dataset.prevT;
+      w.style.width = w.dataset.prevW; w.style.height = w.dataset.prevH;
+      w.dataset.maximized = '0';
+    } else {
+      w.dataset.prevL = w.style.left; w.dataset.prevT = w.style.top;
+      w.dataset.prevW = w.style.width; w.dataset.prevH = w.style.height;
+      w.style.left = '0'; w.style.top = '0';
+      w.style.width = desktop.clientWidth + 'px';
+      w.style.height = desktop.clientHeight + 'px';
+      w.dataset.maximized = '1';
+    }
+  });
+
+  // Drag
+  const titlebar = w.querySelector('.window-titlebar');
+  titlebar.addEventListener('mousedown', e => {
+    if (e.target.closest('.window-controls')) return;
+    STATE.dragState = { win: w, startX: e.clientX, startY: e.clientY,
+      origX: parseInt(w.style.left), origY: parseInt(w.style.top) };
+    bringToFront(id);
+  });
+
+  // Focus on click
+  w.addEventListener('mousedown', () => bringToFront(id));
+
+  desktop.appendChild(w);
+  STATE.windows[id] = w;
+  STATE.openApps.add(id);
+  renderDock();
+
+  // Render app content
+  renderApp(id);
+}
+
+function closeWindow(id) {
+  const w = STATE.windows[id];
+  if (w) { w.remove(); delete STATE.windows[id]; }
+  STATE.openApps.delete(id);
+  STATE.minimizedApps.delete(id);
+  renderDock();
+}
+
+function closeAllWindows() {
+  [...STATE.openApps].forEach(id => closeWindow(id));
+}
+
+function minimizeWindow(id) {
+  const w = STATE.windows[id];
+  if (!w) return;
+  w.classList.add('minimizing');
+  STATE.minimizedApps.add(id);
+  setTimeout(() => { w.style.display = 'none'; w.classList.remove('minimizing'); }, 250);
+}
+
+function minimizeAll() {
+  [...STATE.openApps].forEach(id => {
+    if (!STATE.minimizedApps.has(id)) minimizeWindow(id);
+  });
+}
+
+function restoreWindow(id) {
+  const w = STATE.windows[id];
+  if (!w) return;
+  w.style.display = 'flex';
+  STATE.minimizedApps.delete(id);
+  bringToFront(id);
+}
+
+function bringToFront(id) {
+  STATE.zIndex++;
+  const w = STATE.windows[id];
+  if (w) w.style.zIndex = STATE.zIndex;
+}
+
+function tileWindows() {
+  const ids = [...STATE.openApps].filter(id => !STATE.minimizedApps.has(id));
+  if (ids.length === 0) return;
+  const desktop = document.getElementById('desktop');
+  const cols = Math.ceil(Math.sqrt(ids.length));
+  const rows = Math.ceil(ids.length / cols);
+  const w = Math.floor(desktop.clientWidth / cols);
+  const h = Math.floor(desktop.clientHeight / rows);
+  ids.forEach((id, i) => {
+    const win = STATE.windows[id];
+    if (!win) return;
+    win.style.left = (i % cols) * w + 'px';
+    win.style.top = Math.floor(i / cols) * h + 'px';
+    win.style.width = w + 'px';
+    win.style.height = h + 'px';
+    win.dataset.maximized = '0';
+  });
+}
+
+// Global drag handler
+document.addEventListener('mousemove', e => {
+  if (!STATE.dragState) return;
+  const { win, startX, startY, origX, origY } = STATE.dragState;
+  win.style.left = (origX + e.clientX - startX) + 'px';
+  win.style.top = (origY + e.clientY - startY) + 'px';
+});
+document.addEventListener('mouseup', () => { STATE.dragState = null; });
+
+// ===== APP RENDERERS =====
+function renderApp(id) {
+  const body = document.getElementById('body-' + id);
+  if (!body) return;
+  const renderers = {
+    minecraft: renderMinecraft,
+    projects: renderProjects,
+    journal: renderJournal,
+    store: renderStore,
+    lab: renderLab,
+    chat: renderChat,
+    music: renderMusic,
+    settings: renderSettings,
+    dashboard: renderDashboard,
+    trash: renderTrash,
+  };
+  if (renderers[id]) renderers[id](body);
+}
+
+// ----- MINECRAFT -----
+function renderMinecraft(body) {
+  body.style.padding = '0'; body.style.position = 'relative'; body.style.overflow = 'hidden';
+  body.innerHTML = `
+    <div class="mc-container">
+      <canvas class="mc-canvas" id="mc-canvas"></canvas>
+    </div>
+    <div class="mc-crosshair">+</div>
+    <div class="mc-info" id="mc-info">Click canvas to play. WASD move, Mouse look, LMB break, RMB place, 1-5 blocks</div>
+    <div class="mc-hud" id="mc-hud"></div>
+  `;
+
+  const canvas = document.getElementById('mc-canvas');
+  const ctx = canvas.getContext('2d');
+  const info = document.getElementById('mc-info');
+
+  // World
+  const WX = 20, WY = 5, WZ = 20;
+  const world = new Array(WX * WY * WZ).fill(0);
+  const BLOCK_COLORS = {
+    1: ['#4CAF50','#388E3C','#2E7D32'], // grass
+    2: ['#8D6E63','#795548','#6D4C41'], // dirt
+    3: ['#9E9E9E','#757575','#616161'], // stone
+    4: ['#A1887F','#8D6E63','#795548'], // wood
+    5: ['#42A5F5','#2196F3','#1E88E5'], // water
+  };
+
+  function idx(x,y,z) { return x + y*WX + z*WX*WY; }
+  function getBlock(x,y,z) {
+    if (x<0||x>=WX||y<0||y>=WY||z<0||z>=WZ) return 0;
+    return world[idx(x,y,z)];
+  }
+  function setBlock(x,y,z,v) {
+    if (x<0||x>=WX||y<0||y>=WY||z<0||z>=WZ) return;
+    world[idx(x,y,z)] = v;
+  }
+
+  // Generate terrain
+  for (let x=0;x<WX;x++) for (let z=0;z<WZ;z++) {
+    setBlock(x,0,z,3); // stone bottom
+    setBlock(x,1,z,3);
+    setBlock(x,2,z,2); // dirt
+    setBlock(x,3,z,1); // grass top
+  }
+  // A few trees
+  [[5,4,5],[12,4,10],[3,4,15]].forEach(([tx,ty,tz]) => {
+    for (let i=0;i<3;i++) setBlock(tx,ty+i,tz,4);
+    for (let dx=-1;dx<=1;dx++) for (let dz=-1;dz<=1;dz++) {
+      if (dx===0&&dz===0) continue;
+      setBlock(tx+dx,ty+2,tz+dz,1);
+      setBlock(tx+dx,ty+3,tz+dz,1);
+    }
+    setBlock(tx,ty+3,tz,1);
+  });
+
+  // Camera
+  let camX = 10, camY = 5.5, camZ = -2;
+  let yaw = 0, pitch = 0;
+  let selectedBlock = 1;
+  const keys = {};
+  let locked = false;
+
+  // HUD
+  const hud = document.getElementById('mc-hud');
+  const blockNames = ['','Grass','Dirt','Stone','Wood','Water'];
+  function renderHUD() {
+    hud.innerHTML = '';
+    for (let i=1;i<=5;i++) {
+      const slot = document.createElement('div');
+      slot.className = 'mc-slot' + (i===selectedBlock?' active':'');
+      slot.style.background = BLOCK_COLORS[i] ? `rgba(0,0,0,0.3)` : 'rgba(0,0,0,0.3)';
+      const swatch = document.createElement('div');
+      swatch.style.cssText = `width:20px;height:20px;border-radius:3px;background:${BLOCK_COLORS[i]?BLOCK_COLORS[i][0]:'#555'}`;
+      slot.appendChild(swatch);
+      hud.appendChild(slot);
+    }
+  }
+  renderHUD();
+
+  canvas.addEventListener('click', () => {
+    if (!locked) canvas.requestPointerLock();
+  });
+  document.addEventListener('pointerlockchange', () => {
+    locked = document.pointerLockElement === canvas;
+    if (locked) info.textContent = `WASD move | LMB break | RMB place | 1-5 select | ESC exit`;
+  });
+  document.addEventListener('mousemove', e => {
+    if (!locked) return;
+    yaw += e.movementX * 0.003;
+    pitch -= e.movementY * 0.003;
+    pitch = Math.max(-Math.PI/2+0.01, Math.min(Math.PI/2-0.01, pitch));
+  });
+  document.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true;
+    if (e.key >= '1' && e.key <= '5') { selectedBlock = parseInt(e.key); renderHUD(); }
+  });
+  document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  canvas.addEventListener('mousedown', e => {
+    if (!locked) return;
+    const hit = raycast();
+    if (!hit) return;
+    if (e.button === 0) { // break
+      setBlock(hit.x, hit.y, hit.z, 0);
+    } else if (e.button === 2) { // place
+      const px = hit.x + hit.nx, py = hit.y + hit.ny, pz = hit.z + hit.nz;
+      if (px>=0&&px<WX&&py>=0&&py<WY&&pz>=0&&pz<WZ) setBlock(px,py,pz,selectedBlock);
+    }
+  });
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  function raycast() {
+    const dx = Math.cos(pitch)*Math.sin(yaw), dy = Math.sin(pitch), dz = Math.cos(pitch)*Math.cos(yaw);
+    let rx=camX, ry=camY, rz=camZ;
+    for (let i=0;i<80;i++) {
+      rx+=dx*0.1; ry+=dy*0.1; rz+=dz*0.1;
+      const bx=Math.floor(rx), by=Math.floor(ry), bz=Math.floor(rz);
+      if (bx<0||bx>=WX||by<0||by>=WY||bz<0||bz>=WZ) continue;
+      if (getBlock(bx,by,bz)) {
+        // Compute normal (which face hit)
+        const px=rx-dx*0.1, py=ry-dy*0.1, pz=rz-dz*0.1;
+        let nx=0,ny=0,nz=0;
+        if (Math.floor(px)!==bx) nx = px<rx?-1:1;
+        else if (Math.floor(py)!==by) ny = py<ry?-1:1;
+        else nz = pz<rz?-1:1;
+        return {x:bx,y:by,z:bz,nx,ny,nz};
+      }
+    }
+    return null;
+  }
+
+  // Render loop
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width; canvas.height = rect.height;
+  }
+  resize();
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas.parentElement);
+
+  function render() {
+    if (!document.getElementById('mc-canvas')) return; // window closed
+    // Movement
+    const speed = 0.08;
+    const fwd = [Math.sin(yaw)*speed, 0, Math.cos(yaw)*speed];
+    const right = [Math.cos(yaw)*speed, 0, -Math.sin(yaw)*speed];
+    if (keys['w']) { camX+=fwd[0]; camZ+=fwd[2]; }
+    if (keys['s']) { camX-=fwd[0]; camZ-=fwd[2]; }
+    if (keys['a']) { camX-=right[0]; camZ-=right[2]; }
+    if (keys['d']) { camX+=right[0]; camZ+=right[2]; }
+    if (keys[' ']) camY+=speed;
+    if (keys['shift']) camY-=speed;
+
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Sky gradient
+    const skyGrad = ctx.createLinearGradient(0,0,0,H);
+    skyGrad.addColorStop(0, '#1a1a2e');
+    skyGrad.addColorStop(0.5, '#4a90d9');
+    skyGrad.addColorStop(1, '#87CEEB');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0,0,W,H);
+
+    // Collect visible faces
+    const faces = [];
+    for (let x=0;x<WX;x++) for (let y=0;y<WY;y++) for (let z=0;z<WZ;z++) {
+      const b = getBlock(x,y,z);
+      if (!b) continue;
+      const sides = [
+        [0,1,0, 0], [0,-1,0, 1], // top/bottom
+        [1,0,0, 2], [-1,0,0, 2], // right/left
+        [0,0,1, 2], [0,0,-1, 2], // front/back
+      ];
+      sides.forEach(([nx,ny,nz,ci]) => {
+        if (!getBlock(x+nx,y+ny,z+nz)) {
+          const cx = x+0.5-camX, cy = y+0.5-camY, cz = z+0.5-camZ;
+          const dist = cx*cx+cy*cy+cz*cz;
+          faces.push({x,y,z,nx,ny,nz,ci,b,dist});
+        }
+      });
+    }
+
+    // Sort back to front
+    faces.sort((a,b) => b.dist - a.dist);
+
+    const fov = 1.2;
+    const aspect = W/H;
+
+    faces.forEach(f => {
+      const corners = getFaceCorners(f.x,f.y,f.z,f.nx,f.ny,f.nz);
+      const projected = corners.map(c => project(c[0]-camX, c[1]-camY, c[2]-camZ, fov, aspect, W, H));
+      if (projected.some(p => !p)) return;
+
+      // Simple backface culling
+      const v1 = [projected[1][0]-projected[0][0], projected[1][1]-projected[0][1]];
+      const v2 = [projected[2][0]-projected[0][0], projected[2][1]-projected[0][1]];
+      const cross = v1[0]*v2[1] - v1[1]*v2[0];
+      if (cross > 0 && (f.ny === 0)) return; // rough backface
+
+      ctx.beginPath();
+      ctx.moveTo(projected[0][0], projected[0][1]);
+      for (let i=1;i<projected.length;i++) ctx.lineTo(projected[i][0], projected[i][1]);
+      ctx.closePath();
+      ctx.fillStyle = BLOCK_COLORS[f.b][f.ci];
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    });
+
+    requestAnimationFrame(render);
+  }
+
+  function getFaceCorners(x,y,z,nx,ny,nz) {
+    if (ny===1)  return [[x,y+1,z],[x+1,y+1,z],[x+1,y+1,z+1],[x,y+1,z+1]];
+    if (ny===-1) return [[x,y,z],[x,y,z+1],[x+1,y,z+1],[x+1,y,z]];
+    if (nx===1)  return [[x+1,y,z],[x+1,y,z+1],[x+1,y+1,z+1],[x+1,y+1,z]];
+    if (nx===-1) return [[x,y,z+1],[x,y,z],[x,y+1,z],[x,y+1,z+1]];
+    if (nz===1)  return [[x+1,y,z+1],[x,y,z+1],[x,y+1,z+1],[x+1,y+1,z+1]];
+    if (nz===-1) return [[x,y,z],[x+1,y,z],[x+1,y+1,z],[x,y+1,z]];
+    return [];
+  }
+
+  function project(x,y,z,fov,aspect,W,H) {
+    // Rotate by yaw and pitch
+    const cosY = Math.cos(-yaw), sinY = Math.sin(-yaw);
+    const rx = x*cosY - z*sinY;
+    const rz = x*sinY + z*cosY;
+    const cosP = Math.cos(-pitch), sinP = Math.sin(-pitch);
+    const ry = y*cosP - rz*sinP;
+    const rz2 = y*sinP + rz*cosP;
+
+    if (rz2 < 0.1) return null; // behind camera
+
+    const scale = fov / rz2;
+    return [W/2 + rx*scale*W/2, H/2 - ry*scale*W/2];
+  }
+
+  requestAnimationFrame(render);
+}
+
+// ----- PROJECTS -----
+function renderProjects(body) {
+  const folders = {
+    'AI-Systems': [
+      { name: 'AI Employee Guide.pdf', size: '2.4 MB', date: '2026-03-15' },
+      { name: 'Chatbot Setup.pdf', size: '1.1 MB', date: '2026-03-10' },
+      { name: 'Fleet Architecture.md', size: '48 KB', date: '2026-03-20' },
+      { name: 'Agent Configs.json', size: '12 KB', date: '2026-03-21' },
+    ],
+    'Products': [
+      { name: 'Budget Template.xlsx', size: '340 KB', date: '2026-03-08' },
+      { name: 'Ecommerce Playbook.pdf', size: '3.2 MB', date: '2026-03-12' },
+      { name: 'Behike Method.pdf', size: '1.8 MB', date: '2026-03-18' },
+      { name: 'Pricing Matrix.csv', size: '28 KB', date: '2026-03-19' },
+    ],
+    'Content': [
+      { name: 'Carousel Templates/', size: '-- ', date: '2026-03-14' },
+      { name: 'Reels Scripts.md', size: '64 KB', date: '2026-03-16' },
+      { name: 'OPB Framework.md', size: '32 KB', date: '2026-03-20' },
+    ],
+    'Tools': [
+      { name: 'News Tracker', size: 'app', date: '2026-03-17' },
+      { name: 'Carousel Generator', size: 'app', date: '2026-03-15' },
+      { name: 'Reddit Scraper', size: 'app', date: '2026-03-10' },
+      { name: 'Book Agent', size: 'app', date: '2026-03-20' },
+      { name: 'Google Trends Bot', size: 'app', date: '2026-03-09' },
+    ],
+    'Legal': [
+      { name: 'Terms of Service.md', size: '18 KB', date: '2026-03-05' },
+      { name: 'Privacy Policy.md', size: '22 KB', date: '2026-03-05' },
+      { name: 'Refund Policy.md', size: '8 KB', date: '2026-03-05' },
+    ],
+  };
+
+  let activeFolder = 'AI-Systems';
+
+  function render() {
+    body.innerHTML = `<div class="file-browser">
+      <div class="file-sidebar">
+        ${Object.keys(folders).map(f =>
+          `<div class="folder${f===activeFolder?' active':''}" data-folder="${f}">&#128193; ${f}</div>`
+        ).join('')}
+      </div>
+      <div class="file-list">
+        ${folders[activeFolder].map(f =>
+          `<div class="file-item"><span class="fname">${f.name}</span><span class="fmeta">${f.size} / ${f.date}</span></div>`
+        ).join('')}
+      </div>
+    </div>`;
+
+    body.querySelectorAll('.folder').forEach(el => {
+      el.addEventListener('click', () => {
+        activeFolder = el.dataset.folder;
+        render();
+      });
+    });
+  }
+  render();
+}
+
+// ----- JOURNAL -----
+function renderJournal(body) {
+  const entries = [
+    {
+      title: 'Session 20: 46 Agents, 300 Files, Zero Sleep',
+      date: 'March 21, 2026',
+      content: 'Tonight the fleet hit 46 autonomous agents. Three hundred files across two machines. The bridge between Ceiba and Cobo is holding. Every agent has a purpose, every tool connects to a real business outcome. We are not building to build. We are building to sell. The stack is real: BehiqueBot live on Railway, product research engine scoring eBay winners, carousel generator pushing content. This is not a hobby project anymore.'
+    },
+    {
+      title: 'The $0 AI Fleet',
+      date: 'March 18, 2026',
+      content: 'Everyone is paying $200/month for ChatGPT and Claude subscriptions. We run Ollama on a GTX 1080 Ti for free. Cobo handles inference, Ceiba handles orchestration. The bridge syncs them over Syncthing. Total monthly cost for AI infrastructure: $0. The advantage is not just financial. When you control your own models, you control your own data, your own latency, your own uptime. No API rate limits. No vendor lock-in. Just raw compute and clean architecture.'
+    },
+    {
+      title: 'Building from Puerto Rico',
+      date: 'March 14, 2026',
+      content: 'People ask why Puerto Rico. The real question is why not. Low cost of living. US territory so no passport needed for business. Tax incentives that actually matter. And the culture, the energy, the hustle is different here. You build because you have to, not because it is trendy. Every dollar matters more. Every product has to work. There is no safety net of VC funding or family money. Just execution and faith.'
+    },
+  ];
+
+  body.innerHTML = entries.map((e,i) => `
+    <div class="journal-entry${i===0?' open':''}" data-idx="${i}">
+      <h3>${e.title}</h3>
+      <div class="jdate">${e.date}</div>
+      <div class="jbody">${e.content}</div>
+    </div>
+  `).join('');
+
+  body.querySelectorAll('.journal-entry h3').forEach(el => {
+    el.addEventListener('click', () => {
+      el.parentElement.classList.toggle('open');
+    });
+  });
+}
+
+// ----- STORE -----
+function renderStore(body) {
+  const products = [
+    { name: 'AI Employee Playbook', price: '$29' },
+    { name: 'Budget Tracker Template', price: '$9' },
+    { name: 'Ecommerce Launch Guide', price: '$19' },
+    { name: 'The Behike Method', price: '$39' },
+    { name: 'Carousel Template Pack', price: '$14' },
+    { name: 'AI Automation Kit', price: '$49' },
+  ];
+  body.innerHTML = `<div class="product-grid">
+    ${products.map(p => `
+      <div class="product-card">
+        <h4>${p.name}</h4>
+        <div class="price">${p.price}</div>
+        <button class="buy-btn" onclick="window.open('#','_blank')">Buy Now</button>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ----- LAB -----
+function renderLab(body) {
+  const tools = [
+    { icon: '&#128200;', name: 'Trend Scanner', desc: 'Google Trends analysis for product research' },
+    { icon: '&#127912;', name: 'Carousel Builder', desc: 'Generate Instagram carousels from prompts' },
+    { icon: '&#129302;', name: 'Agent Spawner', desc: 'Create and deploy autonomous AI agents' },
+    { icon: '&#128218;', name: 'Book Generator', desc: 'AI-powered ebook creation pipeline' },
+    { icon: '&#128270;', name: 'Reddit Scanner', desc: 'Find trending products on Reddit' },
+    { icon: '&#9889;', name: 'n8n Workflows', desc: 'Visual automation builder' },
+  ];
+  body.innerHTML = `<div class="lab-tools">
+    ${tools.map(t => `
+      <div class="lab-card">
+        <div class="lab-icon">${t.icon}</div>
+        <h4>${t.name}</h4>
+        <p>${t.desc}</p>
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ----- CHAT -----
+function renderChat(body) {
+  body.style.padding = '0';
+  body.innerHTML = `
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-msg bot"><div class="bubble">Hey, I'm Behike AI. Ask me anything about building with AI, ecommerce, or automation.</div></div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+        <button id="chat-send">Send</button>
+      </div>
+    </div>
+  `;
+
+  const msgContainer = document.getElementById('chat-messages');
+  const input = document.getElementById('chat-input');
+  const send = document.getElementById('chat-send');
+
+  function sendMsg() {
+    const text = input.value.trim();
+    if (!text) return;
+    msgContainer.innerHTML += `<div class="chat-msg user"><div class="bubble">${escapeHtml(text)}</div></div>`;
+    input.value = '';
+    setTimeout(() => {
+      msgContainer.innerHTML += `<div class="chat-msg bot"><div class="bubble">Chat is offline right now. DM @behikeai on Instagram for a real conversation.</div></div>`;
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    }, 600);
+    msgContainer.scrollTop = msgContainer.scrollHeight;
+  }
+
+  send.addEventListener('click', sendMsg);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+// ----- MUSIC -----
+function renderMusic(body) {
+  body.innerHTML = `
+    <div class="music-player">
+      <div class="album-art">&#127925;</div>
+      <div class="track-name">Ambient Warm</div>
+      <div class="track-artist">Behike Sessions</div>
+      <div class="music-controls">
+        <button>&#9198;</button>
+        <button class="play-btn" id="play-btn">&#9654;</button>
+        <button>&#9197;</button>
+      </div>
+      <div class="progress-track"><div class="progress-current" id="music-progress"></div></div>
+      <div class="time-row"><span>1:12</span><span>3:28</span></div>
+      <div class="volume-row">
+        <span style="font-size:14px">&#128264;</span>
+        <input type="range" min="0" max="100" value="70" id="volume-slider">
+        <span style="font-size:14px">&#128266;</span>
+      </div>
+    </div>
+  `;
+
+  let playing = false;
+  let audio = null;
+  const playBtn = document.getElementById('play-btn');
+  const progress = document.getElementById('music-progress');
+  const volumeSlider = document.getElementById('volume-slider');
+
+  // Try to load audio file
+  try {
+    audio = new Audio('assets/ambient_warm.wav');
+    audio.volume = 0.7;
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) {
+        progress.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      }
+    });
+  } catch(e) { audio = null; }
+
+  playBtn.addEventListener('click', () => {
+    playing = !playing;
+    playBtn.innerHTML = playing ? '&#9646;&#9646;' : '&#9654;';
+    if (audio) {
+      if (playing) audio.play().catch(()=>{});
+      else audio.pause();
+    } else {
+      // Visual-only animation
+      if (playing) {
+        let p = 0;
+        playBtn._interval = setInterval(() => {
+          p = (p + 0.5) % 100;
+          progress.style.width = p + '%';
+        }, 100);
+      } else {
+        clearInterval(playBtn._interval);
+      }
+    }
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    if (audio) audio.volume = volumeSlider.value / 100;
+  });
+}
+
+// ----- SETTINGS -----
+function renderSettings(body) {
+  const themes = [
+    { name: 'Midnight', bg: '#000000', accent: '#0A84FF', text: '#F5F5F7' },
+    { name: 'Snow', bg: '#F5F5F7', accent: '#007AFF', text: '#1D1D1F' },
+    { name: 'Ocean', bg: '#0D1B2A', accent: '#00B4D8', text: '#CAF0F8' },
+    { name: 'Sunset', bg: '#1A0A2E', accent: '#FF6B6B', text: '#FFEAA7' },
+    { name: 'Forest', bg: '#0B1A0B', accent: '#00C853', text: '#C8E6C9' },
+    { name: 'Royal', bg: '#1A0033', accent: '#BB86FC', text: '#E8DEF8' },
+    { name: 'Ember', bg: '#1C0A00', accent: '#FF6D00', text: '#FFE0B2' },
+    { name: 'Candy', bg: '#1A0011', accent: '#FF4081', text: '#FCE4EC' },
+  ];
+
+  body.innerHTML = `
+    <div class="settings-panel">
+      <h3>COLOR THEME</h3>
+      <div class="theme-grid">
+        ${themes.map((t,i) => `
+          <div class="theme-swatch${i===0?' active':''}" data-idx="${i}"
+            style="background: linear-gradient(135deg, ${t.bg}, ${t.accent}30);">
+            ${t.name}
+          </div>
+        `).join('')}
+      </div>
+      <h3>FONT SIZE</h3>
+      <div class="font-sizes">
+        <button data-size="12" class="">S</button>
+        <button data-size="14" class="active">M</button>
+        <button data-size="16" class="">L</button>
+        <button data-size="18" class="">XL</button>
+      </div>
+    </div>
+  `;
+
+  body.querySelectorAll('.theme-swatch').forEach(el => {
+    el.addEventListener('click', () => {
+      body.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      const t = themes[parseInt(el.dataset.idx)];
+      document.documentElement.style.setProperty('--bg', t.bg);
+      document.documentElement.style.setProperty('--accent', t.accent);
+      document.documentElement.style.setProperty('--text', t.text);
+      document.body.style.background = t.bg;
+    });
+  });
+
+  body.querySelectorAll('.font-sizes button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      body.querySelectorAll('.font-sizes button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.documentElement.style.setProperty('--font-size-base', btn.dataset.size + 'px');
+      document.body.style.fontSize = btn.dataset.size + 'px';
+    });
+  });
+}
+
+// ----- DASHBOARD -----
+function renderDashboard(body) {
+  const stats = [
+    { num: '31', label: 'Products Built' },
+    { num: '15', label: 'Tools Created' },
+    { num: '150+', label: 'Content Pieces' },
+    { num: '$0', label: 'Revenue (yet)' },
+    { num: '46', label: 'Agents Deployed' },
+    { num: '2', label: 'Machines Online' },
+  ];
+  body.innerHTML = `
+    <div style="font-family:var(--font-pixel);font-size:10px;color:var(--accent);margin-bottom:16px;">SYSTEM METRICS</div>
+    <div class="dash-grid">
+      ${stats.map(s => `
+        <div class="dash-card">
+          <div class="dash-num">${s.num}</div>
+          <div class="dash-label">${s.label}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ----- TRASH -----
+function renderTrash(body) {
+  body.innerHTML = `
+    <div class="trash-empty">
+      <div class="trash-icon">&#128465;</div>
+      <p>Trash is empty.</p>
+      <p style="margin-top:8px;font-size:11px;color:var(--text-dim);">Nothing to see here. Keep building.</p>
+    </div>
+  `;
+}
+
+</script>
+
+</body></html>

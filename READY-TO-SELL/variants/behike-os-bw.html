@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEHIKE Operating System v3.0 — B&W Edition</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #000000;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --coral: #FF6B6B;
+    --lavender: #B794F6;
+    --mint: #69DB7C;
+    --gold: #FFD43B;
+    --sky: #74C0FC;
+    --orange: #FFA94D;
+    --peach: #FFA8A8;
+    --sage: #A9E34B;
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+
+  /* ---- HEADER ---- */
+  .header {
+    text-align: center;
+    padding: 120px 0 100px;
+  }
+  .header h1 {
+    font-size: 80px;
+    font-weight: 200;
+    letter-spacing: 0.5em;
+    color: var(--white);
+    margin-right: -0.5em;
+  }
+  .header .subtitle {
+    font-size: 18px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gray);
+    margin-top: 8px;
+  }
+  .header .line {
+    width: 80px;
+    height: 1px;
+    background: var(--white);
+    margin: 32px auto;
+  }
+  .header .tagline {
+    font-size: 14px;
+    color: var(--gray);
+    letter-spacing: 0.1em;
+  }
+
+  /* ---- MODULE CARD ---- */
+  .module {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--card-pad);
+    margin-bottom: var(--gap);
+    page-break-inside: avoid;
+  }
+  .module-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--coral);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .module-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 40px;
+    line-height: 1.2;
+  }
+
+  /* ---- LABELS ---- */
+  .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--lavender);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  /* ---- FILL LINES ---- */
+  .fill-line {
+    border-bottom: 1px dotted #444;
+    min-height: 32px;
+    margin-bottom: 16px;
+  }
+
+  /* ---- SECTION DIVIDER ---- */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* ---- GRID HELPERS ---- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .grid-2x3 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  /* ---- CHECKLIST ---- */
+  .checklist { list-style: none; }
+  .checklist li {
+    font-size: 16px;
+    line-height: 2.2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--white);
+  }
+  .checklist li::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    border: 2px solid var(--mint);
+    border-radius: 3px;
+  }
+
+  /* ---- INNER CARD ---- */
+  .inner-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  /* ---- PILL TAGS ---- */
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill {
+    display: inline-block;
+    padding: 8px 20px;
+    border: 1px solid var(--sky);
+    border-radius: 100px;
+    font-size: 14px;
+    color: var(--sky);
+    background: transparent;
+  }
+
+  /* ---- HORIZONTAL FLOW ---- */
+  .h-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .h-flow .step {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    white-space: nowrap;
+  }
+  .h-flow .arrow {
+    color: var(--gray);
+    font-size: 20px;
+    padding: 0 8px;
+    font-weight: 300;
+  }
+
+  /* ---- COLOR CIRCLES ---- */
+  .color-row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .color-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--gray);
+  }
+  .color-circle.filled {
+    background: var(--white);
+    border-color: var(--white);
+  }
+
+  /* ---- STACKED BAR ---- */
+  .stacked-bar {
+    display: flex;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 48px;
+    margin: 16px 0;
+  }
+  .stacked-bar .segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+
+  /* ---- PRICING LADDER ---- */
+  .pricing-ladder {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    height: 200px;
+    padding-top: 20px;
+  }
+  .pricing-step {
+    flex: 1;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 16px;
+    position: relative;
+  }
+  .pricing-step .price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .pricing-step .tier-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* ---- FUNNEL ---- */
+  .funnel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .funnel-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white);
+    border-radius: 6px;
+    margin-bottom: 4px;
+  }
+
+  /* ---- TIMELINE ---- */
+  .timeline-wrap { position: relative; padding: 40px 0 20px; }
+  .timeline-line {
+    position: absolute;
+    top: 58px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--border);
+  }
+  .timeline-phases {
+    display: flex;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .timeline-phase {
+    text-align: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    padding: 4px 0;
+  }
+  .timeline-months {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    position: relative;
+  }
+  .timeline-month {
+    text-align: center;
+    padding-top: 24px;
+  }
+  .timeline-month .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--white);
+    margin: 0 auto 8px;
+  }
+  .timeline-month span {
+    font-size: 12px;
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  /* ---- TABLE ---- */
+  table.clean {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  table.clean th, table.clean td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  table.clean th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--lavender);
+    font-weight: 600;
+  }
+  table.clean td { color: var(--white); }
+
+  /* ---- KPI CARD ---- */
+  .kpi-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .kpi-card .kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--orange);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .kpi-card .kpi-value {
+    font-size: 28px;
+    font-weight: 200;
+    color: var(--gray);
+    border-bottom: 1px dotted #444;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .kpi-card .kpi-desc {
+    font-size: 13px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* ---- RULED LINES ---- */
+  .ruled-lines .ruled-line {
+    border-bottom: 1px solid var(--border);
+    height: 40px;
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    text-align: center;
+    padding: 80px 0 60px;
+    color: var(--gray);
+    font-size: 14px;
+    line-height: 2;
+  }
+  .footer strong {
+    color: var(--white);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    font-size: 13px;
+  }
+
+  /* ---- PHASE CARD (Module 08) ---- */
+  .phase-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+  }
+  .phase-card.target {
+    border-color: var(--mint);
+    box-shadow: 0 0 40px rgba(105, 219, 124, 0.06);
+  }
+  .phase-card .phase-header {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gray);
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .phase-card .phase-range {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .phase-card .revenue-target strong {
+    display: block;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 0;
+    text-transform: none;
+    margin-top: 4px;
+  }
+
+  /* ---- 7-DAY TABLE ---- */
+  .day-table {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+  .day-cell {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    min-height: 100px;
+  }
+  .day-cell .day-name {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  /* Each day gets its own pastel color */
+  .day-cell:nth-child(1) .day-name { color: var(--mint); }
+  .day-cell:nth-child(2) .day-name { color: var(--lavender); }
+  .day-cell:nth-child(3) .day-name { color: var(--peach); }
+  .day-cell:nth-child(4) .day-name { color: var(--sky); }
+  .day-cell:nth-child(5) .day-name { color: var(--coral); }
+  .day-cell:nth-child(6) .day-name { color: var(--gold); }
+  .day-cell:nth-child(7) .day-name { color: var(--sage); }
+
+  .day-cell .day-content {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* ---- SPECTRUM BAR ---- */
+  .spectrum {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+  }
+  .spectrum-bar {
+    flex: 1;
+    height: 4px;
+    background: linear-gradient(to right, var(--border), #555, var(--border));
+    border-radius: 2px;
+    margin: 0 16px;
+    position: relative;
+  }
+  .spectrum-label {
+    font-size: 12px;
+    color: var(--gray);
+    white-space: nowrap;
+  }
+
+  /* ---- PLATFORM CARD ---- */
+  .platform-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+  }
+  .platform-card .pct-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .platform-card .pct-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--white);
+  }
+
+  /* ---- MARGIN NUMBERS (gold accent) ---- */
+  .margin-number {
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 12px;
+  }
+
+  /* ---- QUARTER LABELS ---- */
+  .quarter-label {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  /* ---- PRINT ---- */
+  @media print {
+    body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .module { box-shadow: none !important; page-break-inside: avoid; break-inside: avoid; }
+    .header { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Operating System</p>
+    <div class="line"></div>
+    <p class="tagline">One-person business. Your blueprint. Your rules.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Grab a pen. Fill in the dotted lines, check the boxes, position the sliders. Work through each module in order. By the end, your entire business is mapped on paper.</p>
+  </div>
+
+  <!-- MODULE 01: FOUNDATIONS -->
+  <div class="module">
+    <div class="module-number">01 -- Foundations</div>
+    <h2 class="module-title">Foundations</h2>
+
+    <div class="label">Business Model Canvas</div>
+    <div class="grid-2x3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Key Partners</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Key Activities</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Key Resources</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Customer Segments</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Channels</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Cost Structure</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Value Proposition</div>
+    <div class="fill-line" style="margin-bottom: 32px;"></div>
+    <div class="fill-line" style="margin-bottom: 40px;"></div>
+
+    <div class="label">Revenue Streams</div>
+    <div class="pills" style="margin-bottom: 40px;">
+      <span class="pill">Digital Products</span>
+      <span class="pill">Services</span>
+      <span class="pill">Subscriptions</span>
+      <span class="pill">Affiliate</span>
+      <span class="pill">Licensing</span>
+      <span class="pill">____</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Foundation Checklist</div>
+    <div class="grid-2">
+      <ul class="checklist">
+        <li>Define core offer</li>
+        <li>Identify target customer</li>
+        <li>Set 90-day revenue goal</li>
+        <li>Choose primary platform</li>
+      </ul>
+      <ul class="checklist">
+        <li>Build minimum viable funnel</li>
+        <li>Set up payment processing</li>
+        <li>Create brand assets</li>
+        <li>Launch landing page</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- MODULE 02: BRAND IDENTITY -->
+  <div class="module">
+    <div class="module-number">02 -- Brand Identity</div>
+    <h2 class="module-title">Brand Identity</h2>
+
+    <div class="label">Color Palette</div>
+    <div class="color-row" style="margin-bottom: 40px;">
+      <div class="color-circle filled"></div>
+      <div class="color-circle"></div>
+      <div class="color-circle"></div>
+      <div class="color-circle"></div>
+      <div class="color-circle"></div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Brand Voice Spectrum</div>
+    <div class="spectrum" style="margin-bottom: 40px;">
+      <span class="spectrum-label">Casual</span>
+      <div class="spectrum-bar"></div>
+      <span class="spectrum-label">Formal</span>
+    </div>
+    <div class="spectrum" style="margin-bottom: 40px;">
+      <span class="spectrum-label">Playful</span>
+      <div class="spectrum-bar"></div>
+      <span class="spectrum-label">Serious</span>
+    </div>
+    <div class="spectrum" style="margin-bottom: 40px;">
+      <span class="spectrum-label">Technical</span>
+      <div class="spectrum-bar"></div>
+      <span class="spectrum-label">Simple</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Positioning Statement</div>
+    <div class="fill-line"></div>
+    <div class="fill-line" style="margin-bottom: 40px;"></div>
+
+    <div class="label">Unique Selling Proposition</div>
+    <div style="font-size: 22px; font-weight: 300; color: var(--white); line-height: 2.2; margin-top: 8px;">
+      I help <span style="border-bottom: 1px dotted #444; padding: 0 40px;"></span>
+      achieve <span style="border-bottom: 1px dotted #444; padding: 0 40px;"></span>
+      through <span style="border-bottom: 1px dotted #444; padding: 0 40px;"></span>
+    </div>
+  </div>
+
+  <!-- MODULE 03: LEGAL & FINANCE -->
+  <div class="module">
+    <div class="module-number">03 -- Legal & Finance</div>
+    <h2 class="module-title">Legal & Finance</h2>
+
+    <div class="label">Entity Setup Checklist</div>
+    <div class="grid-2" style="margin-bottom: 40px;">
+      <ul class="checklist">
+        <li>Register LLC</li>
+        <li>Get EIN from IRS</li>
+        <li>Open business bank account</li>
+        <li>Set up bookkeeping system</li>
+      </ul>
+      <ul class="checklist">
+        <li>Get business insurance</li>
+        <li>Register with state tax authority</li>
+        <li>Set up merchant account</li>
+        <li>Consult CPA for tax strategy</li>
+      </ul>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Profit Allocation</div>
+    <div class="stacked-bar">
+      <div class="segment" style="width: 50%; background: #444;">50% Operations</div>
+      <div class="segment" style="width: 30%; background: #333;">30% Growth</div>
+      <div class="segment" style="width: 15%; background: #252525;">15% Reserve</div>
+      <div class="segment" style="width: 5%; background: #1a1a1a; font-size: 10px;">5%</div>
+    </div>
+    <div style="display: flex; font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em;">
+      <span style="width: 50%;">Operations</span>
+      <span style="width: 30%;">Growth</span>
+      <span style="width: 15%;">Reserve</span>
+      <span style="width: 5%;">Personal</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Tax Calendar</div>
+    <div style="display: flex; gap: 24px; margin-top: 12px;">
+      <div class="inner-card" style="flex: 1; text-align: center;">
+        <div class="quarter-label" style="color: var(--white);">Q1</div>
+        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">April 15</div>
+        <div class="fill-line" style="margin-top: 12px;"></div>
+      </div>
+      <div class="inner-card" style="flex: 1; text-align: center;">
+        <div class="quarter-label" style="color: var(--white);">Q2</div>
+        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">June 15</div>
+        <div class="fill-line" style="margin-top: 12px;"></div>
+      </div>
+      <div class="inner-card" style="flex: 1; text-align: center;">
+        <div class="quarter-label" style="color: var(--white);">Q3</div>
+        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">Sept 15</div>
+        <div class="fill-line" style="margin-top: 12px;"></div>
+      </div>
+      <div class="inner-card" style="flex: 1; text-align: center;">
+        <div class="quarter-label" style="color: var(--white);">Q4</div>
+        <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">Jan 15</div>
+        <div class="fill-line" style="margin-top: 12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 04: PRODUCT ENGINE -->
+  <div class="module">
+    <div class="module-number">04 -- Product Engine</div>
+    <h2 class="module-title">Product Engine</h2>
+
+    <div class="grid-3" style="margin-bottom: 40px;">
+      <div class="inner-card">
+        <div class="label">Digital Products</div>
+        <h4>Templates, Courses, Ebooks</h4>
+        <div class="margin-number">85-95% margin</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Physical Products</div>
+        <h4>Reselling, Dropshipping</h4>
+        <div class="margin-number">20-40% margin</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Services</div>
+        <h4>Automation, Consulting</h4>
+        <div class="margin-number">70-90% margin</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Pricing Ladder</div>
+    <div class="pricing-ladder">
+      <div class="pricing-step" style="height: 20%; background: linear-gradient(to top, rgba(255,255,255,0.08), rgba(255,255,255,0.02));">
+        <div class="price">Free</div>
+        <div class="tier-label">Lead Magnet</div>
+      </div>
+      <div class="pricing-step" style="height: 35%; background: linear-gradient(to top, rgba(255,255,255,0.12), rgba(255,255,255,0.03));">
+        <div class="price">$19</div>
+        <div class="tier-label">Entry</div>
+      </div>
+      <div class="pricing-step" style="height: 50%; background: linear-gradient(to top, rgba(255,255,255,0.16), rgba(255,255,255,0.04));">
+        <div class="price">$47</div>
+        <div class="tier-label">Core</div>
+      </div>
+      <div class="pricing-step" style="height: 70%; background: linear-gradient(to top, rgba(255,255,255,0.22), rgba(255,255,255,0.06));">
+        <div class="price">$97</div>
+        <div class="tier-label">Premium</div>
+      </div>
+      <div class="pricing-step" style="height: 100%; background: linear-gradient(to top, rgba(255,255,255,0.3), rgba(255,255,255,0.08));">
+        <div class="price">$497+</div>
+        <div class="tier-label">High Ticket</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Delivery Pipeline Checklist</div>
+    <ul class="checklist">
+      <li>Product creation workflow defined</li>
+      <li>Delivery platform set up (Gumroad / Shopify / Custom)</li>
+      <li>Onboarding email sequence written</li>
+      <li>Feedback collection automated</li>
+      <li>Upsell path mapped for each tier</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 05: MARKETING & SALES -->
+  <div class="module">
+    <div class="module-number">05 -- Marketing & Sales</div>
+    <h2 class="module-title">Marketing & Sales</h2>
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Sales Funnel</div>
+        <div class="funnel">
+          <div class="funnel-stage" style="width: 100%; background: linear-gradient(135deg, rgba(105,219,124,0.3), rgba(105,219,124,0.1));">Traffic</div>
+          <div class="funnel-stage" style="width: 78%; background: linear-gradient(135deg, rgba(105,219,124,0.2), rgba(116,192,252,0.1));">Leads</div>
+          <div class="funnel-stage" style="width: 56%; background: linear-gradient(135deg, rgba(116,192,252,0.2), rgba(116,192,252,0.08));">Nurture</div>
+          <div class="funnel-stage" style="width: 38%; background: linear-gradient(135deg, rgba(116,192,252,0.35), rgba(116,192,252,0.15)); border: 1px solid rgba(116,192,252,0.3);">Convert</div>
+        </div>
+      </div>
+      <div>
+        <div class="label">Ad Strategy</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="inner-card" style="text-align: center;">
+            <h4>Meta</h4>
+            <div style="font-size: 13px; color: var(--gray);">Reels + Stories</div>
+            <div class="fill-line" style="margin-top: 12px;"></div>
+          </div>
+          <div class="inner-card" style="text-align: center;">
+            <h4>TikTok</h4>
+            <div style="font-size: 13px; color: var(--gray);">Short-form video</div>
+            <div class="fill-line" style="margin-top: 12px;"></div>
+          </div>
+          <div class="inner-card" style="text-align: center;">
+            <h4>Google</h4>
+            <div style="font-size: 13px; color: var(--gray);">Search + Shopping</div>
+            <div class="fill-line" style="margin-top: 12px;"></div>
+          </div>
+          <div class="inner-card" style="text-align: center;">
+            <h4>YouTube</h4>
+            <div style="font-size: 13px; color: var(--gray);">Long-form + Shorts</div>
+            <div class="fill-line" style="margin-top: 12px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Email Sequence (5-Step)</div>
+    <div class="h-flow" style="margin-top: 12px;">
+      <div class="step">Welcome</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Story</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Value</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Proof</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Offer</div>
+    </div>
+  </div>
+
+  <!-- MODULE 06: CONTENT SYSTEM -->
+  <div class="module">
+    <div class="module-number">06 -- Content System</div>
+    <h2 class="module-title">Content System</h2>
+
+    <div class="label">Platform Strategy</div>
+    <div class="grid-3" style="margin-bottom: 40px;">
+      <div class="platform-card">
+        <div class="label">Primary</div>
+        <h4 style="font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px;">70%</h4>
+        <div style="font-size: 14px; color: var(--gray);">Main content platform</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="pct-bar"><div class="pct-fill" style="width: 70%;"></div></div>
+      </div>
+      <div class="platform-card">
+        <div class="label">Secondary</div>
+        <h4 style="font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px;">20%</h4>
+        <div style="font-size: 14px; color: var(--gray);">Repurpose channel</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="pct-bar"><div class="pct-fill" style="width: 20%;"></div></div>
+      </div>
+      <div class="platform-card">
+        <div class="label">Community</div>
+        <h4 style="font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 4px;">10%</h4>
+        <div style="font-size: 14px; color: var(--gray);">Engagement hub</div>
+        <div class="fill-line" style="margin-top: 16px;"></div>
+        <div class="pct-bar"><div class="pct-fill" style="width: 10%;"></div></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Content Formula</div>
+    <div class="h-flow" style="margin: 16px 0 40px;">
+      <div class="step">Hook</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Problem</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Value</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">Proof</div>
+      <span class="arrow">&#8594;</span>
+      <div class="step">CTA</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Publishing Schedule</div>
+    <div class="day-table" style="margin-top: 12px;">
+      <div class="day-cell">
+        <div class="day-name">Mon</div>
+        <div class="day-content">Educational<br>post</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Tue</div>
+        <div class="day-content">Behind the<br>scenes</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Wed</div>
+        <div class="day-content">Value<br>thread</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Thu</div>
+        <div class="day-content">Case study<br>or proof</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Fri</div>
+        <div class="day-content">Newsletter<br>or email</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Sat</div>
+        <div class="day-content">Repurpose<br>best content</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Sun</div>
+        <div class="day-content">Plan<br>next week</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 07: OPERATIONS -->
+  <div class="module">
+    <div class="module-number">07 -- Operations</div>
+    <h2 class="module-title">Operations</h2>
+
+    <div class="label">Tool Stack</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px;">
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Creation</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Automation</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Analytics</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Communication</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Design</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Finance</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">AI / LLMs</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Hosting</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Email</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">CRM</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Storage</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+      <div class="inner-card" style="text-align: center;">
+        <div class="label">Scheduling</div>
+        <div class="fill-line" style="margin-top: 8px;"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2">
+      <div>
+        <div class="label">SOPs Checklist</div>
+        <ul class="checklist">
+          <li>Product creation SOP</li>
+          <li>Content publishing SOP</li>
+          <li>Customer onboarding SOP</li>
+          <li>Refund handling SOP</li>
+          <li>Weekly review SOP</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label">Automation Priorities</div>
+        <div class="inner-card" style="margin-bottom: 12px; border-left: 3px solid var(--white);">
+          <div class="label">Tier 1 -- Automate Now</div>
+          <div class="fill-line"></div>
+        </div>
+        <div class="inner-card" style="margin-bottom: 12px; border-left: 3px solid var(--gray);">
+          <div class="label">Tier 2 -- Automate Next</div>
+          <div class="fill-line"></div>
+        </div>
+        <div class="inner-card" style="border-left: 3px solid var(--border);">
+          <div class="label">Tier 3 -- Future</div>
+          <div class="fill-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Weekly Review Template</div>
+    <div class="grid-2" style="margin-top: 12px;">
+      <div>
+        <div style="font-size: 14px; color: var(--gray); margin-bottom: 4px; font-style: italic;">What worked this week?</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div style="font-size: 14px; color: var(--gray); margin-bottom: 4px; margin-top: 16px; font-style: italic;">What didn't work?</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div style="font-size: 14px; color: var(--gray); margin-bottom: 4px; font-style: italic;">Top 3 priorities next week</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div style="font-size: 14px; color: var(--gray); margin-bottom: 4px; margin-top: 16px; font-style: italic;">Revenue this week: $______</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 08: GROWTH & SCALING -->
+  <div class="module">
+    <div class="module-number">08 -- Growth & Scaling</div>
+    <h2 class="module-title">Growth & Scaling</h2>
+
+    <div class="grid-3">
+      <div class="phase-card">
+        <div class="phase-header" style="color: var(--white);">Phase 1</div>
+        <div class="phase-range">$0 - 5K <span>/mo</span></div>
+        <ul class="checklist">
+          <li>First paid product live</li>
+          <li>10 paying customers</li>
+          <li>Email list to 500</li>
+          <li>One content channel active</li>
+          <li>First testimonial collected</li>
+          <li>Consistent weekly revenue</li>
+        </ul>
+        <div class="revenue-target">
+          Target <strong>$5,000/mo</strong>
+        </div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header" style="color: var(--gold);">Phase 2</div>
+        <div class="phase-range">$5K - 15K <span>/mo</span></div>
+        <ul class="checklist">
+          <li>3+ products in catalog</li>
+          <li>Paid ads profitable</li>
+          <li>Email list to 2,500</li>
+          <li>First hire or contractor</li>
+          <li>Affiliate program launched</li>
+          <li>Systems documented</li>
+        </ul>
+        <div class="revenue-target">
+          Target <strong>$15,000/mo</strong>
+        </div>
+      </div>
+      <div class="phase-card target">
+        <div class="phase-header" style="color: var(--mint);">Phase 3</div>
+        <div class="phase-range">$15K - 50K <span>/mo</span></div>
+        <ul class="checklist">
+          <li>High-ticket offer launched</li>
+          <li>Team of 3+</li>
+          <li>Multiple revenue streams</li>
+          <li>Brand recognized in niche</li>
+          <li>80% automated operations</li>
+          <li>Location independent</li>
+        </ul>
+        <div class="revenue-target">
+          Target <strong>$50,000/mo</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 09: ANALYTICS & KPIs -->
+  <div class="module">
+    <div class="module-number">09 -- Analytics & KPIs</div>
+    <h2 class="module-title">Analytics & KPIs</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Monthly Revenue</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Total revenue from all streams before expenses</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Conversion Rate</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Visitors to paying customers percentage</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Email List Size</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Total active subscribers across all lists</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Customer LTV</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Average lifetime value per customer</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Content Reach</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Weekly impressions across all platforms</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Profit Margin</div>
+        <div class="kpi-value">______</div>
+        <div class="kpi-desc">Net profit as percentage of revenue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 10: 12-MONTH TIMELINE -->
+  <div class="module">
+    <div class="module-number">10 -- 12-Month Timeline</div>
+    <h2 class="module-title">12-Month Timeline</h2>
+
+    <div class="timeline-wrap">
+      <div class="timeline-phases">
+        <div class="timeline-phase" style="width: 33%; color: var(--white);">Phase 1: Foundation</div>
+        <div class="timeline-phase" style="width: 33%; color: var(--gold);">Phase 2: Growth</div>
+        <div class="timeline-phase" style="width: 34%; color: var(--mint);">Phase 3: Scale</div>
+      </div>
+      <div class="timeline-line"></div>
+      <div class="timeline-months">
+        <div class="timeline-month"><div class="dot"></div><span>M1</span></div>
+        <div class="timeline-month"><div class="dot"></div><span>M2</span></div>
+        <div class="timeline-month"><div class="dot"></div><span>M3</span></div>
+        <div class="timeline-month"><div class="dot"></div><span>M4</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--gold);"></div><span>M5</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--gold);"></div><span>M6</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--gold);"></div><span>M7</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--gold);"></div><span>M8</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--mint); box-shadow: 0 0 10px rgba(105,219,124,0.4);"></div><span>M9</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--mint); box-shadow: 0 0 10px rgba(105,219,124,0.4);"></div><span>M10</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--mint); box-shadow: 0 0 10px rgba(105,219,124,0.4);"></div><span>M11</span></div>
+        <div class="timeline-month"><div class="dot" style="background: var(--mint); box-shadow: 0 0 10px rgba(105,219,124,0.4);"></div><span>M12</span></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Revenue Tracker</div>
+    <table class="clean" style="margin-bottom: 40px;">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Revenue Goal</th>
+          <th>Actual</th>
+          <th>Profit</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Month 1</td><td>$______</td><td>$______</td><td>$______</td><td style="border-bottom: 1px dotted var(--border);"></td></tr>
+        <tr><td>Month 2</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 3</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 4</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 5</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 6</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 7</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 8</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 9</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 10</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 11</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+        <tr><td>Month 12</td><td>$______</td><td>$______</td><td>$______</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <div class="label">Notes</div>
+    <div class="ruled-lines">
+      <div class="ruled-line"></div>
+      <div class="ruled-line"></div>
+      <div class="ruled-line"></div>
+      <div class="ruled-line"></div>
+      <div class="ruled-line"></div>
+      <div class="ruled-line"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>BEHIKE OPERATING SYSTEM v3.0</strong><br>
+    behike.co<br>
+    behike.co
+  </div>
+
+</div>
+
+</body>
+</html>

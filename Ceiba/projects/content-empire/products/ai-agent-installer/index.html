@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Installer Kit</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-hover: #1a1a1a;
+    --border: #222;
+    --text: #fff;
+    --text-dim: #888;
+    --accent: #0066ff;
+    --success: #00c853;
+    --warning: #ffd600;
+    --danger: #ff3d00;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 60px 24px 20px;
+  }
+  header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  header p {
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* Views */
+  .view {
+    display: none;
+    animation: fadeIn 0.35s ease;
+  }
+  .view.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Tier Cards */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px 0 60px;
+  }
+  @media (max-width: 720px) {
+    .tier-grid { grid-template-columns: 1fr; gap: 16px; }
+    header h1 { font-size: 1.8rem; }
+  }
+
+  .tier-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .tier-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .tier-card.green:hover { border-color: var(--success); }
+  .tier-card.yellow:hover { border-color: var(--warning); }
+  .tier-card.red:hover { border-color: var(--danger); }
+
+  .tier-emoji {
+    font-size: 3.2rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .tier-card h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .tier-card p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  /* Back Button */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .back-btn:hover { border-color: var(--text-dim); color: var(--text); }
+
+  /* Section Headers */
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .section-subtitle {
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    font-size: 1rem;
+  }
+
+  /* Wizard */
+  .wizard-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .wizard-step.active { display: block; }
+
+  .wizard-progress {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 36px;
+  }
+  .wizard-progress .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .wizard-progress .dot.active { background: var(--success); }
+  .wizard-progress .dot.done { background: var(--success); }
+
+  .wizard-label {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+  .wizard-question {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  /* Option Buttons */
+  .option-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 18px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .option-btn:hover {
+    border-color: var(--success);
+    background: var(--surface-hover);
+  }
+  .option-btn .option-title { font-weight: 600; }
+  .option-btn .option-desc { color: var(--text-dim); font-size: 0.88rem; margin-top: 4px; }
+
+  /* Tool Cards */
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+  .tool-card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .tool-card p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 14px; }
+  .tool-link {
+    display: inline-block;
+    background: var(--success);
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+  }
+  .tool-link:hover { opacity: 0.85; }
+
+  /* Email Capture */
+  .email-capture {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .email-capture h3 { margin-bottom: 8px; font-size: 1.15rem; }
+  .email-capture p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 20px; }
+  .email-row {
+    display: flex;
+    gap: 10px;
+  }
+  @media (max-width: 480px) {
+    .email-row { flex-direction: column; }
+  }
+  .email-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .email-input:focus { border-color: var(--accent); }
+  .email-submit {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    background: var(--success);
+    color: #000;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .email-submit:hover { opacity: 0.85; }
+
+  /* Moderate Tier */
+  .setup-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .setup-header {
+    padding: 20px 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .setup-header:hover { background: var(--surface-hover); }
+  .setup-header h3 { font-size: 1.05rem; }
+  .setup-header .chevron {
+    color: var(--text-dim);
+    transition: transform 0.3s;
+    font-size: 1.2rem;
+  }
+  .setup-header.open .chevron { transform: rotate(180deg); }
+  .setup-body {
+    display: none;
+    padding: 0 24px 24px;
+    animation: fadeIn 0.25s ease;
+  }
+  .setup-body.open { display: block; }
+  .setup-body .desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+
+  pre {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .copy-btn:hover { color: var(--text); }
+
+  .expected-output {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+  }
+  .troubleshoot {
+    background: rgba(255,61,0,0.08);
+    border: 1px solid rgba(255,61,0,0.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+  .troubleshoot strong { color: var(--danger); }
+
+  /* Product CTA */
+  .product-cta {
+    background: linear-gradient(135deg, rgba(0,102,255,0.1), rgba(0,200,83,0.1));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .product-cta .info h3 { font-size: 1.05rem; margin-bottom: 4px; }
+  .product-cta .info p { color: var(--text-dim); font-size: 0.88rem; }
+  .product-cta .price-btn {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+  .product-cta .price-btn:hover { opacity: 0.85; }
+
+  /* Advanced Tier */
+  .arch-diagram {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    overflow-x: auto;
+    margin-bottom: 24px;
+    white-space: pre;
+  }
+  .doc-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 600px) {
+    .doc-grid { grid-template-columns: 1fr; }
+  }
+  .doc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text);
+    display: block;
+  }
+  .doc-card:hover { border-color: var(--danger); }
+  .doc-card h3 { font-size: 1rem; margin-bottom: 4px; }
+  .doc-card p { color: var(--text-dim); font-size: 0.85rem; }
+
+  .config-template {
+    margin-bottom: 24px;
+  }
+  .config-template h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 48px 24px 60px;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  footer p { color: var(--text-dim); font-size: 0.95rem; }
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  footer a:hover { text-decoration: underline; }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tag-green { background: rgba(0,200,83,0.15); color: var(--success); }
+  .tag-yellow { background: rgba(255,214,0,0.15); color: var(--warning); }
+  .tag-red { background: rgba(255,61,0,0.15); color: var(--danger); }
+
+  .success-msg {
+    color: var(--success);
+    font-weight: 600;
+    margin-top: 12px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AI Agent Installer Kit</h1>
+  <p>Choose your experience level. We will match you with the right tools, guides, and setup path.</p>
+</header>
+
+<div class="container">
+
+  <!-- TIER SELECTION -->
+  <div id="view-home" class="view active">
+    <div class="tier-grid">
+      <div class="tier-card green" onclick="showView('beginner')">
+        <span class="tier-emoji">🟢</span>
+        <h2>I'm New to AI</h2>
+        <p>Click a button, get started. No tech required.</p>
+      </div>
+      <div class="tier-card yellow" onclick="showView('moderate')">
+        <span class="tier-emoji">🟡</span>
+        <h2>I Know Some AI</h2>
+        <p>Guided setup with prompts and templates.</p>
+      </div>
+      <div class="tier-card red" onclick="showView('advanced')">
+        <span class="tier-emoji">🔴</span>
+        <h2>I Build With AI</h2>
+        <p>Full documentation. Architecture. APIs.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEGINNER VIEW -->
+  <div id="view-beginner" class="view">
+    <button class="back-btn" onclick="showView('home')">&#8592; Back</button>
+    <span class="tag tag-green">Beginner</span>
+    <h2 class="section-title" style="margin-top:12px;">Let's Get You Started</h2>
+    <p class="section-subtitle">No technical knowledge needed. Just answer a couple of questions.</p>
+
+    <!-- Wizard Progress -->
+    <div class="wizard-progress">
+      <div class="dot active" id="dot-1"></div>
+      <div class="dot" id="dot-2"></div>
+      <div class="dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="wizard-step active" id="wiz-1">
+      <p class="wizard-label">Step 1 of 3</p>
+      <p class="wizard-question">What do you want AI to help with?</p>
+      <div class="option-grid">
+        <button class="option-btn" onclick="selectUseCase('email')">
+          <div class="option-title">Email</div>
+          <div class="option-desc">Write, reply, and organize emails faster.</div>
+        </button>
+        <button class="option-btn" onclick="selectUseCase('content')">
+          <div class="option-title">Content Creation</div>
+          <div class="option-desc">Blog posts, social media, newsletters.</div>
+        </button>
+        <button class="option-btn" onclick="selectUseCase('finances')">
+          <div class="option-title">Finances</div>
+          <div class="option-desc">Budgets, tracking, financial summaries.</div>
+        </button>
+        <button class="option-btn" onclick="selectUseCase('research')">
+          <div class="option-title">Research</div>
+          <div class="option-desc">Find answers, summarize articles, learn faster.</div>
+        </button>
+        <button class="option-btn" onclick="selectUseCase('support')">
+          <div class="option-title">Customer Support</div>
+          <div class="option-desc">Auto-reply to common questions from customers.</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="wizard-step" id="wiz-2">
+      <p class="wizard-label">Step 2 of 3</p>
+      <p class="wizard-question">Choose your first tool</p>
+      <div id="tool-recommendations"></div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="wizard-step" id="wiz-3">
+      <p class="wizard-label">Step 3 of 3</p>
+      <p class="wizard-question">Download your free starter guide</p>
+      <div class="email-capture">
+        <h3>Almost there.</h3>
+        <p>Enter your email and we will send you the AI Starter Guide. It covers everything you need to know in plain English.</p>
+        <div class="email-row">
+          <input type="email" class="email-input" id="beginner-email" placeholder="you@email.com">
+          <button class="email-submit" onclick="captureEmail()">Get the Guide</button>
+        </div>
+        <p class="success-msg" id="email-success">You are all set. Check your inbox.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODERATE VIEW -->
+  <div id="view-moderate" class="view">
+    <button class="back-btn" onclick="showView('home')">&#8592; Back</button>
+    <span class="tag tag-yellow">Moderate</span>
+    <h2 class="section-title" style="margin-top:12px;">Guided Setup</h2>
+    <p class="section-subtitle">Copy, paste, and run. Each section walks you through the full process.</p>
+
+    <!-- Ollama -->
+    <div class="setup-section">
+      <div class="setup-header" onclick="toggleSetup(this)">
+        <h3>Run AI Locally with Ollama</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="setup-body">
+        <p class="desc">Ollama lets you run powerful AI models on your own computer. No cloud, no subscriptions, total privacy. It works on Mac, Windows, and Linux.</p>
+
+        <p><strong>1. Install Ollama</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>curl -fsSL https://ollama.com/install.sh | sh</pre>
+        <p class="expected-output">You should see: "Ollama has been installed successfully."</p>
+
+        <p style="margin-top:16px;"><strong>2. Download your first model</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>ollama pull llama3</pre>
+        <p class="expected-output">This downloads the Llama 3 model. It may take a few minutes depending on your connection.</p>
+
+        <p style="margin-top:16px;"><strong>3. Start a conversation</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>ollama run llama3</pre>
+        <p class="expected-output">You will see a prompt where you can type messages and get responses. Type /bye to exit.</p>
+
+        <div class="troubleshoot">
+          <strong>Troubleshooting:</strong> If the install command fails, visit <a href="https://ollama.com/download" style="color:var(--warning)">ollama.com/download</a> and use the graphical installer instead. Make sure you have at least 8GB of RAM available.
+        </div>
+      </div>
+    </div>
+
+    <!-- n8n -->
+    <div class="setup-section">
+      <div class="setup-header" onclick="toggleSetup(this)">
+        <h3>Automate Workflows with n8n</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="setup-body">
+        <p class="desc">n8n is an open-source automation tool. Think of it like Zapier, but you own it. Connect AI to your email, calendar, database, and more.</p>
+
+        <p><strong>1. Install n8n</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>npm install -g n8n</pre>
+        <p class="expected-output">If you do not have npm, install Node.js first from <a href="https://nodejs.org" style="color:var(--warning)">nodejs.org</a>.</p>
+
+        <p style="margin-top:16px;"><strong>2. Launch n8n</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>n8n start</pre>
+        <p class="expected-output">Open your browser to <code>http://localhost:5678</code>. You will see the n8n editor.</p>
+
+        <p style="margin-top:16px;"><strong>3. Create your first workflow</strong></p>
+        <p class="desc">Click "Add workflow," then add a Webhook trigger and an AI node. Connect them, activate, and you have a working AI endpoint.</p>
+
+        <div class="troubleshoot">
+          <strong>Troubleshooting:</strong> If port 5678 is busy, run <code>N8N_PORT=5679 n8n start</code> instead. For persistent setup, use Docker: <code>docker run -d -p 5678:5678 n8nio/n8n</code>.
+        </div>
+      </div>
+    </div>
+
+    <!-- Telegram Bot -->
+    <div class="setup-section">
+      <div class="setup-header" onclick="toggleSetup(this)">
+        <h3>Build a Telegram Bot</h3>
+        <span class="chevron">&#9660;</span>
+      </div>
+      <div class="setup-body">
+        <p class="desc">A Telegram bot gives you a personal AI assistant in your pocket. Send it messages and get intelligent replies, anywhere.</p>
+
+        <p><strong>1. Create your bot</strong></p>
+        <p class="desc">Open Telegram and message <code>@BotFather</code>. Send <code>/newbot</code> and follow the steps. Save the token it gives you.</p>
+
+        <p style="margin-top:16px;"><strong>2. Install the library</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>pip install python-telegram-bot openai</pre>
+
+        <p style="margin-top:16px;"><strong>3. Create your bot file</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>from telegram.ext import ApplicationBuilder, MessageHandler, filters
+import openai, os
+
+client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+async def reply(update, context):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role":"user","content":update.message.text}]
+    )
+    await update.message.reply_text(response.choices[0].message.content)
+
+app = ApplicationBuilder().token(os.environ["BOT_TOKEN"]).build()
+app.add_handler(MessageHandler(filters.TEXT, reply))
+app.run_polling()</pre>
+
+        <p style="margin-top:16px;"><strong>4. Run it</strong></p>
+        <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>BOT_TOKEN="your-token" OPENAI_API_KEY="your-key" python bot.py</pre>
+        <p class="expected-output">Your bot is now live. Message it on Telegram and it will respond with AI.</p>
+
+        <div class="troubleshoot">
+          <strong>Troubleshooting:</strong> If you get a token error, double-check the token from BotFather. Make sure there are no extra spaces. If the bot does not respond, check that your OpenAI API key is valid and has credits.
+        </div>
+      </div>
+    </div>
+
+    <!-- Product CTAs -->
+    <div class="product-cta">
+      <div class="info">
+        <h3>Prompt Cheat Sheet</h3>
+        <p>50+ tested prompts for business, content, and automation. Copy, paste, profit.</p>
+      </div>
+      <a href="#" class="price-btn" onclick="trackClick('prompt-cheat-sheet')">$9.99</a>
+    </div>
+    <div class="product-cta" style="margin-top:12px;">
+      <div class="info">
+        <h3>AI Employee Guide</h3>
+        <p>Full playbook for replacing manual tasks with AI agents. Includes templates and workflows.</p>
+      </div>
+      <a href="#" class="price-btn" onclick="trackClick('ai-employee-guide-mod')">$19.99</a>
+    </div>
+  </div>
+
+  <!-- ADVANCED VIEW -->
+  <div id="view-advanced" class="view">
+    <button class="back-btn" onclick="showView('home')">&#8592; Back</button>
+    <span class="tag tag-red">Advanced</span>
+    <h2 class="section-title" style="margin-top:12px;">Technical Documentation</h2>
+    <p class="section-subtitle">Architecture, APIs, deployment scripts, and full system specs.</p>
+
+    <h3 style="margin-bottom:12px;">System Architecture</h3>
+    <div class="arch-diagram">
++------------------+     +------------------+     +------------------+
+|   USER LAYER     |     |   AGENT LAYER    |     |   DATA LAYER     |
+|                  |     |                  |     |                  |
+|  Telegram Bot    |----&gt;|  Orchestrator    |----&gt;|  Vector DB       |
+|  Web Dashboard   |----&gt;|  (LangGraph)     |----&gt;|  (ChromaDB)      |
+|  API Endpoint    |----&gt;|                  |----&gt;|                  |
+|                  |     |  Task Router     |     |  SQL Database    |
++--------+---------+     |  Memory Manager  |     |  File Storage    |
+         |               |  Tool Executor   |     +--------+---------+
+         |               +--------+---------+              |
+         |                        |                        |
+         v                        v                        v
++------------------+     +------------------+     +------------------+
+|   TOOLS          |     |   LLM PROVIDERS  |     |   INTEGRATIONS   |
+|                  |     |                  |     |                  |
+|  Web Scraper     |     |  Ollama (local)  |     |  Email (SMTP)    |
+|  Code Executor   |     |  OpenAI API      |     |  Calendar API    |
+|  File Manager    |     |  Anthropic API   |     |  Notion API      |
+|  Browser Auto    |     |  Custom Models   |     |  Slack/Discord   |
++------------------+     +------------------+     +------------------+</div>
+
+    <h3 style="margin-bottom:12px;">Documentation</h3>
+    <div class="doc-grid">
+      <a class="doc-card" href="#" onclick="trackClick('ai-employee-guide-adv')">
+        <h3>AI Employee Guide</h3>
+        <p>Complete architecture, deployment patterns, scaling strategies.</p>
+      </a>
+      <a class="doc-card" href="#" onclick="trackClick('github-repos')">
+        <h3>GitHub Repositories</h3>
+        <p>Source code, starter templates, and example implementations.</p>
+      </a>
+      <a class="doc-card" href="#" onclick="trackClick('api-docs')">
+        <h3>API Documentation</h3>
+        <p>Endpoints, authentication, rate limits, and response schemas.</p>
+      </a>
+      <a class="doc-card" href="#" onclick="trackClick('install-service')">
+        <h3>Installation Service</h3>
+        <p>Custom AI agent builds. We set it up, you run it.</p>
+      </a>
+    </div>
+
+    <div class="config-template">
+      <h3>Configuration Template</h3>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button># agent-config.yaml
+agent:
+  name: "my-agent"
+  version: "1.0.0"
+
+llm:
+  provider: "ollama"           # ollama | openai | anthropic
+  model: "llama3"
+  temperature: 0.7
+  max_tokens: 4096
+
+memory:
+  backend: "chromadb"
+  collection: "agent-memory"
+  persist_directory: "./data/memory"
+
+tools:
+  - name: "web_search"
+    enabled: true
+  - name: "code_executor"
+    enabled: true
+    sandbox: true
+  - name: "file_manager"
+    enabled: true
+    root_dir: "./workspace"
+
+integrations:
+  telegram:
+    enabled: true
+    token: "${BOT_TOKEN}"
+  email:
+    enabled: false
+    smtp_host: "smtp.gmail.com"
+    smtp_port: 587
+
+deployment:
+  platform: "docker"           # docker | railway | bare-metal
+  port: 8080
+  health_check: "/health"
+  auto_restart: true</pre>
+    </div>
+
+    <div class="config-template">
+      <h3>Quick Deploy Script</h3>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button>#!/bin/bash
+# deploy-agent.sh
+set -e
+
+echo "Setting up AI Agent..."
+
+# 1. Clone the repo
+git clone https://github.com/behike/agent-starter.git
+cd agent-starter
+
+# 2. Create environment
+python -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Copy and configure
+cp agent-config.example.yaml agent-config.yaml
+echo "Edit agent-config.yaml with your settings."
+
+# 5. Launch
+python main.py --config agent-config.yaml</pre>
+    </div>
+
+    <div class="product-cta">
+      <div class="info">
+        <h3>AI Agent Installation Service</h3>
+        <p>Need a custom build? We design, deploy, and hand over a fully working AI agent system tailored to your business.</p>
+      </div>
+      <a href="#" class="price-btn" onclick="trackClick('install-service-cta')" style="background:var(--danger);">Get a Quote</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Not sure which level is right for you? <a href="#" onclick="trackClick('quiz-link')">Take our 2-minute quiz</a></p>
+</footer>
+
+<script>
+// Analytics
+function trackClick(id) {
+  const clicks = JSON.parse(localStorage.getItem('aik_clicks') || '{}');
+  clicks[id] = (clicks[id] || 0) + 1;
+  clicks[id + '_last'] = new Date().toISOString();
+  localStorage.setItem('aik_clicks', JSON.stringify(clicks));
+}
+
+// Navigation
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  trackClick('view-' + name);
+
+  // Reset beginner wizard when going home
+  if (name === 'home') {
+    currentWizStep = 1;
+    updateWizard();
+  }
+}
+
+// Beginner Wizard
+let currentWizStep = 1;
+let selectedUseCase = '';
+
+const toolData = {
+  email: [
+    { name: 'ChatGPT', desc: 'Write and reply to emails using conversational AI. Free to start.', link: 'https://chat.openai.com' },
+    { name: 'Grammarly', desc: 'Fix grammar, improve tone, and write clearer emails automatically.', link: 'https://grammarly.com' },
+    { name: 'Superhuman', desc: 'AI-powered email client that helps you reply twice as fast.', link: 'https://superhuman.com' }
+  ],
+  content: [
+    { name: 'ChatGPT', desc: 'Generate blog posts, captions, and newsletters with simple prompts.', link: 'https://chat.openai.com' },
+    { name: 'Canva AI', desc: 'Design social media graphics with AI-generated layouts and text.', link: 'https://canva.com' },
+    { name: 'Notion AI', desc: 'Write and organize content inside your workspace with AI assistance.', link: 'https://notion.so' }
+  ],
+  finances: [
+    { name: 'ChatGPT', desc: 'Ask financial questions, create budgets, and summarize reports.', link: 'https://chat.openai.com' },
+    { name: 'Copilot (Microsoft)', desc: 'AI built into Excel and Office for financial analysis and formulas.', link: 'https://copilot.microsoft.com' }
+  ],
+  research: [
+    { name: 'Perplexity', desc: 'AI-powered search engine that gives you answers with sources.', link: 'https://perplexity.ai' },
+    { name: 'ChatGPT', desc: 'Ask complex questions, summarize documents, and explore topics.', link: 'https://chat.openai.com' },
+    { name: 'NotebookLM', desc: 'Upload documents and let Google AI answer questions about them.', link: 'https://notebooklm.google.com' }
+  ],
+  support: [
+    { name: 'Intercom Fin', desc: 'AI customer support agent that resolves questions automatically.', link: 'https://intercom.com' },
+    { name: 'Tidio', desc: 'Live chat with AI that handles common customer questions 24/7.', link: 'https://tidio.com' },
+    { name: 'ChatGPT', desc: 'Build custom support replies and FAQ templates with AI.', link: 'https://chat.openai.com' }
+  ]
+};
+
+function selectUseCase(useCase) {
+  selectedUseCase = useCase;
+  trackClick('usecase-' + useCase);
+  renderTools(useCase);
+  currentWizStep = 2;
+  updateWizard();
+}
+
+function renderTools(useCase) {
+  const container = document.getElementById('tool-recommendations');
+  const tools = toolData[useCase] || [];
+  container.innerHTML = tools.map(t => `
+    <div class="tool-card">
+      <h3>${t.name}</h3>
+      <p>${t.desc}</p>
+      <a href="${t.link}" target="_blank" class="tool-link" onclick="trackClick('tool-${t.name.toLowerCase().replace(/\s/g,'-')}')">Get Started</a>
+    </div>
+  `).join('') + `
+    <button class="option-btn" style="margin-top:16px;text-align:center;" onclick="goToWizStep(3)">
+      <div class="option-title">Continue to Step 3 &#8594;</div>
+    </button>
+  `;
+}
+
+function goToWizStep(step) {
+  currentWizStep = step;
+  updateWizard();
+}
+
+function updateWizard() {
+  for (let i = 1; i <= 3; i++) {
+    const step = document.getElementById('wiz-' + i);
+    const dot = document.getElementById('dot-' + i);
+    step.classList.toggle('active', i === currentWizStep);
+    dot.classList.toggle('active', i === currentWizStep);
+    dot.classList.toggle('done', i < currentWizStep);
+  }
+}
+
+// Email Capture
+function captureEmail() {
+  const input = document.getElementById('beginner-email');
+  const email = input.value.trim();
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = 'var(--danger)';
+    return;
+  }
+  input.style.borderColor = 'var(--success)';
+
+  // Store locally
+  const leads = JSON.parse(localStorage.getItem('aik_leads') || '[]');
+  leads.push({ email, useCase: selectedUseCase, date: new Date().toISOString() });
+  localStorage.setItem('aik_leads', JSON.stringify(leads));
+
+  trackClick('email-captured');
+  document.getElementById('email-success').style.display = 'block';
+}
+
+// Moderate Tier: Accordion
+function toggleSetup(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+
+  // Close all
+  document.querySelectorAll('.setup-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.setup-header').forEach(h => h.classList.remove('open'));
+
+  if (!isOpen) {
+    body.classList.add('open');
+    header.classList.add('open');
+  }
+}
+
+// Copy Code
+function copyCode(btn) {
+  const pre = btn.parentElement;
+  const code = pre.textContent.replace('Copy', '').trim();
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+</script>
+
+</body>
+</html>

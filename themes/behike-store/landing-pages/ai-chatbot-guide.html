@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Add an AI chatbot to your website in 30 minutes. $0/month. Runs on your own computer. Works with any website.">
+    <title>AI Chatbot Guide | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --gray: #86868B;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.8s ease-out both;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-cta {
+            background: var(--blue);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover {
+            opacity: 0.85;
+        }
+
+        /* Sections */
+        section {
+            padding: 120px 24px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 1px solid rgba(10, 132, 255, 0.3);
+            border-radius: 980px;
+            font-size: 13px;
+            color: var(--blue);
+            margin-bottom: 32px;
+            letter-spacing: 0.02em;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            max-width: 800px;
+        }
+
+        .hero h1 span {
+            color: var(--blue);
+        }
+
+        .hero-tagline {
+            font-size: clamp(16px, 2.5vw, 21px);
+            color: var(--gray);
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.5;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .hero-cta:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+
+        .hero-price {
+            margin-top: 16px;
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        /* Chat Mockup */
+        .mockup-section {
+            text-align: center;
+            padding: 120px 24px;
+            max-width: 100%;
+            background: var(--secondary-bg);
+        }
+
+        .mockup-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .mockup-subtitle {
+            color: var(--gray);
+            font-size: 19px;
+            margin-bottom: 48px;
+        }
+
+        .chat-mockup-container {
+            max-width: 380px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-mockup {
+            background: rgba(20, 20, 20, 0.95);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .chat-mockup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .chat-mockup-header-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #F5F5F7;
+        }
+
+        .chat-mockup-close {
+            color: #86868B;
+            font-size: 18px;
+        }
+
+        .chat-mockup-messages {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 260px;
+        }
+
+        .mock-msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .mock-msg.bot {
+            background: rgba(255, 255, 255, 0.08);
+            color: #F5F5F7;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .mock-msg.user {
+            background: var(--blue);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .mock-typing {
+            display: flex;
+            gap: 4px;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .mock-typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #86868B;
+            border-radius: 50%;
+            animation: typingBounce 1.2s infinite;
+        }
+
+        .mock-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .mock-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        .chat-mockup-input {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .mock-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 980px;
+            color: #86868B;
+            font-size: 13px;
+        }
+
+        .mock-send {
+            background: var(--blue);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mock-send svg {
+            width: 16px;
+            height: 16px;
+            fill: #fff;
+        }
+
+        .chat-mockup-bubble {
+            position: absolute;
+            bottom: -60px;
+            right: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Problem */
+        .problem {
+            text-align: center;
+            max-width: 100%;
+            padding: 120px 24px;
+        }
+
+        .problem-inner {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .problem h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .problem h2 span {
+            color: var(--blue);
+        }
+
+        .problem p {
+            font-size: 19px;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .problem p strong {
+            color: var(--light);
+        }
+
+        /* Value Stack */
+        .value-stack {
+            text-align: center;
+            padding: 120px 24px;
+            max-width: 100%;
+            background: var(--secondary-bg);
+        }
+
+        .value-stack h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .value-stack-subtitle {
+            color: var(--gray);
+            font-size: 19px;
+            margin-bottom: 48px;
+        }
+
+        .value-stack-table {
+            max-width: 560px;
+            margin: 0 auto 48px;
+            background: var(--black);
+            border: 1px solid rgba(245, 245, 247, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .value-stack-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .value-stack-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+            font-size: 15px;
+        }
+
+        .value-stack-table td:first-child {
+            text-align: left;
+            color: var(--light);
+        }
+
+        .value-stack-table td:last-child {
+            text-align: right;
+            color: var(--gray);
+            text-decoration: line-through;
+            white-space: nowrap;
+        }
+
+        .value-stack-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .value-stack-total {
+            max-width: 560px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 24px;
+        }
+
+        .value-stack-total .total-label {
+            font-size: 15px;
+            color: var(--gray);
+        }
+
+        .value-stack-total .total-old {
+            font-size: 24px;
+            color: var(--gray);
+            text-decoration: line-through;
+            margin-right: 16px;
+        }
+
+        .value-stack-total .total-new {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: -0.04em;
+        }
+
+        /* Use Cases */
+        .use-cases {
+            text-align: center;
+            padding: 120px 24px;
+            max-width: 100%;
+        }
+
+        .use-cases h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .use-cases-subtitle {
+            color: var(--gray);
+            font-size: 19px;
+            margin-bottom: 48px;
+        }
+
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .use-case-card {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(245, 245, 247, 0.06);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: left;
+        }
+
+        .use-case-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .use-case-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .use-case-card p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .use-case-example {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(10, 132, 255, 0.08);
+            border-radius: 10px;
+            font-size: 13px;
+            color: var(--blue);
+            font-style: italic;
+        }
+
+        /* What's Inside */
+        .contents {
+            padding: 120px 24px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .contents h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .contents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 48px;
+        }
+
+        .content-section h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--blue);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .content-section ol {
+            list-style: none;
+            counter-reset: chapter;
+        }
+
+        .content-section ol li {
+            counter-increment: chapter;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+            font-size: 15px;
+            color: var(--gray);
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+
+        .content-section ol li::before {
+            content: counter(chapter, decimal-leading-zero);
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(245, 245, 247, 0.25);
+            min-width: 20px;
+        }
+
+        /* FAQ */
+        .faq {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 120px 24px;
+        }
+
+        .faq h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 500;
+            padding: 24px 0;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: "+";
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--gray);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding-bottom: 24px;
+        }
+
+        .faq-answer p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Cross-sell */
+        .cross-sell {
+            text-align: center;
+            padding: 120px 24px;
+            max-width: 100%;
+            background: var(--secondary-bg);
+        }
+
+        .cross-sell-inner {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .cross-sell h2 {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .cross-sell p {
+            font-size: 17px;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .cross-sell-cta {
+            display: inline-block;
+            background: transparent;
+            color: var(--blue);
+            padding: 14px 32px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid var(--blue);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .cross-sell-cta:hover {
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .cross-sell .price {
+            color: var(--blue);
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        /* Pricing */
+        .pricing {
+            text-align: center;
+            padding: 120px 24px;
+            max-width: 100%;
+        }
+
+        .pricing h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .pricing-subtitle {
+            color: var(--gray);
+            font-size: 19px;
+            margin-bottom: 48px;
+        }
+
+        .pricing-card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--secondary-bg);
+            border: 1px solid rgba(245, 245, 247, 0.1);
+            border-radius: 20px;
+            padding: 48px 40px;
+        }
+
+        .pricing-amount {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 8px;
+        }
+
+        .pricing-one-time {
+            color: var(--gray);
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+            font-size: 15px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--blue);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .pricing-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            padding: 16px 48px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .pricing-cta:hover {
+            opacity: 0.85;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 48px 24px;
+            border-top: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .footer-links {
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 16px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-copy {
+            color: var(--gray);
+            font-size: 13px;
+        }
+
+        /* Exit Intent Popup */
+        .exit-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exit-popup-overlay.active {
+            display: flex;
+        }
+
+        .exit-popup {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(245, 245, 247, 0.1);
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 440px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+
+        .exit-popup-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .exit-popup h3 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 12px;
+        }
+
+        .exit-popup p {
+            font-size: 16px;
+            color: var(--gray);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .exit-popup .price {
+            color: var(--blue);
+        }
+
+        .exit-popup-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            padding: 14px 40px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+            width: 100%;
+        }
+
+        .exit-popup-cta:hover {
+            opacity: 0.85;
+        }
+
+        /* Section label */
+        .section-label {
+            display: block;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--blue);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            section {
+                padding: 80px 20px;
+            }
+
+            .pricing-card {
+                padding: 36px 24px;
+            }
+
+            .exit-popup {
+                padding: 36px 24px;
+            }
+
+            .chat-mockup-container {
+                max-width: 300px;
+            }
+
+            .value-stack-total .total-new {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-logo">Behike</div>
+        <a href="#pricing" class="nav-cta">Get the Guide</a>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge fade-up">New Guide</div>
+        <h1 class="fade-up delay-1">Add an <span>AI Chatbot</span> to Your Website</h1>
+        <p class="hero-tagline fade-up delay-2">30 minutes. $0/month. Your own AI. Works with any website.</p>
+        <a href="#pricing" class="hero-cta fade-up delay-3">Get the Guide - $4.99</a>
+        <p class="hero-price fade-up delay-4">One-time purchase. Instant download.</p>
+    </section>
+
+    <!-- Chat Widget Mockup -->
+    <div class="mockup-section">
+        <div style="max-width: 980px; margin: 0 auto;">
+            <span class="section-label reveal">What You'll Build</span>
+            <h2 class="reveal">A professional chat widget on <em>your</em> site</h2>
+            <p class="mockup-subtitle reveal">Powered by AI running on your own computer. Not a $50/month SaaS tool.</p>
+        </div>
+
+        <div class="chat-mockup-container reveal">
+            <div class="chat-mockup">
+                <div class="chat-mockup-header">
+                    <span class="chat-mockup-header-title">Your AI Assistant</span>
+                    <span class="chat-mockup-close">&times;</span>
+                </div>
+                <div class="chat-mockup-messages">
+                    <div class="mock-msg bot">Hey! How can I help you today?</div>
+                    <div class="mock-msg user">Do you ship internationally?</div>
+                    <div class="mock-msg bot">We ship to 30+ countries. Standard international shipping is $12.99 and takes 7-14 business days. Free shipping on orders over $75.</div>
+                    <div class="mock-msg user">What about returns?</div>
+                    <div class="mock-typing">
+                        <div class="mock-typing-dot"></div>
+                        <div class="mock-typing-dot"></div>
+                        <div class="mock-typing-dot"></div>
+                    </div>
+                </div>
+                <div class="chat-mockup-input">
+                    <div class="mock-input">Ask something...</div>
+                    <div class="mock-send">
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-mockup-bubble">&#x1F4AC;</div>
+        </div>
+    </div>
+
+    <!-- Problem / PAS -->
+    <section class="problem">
+        <div class="problem-inner reveal">
+            <h2>Your customers have questions at <span>2am</span></h2>
+            <p>You're asleep. They leave. They buy from someone else. By morning, the sale is gone and you never even knew it happened.</p>
+            <p>Chatbot services want $30-$100/month. They own your data. They limit your messages. And they still sound like robots.</p>
+            <p><strong>What if you could have an AI that knows your products, runs 24/7, and costs you $0/month?</strong></p>
+        </div>
+    </section>
+
+    <!-- Value Stack -->
+    <div class="value-stack">
+        <div style="max-width: 980px; margin: 0 auto;">
+            <span class="section-label reveal">What's Included</span>
+            <h2 class="reveal">Everything you need</h2>
+            <p class="value-stack-subtitle reveal">Code, templates, and deployment guide. All tested, all working.</p>
+        </div>
+
+        <div class="value-stack-table reveal">
+            <table>
+                <tr>
+                    <td>Complete chat widget code (copy + paste)</td>
+                    <td>$47</td>
+                </tr>
+                <tr>
+                    <td>Python API server template</td>
+                    <td>$47</td>
+                </tr>
+                <tr>
+                    <td>3 system prompt templates (ecommerce, freelancer, restaurant)</td>
+                    <td>$27</td>
+                </tr>
+                <tr>
+                    <td>Deployment guide (local, VPS, old laptop)</td>
+                    <td>$27</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="value-stack-total reveal">
+            <span class="total-label">Total value</span>
+            <div>
+                <span class="total-old">$148</span>
+                <span class="total-new">$4.99</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use Cases -->
+    <section class="use-cases">
+        <span class="section-label reveal">Built For You</span>
+        <h2 class="reveal">Three businesses, one guide</h2>
+        <p class="use-cases-subtitle reveal">Complete system prompt templates included for each.</p>
+
+        <div class="use-cases-grid">
+            <div class="use-case-card reveal">
+                <div class="use-case-icon">&#x1F6D2;</div>
+                <h3>Ecommerce Store</h3>
+                <p>Answer product questions, share pricing, explain shipping and returns. Convert browsers into buyers while you sleep.</p>
+                <div class="use-case-example">"What's in the Vitamin C Serum?" "Do you ship to Canada?"</div>
+            </div>
+            <div class="use-case-card reveal">
+                <div class="use-case-icon">&#x1F4BB;</div>
+                <h3>Freelancer Portfolio</h3>
+                <p>Qualify leads automatically. Share your services, pricing, and availability without answering the same email 50 times.</p>
+                <div class="use-case-example">"How much for a landing page?" "Are you available next month?"</div>
+            </div>
+            <div class="use-case-card reveal">
+                <div class="use-case-icon">&#x1F37D;</div>
+                <h3>Local Business</h3>
+                <p>Share hours, menu, reservations, and directions. Perfect for restaurants, salons, gyms, and service businesses.</p>
+                <div class="use-case-example">"Are you open on Sundays?" "Do you do catering?"</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's Inside -->
+    <section class="contents">
+        <h2 class="reveal">What's Inside</h2>
+        <div class="contents-grid">
+            <div class="content-section reveal">
+                <h3>Setup (Chapters 1-3)</h3>
+                <ol>
+                    <li>What you're building</li>
+                    <li>Prerequisites</li>
+                    <li>Install Ollama + pull your first model</li>
+                </ol>
+            </div>
+            <div class="content-section reveal">
+                <h3>Build (Chapters 4-5)</h3>
+                <ol>
+                    <li>Build the Python API server</li>
+                    <li>Add the chat widget to your site</li>
+                </ol>
+            </div>
+            <div class="content-section reveal">
+                <h3>Ship (Chapters 6-8)</h3>
+                <ol>
+                    <li>Customize for your business</li>
+                    <li>Deploy it (3 options)</li>
+                    <li>Troubleshooting</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <div class="faq">
+        <h2 class="reveal">Questions</h2>
+
+        <div class="faq-item reveal">
+            <button class="faq-question">Do I need coding experience?</button>
+            <div class="faq-answer">
+                <p>Basic HTML knowledge is enough. If you can paste a script tag into your website, you can follow this guide. The code is provided, you just customize three variables.</p>
+            </div>
+        </div>
+
+        <div class="faq-item reveal">
+            <button class="faq-question">Will this work on my computer?</button>
+            <div class="faq-answer">
+                <p>If your computer has 8GB of RAM or more, yes. Mac, Windows, and Linux all work. For older or weaker machines, the guide includes a lightweight model option that uses less resources.</p>
+            </div>
+        </div>
+
+        <div class="faq-item reveal">
+            <button class="faq-question">Does it work with WordPress / Shopify / Squarespace?</button>
+            <div class="faq-answer">
+                <p>It works with any website where you can add a script tag. That includes WordPress, Shopify, Squarespace, Wix, static HTML sites, and custom-built sites.</p>
+            </div>
+        </div>
+
+        <div class="faq-item reveal">
+            <button class="faq-question">Is this actually free to run after setup?</button>
+            <div class="faq-answer">
+                <p>Yes. The AI runs on your own computer using Ollama, which is free and open source. There are no API fees, no monthly subscriptions, no per-message costs. If you deploy on a VPS, that costs $5-10/month for the server, but the AI itself is still free.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cross-sell -->
+    <div class="cross-sell">
+        <div class="cross-sell-inner reveal">
+            <span class="section-label">Go Deeper</span>
+            <h2>Want the full AI infrastructure?</h2>
+            <p>The AI Chatbot Guide gets you one bot on one machine. The AI Employee Guide shows you how to build a multi-machine AI system with dedicated hardware, agent orchestration, SSH access, and automation. 20 chapters. The complete blueprint.</p>
+            <div class="price">$19.99</div>
+            <a href="ai-employee-guide.html" class="cross-sell-cta">See the AI Employee Guide</a>
+        </div>
+    </div>
+
+    <!-- Pricing -->
+    <section class="pricing" id="pricing">
+        <span class="section-label reveal">Get Started</span>
+        <h2 class="reveal">AI Chatbot Guide</h2>
+        <p class="pricing-subtitle reveal">Everything you need to add an AI chatbot to your website today.</p>
+
+        <div class="pricing-card reveal">
+            <div class="pricing-amount">$4.99</div>
+            <p class="pricing-one-time">One-time purchase. Instant PDF download.</p>
+            <ul class="pricing-features">
+                <li>Complete chat widget code (copy + paste ready)</li>
+                <li>Python API server with rate limiting</li>
+                <li>3 business-specific system prompt templates</li>
+                <li>Deployment guide (local, VPS, old laptop)</li>
+                <li>Troubleshooting section for common issues</li>
+                <li>Works with any website platform</li>
+                <li>$0/month running cost</li>
+            </ul>
+            <a href="https://behikeai.gumroad.com/l/ai-chatbot-guide" class="pricing-cta cta-button">Get the Guide - $4.99</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">All Products</a>
+            <a href="ai-employee-guide.html">AI Employee Guide</a>
+        </div>
+        <p class="footer-copy">&copy; 2026 Behike. All rights reserved.</p>
+    </footer>
+
+    <!-- Exit Intent Popup -->
+    <div class="exit-popup-overlay" id="exitPopup">
+        <div class="exit-popup">
+            <button class="exit-popup-close" id="exitClose">&times;</button>
+            <h3>Before you go</h3>
+            <p>Your competitors already have chatbots. For <span class="price">$4.99</span>, yours can be smarter, cheaper, and actually yours.</p>
+            <a href="#pricing" class="exit-popup-cta" id="exitCta">Get the Guide - $4.99</a>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="settings-widget.js"></script>
+    <script src="chat-widget.js"></script>
+
+    <script>
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // FAQ
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                if (!isActive) item.classList.add('active');
+            });
+        });
+
+        // Exit intent
+        let exitShown = false;
+        document.addEventListener('mouseout', (e) => {
+            if (e.clientY < 5 && !exitShown) {
+                exitShown = true;
+                document.getElementById('exitPopup').classList.add('active');
+            }
+        });
+
+        document.getElementById('exitClose').addEventListener('click', () => {
+            document.getElementById('exitPopup').classList.remove('active');
+        });
+
+        document.getElementById('exitPopup').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                document.getElementById('exitPopup').classList.remove('active');
+            }
+        });
+
+        document.getElementById('exitCta').addEventListener('click', () => {
+            document.getElementById('exitPopup').classList.remove('active');
+        });
+    </script>
+
+</body>
+</html>

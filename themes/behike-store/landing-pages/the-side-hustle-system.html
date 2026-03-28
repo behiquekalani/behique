@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Side Hustle System — Behike</title>
+  <meta name="description" content="The complete framework for building a side income that can replace your main income — not just supplement it. $17.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --border: #1D1D1F;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    nav {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(42px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    .hero-tagline {
+      font-size: clamp(17px, 2.2vw, 21px);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      border-radius: 980px;
+      padding: 8px 20px;
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero-trust {
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 3.8vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 56px;
+      line-height: 1.6;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .model-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .model-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .model-card:nth-child(2)::before { background: #FF9F0A; }
+    .model-card:nth-child(3)::before { background: var(--cta); }
+    .model-card:nth-child(4)::before { background: #BF5AF2; }
+    .model-card:nth-child(5)::before { background: #FF453A; }
+    .model-number {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .model-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .model-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .model-stat {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 980px;
+    }
+    .model-card:nth-child(2) .model-stat { background: rgba(255, 159, 10, 0.1); color: #FF9F0A; }
+    .model-card:nth-child(3) .model-stat { background: rgba(48, 209, 88, 0.1); color: var(--cta); }
+    .model-card:nth-child(4) .model-stat { background: rgba(191, 90, 242, 0.1); color: #BF5AF2; }
+    .model-card:nth-child(5) .model-stat { background: rgba(255, 69, 58, 0.1); color: #FF453A; }
+
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .appendix-banner {
+      margin-top: 20px;
+      background: rgba(10, 132, 255, 0.06);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .appendix-banner .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .appendix-banner p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testimonial-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .testimonial-stars {
+      color: #FF9F0A;
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .testimonial-text {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .author-info .name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .author-info .role {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 600px) { .for-grid { grid-template-columns: 1fr; } }
+    .for-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .for-block h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .for-block.is-for h3 { color: var(--cta); }
+    .for-block.not-for h3 { color: var(--muted); }
+    .for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .for-list li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .for-list li span.check { color: var(--cta); font-weight: 700; }
+    .for-list li span.cross { color: #FF453A; font-weight: 700; }
+
+    .price-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 56px 48px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    @media (max-width: 640px) { .price-block { padding: 40px 24px; } }
+    .price-block .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .price-display {
+      font-size: clamp(52px, 8vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-compare {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .price-includes {
+      list-style: none;
+      text-align: left;
+      margin: 0 auto 36px;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .price-includes li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .price-includes li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cta);
+      flex-shrink: 0;
+    }
+    .guarantee-strip {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .guarantee-strip strong { color: var(--text); }
+
+    .final-cta {
+      padding: 120px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 64px 0; }
+      .models-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="#buy" class="nav-cta">Get it — $17.99</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <span class="hero-eyebrow">Digital Product by Behike</span>
+      </div>
+      <h1 class="hero-title reveal reveal-delay-1">
+        A side hustle that doesn't become<br>a business is just a second job.
+      </h1>
+      <p class="hero-tagline reveal reveal-delay-2">
+        The complete framework for building a side income that can replace your main income. Not just supplement it.
+      </p>
+      <div class="hero-cta-group reveal reveal-delay-3">
+        <a href="#buy" class="btn-primary">
+          Get the System
+          <span style="opacity:0.7; font-weight:400;">$17.99</span>
+        </a>
+        <div class="price-badge">
+          <span>Instant PDF download</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>5 validated models</span>
+          <span style="color: var(--muted);">&#8226;</span>
+          <span>Income calculator included</span>
+        </div>
+      </div>
+      <p class="hero-trust reveal reveal-delay-4">
+        30-day money-back guarantee. No questions asked.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="container">
+      <p class="section-label reveal">The real problem</p>
+      <h2 class="section-title reveal reveal-delay-1">Most side hustles stay side hustles<br>because of how they are built.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        The problem is not effort. Most people work hard at their side hustle. The problem is structure. Without the right model and timeline, hard work just keeps you busy on the side.
+      </p>
+      <div class="problem-grid">
+        <div class="problem-card reveal reveal-delay-1">
+          <div class="icon">&#9201;</div>
+          <h3>Optimized for the wrong metric</h3>
+          <p>Most side hustles are optimized for extra cash, not replacement income. The model, pricing, and time investment never get calibrated to the actual goal: getting out of a job you do not want.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-2">
+          <div class="icon">&#128259;</div>
+          <h3>No transition plan</h3>
+          <p>Knowing you want to go full-time is not the same as knowing when and how. Without a concrete income replacement number and a transition timeline, you stay in limbo indefinitely.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3">
+          <div class="icon">&#9200;</div>
+          <h3>The 10-hour trap</h3>
+          <p>Most people have 10 hours per week, not 40. Side hustle advice built for full-time effort fails people who have a job, a life, and limited hours. You need a system built for real constraints.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 MODELS -->
+  <section class="section" id="models">
+    <div class="container">
+      <p class="section-label reveal">The five models</p>
+      <h2 class="section-title reveal reveal-delay-1">Five validated paths.<br>Ranked by scalability.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        Each model is ranked by scalability, income ceiling, and time-to-first-dollar. The system tells you which one fits your skills, your schedule, and your goal.
+      </p>
+      <div class="models-grid">
+        <div class="model-card reveal reveal-delay-1">
+          <p class="model-number">Model 01</p>
+          <h3>Digital Products</h3>
+          <p>Create once, sell repeatedly. Templates, guides, and tools that solve a specific problem for a specific person. The highest scalability of any model at this income level.</p>
+          <span class="model-stat">Scalability: 9/10</span>
+        </div>
+        <div class="model-card reveal reveal-delay-2">
+          <p class="model-number">Model 02</p>
+          <h3>Freelance Services</h3>
+          <p>Sell a skill you already have at a premium to clients who need it done, not taught. Fast path to $1K/month with a small client base and a defined service scope.</p>
+          <span class="model-stat">Scalability: 6/10</span>
+        </div>
+        <div class="model-card reveal reveal-delay-3">
+          <p class="model-number">Model 03</p>
+          <h3>Content Monetization</h3>
+          <p>Build an audience around a niche, then monetize through sponsorships, affiliate income, or your own products. Slower to start, but compounds significantly over 12 to 18 months.</p>
+          <span class="model-stat">Scalability: 8/10</span>
+        </div>
+        <div class="model-card reveal reveal-delay-4">
+          <p class="model-number">Model 04</p>
+          <h3>Productized Service</h3>
+          <p>Package a service into a fixed-scope, fixed-price offer. Easier to sell than custom freelance work. Scales to a small team or a solo recurring revenue stream.</p>
+          <span class="model-stat">Scalability: 7/10</span>
+        </div>
+        <div class="model-card reveal">
+          <p class="model-number">Model 05</p>
+          <h3>Consulting and Coaching</h3>
+          <p>Charge for access to your thinking, experience, or transformation. The highest hourly rate available in the side hustle category, but requires a specific type of credibility.</p>
+          <span class="model-stat">Scalability: 5/10</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section" id="inside">
+    <div class="container">
+      <p class="section-label reveal">What is inside</p>
+      <h2 class="section-title reveal reveal-delay-1">The complete system.<br>From zero to replacement income.</h2>
+      <p class="section-body reveal reveal-delay-2">
+        Every component is designed to work within 10 hours per week. Real timelines. Real numbers. No motivational padding.
+      </p>
+      <div class="chapters-grid">
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">01</span>
+          <div class="chapter-text">
+            <h4>5 Side Hustle Models Ranked by Scalability</h4>
+            <p>Full breakdown of each model with income ceiling, time-to-revenue, and ideal fit profile.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">02</span>
+          <div class="chapter-text">
+            <h4>The 10-Hour-Per-Week Schedule</h4>
+            <p>A specific weekly block structure that moves the business forward without burning out the employee.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">03</span>
+          <div class="chapter-text">
+            <h4>The $1K First Month Plan</h4>
+            <p>A 30-day action sequence focused on generating the first $1,000 in revenue regardless of which model you choose.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-2">
+          <span class="chapter-num">04</span>
+          <div class="chapter-text">
+            <h4>The Income Replacement Calculator</h4>
+            <p>A formula for calculating your exact replacement number, including taxes, benefits gap, and emergency fund requirements.</p>
+          </div>
+        </div>
+        <div class="chapter-item reveal reveal-delay-1">
+          <span class="chapter-num">05</span>
+          <div class="chapter-text">
+            <h4>The Transition Timeline</h4>
+            <p>A phased plan for moving from employee to owner: the milestones, the signals, and the decision point for when to quit.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-banner reveal">
+        <span class="label">Bonus</span>
+        <p>Weekly tracking sheet, model selection decision matrix, and 5 cold outreach templates for landing your first paying client.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section" id="proof">
+    <div class="container">
+      <p class="section-label reveal">Social proof</p>
+      <h2 class="section-title reveal reveal-delay-1">People who used the system<br>to get out.</h2>
+      <div class="testimonials-grid" style="margin-top: 48px;">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I had tried four different side hustles over two years and stayed stuck under $300/month with all of them. The model selection matrix made it clear I had been building the wrong thing for my actual schedule. Switched to digital products. Hit $1,200 in month two."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">R</div>
+            <div class="author-info">
+              <p class="name">Rafael M.</p>
+              <p class="role">Teacher, former side hustler</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The income replacement calculator stopped me from quitting too early. I realized I needed $4,800/month net, not $3,000 I had been targeting. That recalibration saved me from a financial disaster. Now at month seven, I am at $5,100 and gave notice last week."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">J</div>
+            <div class="author-info">
+              <p class="name">Jamie L.</p>
+              <p class="role">Operations coordinator, exiting corporate</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The 10-hour schedule is what made this real. I have two kids and a full-time job. Every other guide assumed I had evenings free. This one built everything around my actual available hours. Consistent $900 to $1,400/month for the last four months."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">T</div>
+            <div class="author-info">
+              <p class="name">Tonya W.</p>
+              <p class="role">Nurse, building on the side</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR / NOT FOR -->
+  <section class="section" id="fit">
+    <div class="container">
+      <p class="section-label reveal">Who this is for</p>
+      <h2 class="section-title reveal reveal-delay-1">Be honest about what you actually want.</h2>
+      <div class="for-grid" style="margin-top: 48px;">
+        <div class="for-block is-for reveal reveal-delay-1">
+          <h3>This is for you if:</h3>
+          <ul class="for-list">
+            <li><span class="check">+</span> You want to eventually leave your job, not just earn extra money</li>
+            <li><span class="check">+</span> You have 10 hours per week or less to dedicate to this</li>
+            <li><span class="check">+</span> You have a skill, knowledge, or a niche but no system around it</li>
+            <li><span class="check">+</span> You want a concrete timeline and specific income milestones</li>
+            <li><span class="check">+</span> You want a framework, not a course, not a community</li>
+          </ul>
+        </div>
+        <div class="for-block not-for reveal reveal-delay-2">
+          <h3>This is not for you if:</h3>
+          <ul class="for-list">
+            <li><span class="cross">-</span> You want a get-rich-quick method with no execution required</li>
+            <li><span class="cross">-</span> You already have a side business generating over $5K/month</li>
+            <li><span class="cross">-</span> You are not willing to put in consistent weekly effort</li>
+            <li><span class="cross">-</span> You want hand-holding through implementation</li>
+            <li><span class="cross">-</span> You are happy staying supplemental income forever</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE + GUARANTEE -->
+  <section class="section" id="buy">
+    <div class="container">
+      <div class="price-block reveal">
+        <p class="product-name">The Side Hustle System</p>
+        <div class="price-display">$17.99</div>
+        <p class="price-compare">One-time payment. No subscription. Yours forever.</p>
+        <ul class="price-includes">
+          <li>5 side hustle models ranked by scalability</li>
+          <li>The 10-hour-per-week schedule</li>
+          <li>The $1K first month action plan</li>
+          <li>Income replacement calculator</li>
+          <li>Transition timeline and decision framework</li>
+          <li>Model selection decision matrix</li>
+          <li>5 cold outreach templates</li>
+          <li>Instant download</li>
+        </ul>
+        <a href="#" class="btn-primary" style="width: 100%; justify-content: center; font-size: 18px; padding: 18px 0;">
+          Get Instant Access
+        </a>
+        <div class="guarantee-strip">
+          <strong>30-day money-back guarantee.</strong> If this does not deliver value, email Behike and you get a full refund. No forms, no friction.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2 class="reveal">The side hustle you build today<br>is the business you own tomorrow.</h2>
+      <p class="reveal reveal-delay-1">
+        The system shows you which model to pick, how to structure your time, and exactly when to make the move.
+      </p>
+      <a href="#buy" class="btn-primary reveal reveal-delay-2" style="font-size: 18px; padding: 18px 40px;">
+        Get The Side Hustle System for $17.99
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      &copy; 2026 Behike. All rights reserved.
+      &nbsp;&nbsp;
+      <a href="/privacy.html">Privacy</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/terms.html">Terms</a>
+      &nbsp;&middot;&nbsp;
+      <a href="/refund.html">Refund Policy</a>
+    </p>
+  </footer>
+
+  <!-- INTERSECTION OBSERVER ANIMATIONS -->
+  <script>
+    (function () {
+      const elements = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      elements.forEach(function (el) { observer.observe(el); });
+    })();
+  </script>
+
+</body>
+</html>

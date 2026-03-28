@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="The Solopreneur's Sales System. How to close clients, write copy that converts, and build a referral loop without feeling like you're selling.">
+    <title>The Solopreneur's Sales System | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --blue-dim: rgba(10, 132, 255, 0.12);
+            --blue-glow: rgba(10, 132, 255, 0.3);
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --card-bg: #111111;
+            --gray: #86868B;
+            --green: #30D158;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up { animation: fadeUp 0.8s ease-out both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .nav-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--light);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-cta {
+            background: var(--green);
+            color: #000;
+            padding: 10px 22px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .nav-cta:hover { opacity: 0.85; }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: var(--blue-dim);
+            color: var(--blue);
+            border: 1px solid rgba(10, 132, 255, 0.25);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 28px;
+            color: var(--light);
+        }
+
+        .hero h1 span {
+            color: var(--blue);
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            line-height: 1.55;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #000;
+            padding: 16px 36px;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        .price-tag {
+            font-size: 18px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .price-tag strong {
+            color: var(--light);
+            font-weight: 700;
+        }
+
+        /* Problem section */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: clamp(30px, 4vw, 44px);
+            font-weight: 700;
+            letter-spacing: -1.2px;
+            line-height: 1.15;
+            margin-bottom: 28px;
+        }
+
+        .section p {
+            font-size: 18px;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 20px;
+            max-width: 660px;
+        }
+
+        .section p strong {
+            color: var(--light);
+        }
+
+        /* Quote block */
+        .quote-block {
+            background: var(--secondary-bg);
+            border-left: 3px solid var(--blue);
+            padding: 32px 40px;
+            border-radius: 0 12px 12px 0;
+            margin: 48px 0;
+        }
+
+        .quote-block p {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--light);
+            line-height: 1.5;
+            max-width: 100%;
+        }
+
+        /* What's inside */
+        .inside-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+
+        .inside-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 32px;
+            transition: border-color 0.2s;
+        }
+        .inside-card:hover { border-color: rgba(10, 132, 255, 0.3); }
+
+        .card-num {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* For who */
+        .for-list {
+            list-style: none;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .for-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-size: 17px;
+            color: var(--light);
+            line-height: 1.5;
+        }
+
+        .for-list li::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: var(--blue-dim);
+            border: 1.5px solid var(--blue);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            position: relative;
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--blue-dim);
+            border: 1.5px solid var(--blue);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--blue);
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .stat {
+            background: var(--card-bg);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--blue);
+            letter-spacing: -1.5px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* CTA section */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #0A1628 0%, #0D1F3C 100%);
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            border-radius: 24px;
+            padding: 72px 60px;
+        }
+
+        .cta-box h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: -1.2px;
+            margin-bottom: 20px;
+        }
+
+        .cta-box p {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 500px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .cta-price-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .cta-price {
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--light);
+            letter-spacing: -1.5px;
+        }
+
+        .cta-desc {
+            font-size: 14px;
+            color: var(--gray);
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .btn-large {
+            background: var(--green);
+            color: #000;
+            padding: 20px 52px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-large:hover { opacity: 0.88; transform: translateY(-2px); }
+
+        .guarantee {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 24px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        footer a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; }
+            .container { padding: 0 20px; }
+            .hero { padding: 120px 0 80px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .cta-box { padding: 48px 24px; }
+            .quote-block { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="https://behike.gumroad.com" class="nav-cta">Get It Now</a>
+</nav>
+
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-label fade-up">Sales System</div>
+            <h1 class="fade-up delay-1">The Solopreneur's<br><span>Sales System</span></h1>
+            <p class="hero-sub fade-up delay-2">How to close clients, write copy that converts, handle objections naturally, and build a referral loop. Without feeling like you are selling.</p>
+            <div class="hero-cta-group fade-up delay-3">
+                <a href="https://behike.gumroad.com" class="btn-primary">Get Instant Access</a>
+                <span class="price-tag">One-time payment of <strong>$23.99</strong></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Problem -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">The Problem</div>
+            <h2 class="reveal">You built something real. Selling it feels wrong.</h2>
+            <p class="reveal">You know your work is good. You have seen it help people. But when someone asks "how much?" something contracts. The pitch sounds hollow. The follow-up feels desperate.</p>
+            <p class="reveal">This is not a character flaw. It is a training problem. You were taught sales through the lens of people who needed to push commodities on strangers who did not want to buy. That is one model. It is not the only one.</p>
+
+            <div class="quote-block reveal">
+                <p>"Nobody likes being sold to. Everybody likes making good decisions. Your job is not to sell. Your job is to help someone make a good decision about whether your offer is right for them."</p>
+            </div>
+
+            <p class="reveal">The solopreneur operates in a different context. You are not chasing strangers. You are helping people who already have a problem understand how your specific work solves it. The sale is downstream of the trust.</p>
+            <p class="reveal">When you understand this, selling stops feeling like manipulation and starts feeling like clarity.</p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Stats -->
+    <section class="section" style="padding-top: 0; padding-bottom: 0;">
+        <div class="container">
+            <div class="stats-row reveal">
+                <div class="stat">
+                    <div class="stat-number">9</div>
+                    <div class="stat-label">Complete frameworks</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">5,000+</div>
+                    <div class="stat-label">Words of practical guidance</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">PDF</div>
+                    <div class="stat-label">Instant download</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's inside -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">What's Inside</div>
+            <h2 class="reveal">Nine parts. One complete system.</h2>
+            <p class="reveal">Each section addresses a specific point in the sales process where most solopreneurs stall.</p>
+
+            <div class="inside-grid">
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 01</div>
+                    <div class="card-title">Selling Without Feeling Salesy</div>
+                    <div class="card-desc">Why "salesy" is a feeling, not a tactic. The core reframe that changes how you show up in every conversation.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 02</div>
+                    <div class="card-title">The Value-First Framework</div>
+                    <div class="card-desc">What value-first actually means in practice and how to build an audience before you build an offer.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 03</div>
+                    <div class="card-title">Conversation-to-Conversion</div>
+                    <div class="card-desc">The four-stage sales conversation structure. How to listen, diagnose, and invite a decision without pressure.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 04</div>
+                    <div class="card-title">Copy That Does Not Make You Cringe</div>
+                    <div class="card-desc">The three elements of honest copy that converts. Architecture for a sales page that does the work.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 05</div>
+                    <div class="card-title">Handling Objections Naturally</div>
+                    <div class="card-desc">The four most common objections and how to respond to each one without caving or pushing.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 06</div>
+                    <div class="card-title">The Follow-Up System</div>
+                    <div class="card-desc">The value-first follow-up cadence. How to stay in touch without feeling like you are chasing.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 07</div>
+                    <div class="card-title">Pricing Conversations</div>
+                    <div class="card-desc">How to state your number with confidence, frame value correctly, and stop apologizing for your price.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 08</div>
+                    <div class="card-title">Building a Sales Page That Converts</div>
+                    <div class="card-desc">The architecture of a sales page that moves people from skeptical to decided.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 09</div>
+                    <div class="card-title">The Referral Loop</div>
+                    <div class="card-desc">How to turn great client relationships into a reliable source of warm, inbound leads.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- For who -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">Who This Is For</div>
+            <h2 class="reveal">Built for people who build things.</h2>
+            <p class="reveal">This is not for trained salespeople or people running cold outreach at scale. It is for builders who need a system that fits how they actually work.</p>
+
+            <ul class="for-list" style="margin-top: 40px;">
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Freelancers and consultants who want more consistent client flow without feeling like they are pitching constantly
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Digital product creators who want sales pages that convert without sounding like infomercials
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Solopreneurs who have avoided the money conversation because they did not have a framework for it
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    People who know their work is good and want a system for communicating that clearly
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Anyone who has lost clients to follow-up failure or price objections they did not know how to handle
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box reveal">
+                <h2>The complete sales system for one-person businesses.</h2>
+                <p>Nine frameworks. Instant PDF download. Use the first chapter in your next sales conversation this week.</p>
+
+                <div class="cta-price-row">
+                    <div class="cta-price">$23.99</div>
+                    <div class="cta-desc">One-time payment.<br>Instant access. PDF format.</div>
+                </div>
+
+                <a href="https://behike.gumroad.com" class="btn-large">Get Instant Access</a>
+                <p class="guarantee">Instant download. Yours to keep.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="divider"></div>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 Behike. All rights reserved. <a href="/">behike.com</a></p>
+    </div>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

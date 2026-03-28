@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="The Creator's Mindset Mastery. The mental operating system for builders who want to ship consistently, handle failure without quitting, and build something that lasts.">
+    <title>The Creator's Mindset Mastery | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --blue-dim: rgba(10, 132, 255, 0.12);
+            --blue-glow: rgba(10, 132, 255, 0.3);
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --card-bg: #111111;
+            --gray: #86868B;
+            --green: #30D158;
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up { animation: fadeUp 0.8s ease-out both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .nav-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--light);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-cta {
+            background: var(--green);
+            color: #000;
+            padding: 10px 22px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .nav-cta:hover { opacity: 0.85; }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 100px;
+            text-align: center;
+        }
+
+        .hero-label {
+            display: inline-block;
+            background: var(--blue-dim);
+            color: var(--blue);
+            border: 1px solid rgba(10, 132, 255, 0.25);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 28px;
+            color: var(--light);
+        }
+
+        .hero h1 span {
+            color: var(--blue);
+        }
+
+        .hero-sub {
+            font-size: 20px;
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            line-height: 1.55;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #000;
+            padding: 16px 36px;
+            border-radius: 100px;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+        .price-tag {
+            font-size: 18px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .price-tag strong {
+            color: var(--light);
+            font-weight: 700;
+        }
+
+        /* Section */
+        .section {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: clamp(30px, 4vw, 44px);
+            font-weight: 700;
+            letter-spacing: -1.2px;
+            line-height: 1.15;
+            margin-bottom: 28px;
+        }
+
+        .section p {
+            font-size: 18px;
+            color: var(--gray);
+            line-height: 1.7;
+            margin-bottom: 20px;
+            max-width: 660px;
+        }
+
+        .section p strong {
+            color: var(--light);
+        }
+
+        /* Quote block */
+        .quote-block {
+            background: var(--secondary-bg);
+            border-left: 3px solid var(--blue);
+            padding: 32px 40px;
+            border-radius: 0 12px 12px 0;
+            margin: 48px 0;
+        }
+
+        .quote-block p {
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--light);
+            line-height: 1.5;
+            max-width: 100%;
+        }
+
+        /* What's inside */
+        .inside-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+
+        .inside-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 32px;
+            transition: border-color 0.2s;
+        }
+        .inside-card:hover { border-color: rgba(10, 132, 255, 0.3); }
+
+        .card-num {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* Two-col layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        /* For who */
+        .for-list {
+            list-style: none;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .for-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            font-size: 17px;
+            color: var(--light);
+            line-height: 1.5;
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--blue-dim);
+            border: 1.5px solid var(--blue);
+            border-radius: 50%;
+            flex-shrink: 0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--blue);
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 60px;
+        }
+
+        .stat {
+            background: var(--card-bg);
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--blue);
+            letter-spacing: -1.5px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* Principles */
+        .principles-list {
+            list-style: none;
+            margin-top: 40px;
+            counter-reset: principle;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .principles-list li {
+            counter-increment: principle;
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .principle-num {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--blue);
+            background: var(--blue-dim);
+            border: 1px solid rgba(10,132,255,0.2);
+            border-radius: 6px;
+            padding: 4px 10px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .principle-text {
+            font-size: 17px;
+            color: var(--light);
+            line-height: 1.55;
+        }
+
+        /* CTA */
+        .cta-section {
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #0A1628 0%, #0D1F3C 100%);
+            border: 1px solid rgba(10, 132, 255, 0.2);
+            border-radius: 24px;
+            padding: 72px 60px;
+        }
+
+        .cta-box h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: -1.2px;
+            margin-bottom: 20px;
+        }
+
+        .cta-box p {
+            font-size: 18px;
+            color: var(--gray);
+            max-width: 500px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .cta-price-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .cta-price {
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--light);
+            letter-spacing: -1.5px;
+        }
+
+        .cta-desc {
+            font-size: 14px;
+            color: var(--gray);
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .btn-large {
+            background: var(--green);
+            color: #000;
+            padding: 20px 52px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn-large:hover { opacity: 0.88; transform: translateY(-2px); }
+
+        .guarantee {
+            font-size: 14px;
+            color: var(--gray);
+            margin-top: 24px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.07);
+        }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        footer a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; }
+            .container { padding: 0 20px; }
+            .hero { padding: 120px 0 80px; }
+            .two-col { grid-template-columns: 1fr; gap: 40px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .cta-box { padding: 48px 24px; }
+            .quote-block { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="https://behike.gumroad.com" class="nav-cta">Get It Now</a>
+</nav>
+
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-label fade-up">Mindset</div>
+            <h1 class="fade-up delay-1">The Creator's<br><span>Mindset Mastery</span></h1>
+            <p class="hero-sub fade-up delay-2">The mental operating system for builders who want to ship consistently, handle failure without quitting, and build something that actually lasts.</p>
+            <div class="hero-cta-group fade-up delay-3">
+                <a href="https://behike.gumroad.com" class="btn-primary">Get Instant Access</a>
+                <span class="price-tag">One-time payment of <strong>$17.99</strong></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Problem -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">The Real Bottleneck</div>
+            <h2 class="reveal">Strategy is not your problem. Mindset is.</h2>
+            <p class="reveal">You can have the best system and still not ship. You can know exactly what to do and still avoid doing it. You can build something real and then watch it sit quietly because sending it into the world feels too exposed.</p>
+            <p class="reveal">This is the work nobody talks about because it is harder to package than a checklist. But it is the work that actually determines whether the tools you buy and the plans you make ever amount to anything.</p>
+
+            <div class="quote-block reveal">
+                <p>"Confidence is not the precondition for action. It is the result of it. The evidence base for believing in your own competence is built through actually doing things and seeing what happens."</p>
+            </div>
+
+            <p class="reveal">The mental operating system you install in your twenties tends to be the one you run on for the next decade. This guide is about examining it clearly, identifying what needs to change, and installing something better.</p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Stats -->
+    <section class="section" style="padding-top: 0; padding-bottom: 0;">
+        <div class="container">
+            <div class="stats-row reveal">
+                <div class="stat">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Core mindset frameworks</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">5,000+</div>
+                    <div class="stat-label">Words of deep practical work</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">PDF</div>
+                    <div class="stat-label">Instant download</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's inside -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">What's Inside</div>
+            <h2 class="reveal">Eight parts. One complete mental OS.</h2>
+            <p class="reveal">Each section addresses a specific belief pattern or behavior that blocks consistent creative output.</p>
+
+            <div class="inside-grid">
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 01</div>
+                    <div class="card-title">The Identity Shift</div>
+                    <div class="card-desc">How to move from the employee OS to the builder OS. What the shift looks like in practice and how to make it stick.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 02</div>
+                    <div class="card-title">Comparison and Imposter Syndrome</div>
+                    <div class="card-desc">Why imposter syndrome appears exactly where growth is happening. The two things that actually reduce it.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 03</div>
+                    <div class="card-title">The Long Game Mindset</div>
+                    <div class="card-desc">How the internet distorts your timeline expectations. Why consistency beats intensity across every meaningful metric.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 04</div>
+                    <div class="card-title">Shipping Before You Feel Ready</div>
+                    <div class="card-desc">Why readiness is a moving target. The 80 percent rule and what to do with the fear of exposure.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 05</div>
+                    <div class="card-title">Handling Failure Without Quitting</div>
+                    <div class="card-desc">The debrief practice that turns failure into data. How to separate your identity from the outcome of individual projects.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 06</div>
+                    <div class="card-title">The Creator's Relationship With Money</div>
+                    <div class="card-desc">Why charging for your work is an ethical act. Revenue as infrastructure, not goal.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 07</div>
+                    <div class="card-title">Confidence Through Action</div>
+                    <div class="card-desc">The action-evidence loop. Why self-help sells confidence backwards, and what actually builds it.</div>
+                </div>
+                <div class="inside-card reveal">
+                    <div class="card-num">Part 08</div>
+                    <div class="card-title">Discipline Systems That Work</div>
+                    <div class="card-desc">Five systems for consistent output that work when motivation fails. Architecture over willpower.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Core principles -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">The Foundation</div>
+            <h2 class="reveal">Ten principles. One operating system.</h2>
+            <p class="reveal">These are the beliefs that separate builders who sustain from builders who stop.</p>
+
+            <ul class="principles-list">
+                <li class="reveal">
+                    <span class="principle-num">01</span>
+                    <span class="principle-text">The employee OS and the builder OS are incompatible. You have to choose to install the second one.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">02</span>
+                    <span class="principle-text">Comparison is navigation when it is directional. It is self-punishment when it is evaluative.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">03</span>
+                    <span class="principle-text">Imposter syndrome signals you are at the edge of your ability. That is where growth happens.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">04</span>
+                    <span class="principle-text">The long game requires low-friction systems, not high-willpower discipline.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">05</span>
+                    <span class="principle-text">Readiness is not a state you reach. It is a story you use to avoid moving.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">06</span>
+                    <span class="principle-text">Failure is data about the hypothesis, not evidence about your capacity.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">07</span>
+                    <span class="principle-text">Revenue is infrastructure for the work, not the goal of the work.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">08</span>
+                    <span class="principle-text">Confidence is built through action and evidence, not through preparation and reflection.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">09</span>
+                    <span class="principle-text">Discipline is architecture. Build environments that make the right behavior the default.</span>
+                </li>
+                <li class="reveal">
+                    <span class="principle-num">10</span>
+                    <span class="principle-text">The body of work is the compound interest on every individual thing you shipped.</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- For who -->
+    <section class="section">
+        <div class="container">
+            <div class="section-label reveal">Who This Is For</div>
+            <h2 class="reveal">For builders who know what to do and keep not doing it.</h2>
+            <p class="reveal">This is not a motivational guide. It is a diagnostic and installation manual for the mental patterns that determine whether you build consistently or in bursts.</p>
+
+            <ul class="for-list" style="margin-top: 40px;">
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Creators who start projects and abandon them before they see results
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Builders who are paralyzed by comparison to others further along
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Anyone who has a draft, a product, or a plan that has been "almost ready" for months
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    People who have taken a failure personally instead of treating it as data
+                </li>
+                <li class="reveal">
+                    <span class="check-icon">&#10003;</span>
+                    Solopreneurs who want to build something that lasts beyond any single viral moment
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box reveal">
+                <h2>The mental operating system for builders who want to last.</h2>
+                <p>Eight frameworks. Instant PDF download. Read the first two sections before you open your next project.</p>
+
+                <div class="cta-price-row">
+                    <div class="cta-price">$17.99</div>
+                    <div class="cta-desc">One-time payment.<br>Instant access. PDF format.</div>
+                </div>
+
+                <a href="https://behike.gumroad.com" class="btn-large">Get Instant Access</a>
+                <p class="guarantee">Instant download. Yours to keep.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div class="divider"></div>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 Behike. All rights reserved. <a href="/">behike.com</a></p>
+    </div>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

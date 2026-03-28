@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Business Metrics Guide — Behike</title>
+  <meta name="description" content="The only metrics a solo operator actually needs to track. Revenue, profit, conversion, content metrics that predict sales, and a monthly dashboard you can build in under two hours.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .hero-label.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-title {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      max-width: 800px;
+      margin: 0 auto 24px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+    }
+
+    .hero-title.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-subtitle {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s;
+    }
+
+    .hero-subtitle.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+    }
+
+    .hero-actions.visible { opacity: 1; transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 17px;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { opacity: 0.88; transform: scale(1.02); }
+
+    .price-note {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.65;
+      max-width: 680px;
+    }
+
+    /* ANIMATE */
+    .animate {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .animate.visible { opacity: 1; transform: translateY(0); }
+
+    /* METRICS GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      padding: 28px;
+    }
+
+    .metric-category {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .metric-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .metric-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* PROBLEM LIST */
+    .problem-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .problem-item {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .problem-item:last-child { border-bottom: none; }
+
+    .problem-marker {
+      color: #FF453A;
+      font-weight: 700;
+      font-size: 18px;
+      margin-top: 2px;
+    }
+
+    .problem-text {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .problem-text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* DASHBOARD PREVIEW */
+    .dashboard-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      margin-top: 48px;
+      font-family: "SF Mono", "Fira Code", "Courier New", monospace;
+    }
+
+    .dashboard-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 24px;
+      font-family: var(--font);
+    }
+
+    .dashboard-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 80px;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      align-items: center;
+    }
+
+    .dashboard-row.header {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .dashboard-row:last-child { border-bottom: none; }
+
+    .trend-up { color: var(--cta); font-weight: 700; }
+    .trend-down { color: #FF453A; font-weight: 700; }
+    .trend-flat { color: var(--text-muted); }
+
+    /* TOC */
+    .toc-list {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .toc-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .toc-card:hover { border-color: #333; }
+
+    .toc-part {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .toc-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+
+    .toc-chapters {
+      list-style: none;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 64px 48px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-price {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+
+    .cta-price-sub {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .cta-features {
+      list-style: none;
+      text-align: left;
+      margin: 32px 0 40px;
+      font-size: 15px;
+      line-height: 1.9;
+    }
+
+    .cta-features li::before {
+      content: "- ";
+      color: var(--cta);
+    }
+
+    .cta-guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 64px 0 48px; }
+      section { padding: 56px 0; }
+      .cta-box { padding: 40px 24px; }
+      .dashboard-box { padding: 24px 16px; overflow-x: auto; }
+      .dashboard-row { grid-template-columns: 2fr 1fr 1fr 60px; gap: 8px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/index.html" class="nav-brand">Behike</a>
+    <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="nav-cta">Get It — $19.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label">Digital Guide</div>
+    <h1 class="hero-title">Solopreneur's Business Metrics Guide</h1>
+    <p class="hero-subtitle">The only numbers a solo operator actually needs. How to read them, act on them, and build a monthly dashboard in under two hours.</p>
+    <div class="hero-actions">
+      <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="btn-primary">Get the Guide — $19.99</a>
+      <span class="price-note">PDF + Markdown. Instant download.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <p class="section-label animate">The Problem</p>
+    <h2 class="section-title animate">More data equals more time not spent building.</h2>
+    <p class="section-body animate">The internet has convinced solopreneurs that tracking everything is the path to clarity. It is not. For a one-person business, every hour interpreting data is an hour not generating revenue. The real problem is not lacking data. It is tracking the wrong data.</p>
+
+    <div class="problem-list">
+      <div class="problem-item animate">
+        <div class="problem-marker">x</div>
+        <div class="problem-text"><strong>Tracking gross revenue instead of net profit margin.</strong> A $20,000 month with $18,000 in expenses is worse than a $10,000 month at 65 percent margin. Gross revenue without margin context is a vanity metric.</div>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-marker">x</div>
+        <div class="problem-text"><strong>Optimizing social followers instead of email subscribers.</strong> A list of 500 engaged email subscribers consistently outperforms 50,000 social followers for solo product businesses. Follower count is a media company metric.</div>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-marker">x</div>
+        <div class="problem-text"><strong>Watching open rates that are no longer reliable.</strong> Apple Mail Privacy Protection has made email open rates directional at best. Solo operators using open rate as their primary email metric are making decisions on flawed data.</div>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-marker">x</div>
+        <div class="problem-text"><strong>No cash runway visibility.</strong> Most solo operators do not know how many months they can operate without new revenue. This is not a bookkeeping problem. It is a decision-making problem that creates unnecessary anxiety and unnecessary risk.</div>
+      </div>
+      <div class="problem-item animate">
+        <div class="problem-marker">x</div>
+        <div class="problem-text"><strong>Tracking metrics they cannot act on.</strong> If a metric cannot trigger a specific decision, it is noise. Most solopreneurs spend hours per week in analytics they never act on.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION: METRICS PREVIEW -->
+<section>
+  <div class="container">
+    <p class="section-label animate">What You Will Track</p>
+    <h2 class="section-title animate">Six metrics. One dashboard. Twenty minutes per month.</h2>
+    <p class="section-body animate">Every metric in this guide is selected because it either directly measures revenue, predicts future revenue, or protects against financial failure. Nothing else makes the list.</p>
+
+    <div class="metrics-grid">
+      <div class="metric-card animate">
+        <div class="metric-category">Revenue</div>
+        <div class="metric-name">Net Revenue</div>
+        <p class="metric-desc">Revenue after refunds and platform fees. The actual top-line number, not the number you invoice.</p>
+      </div>
+      <div class="metric-card animate">
+        <div class="metric-category">Profit</div>
+        <div class="metric-name">Net Profit Margin</div>
+        <p class="metric-desc">What the business actually produces after all operating expenses. Healthy solo digital businesses target 40 to 70 percent.</p>
+      </div>
+      <div class="metric-card animate">
+        <div class="metric-category">Conversion</div>
+        <div class="metric-name">Sales Page CVR</div>
+        <p class="metric-desc">Direct traffic converts at 5 to 15 percent. Cold traffic at 0.5 to 3 percent. Below benchmark, something is wrong with problem statement, social proof, or price framing.</p>
+      </div>
+      <div class="metric-card animate">
+        <div class="metric-category">Email</div>
+        <div class="metric-name">Revenue Per Subscriber</div>
+        <p class="metric-desc">Total email-attributed revenue divided by list size. The most important email metric most solo operators never track. Benchmark: $1 to $3 per subscriber per month.</p>
+      </div>
+      <div class="metric-card animate">
+        <div class="metric-category">Content</div>
+        <div class="metric-name">Net New Subscribers</div>
+        <p class="metric-desc">The leading indicator of future revenue for content-driven businesses. More reliable than pageviews, follower count, or any social metric.</p>
+      </div>
+      <div class="metric-card animate">
+        <div class="metric-category">Financial Health</div>
+        <div class="metric-name">Cash Runway</div>
+        <p class="metric-desc">Months of operating capacity without new revenue. Below 3 months: build the buffer first. Above 6 months: position to take calculated risks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD PREVIEW -->
+<section>
+  <div class="container">
+    <p class="section-label animate">The Dashboard</p>
+    <h2 class="section-title animate">One view. Every answer you need.</h2>
+    <p class="section-body animate">The dashboard template in this guide answers six questions in under five minutes: Is revenue growing? Am I profitable? Is my conversion working? Is my content building the business? Are customers satisfied? Is the business financially healthy.</p>
+
+    <div class="dashboard-box animate">
+      <div class="dashboard-title">Monthly Business Dashboard</div>
+      <div class="dashboard-row header">
+        <span>Metric</span>
+        <span>This Month</span>
+        <span>Last Month</span>
+        <span>Trend</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Net Revenue</span>
+        <span>$4,820</span>
+        <span>$4,100</span>
+        <span class="trend-up">up</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Net Profit Margin</span>
+        <span>58%</span>
+        <span>54%</span>
+        <span class="trend-up">up</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Email CTR</span>
+        <span>3.2%</span>
+        <span>3.8%</span>
+        <span class="trend-down">down</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Net New Subscribers</span>
+        <span>+141</span>
+        <span>+118</span>
+        <span class="trend-up">up</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Customer Satisfaction</span>
+        <span>8.4</span>
+        <span>8.1</span>
+        <span class="trend-up">up</span>
+      </div>
+      <div class="dashboard-row">
+        <span>Cash Runway</span>
+        <span>5.2 mo</span>
+        <span>4.9 mo</span>
+        <span class="trend-up">up</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOC PREVIEW -->
+<section>
+  <div class="container">
+    <p class="section-label animate">Contents</p>
+    <h2 class="section-title animate">Eight parts. Sixteen chapters. Every metric you need.</h2>
+    <p class="section-body animate">5,000+ words covering the complete metrics picture for a solo operator: revenue, profit, conversion, email, content, client satisfaction, financial health, and how to build the dashboard that ties it together.</p>
+
+    <div class="toc-list">
+      <div class="toc-card animate">
+        <div class="toc-part">Part One</div>
+        <div class="toc-title">Revenue Metrics</div>
+        <ul class="toc-chapters">
+          <li>The only revenue numbers that matter</li>
+          <li>Profit metrics (margin, ODE)</li>
+          <li>The revenue tracking system</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Two</div>
+        <div class="toc-title">Conversion Metrics</div>
+        <ul class="toc-chapters">
+          <li>Understanding your funnel</li>
+          <li>Email metrics that predict sales</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Three</div>
+        <div class="toc-title">Content Metrics</div>
+        <ul class="toc-chapters">
+          <li>The content metrics trap</li>
+          <li>The content quality signal</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Four</div>
+        <div class="toc-title">Client Metrics</div>
+        <ul class="toc-chapters">
+          <li>Utilization rate</li>
+          <li>Average client lifetime value</li>
+          <li>Client satisfaction metrics</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Part Five</div>
+        <div class="toc-title">Financial Health</div>
+        <ul class="toc-chapters">
+          <li>Cash flow vs. profit</li>
+          <li>The quarterly expense audit</li>
+        </ul>
+      </div>
+      <div class="toc-card animate">
+        <div class="toc-part">Parts Six - Eight</div>
+        <div class="toc-title">Dashboard and Decision-Making</div>
+        <ul class="toc-chapters">
+          <li>Building your six-metric dashboard</li>
+          <li>The one-hour monthly review</li>
+          <li>Metrics to deliberately ignore</li>
+          <li>Advanced metrics for growth stage</li>
+          <li>Two metrics that predict the next 12 months</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box animate">
+      <p class="section-label" style="text-align:center;">Solopreneur's Business Metrics Guide</p>
+      <div class="cta-price">$19.99</div>
+      <p class="cta-price-sub">One-time payment. Instant download.</p>
+      <a href="https://kalaniandrez.gumroad.com" target="_blank" rel="noopener" class="btn-primary" style="font-size:18px; padding:18px 48px;">Get the Guide</a>
+      <ul class="cta-features">
+        <li>5,000+ word reference guide (PDF + Markdown)</li>
+        <li>Eight parts covering every major metrics category</li>
+        <li>The six-metric monthly dashboard template</li>
+        <li>Decision framework for each metric (act / investigate / ignore)</li>
+        <li>Quarterly expense audit process</li>
+        <li>Metrics to stop tracking immediately</li>
+        <li>Advanced metrics for businesses past $10K/month</li>
+      </ul>
+      <p class="cta-guarantee">14-day money-back guarantee. No questions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>
+      <a href="/index.html">Behike</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/terms.html">Terms</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/privacy.html">Privacy</a> &nbsp;|&nbsp;
+      <a href="/landing-pages/refund.html">Refunds</a>
+    </p>
+    <p style="margin-top:12px;">Behike Digital. Puerto Rico.</p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate, .hero-label, .hero-title, .hero-subtitle, .hero-actions').forEach(el => {
+    observer.observe(el);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.hero-label, .hero-title, .hero-subtitle, .hero-actions').forEach(el => {
+        el.classList.add('visible');
+      });
+    }, 80);
+  });
+</script>
+
+</body>
+</html>

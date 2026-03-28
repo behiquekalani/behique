@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Creator's Community Building Guide — Behike</title>
+  <meta name="description" content="Why most creator communities die within 90 days, and the architecture behind ones that compound. A complete guide to building communities that outlast your content." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a244;
+      --border: #1D1D1F;
+      --card-bg: #111111;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 96px 0; }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+    nav .inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    #hero {
+      padding: 120px 0 96px;
+      text-align: center;
+    }
+    .price-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 32px;
+    }
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .tagline {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .hero-subtext {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Problem section */
+    #problem { background: #000; }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-card .number {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 12px;
+      opacity: 0.7;
+    }
+    .problem-card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* What's Inside */
+    #inside { background: #000; }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 28px 24px;
+      transition: border-color 0.2s;
+    }
+    .chapter-card:hover { border-color: rgba(10, 132, 255, 0.4); }
+    .chapter-num {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .chapter-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+    .chapter-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Who it's for */
+    #for { background: #000; }
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) { .for-grid { grid-template-columns: 1fr; } }
+    .for-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .for-card.yes { border-color: rgba(48, 209, 88, 0.25); }
+    .for-card.no  { border-color: rgba(255, 69, 58, 0.2); }
+    .for-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .for-label.yes { color: var(--cta); }
+    .for-label.no  { color: #FF453A; }
+    .for-card ul { list-style: none; }
+    .for-card ul li {
+      font-size: 15px;
+      color: var(--muted);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .for-card ul li:last-child { border-bottom: none; }
+
+    /* CTA section */
+    #cta-section {
+      background: #000;
+      text-align: center;
+    }
+    .cta-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 64px 40px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .cta-price {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .cta-price-sub {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .cta-features {
+      list-style: none;
+      margin-bottom: 40px;
+      text-align: left;
+      display: inline-block;
+    }
+    .cta-features li {
+      font-size: 15px;
+      color: var(--muted);
+      padding: 6px 0;
+    }
+    .cta-features li::before {
+      content: "✓  ";
+      color: var(--cta);
+      font-weight: 700;
+    }
+
+    footer {
+      padding: 40px 24px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="inner">
+      <span class="nav-brand">Behike</span>
+      <a href="#cta-section" class="nav-cta">Get the Guide — $22.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container fade-in">
+      <div class="price-badge">PDF Guide — $22.99</div>
+      <h1>The Creator's Community<br>Building Guide</h1>
+      <p class="tagline">Most creator communities are dead within 90 days. This is the architecture that keeps them alive, active, and profitable.</p>
+      <div class="hero-cta-group">
+        <a href="https://behiqueai.gumroad.com/l/creators-community-building-guide" class="btn-primary">Get the Guide for $22.99</a>
+        <span class="hero-subtext">PDF download. Instant access. No subscription.</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container fade-in">
+      <div class="section-label">The Real Problem</div>
+      <h2>You built an audience.<br>You do not have a community.</h2>
+      <p class="section-desc">These are structurally different things. Confusing them is the reason most community launches fail before they find their footing.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="number">90</div>
+          <h3>Days to silence</h3>
+          <p>The average creator community goes quiet within three months. Not because the creator is bad, but because the structure was wrong from the start.</p>
+        </div>
+        <div class="problem-card">
+          <div class="number">1</div>
+          <h3>Point of failure</h3>
+          <p>When the community's value depends entirely on the creator's presence, you have built a live show. The moment you stop performing, the value disappears.</p>
+        </div>
+        <div class="problem-card">
+          <div class="number">0</div>
+          <h3>Horizontal connections</h3>
+          <p>In most creator communities, all attention flows upward to the creator. Members have no connection to each other. That is an audience, not a community.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- WHAT'S INSIDE -->
+  <section id="inside">
+    <div class="container fade-in">
+      <div class="section-label">What's Inside</div>
+      <h2>9 sections. Cover to cover<br>community architecture.</h2>
+      <p class="section-desc">From the founding member strategy to monetization models to conflict management. Every phase of a real community is covered.</p>
+      <div class="chapters-grid">
+        <div class="chapter-card">
+          <div class="chapter-num">Section 1</div>
+          <h3>Why Communities Die in 90 Days</h3>
+          <p>The four structural failures that kill most communities, and the specific fix for each one.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 2</div>
+          <h3>Community vs Audience</h3>
+          <p>The one question that reveals which one you have, and the design decisions that create the difference.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 3</div>
+          <h3>Platform Selection</h3>
+          <p>Discord, Circle, Slack, Skool. An honest comparison of what each one actually does well and where each one fails.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 4</div>
+          <h3>The Founding Member Strategy</h3>
+          <p>How to seed culture before you launch publicly, so new members enter a living community instead of an empty room.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 5</div>
+          <h3>Onboarding Design</h3>
+          <p>The three questions every new member is asking, and how to answer all three within the first 48 hours.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 6</div>
+          <h3>Content Rhythm</h3>
+          <p>The weekly posting structure that creates predictable engagement without burning out the founder.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 7</div>
+          <h3>Monetization Models</h3>
+          <p>Paid access, cohort programs, and upsell infrastructure. The three models, when each one works, and how to pick yours.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 8</div>
+          <h3>Managing Conflict at Scale</h3>
+          <p>How to handle rule-breaking, quality drift, and difficult members before they damage what you have built.</p>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">Section 9</div>
+          <h3>Community as Product Research</h3>
+          <p>How to use your community's questions, complaints, and breakthroughs to build products that sell before they launch.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- WHO IT'S FOR -->
+  <section id="for">
+    <div class="container fade-in">
+      <div class="section-label">Who This Is For</div>
+      <h2>This guide is specific.<br>It is not for everyone.</h2>
+      <p class="section-desc">The clearer you are on who this is built for, the faster you can decide if it belongs in your toolkit.</p>
+      <div class="for-grid">
+        <div class="for-card yes">
+          <div class="for-label yes">This is for you if</div>
+          <ul>
+            <li>You have an existing audience and want to build something more durable</li>
+            <li>You have tried a community before and watched it go quiet</li>
+            <li>You want recurring revenue that does not depend on constant content output</li>
+            <li>You are launching a community in the next 90 days and want the architecture right from day one</li>
+          </ul>
+        </div>
+        <div class="for-card no">
+          <div class="for-label no">This is not for you if</div>
+          <ul>
+            <li>You have zero existing audience and no distribution channel</li>
+            <li>You want a shortcut that avoids doing the actual work of facilitation</li>
+            <li>You are looking for viral growth tactics rather than structural design</li>
+            <li>You need a platform tutorial rather than a strategic framework</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- CTA -->
+  <section id="cta-section">
+    <div class="container fade-in">
+      <div class="cta-box">
+        <div class="cta-price">$22.99</div>
+        <div class="cta-price-sub">One-time purchase. Instant PDF download.</div>
+        <ul class="cta-features">
+          <li>Full 9-section guide (~2,500 words)</li>
+          <li>Platform comparison: Discord, Circle, Slack, Skool</li>
+          <li>Founding member strategy and onboarding templates</li>
+          <li>Weekly content rhythm framework</li>
+          <li>3 monetization models with pricing logic</li>
+          <li>Conflict management and quality control systems</li>
+          <li>Community-to-product feedback loop methodology</li>
+        </ul>
+        <a href="https://behiqueai.gumroad.com/l/creators-community-building-guide" class="btn-primary">Get the Guide for $22.99</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Behike &mdash; <a href="https://behiqueai.com">behiqueai.com</a> &mdash; Built for creators who build seriously.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

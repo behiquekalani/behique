@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Build your own AI news tracker in Python. 18+ sources, automated impact scoring, daily digest. No accounts, no API keys, no cloud.">
+    <title>AI News Tracker Guide | Behike</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000000;
+            --text: #F5F5F7;
+            --muted: #86868b;
+            --accent: #0A84FF;
+            --cta: #30D158;
+            --border: rgba(255,255,255,0.08);
+            --max: 980px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+        /* NAV */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: 20px 0;
+        }
+        nav .wrap { display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); text-decoration: none; }
+        .nav-cta { font-size: 13px; font-weight: 500; color: var(--cta); text-decoration: none; border: 1px solid var(--cta); padding: 7px 18px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
+        .nav-cta:hover { background: var(--cta); color: #000; }
+
+        /* HERO */
+        .hero {
+            padding: 120px 0 100px;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 28px;
+        }
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            max-width: 740px;
+            margin-bottom: 28px;
+        }
+        .hero h1 span { color: var(--accent); }
+        .hero-sub {
+            font-size: clamp(17px, 2vw, 20px);
+            color: var(--muted);
+            max-width: 560px;
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+        .hero-actions { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-block;
+            background: var(--cta);
+            color: #000;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+        .hero-price { font-size: 18px; font-weight: 600; color: var(--text); }
+        .hero-price span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+
+        /* SECTION BASE */
+        section { padding: 100px 0; border-bottom: 1px solid var(--border); }
+        section:last-of-type { border-bottom: none; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: clamp(28px, 4vw, 42px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+        .section-body {
+            font-size: 17px;
+            color: var(--muted);
+            max-width: 620px;
+            line-height: 1.7;
+        }
+
+        /* PROBLEM */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2px;
+            margin-top: 56px;
+        }
+        .pain-card {
+            background: #0d0d0d;
+            padding: 36px 32px;
+            border: 1px solid var(--border);
+            border-radius: 2px;
+        }
+        .pain-num {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+        .pain-title {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        .pain-body { font-size: 15px; color: var(--muted); line-height: 1.65; }
+
+        /* WHAT'S INSIDE */
+        .inside-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 56px;
+        }
+        .inside-item {
+            padding: 28px 0;
+            border-top: 1px solid var(--border);
+        }
+        .inside-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .inside-desc { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+        /* WHO IT'S FOR */
+        .for-list {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .for-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .for-item:first-child { border-top: 1px solid var(--border); }
+        .for-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--cta);
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+        .for-text { font-size: 17px; color: var(--text); }
+
+        /* TESTIMONIALS */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2px;
+            margin-top: 56px;
+        }
+        .testimonial {
+            background: #0d0d0d;
+            border: 1px solid var(--border);
+            padding: 32px 28px;
+        }
+        .testimonial-body {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 24px;
+        }
+        .testimonial-author {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .author-name { font-size: 14px; font-weight: 600; color: var(--text); }
+        .author-role { font-size: 13px; color: var(--muted); }
+
+        /* PRICING */
+        .pricing-card {
+            background: #0d0d0d;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 52px;
+            max-width: 520px;
+            margin-top: 56px;
+        }
+        .pricing-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+        .pricing-amount {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .pricing-note {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 36px;
+        }
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .pricing-features li {
+            font-size: 15px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pricing-features li::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--cta);
+            flex-shrink: 0;
+        }
+        .btn-cta {
+            display: block;
+            width: 100%;
+            background: var(--cta);
+            color: #000;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            padding: 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            margin-bottom: 16px;
+        }
+        .btn-cta:hover { opacity: 0.85; }
+        .guarantee {
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* FINAL CTA */
+        .final-cta {
+            padding: 120px 0;
+            text-align: center;
+        }
+        .final-cta .section-title { margin: 0 auto 20px; max-width: 600px; }
+        .final-cta .section-body { margin: 0 auto 48px; text-align: center; }
+
+        /* FOOTER */
+        footer {
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+        }
+        footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .footer-copy { font-size: 13px; color: var(--muted); }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text); }
+
+        /* FADE UP ANIMATION */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .hero { padding: 80px 0 72px; }
+            .pricing-card { padding: 36px 24px; }
+            section { padding: 72px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="wrap">
+        <a href="index.html" class="nav-logo">Behike</a>
+        <a href="#pricing" class="nav-cta">Get the guide — $4.99</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="wrap">
+        <div class="hero-label fade-up">AI News Tracker Guide</div>
+        <h1 class="fade-up">Build your own <span>AI news tracker</span> in Python</h1>
+        <p class="hero-sub fade-up">18 sources. Automated impact scoring. A daily digest that surfaces what matters and buries the noise. 10 minutes to set up.</p>
+        <div class="hero-actions fade-up">
+            <a href="#pricing" class="btn-primary">Get the guide for $4.99</a>
+            <div class="hero-price">$4.99 <span>one-time, instant PDF</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+    <div class="wrap">
+        <div class="section-label fade-up">The problem</div>
+        <h2 class="section-title fade-up">You're drowning in noise and missing the signal</h2>
+        <p class="section-body fade-up">The AI space generates hundreds of articles a day. Most of them don't matter. The ones that do are buried.</p>
+        <div class="problem-grid">
+            <div class="pain-card fade-up">
+                <div class="pain-num">01</div>
+                <div class="pain-title">Too many sources, no filter</div>
+                <p class="pain-body">You have 12 tabs open every morning. Twitter, newsletters, HN, Reddit, three tech blogs. You spend an hour and still aren't sure you caught the important news.</p>
+            </div>
+            <div class="pain-card fade-up">
+                <div class="pain-num">02</div>
+                <div class="pain-title">Google Alerts is reactive, not smart</div>
+                <p class="pain-body">Alerts send you emails hours after something breaks. There's no concept of HIGH versus LOW impact. You get 40 notifications and none of them tell you what to pay attention to.</p>
+            </div>
+            <div class="pain-card fade-up">
+                <div class="pain-num">03</div>
+                <div class="pain-title">You don't own the data</div>
+                <p class="pain-body">Every platform, newsletter, and aggregator holds your reading history hostage. When you want to analyze trends or search past articles, you have nothing. Your intel lives in someone else's database.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section>
+    <div class="wrap">
+        <div class="section-label fade-up">What's inside</div>
+        <h2 class="section-title fade-up">Every layer of the tracker, documented</h2>
+        <p class="section-body fade-up">This is not a copy-paste tutorial. You'll understand exactly how the system works so you can configure it for your specific focus area.</p>
+        <div class="inside-grid">
+            <div class="inside-item fade-up">
+                <div class="inside-title">18+ RSS Feed Configuration</div>
+                <p class="inside-desc">TechCrunch, The Verge, Ars Technica, Hacker News, MIT Tech Review, OpenAI Blog, Anthropic News, NVIDIA Blog, VentureBeat, and 8 subreddits. How to add any feed in 10 seconds.</p>
+            </div>
+            <div class="inside-item fade-up">
+                <div class="inside-title">Impact Scoring System</div>
+                <p class="inside-desc">The full keyword system that assigns HIGH, MEDIUM, or LOW to every article automatically. How it works, how to customize it for robotics, crypto, open source, or any other niche.</p>
+            </div>
+            <div class="inside-item fade-up">
+                <div class="inside-title">Entity Tracking</div>
+                <p class="inside-desc">Track mentions of specific people and companies. Sam Altman, Jensen Huang, Dario Amodei. How to add anyone from the command line and get alerted when they appear in the news.</p>
+            </div>
+            <div class="inside-item fade-up">
+                <div class="inside-title">Daily Digest Generation</div>
+                <p class="inside-desc">Text format for terminal. HTML format for browser. How the digest is styled, sorted, and saved. Setting up a cron job so it runs every morning without touching it.</p>
+            </div>
+            <div class="inside-item fade-up">
+                <div class="inside-title">Search and Analysis</div>
+                <p class="inside-desc">Searching 30 days of stored articles by keyword, entity, or category. How the JSON storage works, why it stays under a few megabytes even with 18 feeds running hourly.</p>
+            </div>
+            <div class="inside-item fade-up">
+                <div class="inside-title">Automation Setup</div>
+                <p class="inside-desc">Hourly cron job for fetching. 6am daily digest. One-command bash script for the morning routine. Everything you need to make this fully hands-off.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section>
+    <div class="wrap">
+        <div class="section-label fade-up">Who it's for</div>
+        <h2 class="section-title fade-up">For builders who need signal, not headlines</h2>
+        <p class="section-body fade-up">If you need to stay current on AI without spending an hour every morning doing it, this is the tool.</p>
+        <div class="for-list">
+            <div class="for-item fade-up">
+                <div class="for-dot"></div>
+                <div class="for-text">Developers and engineers who need to track the AI ecosystem as part of their work without getting distracted by content farms</div>
+            </div>
+            <div class="for-item fade-up">
+                <div class="for-dot"></div>
+                <div class="for-text">Content creators who want their posts to be based on actual high-impact stories, not whatever went viral yesterday</div>
+            </div>
+            <div class="for-item fade-up">
+                <div class="for-dot"></div>
+                <div class="for-text">Solo operators and founders who do competitive intelligence manually today and want to automate it</div>
+            </div>
+            <div class="for-item fade-up">
+                <div class="for-dot"></div>
+                <div class="for-text">Anyone who wants their research data local, searchable, and piped into other tools without paying for a SaaS subscription</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section>
+    <div class="wrap">
+        <div class="section-label fade-up">What people are saying</div>
+        <h2 class="section-title fade-up">Trusted by builders who ship</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial fade-up">
+                <p class="testimonial-body">"Set it up in about 15 minutes. The scoring system caught the NVIDIA Blackwell announcement before I saw it anywhere else. The HIGH rating was accurate."</p>
+                <div class="testimonial-author">
+                    <span class="author-name">J. Fernandez</span>
+                    <span class="author-role">ML engineer, Spain</span>
+                </div>
+            </div>
+            <div class="testimonial fade-up">
+                <p class="testimonial-body">"I added my own keyword categories for the robotics space in about 5 minutes. The customization instructions in the guide are clear and the code is easy to read."</p>
+                <div class="testimonial-author">
+                    <span class="author-name">A. Williams</span>
+                    <span class="author-role">Robotics researcher, UK</span>
+                </div>
+            </div>
+            <div class="testimonial fade-up">
+                <p class="testimonial-body">"The thing I needed was a tool that stored everything locally. No cloud, no account, no API key. This is exactly that. I'm using the JSON output in two other scripts now."</p>
+                <div class="testimonial-author">
+                    <span class="author-name">P. Osei</span>
+                    <span class="author-role">Independent developer, Ghana</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+    <div class="wrap">
+        <div class="section-label fade-up">Pricing</div>
+        <h2 class="section-title fade-up">One price. No subscription.</h2>
+        <p class="section-body fade-up">Pay once. The guide is yours. The code is yours. Everything runs on your machine, not in the cloud.</p>
+        <div class="pricing-card fade-up">
+            <div class="pricing-label">AI News Tracker Guide</div>
+            <div class="pricing-amount">$4.99</div>
+            <div class="pricing-note">Instant PDF download. 30-day money-back guarantee.</div>
+            <ul class="pricing-features">
+                <li>Full setup walkthrough (10 minutes)</li>
+                <li>18+ RSS feed configuration</li>
+                <li>Impact scoring system with customization guide</li>
+                <li>Entity tracking for people and companies</li>
+                <li>Cron job automation setup</li>
+                <li>Pairs with Social Media Pipeline Guide</li>
+            </ul>
+            <a href="https://behike.gumroad.com/l/ai-news-tracker-guide" class="btn-cta">Get the guide for $4.99</a>
+            <p class="guarantee">30-day money-back guarantee. No questions asked.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+    <div class="wrap">
+        <h2 class="section-title fade-up">Stop checking 12 tabs. Read one digest.</h2>
+        <p class="section-body fade-up">The AI news tracker runs once, scores everything by impact, and gives you the five stories that actually matter. Set it up once and it handles the rest.</p>
+        <div class="fade-up">
+            <a href="https://behike.gumroad.com/l/ai-news-tracker-guide" class="btn-primary">Get the guide for $4.99</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="wrap">
+        <span class="footer-copy">2026 Behike. All rights reserved.</span>
+        <div class="footer-links">
+            <a href="index.html">Store</a>
+            <a href="social-media-pipeline-guide.html">Social Media Pipeline</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,750 @@
+<!--
+  ============================================================
+  FREE-FALL PRICING WIDGET
+  by Behike | behike.ai
+  Version 1.0 | 2026
+  ============================================================
+
+  README - HOW TO CUSTOMIZE
+  ============================================================
+
+  1. ADDING PRODUCTS
+     Scroll to the bottom <script> section and find the
+     FreeFallPricing.init() call. Each product is a JS object:
+
+     {
+       id: 'unique-id',
+       name: 'Product Name',
+       image: 'https://your-image-url.jpg',
+       startPrice: 99.99,
+       floorPrice: 19.99,
+       dropMin: 0.10,
+       dropMax: 1.50,
+       intervalMin: 2000,
+       intervalMax: 5000,
+       watchers: 5
+     }
+
+     - id: unique string identifier
+     - name: display name
+     - image: URL to product image (or leave empty for placeholder)
+     - startPrice: the price it starts at (and resets to)
+     - floorPrice: the lowest price it can drop to
+     - dropMin / dropMax: random drop amount range (in dollars)
+     - intervalMin / intervalMax: random interval range (in ms)
+     - watchers: fake "people watching" count (randomizes +/- 2)
+
+  2. SOUND EFFECTS
+     Sound is off by default. Users toggle it via the speaker
+     icon in the top bar. The tick sound is generated via the
+     Web Audio API, so no external files are needed.
+
+  3. EMBEDDING ON SHOPIFY / OTHER SITES
+     Copy this entire file into a Shopify custom page, or
+     extract the <style> and <script> blocks into your theme.
+     The widget is fully self-contained with zero dependencies.
+
+  4. STYLING
+     Primary accent: #0A84FF (Apple blue)
+     Background: #000000
+     Card background: #1C1C1E
+     All colors are CSS custom properties at the top of <style>.
+
+  5. BUY NOW CALLBACK
+     Find the onBuy function inside FreeFallPricing. Replace the
+     alert() with your checkout logic, cart API call, etc.
+
+  Copyright 2026 Behike. All rights reserved.
+  ============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noai, noimageai">
+  <title>Free-Fall Pricing | Live Price Drops</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --card-bg: #1C1C1E;
+      --card-border: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --accent: #0A84FF;
+      --accent-glow: rgba(10, 132, 255, 0.3);
+      --red: #FF453A;
+      --green: #30D158;
+      --orange: #FF9F0A;
+      --card-radius: 16px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .ff-header {
+      text-align: center;
+      padding: 48px 20px 32px;
+    }
+
+    .ff-header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .ff-header h1 span {
+      color: var(--accent);
+    }
+
+    .ff-header p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .ff-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px 32px;
+    }
+
+    .ff-sound-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ff-sound-toggle:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .ff-sound-toggle.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .ff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    .ff-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .ff-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .ff-card-image {
+      width: 100%;
+      height: 200px;
+      background: #2C2C2E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ff-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ff-card-image .ff-placeholder {
+      font-size: 48px;
+      opacity: 0.3;
+    }
+
+    .ff-live-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--red);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ff-live-dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .ff-card-body {
+      padding: 20px;
+    }
+
+    .ff-product-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .ff-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .ff-current-price {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--green);
+      transition: color 0.3s;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ff-current-price.dropping {
+      color: var(--red);
+      animation: price-flash 0.4s ease;
+    }
+
+    @keyframes price-flash {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .ff-original-price {
+      font-size: 18px;
+      color: var(--text-secondary);
+      text-decoration: line-through;
+    }
+
+    .ff-savings {
+      font-size: 14px;
+      color: var(--green);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .ff-urgency {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .ff-urgency-tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .ff-watchers {
+      background: rgba(255, 159, 10, 0.15);
+      color: var(--orange);
+    }
+
+    .ff-speed {
+      background: rgba(255, 69, 58, 0.15);
+      color: var(--red);
+    }
+
+    .ff-next-drop {
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .ff-chart-container {
+      margin-bottom: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .ff-chart-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .ff-chart {
+      width: 100%;
+      height: 60px;
+    }
+
+    .ff-chart polyline {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .ff-chart .ff-chart-area {
+      fill: url(#chartGradient);
+      opacity: 0.3;
+    }
+
+    .ff-buy-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ff-buy-btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    .ff-buy-btn:active {
+      transform: translateY(0);
+    }
+
+    .ff-buy-btn.locked {
+      background: var(--green);
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .ff-floor-notice {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    .ff-footer {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .ff-header h1 {
+        font-size: 28px;
+      }
+
+      .ff-grid {
+        grid-template-columns: 1fr;
+        padding: 0 12px 40px;
+      }
+
+      .ff-current-price {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ff-header">
+    <h1>Free-<span>Fall</span> Pricing</h1>
+    <p>Prices drop in real time. Lock in your price before it resets.</p>
+  </div>
+
+  <div class="ff-controls">
+    <button class="ff-sound-toggle" id="soundToggle" onclick="FreeFallPricing.toggleSound()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+        <path class="ff-sound-waves" d="M15.54 8.46a5 5 0 010 7.07M19.07 4.93a10 10 0 010 14.14"/>
+      </svg>
+      <span>Sound</span>
+    </button>
+  </div>
+
+  <div class="ff-grid" id="productGrid"></div>
+
+  <div class="ff-footer">
+    &copy; 2026 Behike. All rights reserved.
+  </div>
+
+  <!-- SVG gradient definition for charts -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0A84FF" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#0A84FF" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <script>
+    const FreeFallPricing = (() => {
+      let products = [];
+      let soundEnabled = false;
+      let audioCtx = null;
+
+      function init(config) {
+        products = config.map(p => ({
+          ...p,
+          currentPrice: p.startPrice,
+          history: [p.startPrice],
+          timer: null,
+          locked: false,
+          dropCount: 0,
+          nextDropIn: 0
+        }));
+        render();
+        products.forEach(startDrop);
+      }
+
+      function render() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = products.map(p => cardHTML(p)).join('');
+      }
+
+      function cardHTML(p) {
+        const imageContent = p.image
+          ? `<img src="${p.image}" alt="${p.name}">`
+          : `<div class="ff-placeholder">&#9679;</div>`;
+
+        return `
+          <div class="ff-card" id="card-${p.id}">
+            <div class="ff-card-image">
+              ${imageContent}
+              <div class="ff-live-badge"><div class="ff-live-dot"></div> Live</div>
+            </div>
+            <div class="ff-card-body">
+              <div class="ff-product-name">${p.name}</div>
+              <div class="ff-price-row">
+                <div class="ff-current-price" id="price-${p.id}">$${p.currentPrice.toFixed(2)}</div>
+                <div class="ff-original-price">$${p.startPrice.toFixed(2)}</div>
+              </div>
+              <div class="ff-savings" id="savings-${p.id}">${calcSavings(p)}% off</div>
+              <div class="ff-urgency">
+                <span class="ff-urgency-tag ff-watchers" id="watchers-${p.id}">${randomWatchers(p.watchers)} watching</span>
+                <span class="ff-urgency-tag ff-speed" id="speed-${p.id}">Dropping</span>
+                <span class="ff-urgency-tag ff-next-drop" id="countdown-${p.id}">Next drop: --</span>
+              </div>
+              <div class="ff-chart-container">
+                <div class="ff-chart-label">Price History</div>
+                <svg class="ff-chart" id="chart-${p.id}" viewBox="0 0 280 60" preserveAspectRatio="none"></svg>
+              </div>
+              <button class="ff-buy-btn" id="btn-${p.id}" onclick="FreeFallPricing.buy('${p.id}')">
+                Buy Now - $${p.currentPrice.toFixed(2)}
+              </button>
+              <div class="ff-floor-notice">Floor price: $${p.floorPrice.toFixed(2)}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function calcSavings(p) {
+        return Math.round(((p.startPrice - p.currentPrice) / p.startPrice) * 100);
+      }
+
+      function randomWatchers(base) {
+        return Math.max(1, base + Math.floor(Math.random() * 5) - 2);
+      }
+
+      function startDrop(p) {
+        if (p.locked) return;
+
+        const interval = randomBetween(p.intervalMin, p.intervalMax);
+        p.nextDropIn = interval;
+
+        // Countdown timer
+        if (p.countdownInterval) clearInterval(p.countdownInterval);
+        p.countdownInterval = setInterval(() => {
+          p.nextDropIn -= 100;
+          if (p.nextDropIn < 0) p.nextDropIn = 0;
+          const el = document.getElementById(`countdown-${p.id}`);
+          if (el) el.textContent = `Next drop: ${(p.nextDropIn / 1000).toFixed(1)}s`;
+        }, 100);
+
+        p.timer = setTimeout(() => {
+          if (p.locked) return;
+          drop(p);
+        }, interval);
+      }
+
+      function drop(p) {
+        const amount = randomBetween(p.dropMin * 100, p.dropMax * 100) / 100;
+        const newPrice = Math.max(p.floorPrice, +(p.currentPrice - amount).toFixed(2));
+
+        // Animate from old to new
+        animatePrice(p, p.currentPrice, newPrice);
+
+        p.currentPrice = newPrice;
+        p.dropCount++;
+        p.history.push(newPrice);
+        if (p.history.length > 10) p.history.shift();
+
+        // Play tick sound
+        if (soundEnabled) playTick();
+
+        // Update UI elements
+        updateCard(p);
+
+        // Check floor
+        if (p.currentPrice <= p.floorPrice) {
+          setTimeout(() => resetProduct(p), 2000);
+        } else {
+          startDrop(p);
+        }
+      }
+
+      function animatePrice(p, from, to) {
+        const el = document.getElementById(`price-${p.id}`);
+        if (!el) return;
+
+        el.classList.add('dropping');
+        setTimeout(() => el.classList.remove('dropping'), 400);
+
+        const steps = 12;
+        const diff = to - from;
+        let step = 0;
+
+        const anim = setInterval(() => {
+          step++;
+          const progress = step / steps;
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const val = from + diff * eased;
+          el.textContent = `$${val.toFixed(2)}`;
+          if (step >= steps) {
+            clearInterval(anim);
+            el.textContent = `$${to.toFixed(2)}`;
+          }
+        }, 25);
+      }
+
+      function updateCard(p) {
+        const savings = document.getElementById(`savings-${p.id}`);
+        if (savings) savings.textContent = `${calcSavings(p)}% off`;
+
+        const watchers = document.getElementById(`watchers-${p.id}`);
+        if (watchers) watchers.textContent = `${randomWatchers(p.watchers)} watching`;
+
+        const speed = document.getElementById(`speed-${p.id}`);
+        if (speed) {
+          if (p.dropCount > 6) {
+            speed.textContent = 'Dropping fast';
+          } else if (p.dropCount > 3) {
+            speed.textContent = 'Accelerating';
+          } else {
+            speed.textContent = 'Dropping';
+          }
+        }
+
+        const btn = document.getElementById(`btn-${p.id}`);
+        if (btn && !p.locked) btn.textContent = `Buy Now - $${p.currentPrice.toFixed(2)}`;
+
+        drawChart(p);
+      }
+
+      function drawChart(p) {
+        const svg = document.getElementById(`chart-${p.id}`);
+        if (!svg || p.history.length < 2) return;
+
+        const w = 280;
+        const h = 60;
+        const padding = 4;
+        const max = p.startPrice;
+        const min = p.floorPrice;
+        const range = max - min || 1;
+
+        const points = p.history.map((val, i) => {
+          const x = padding + (i / (Math.max(p.history.length - 1, 1))) * (w - padding * 2);
+          const y = padding + (1 - (val - min) / range) * (h - padding * 2);
+          return `${x},${y}`;
+        });
+
+        const areaPoints = [...points, `${padding + ((p.history.length - 1) / Math.max(p.history.length - 1, 1)) * (w - padding * 2)},${h}`, `${padding},${h}`];
+
+        svg.innerHTML = `
+          <polygon class="ff-chart-area" points="${areaPoints.join(' ')}"/>
+          <polyline points="${points.join(' ')}"/>
+        `;
+      }
+
+      function resetProduct(p) {
+        p.currentPrice = p.startPrice;
+        p.history = [p.startPrice];
+        p.dropCount = 0;
+
+        const el = document.getElementById(`price-${p.id}`);
+        if (el) {
+          el.textContent = `$${p.startPrice.toFixed(2)}`;
+          el.style.color = '';
+        }
+
+        updateCard(p);
+        startDrop(p);
+      }
+
+      function buy(id) {
+        const p = products.find(x => x.id === id);
+        if (!p || p.locked) return;
+
+        p.locked = true;
+        clearTimeout(p.timer);
+        clearInterval(p.countdownInterval);
+
+        const btn = document.getElementById(`btn-${p.id}`);
+        if (btn) {
+          btn.classList.add('locked');
+          btn.textContent = `Locked at $${p.currentPrice.toFixed(2)}`;
+        }
+
+        const countdown = document.getElementById(`countdown-${p.id}`);
+        if (countdown) countdown.textContent = 'Sold!';
+
+        const speed = document.getElementById(`speed-${p.id}`);
+        if (speed) {
+          speed.textContent = 'Purchased';
+          speed.style.background = 'rgba(48, 209, 88, 0.15)';
+          speed.style.color = '#30D158';
+        }
+
+        // Replace this with your checkout / cart logic
+        setTimeout(() => {
+          alert(`Price locked at $${p.currentPrice.toFixed(2)} for "${p.name}". Implement your checkout here.`);
+        }, 300);
+
+        // Auto-reset after 8 seconds for demo
+        setTimeout(() => {
+          p.locked = false;
+          if (btn) btn.classList.remove('locked');
+          if (speed) {
+            speed.style.background = '';
+            speed.style.color = '';
+          }
+          resetProduct(p);
+        }, 8000);
+      }
+
+      function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('soundToggle');
+        if (btn) btn.classList.toggle('active', soundEnabled);
+
+        if (soundEnabled && !audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+
+      function playTick() {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = 880;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.08);
+      }
+
+      function randomBetween(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      return { init, buy, toggleSound };
+    })();
+
+    // ============================================================
+    // CONFIGURE YOUR PRODUCTS HERE
+    // ============================================================
+    FreeFallPricing.init([
+      {
+        id: 'wireless-earbuds',
+        name: 'Pro Wireless Earbuds',
+        image: '',
+        startPrice: 79.99,
+        floorPrice: 19.99,
+        dropMin: 0.25,
+        dropMax: 2.50,
+        intervalMin: 2000,
+        intervalMax: 5000,
+        watchers: 4
+      },
+      {
+        id: 'smart-watch',
+        name: 'Smart Fitness Watch',
+        image: '',
+        startPrice: 149.99,
+        floorPrice: 39.99,
+        dropMin: 0.50,
+        dropMax: 4.00,
+        intervalMin: 2000,
+        intervalMax: 4000,
+        watchers: 7
+      },
+      {
+        id: 'portable-speaker',
+        name: 'Portable Bluetooth Speaker',
+        image: '',
+        startPrice: 59.99,
+        floorPrice: 14.99,
+        dropMin: 0.15,
+        dropMax: 1.75,
+        intervalMin: 3000,
+        intervalMax: 5000,
+        watchers: 3
+      }
+    ]);
+  </script>
+
+</body>
+</html>

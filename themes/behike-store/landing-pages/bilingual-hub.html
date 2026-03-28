@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilingual Content Pipeline — Behike</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface2: #111111;
+      --surface3: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --muted: #888888;
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --cyan: #64D2FF;
+      --teal: #30D5C8;
+      --indigo: #5E5CE6;
+      --accent: #0A84FF;
+      --accent2: #30D158;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none; letter-spacing: -0.3px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* SECTIONS */
+    section { padding: 80px 32px; max-width: 1040px; margin: 0 auto; }
+
+    /* HERO */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 80px;
+      text-align: center;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      color: var(--blue);
+      padding: 6px 14px;
+      border-radius: 980px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .hero h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 24px;
+    }
+    .hero h1 .en { color: var(--blue); }
+    .hero h1 .es { color: var(--green); }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .stat-cell {
+      background: var(--surface);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+    .stat-num.blue { color: var(--blue); }
+    .stat-num.green { color: var(--green); }
+    .stat-num.amber { color: var(--amber); }
+    .stat-label { font-size: 14px; color: var(--muted); }
+
+    /* SECTION HEADERS */
+    .section-header {
+      margin-bottom: 48px;
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(28px, 3.5vw, 40px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-header p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.5;
+    }
+
+    /* DEMO: SIDE BY SIDE */
+    .demo-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .demo-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #FF5F57; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #28C840; }
+    .demo-title { font-size: 13px; color: var(--muted); margin-left: 8px; }
+    .demo-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .demo-panel {
+      padding: 28px;
+    }
+    .demo-panel:first-child {
+      border-right: 1px solid var(--border);
+    }
+    .demo-panel-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lang-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .lang-en { background: rgba(10,132,255,0.15); color: var(--blue); }
+    .lang-es { background: rgba(48,209,88,0.15); color: var(--green); }
+    .demo-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .demo-content p { margin-bottom: 12px; }
+    .demo-content p:last-child { margin-bottom: 0; }
+    .voice-note {
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: rgba(48,209,88,0.06);
+      border: 1px solid rgba(48,209,88,0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--green);
+    }
+    .voice-note-en {
+      background: rgba(10,132,255,0.06);
+      border-color: rgba(10,132,255,0.2);
+      color: var(--blue);
+    }
+    .demo-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .arrow-flow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .arrow-step {
+      padding: 4px 10px;
+      background: var(--surface3);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .arrow-sep { color: var(--muted); font-size: 16px; }
+
+    /* PIPELINE STEPS */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 80px;
+      position: relative;
+    }
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      left: 23px;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--blue), var(--green));
+    }
+    .pipeline-step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      padding: 24px 0;
+    }
+    .step-num {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      position: relative;
+      z-index: 1;
+    }
+    .step-body h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .step-body p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .step-langs {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .step-tag {
+      padding: 3px 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* MARKET TABLE */
+    .market-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 80px;
+      font-size: 15px;
+    }
+    .market-table th {
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .market-table td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+    .market-table tr:last-child td { border-bottom: none; }
+    .market-table .highlight td {
+      background: rgba(48,209,88,0.04);
+      font-weight: 600;
+    }
+    .market-table .highlight td:last-child { color: var(--green); }
+    td.blue { color: var(--blue); }
+    td.green { color: var(--green); }
+    td.muted { color: var(--muted); }
+    .market-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* CONTENT ANGLES */
+    .angle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 80px;
+    }
+    .angle-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .angle-card:hover { border-color: var(--accent); }
+    .angle-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .angle-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+    .angle-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WAITLIST FORM */
+    .waitlist-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      text-align: center;
+      margin-bottom: 80px;
+    }
+    .waitlist-box h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+    .waitlist-box p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .waitlist-form {
+      display: flex;
+      gap: 8px;
+      max-width: 440px;
+      margin: 0 auto 20px;
+    }
+    .waitlist-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 980px;
+      padding: 12px 20px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .waitlist-input:focus { border-color: var(--accent); }
+    .waitlist-input::placeholder { color: var(--muted); }
+    .waitlist-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 980px;
+      padding: 12px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .waitlist-btn:hover { opacity: 0.85; }
+    .waitlist-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .waitlist-count strong { color: var(--accent); }
+    .waitlist-success {
+      display: none;
+      color: var(--green);
+      font-size: 16px;
+      margin-top: 16px;
+    }
+
+    /* FAQ */
+    .faq-list { margin-bottom: 80px; }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .faq-a {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: gap;
+    }
+    footer .foot-left { font-size: 14px; color: var(--muted); }
+    footer .foot-links { display: flex; gap: 20px; }
+    footer .foot-links a { font-size: 14px; color: var(--muted); text-decoration: none; }
+    footer .foot-links a:hover { color: var(--text); }
+
+    @media (max-width: 700px) {
+      nav { padding: 14px 20px; }
+      section { padding: 60px 20px; }
+      .hero { padding-top: 110px; padding-bottom: 60px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .demo-panels { grid-template-columns: 1fr; }
+      .demo-panel:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+      .angle-grid { grid-template-columns: 1fr; }
+      .waitlist-form { flex-direction: column; }
+      .waitlist-btn { width: 100%; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Behike</a>
+  <div class="nav-links">
+    <a href="index.html">Store</a>
+    <a href="learn.html">Learn</a>
+    <a href="about.html">About</a>
+    <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="status-badge">
+    <span class="status-dot"></span>
+    Building Now — Waitlist Open
+  </div>
+  <h1>Write once.<br><span class="en">English.</span> <span class="es">Espanol.</span><br>Two markets.</h1>
+  <p class="hero-sub">The Bilingual Content Pipeline turns a single piece of content into two polished versions. No translator. No second account workflow. One press.</p>
+  <div class="hero-ctas">
+    <a href="#waitlist" class="btn-primary">Join the Waitlist</a>
+    <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+  </div>
+</section>
+
+<!-- STATS -->
+<section style="padding-top: 0;">
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-num blue">680M</div>
+      <div class="stat-label">Spanish speakers globally</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num green">~0</div>
+      <div class="stat-label">AI education competitors in Spanish</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num amber">+40%</div>
+      <div class="stat-label">Projected revenue from ES market, Year 1</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section>
+  <div class="section-header">
+    <div class="section-label">Live Demo</div>
+    <h2>The same post. Two languages.<br>One source.</h2>
+    <p>Write in English. The pipeline applies Voice Bible ES rules, flags idioms for review, and queues both versions for scheduling.</p>
+  </div>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <div class="demo-dot dot-red"></div>
+      <div class="demo-dot dot-yellow"></div>
+      <div class="demo-dot dot-green"></div>
+      <span class="demo-title">bilingual_pipeline.py — side-by-side preview</span>
+    </div>
+    <div class="demo-panels">
+      <div class="demo-panel">
+        <div class="demo-panel-label">
+          Source <span class="lang-badge lang-en">EN</span>
+        </div>
+        <div class="demo-content">
+          <p>Three computers. Six AI agents. Zero employees.</p>
+          <p>That is the setup I built to run my entire content pipeline without hiring anyone.</p>
+          <p>The AI Employee Guide breaks down every tool, every connection, and every workflow. Screenshots included.</p>
+          <p>Link in bio.</p>
+        </div>
+        <div class="voice-note voice-note-en">
+          Voice Bible: short sentences, thesis first, no em dashes
+        </div>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-panel-label">
+          Generated <span class="lang-badge lang-es">ES</span>
+        </div>
+        <div class="demo-content">
+          <p>Tres computadoras. Seis agentes de AI. Cero empleados.</p>
+          <p>Eso es lo que construi para manejar todo mi contenido sin contratar a nadie.</p>
+          <p>La Guia del Empleado AI explica cada herramienta, cada conexion, y cada flujo de trabajo. Capturas de pantalla incluidas.</p>
+          <p>Enlace en bio.</p>
+        </div>
+        <div class="voice-note">
+          Review flag: "AI" stays untranslated (tech term). 1 idiom check passed.
+        </div>
+      </div>
+    </div>
+    <div class="demo-arrow">
+      <div class="arrow-flow">
+        <span class="arrow-step">Write EN</span>
+        <span class="arrow-sep">→</span>
+        <span class="arrow-step">Pipeline applies Voice Bible ES</span>
+        <span class="arrow-sep">→</span>
+        <span class="arrow-step">Kalani reviews flags</span>
+        <span class="arrow-sep">→</span>
+        <span class="arrow-step">Both versions scheduled</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" style="padding-top: 0;">
+  <div class="section-header">
+    <div class="section-label">How It Works</div>
+    <h2>Four steps.<br>Content doubles.</h2>
+  </div>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Write in English</h3>
+        <p>Draft any piece of content in English. Instagram caption, newsletter, product description, YouTube script. The Voice Bible EN rules apply automatically.</p>
+        <div class="step-langs">
+          <span class="step-tag">Instagram</span>
+          <span class="step-tag">Twitter</span>
+          <span class="step-tag">Newsletter</span>
+          <span class="step-tag">Product pages</span>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Pipeline generates Spanish version</h3>
+        <p>The bilingual pipeline applies Voice Bible ES rules: Puerto Rican idiom awareness, tech terms that stay in English, tone calibration for LATAM audiences, Caribbean pacing.</p>
+        <div class="step-langs">
+          <span class="step-tag">Voice Bible ES</span>
+          <span class="step-tag">Idiom detection</span>
+          <span class="step-tag">PR-specific phrasing</span>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Review flagged sentences</h3>
+        <p>The pipeline flags sentences that need human review: idioms, cultural references, terms where translation would lose meaning. Kalani reviews and edits. Takes two minutes.</p>
+        <div class="step-langs">
+          <span class="step-tag">Idiom flags</span>
+          <span class="step-tag">Cultural notes</span>
+          <span class="step-tag">Side-by-side edit</span>
+        </div>
+      </div>
+    </div>
+    <div class="pipeline-step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Both versions scheduled</h3>
+        <p>EN and ES versions go into the content calendar. EN Monday, ES Tuesday. Both accounts grow from one source. Products get ES variant pages at 75% of EN price.</p>
+        <div class="step-langs">
+          <span class="step-tag">@behikeai EN</span>
+          <span class="step-tag">@kalaniandrez ES</span>
+          <span class="step-tag">Gumroad ES variants</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET OPPORTUNITY -->
+<section style="padding-top: 0;">
+  <div class="section-header">
+    <div class="section-label">Revenue Projection</div>
+    <h2>The math is simple.<br>The gap is real.</h2>
+    <p>AI education in Spanish barely exists. That changes. Either you're first or you're competing with whoever was.</p>
+  </div>
+
+  <table class="market-table">
+    <thead>
+      <tr>
+        <th>Market</th>
+        <th>EN Revenue</th>
+        <th>ES Revenue</th>
+        <th>Combined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Addressable market</td>
+        <td class="blue">330M (US)</td>
+        <td class="green">680M (LATAM + US Hispanic)</td>
+        <td>1B+</td>
+      </tr>
+      <tr>
+        <td>AI education competitors</td>
+        <td class="muted">Hundreds</td>
+        <td class="green">Almost none</td>
+        <td class="muted">Massive gap</td>
+      </tr>
+      <tr>
+        <td>Year 1 projection</td>
+        <td class="blue">$5,512/mo</td>
+        <td class="green">$2,200/mo</td>
+        <td>$7,712/mo</td>
+      </tr>
+      <tr class="highlight">
+        <td>Year 2 projection</td>
+        <td class="blue">$8,000/mo</td>
+        <td class="green">$5,000/mo</td>
+        <td>+$5,000/mo vs EN-only</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="font-size: 13px; color: var(--muted); margin-top: -60px; margin-bottom: 80px;">Year 1 ES revenue assumes 40% of EN at 75% average price. Year 2 assumes word-of-mouth in an underserved market accelerates faster than EN.</p>
+</section>
+
+<!-- CONTENT ANGLES -->
+<section style="padding-top: 0;">
+  <div class="section-header">
+    <div class="section-label">Content Strategy</div>
+    <h2>The story writes itself.<br>Four angles.</h2>
+  </div>
+
+  <div class="angle-grid">
+    <div class="angle-card">
+      <span class="angle-icon">🌐</span>
+      <h3>"I doubled my market by pressing one button"</h3>
+      <p>The bilingual pipeline story. One English post becomes one Spanish post in two minutes. Here is what it looks like live.</p>
+    </div>
+    <div class="angle-card">
+      <span class="angle-icon">📊</span>
+      <h3>"Why LATAM is the biggest gap in AI education"</h3>
+      <p>Data-driven. 680M Spanish speakers. Search volume for AI topics in Spanish growing 80% YoY. Zero serious competitors. This is the 2021 EN opportunity.</p>
+    </div>
+    <div class="angle-card">
+      <span class="angle-icon">🏝️</span>
+      <h3>"Building for 680 million people nobody is teaching"</h3>
+      <p>Mission-driven. Puerto Rican builder. Faith and family as foundation. Building for the version of yourself that never had access to this.</p>
+    </div>
+    <div class="angle-card">
+      <span class="angle-icon">🗞️</span>
+      <h3>"Puerto Rican student builds bilingual AI platform"</h3>
+      <p>PR angle. Colmena66. El Nuevo Dia. Startup scene coverage. University engineering department. This has local press written all over it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section id="waitlist" style="padding-top: 0;">
+  <div class="waitlist-box">
+    <h2>Get early access</h2>
+    <p>The pipeline ships in 60 days. Waitlist members get it first, at half the launch price, and keep that price forever.</p>
+    <form class="waitlist-form" onsubmit="submitWaitlist(event)">
+      <input type="email" class="waitlist-input" placeholder="tu@email.com" id="waitlist-email" required>
+      <button type="submit" class="waitlist-btn">Join waitlist</button>
+    </form>
+    <div id="waitlist-success" class="waitlist-success">You are in. 74 others are waiting.</div>
+    <div class="waitlist-count"><strong>73 people</strong> already waiting</div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="padding-top: 0;">
+  <div class="section-header">
+    <div class="section-label">FAQ</div>
+    <h2>Questions.</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q">Do I need to speak Spanish to use this?</div>
+      <div class="faq-a">No. The pipeline generates the Spanish version and flags anything that needs review. You approve, not translate. But reviewing is easier if you have basic Spanish. Most LATAM-facing creators do.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What content types does it handle?</div>
+      <div class="faq-a">Instagram captions, Twitter threads, newsletter issues, YouTube scripts, and product page descriptions. It does not handle video narration or voiceover translation yet. That is a future phase.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What is the Voice Bible ES?</div>
+      <div class="faq-a">A set of rules for writing as Kalani in Spanish. Puerto Rican Caribbean pacing. Tech terms that stay in English. Short sentences. Thesis first. The same personality, different language.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">How long does the ES version take to generate?</div>
+      <div class="faq-a">Under 30 seconds for a caption. Under 2 minutes for a full newsletter. Review flags add 2-3 minutes of human time per piece. Total: 5 minutes to double your content output.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What will the price be at launch?</div>
+      <div class="faq-a">$29/mo for the pipeline. Waitlist members lock in $14/mo forever. The tool works locally on your machine, like every Behike tool. No subscription to a third-party API required (you bring your own key).</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-left">2026 Behike. Built in Puerto Rico.</div>
+  <div class="foot-links">
+    <a href="index.html">Store</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="about.html">About</a>
+  </div>
+</footer>
+
+<script>
+  function submitWaitlist(e) {
+    e.preventDefault();
+    const email = document.getElementById('waitlist-email').value;
+    if (!email || !email.includes('@')) return;
+    document.querySelector('.waitlist-form').style.display = 'none';
+    document.querySelector('.waitlist-count').style.display = 'none';
+    document.getElementById('waitlist-success').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

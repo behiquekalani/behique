@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transcription Pro — Local AI Transcription Powered by Whisper</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --accent: #0A84FF;
+      --green: #30D158;
+      --text: #FFFFFF;
+      --muted: #8E8E93;
+      --card-bg: #111111;
+      --border: #1C1C1E;
+      --radius-card: 12px;
+      --radius-pill: 980px;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 100px 0 80px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10,132,255,0.12);
+      border: 1px solid rgba(10,132,255,0.3);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 32px;
+      letter-spacing: 0.03em;
+    }
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 60px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      max-width: 780px;
+      margin: 0 auto 20px;
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--green);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 32px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    /* SOCIAL PROOF BAR */
+    .proof-bar {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .proof-items {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .proof-item .icon { color: var(--green); font-size: 16px; }
+
+    /* SECTION HEADER */
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+    .section-header p {
+      color: var(--muted);
+      font-size: 17px;
+      margin-top: 14px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* PROBLEM */
+    .problem { padding: 100px 0; }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 16px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card .x-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,59,48,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .problem-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FEATURES */
+    .features { padding: 100px 0; background: #080808; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .feature-card.visible { opacity: 1; transform: translateY(0); }
+    .feature-card .feat-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(10,132,255,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* USE CASES */
+    .usecases { padding: 100px 0; }
+    .usecase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .usecase-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .usecase-card.visible { opacity: 1; transform: translateY(0); }
+    .usecase-card .uc-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(10,132,255,0.1);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 16px;
+    }
+    .usecase-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .usecase-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* TERMINAL */
+    .demo { padding: 100px 0; background: #080808; }
+    .terminal {
+      background: #0D0D0D;
+      border: 1px solid #2C2C2E;
+      border-radius: 14px;
+      overflow: hidden;
+      max-width: 680px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .terminal.visible { opacity: 1; transform: translateY(0); }
+    .terminal-bar {
+      background: #1C1C1E;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .terminal-dot.red { background: #FF5F57; }
+    .terminal-dot.yellow { background: #FFBD2E; }
+    .terminal-dot.green-dot { background: #28CA41; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .terminal-body {
+      padding: 24px 28px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    .t-cmd { color: var(--green); }
+    .t-path { color: var(--accent); }
+    .t-ts { color: var(--muted); }
+    .t-out { color: #E5E5EA; }
+    .t-meta { color: var(--accent); margin-top: 8px; display: block; }
+    .t-blank { height: 8px; }
+    .t-line { display: block; }
+
+    /* PRICING */
+    .pricing { padding: 100px 0; }
+    .pricing-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 48px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .pricing-card.visible { opacity: 1; transform: translateY(0); }
+    .pricing-badge {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 28px;
+    }
+    .pricing-amount {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .pricing-amount sup {
+      font-size: 28px;
+      font-weight: 700;
+      vertical-align: super;
+    }
+    .pricing-once {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .pricing-list {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 36px;
+    }
+    .pricing-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .pricing-list li:last-child { border-bottom: none; }
+    .pricing-list .check {
+      color: var(--green);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .pricing-guarantee {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 20px;
+    }
+
+    /* FAQ */
+    .faq { padding: 100px 0; background: #080808; }
+    .faq-list {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .faq-item.visible { opacity: 1; transform: translateY(0); }
+    .faq-q {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      padding: 24px 0;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      font-family: inherit;
+    }
+    .faq-arrow {
+      color: var(--muted);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-a {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s;
+    }
+    .faq-item.open .faq-a { max-height: 300px; padding-bottom: 24px; }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .final-cta h2 {
+      font-size: clamp(30px, 5vw, 50px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .footer-brand span { color: var(--text); }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    footer a:hover { color: var(--text); }
+
+    /* SCROLL ANIMATION DELAYS */
+    .problem-card:nth-child(2) { transition-delay: 0.1s; }
+    .problem-card:nth-child(3) { transition-delay: 0.2s; }
+    .feature-card:nth-child(2) { transition-delay: 0.1s; }
+    .feature-card:nth-child(3) { transition-delay: 0.2s; }
+    .feature-card:nth-child(4) { transition-delay: 0.3s; }
+    .usecase-card:nth-child(2) { transition-delay: 0.1s; }
+    .usecase-card:nth-child(3) { transition-delay: 0.2s; }
+    .faq-item:nth-child(2) { transition-delay: 0.05s; }
+    .faq-item:nth-child(3) { transition-delay: 0.1s; }
+    .faq-item:nth-child(4) { transition-delay: 0.15s; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 72px 0 60px; }
+      .problem, .features, .usecases, .demo, .pricing, .faq, .final-cta { padding: 72px 0; }
+      .pricing-card { padding: 32px 24px; }
+      .nav-cta { font-size: 13px; padding: 9px 16px; }
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+      .proof-items { gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="https://behike.shop" class="nav-logo">behike<span>.shop</span></a>
+      <a href="https://gumroad.com/l/transcription-pro" class="nav-cta">Get it for $9.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Powered by OpenAI Whisper
+      </div>
+      <h1>Turn Any Audio or Video Into Text <span class="accent">in Minutes. For Free.</span></h1>
+      <p class="hero-sub">Transcription Pro runs OpenAI Whisper locally on your machine. No monthly fees, no upload limits, no third-party servers. One payment.</p>
+      <div class="hero-cta-group">
+        <a href="https://gumroad.com/l/transcription-pro" class="btn-primary">
+          Get Transcription Pro &nbsp;&nbsp; $9.99
+        </a>
+      </div>
+      <p class="hero-note">One-time payment. Instant download. Works on Mac, Windows, and Linux.</p>
+    </div>
+  </section>
+
+  <!-- PROOF BAR -->
+  <div class="proof-bar">
+    <div class="container">
+      <div class="proof-items">
+        <div class="proof-item"><span class="icon">&#10003;</span> Runs 100% offline</div>
+        <div class="proof-item"><span class="icon">&#10003;</span> No subscription required</div>
+        <div class="proof-item"><span class="icon">&#10003;</span> Works on any file type</div>
+        <div class="proof-item"><span class="icon">&#10003;</span> Whisper by OpenAI</div>
+        <div class="proof-item"><span class="icon">&#10003;</span> Setup in under 10 minutes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">The problem</span>
+        <h2>Transcription services are a racket</h2>
+        <p>You are being charged monthly for something your own machine can do for free.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="x-icon">$</div>
+          <h3>Otter.ai charges $17/month for what Whisper does for $0</h3>
+          <p>That is $204 a year. Whisper runs on your machine. You already own the hardware. The transcription is free after a $9.99 setup script.</p>
+        </div>
+        <div class="problem-card">
+          <div class="x-icon">&#128274;</div>
+          <h3>You are uploading your private voice memos to some startup's server</h3>
+          <p>Every audio note, every idea, every sensitive meeting. Sent to a cloud server you do not control, owned by a company you do not know.</p>
+        </div>
+        <div class="problem-card">
+          <div class="x-icon">&#9201;</div>
+          <h3>Manual transcription is 10x slower than speaking</h3>
+          <p>A 30-minute recording takes hours to transcribe by hand. Whisper does it in minutes. That is time you do not get back.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">What it does</span>
+        <h2>One command. Clean text output.</h2>
+        <p>Transcription Pro wraps Whisper in a clean, zero-config script you can run in seconds.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feat-icon">&#127911;</div>
+          <h3>Any audio or video format</h3>
+          <p>Transcribes MP3, MP4, M4A, WAV, FLAC, MOV, and more. If your computer can play it, Transcription Pro can read it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">&#128274;</div>
+          <h3>Fully local processing</h3>
+          <p>Runs on your machine using Whisper. Your audio never leaves your device. No API calls, no cloud uploads, no privacy risk.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">&#128196;</div>
+          <h3>Clean .txt output with timestamps</h3>
+          <p>Outputs a properly formatted .txt file with timestamps at every segment. Paste it anywhere, edit freely, or feed it into other tools.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feat-icon">&#128187;</div>
+          <h3>Mac, Windows, and Linux</h3>
+          <p>Works on any operating system. The setup guide walks you through the install step by step. No technical background required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section class="usecases">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Who it is for</span>
+        <h2>Three types of people who use this daily</h2>
+      </div>
+      <div class="usecase-grid">
+        <div class="usecase-card">
+          <span class="uc-label">Creators</span>
+          <h3>Podcast and YouTube producers</h3>
+          <p>Auto-generate show notes, subtitles, and captions from every episode. Stop paying editors to transcribe. Run one command after you record.</p>
+        </div>
+        <div class="usecase-card">
+          <span class="uc-label">Solopreneurs</span>
+          <h3>Voice memo to written idea in minutes</h3>
+          <p>Record your best thinking on your phone while walking. Transcription Pro converts it to clean text so you can actually build from it. Capture everything, lose nothing.</p>
+        </div>
+        <div class="usecase-card">
+          <span class="uc-label">Students</span>
+          <h3>Lecture recordings turned into study notes</h3>
+          <p>Stop rewinding audio to catch what the professor said. Run Transcription Pro on the recording and get a full text document you can search, annotate, and study from.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO TERMINAL -->
+  <section class="demo">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Sample output</span>
+        <h2>This is what it looks like in action</h2>
+        <p>One command. Readable text. Timestamps included. Done.</p>
+      </div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span>
+          <span class="terminal-dot yellow"></span>
+          <span class="terminal-dot green-dot"></span>
+          <span class="terminal-title">zsh &mdash; transcribe.py</span>
+        </div>
+        <div class="terminal-body">
+          <span class="t-line"><span class="t-path">~/voice-memos</span> <span class="t-cmd">$ python3 transcribe.py voice_memo.m4a</span></span>
+          <span class="t-blank"></span>
+          <span class="t-line t-out">Loading Whisper model (base)...</span>
+          <span class="t-line t-out">Transcribing voice_memo.m4a...</span>
+          <span class="t-blank"></span>
+          <span class="t-line"><span class="t-ts">[00:00]</span> <span class="t-out">So today I had this idea for a new product...</span></span>
+          <span class="t-line"><span class="t-ts">[00:08]</span> <span class="t-out">It's basically a system for automating the boring part...</span></span>
+          <span class="t-line"><span class="t-ts">[00:15]</span> <span class="t-out">The key insight is that most people don't realize...</span></span>
+          <span class="t-line"><span class="t-ts">[00:22]</span> <span class="t-out">what they're already sitting on. The raw material is there.</span></span>
+          <span class="t-line"><span class="t-ts">[00:31]</span> <span class="t-out">You just need to process it the right way. Here's how...</span></span>
+          <span class="t-blank"></span>
+          <span class="t-meta">Output saved: voice_memo_transcript.txt (3,847 words)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Pricing</span>
+        <h2>Pay once. Use forever.</h2>
+        <p>No subscriptions. No per-minute billing. No rate limits. One payment and it is yours.</p>
+      </div>
+      <div class="pricing-card">
+        <span class="pricing-badge">One-time purchase</span>
+        <div class="pricing-amount"><sup>$</sup>9.99</div>
+        <p class="pricing-once">Pay once. Instant download. No recurring charges.</p>
+        <ul class="pricing-list">
+          <li><span class="check">&#10003;</span> <span>transcribe.py, the main script, ready to run</span></li>
+          <li><span class="check">&#10003;</span> <span>Full setup guide for Mac, Windows, and Linux</span></li>
+          <li><span class="check">&#10003;</span> <span>Whisper model configuration and selection guide</span></li>
+          <li><span class="check">&#10003;</span> <span>Batch transcription instructions for bulk files</span></li>
+          <li><span class="check">&#10003;</span> <span>Common error fixes and troubleshooting doc</span></li>
+          <li><span class="check">&#10003;</span> <span>Free updates as the script improves</span></li>
+        </ul>
+        <a href="https://gumroad.com/l/transcription-pro" class="btn-primary" style="width:100%;justify-content:center;">
+          Get Transcription Pro &nbsp;&nbsp; $9.99
+        </a>
+        <p class="pricing-guarantee">Instant download on purchase. Works on Mac, Windows, and Linux.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">FAQ</span>
+        <h2>Common questions</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How do I install it?
+            <span class="faq-arrow">&#8964;</span>
+          </button>
+          <div class="faq-a">The setup guide walks you through every step. You will install Python if you do not have it, install the Whisper package via pip, and download the transcribe.py script. The whole process takes about 5 to 10 minutes. No technical background required.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What languages does it support?
+            <span class="faq-arrow">&#8964;</span>
+          </button>
+          <div class="faq-a">Whisper supports over 99 languages including English, Spanish, French, Portuguese, German, Japanese, Arabic, and more. It automatically detects the language in the audio so you do not need to configure anything for most use cases.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Does it work without an internet connection?
+            <span class="faq-arrow">&#8964;</span>
+          </button>
+          <div class="faq-a">Yes. After the initial setup, which requires a one-time model download, Transcription Pro runs entirely offline. Your audio is processed locally on your machine. No internet connection needed for transcription, no data sent anywhere.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How accurate is it compared to paid services?
+            <span class="faq-arrow">&#8964;</span>
+          </button>
+          <div class="faq-a">Whisper is the same model that powers many paid transcription services. In standard English it achieves over 95% accuracy on clear audio. For heavily accented speech or noisy recordings, accuracy varies. The larger Whisper models produce better results on difficult audio and the setup guide explains how to switch between them.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>Stop paying $17/month for something your computer can do for free.</h2>
+      <p>One script. One setup guide. Pay $9.99 once and transcribe anything, forever.</p>
+      <a href="https://gumroad.com/l/transcription-pro" class="btn-primary">
+        Get Transcription Pro &nbsp;&nbsp; $9.99
+      </a>
+      <p class="hero-note" style="margin-top:16px;">Instant download. No subscription. Works on Mac, Windows, and Linux.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-brand">behike<span>.shop</span></span>
+        <div class="footer-links">
+          <a href="https://behike.shop">Store</a>
+          <a href="https://behike.shop/contact">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll-triggered fade-in animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    document.querySelectorAll(
+      '.problem-card, .feature-card, .usecase-card, .terminal, .pricing-card, .faq-item'
+    ).forEach(el => observer.observe(el));
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Channel Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #000;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .day-table { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .day-cell { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; padding: 16px 12px; text-align: center; min-height: 100px; }
+  .day-cell .day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 12px; }
+  .day-cell .day-content { font-size: 12px; color: var(--gray); line-height: 1.6; }
+  .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .stacked-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">YouTube Channel Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">Build a channel that works for you. Strategy, not luck.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and plan your entire YouTube strategy on paper before you hit record.</p>
+  </div>
+  <!-- MODULE 01: NICHE SELECTION -->
+  <div class="module">
+    <div class="module-number">01 -- Niche Selection</div>
+    <h2 class="module-title">Niche Selection</h2>
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">What You Know</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">What You Enjoy</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">What People Search For</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Your Niche (intersection of all three)</div>
+    <div class="fill-line" style="margin-bottom: 32px;"></div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Target Viewer</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Viewer's Core Problem</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Niche Validation Checklist</div>
+    <ul class="checklist">
+      <li>Found 5+ channels in this niche with 10K+ subs</li>
+      <li>Searched 10 video ideas, all have 1K+ monthly searches</li>
+      <li>Niche has clear monetization paths (products, sponsors, affiliates)</li>
+      <li>You can create 50+ video ideas without running dry</li>
+    </ul>
+  </div>
+  <!-- MODULE 02: CHANNEL SETUP -->
+  <div class="module">
+    <div class="module-number">02 -- Channel Setup</div>
+    <h2 class="module-title">Channel Setup</h2>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Channel Name</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Channel Tagline</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Channel Description (first 2 lines)</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Brand Voice</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Visual Style</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Thumbnail Style</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <div class="label">Channel Setup Checklist</div>
+    <ul class="checklist">
+      <li>Profile picture uploaded</li>
+      <li>Banner designed and uploaded</li>
+      <li>Channel description written</li>
+      <li>Links added (website, socials)</li>
+      <li>Channel trailer recorded</li>
+      <li>Default upload settings configured</li>
+      <li>Watermark / subscribe button added</li>
+    </ul>
+  </div>
+  <!-- MODULE 03: CONTENT STRATEGY -->
+  <div class="module">
+    <div class="module-number">03 -- Content Strategy</div>
+    <h2 class="module-title">Content Strategy</h2>
+    <div class="label">Pillar-Cluster Model</div>
+    <p style="font-size: 14px; color: var(--gray); margin-bottom: 24px;">Define 3 content pillars. Each pillar spawns cluster videos that link back to the pillar topic.</p>
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card" style="border-color: var(--cyan);">
+        <div class="label" style="color: var(--cyan);">Pillar 1</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Cluster Topics</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card" style="border-color: var(--cyan);">
+        <div class="label" style="color: var(--cyan);">Pillar 2</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Cluster Topics</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card" style="border-color: var(--cyan);">
+        <div class="label" style="color: var(--cyan);">Pillar 3</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 16px;">Cluster Topics</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Content Mix</div>
+    <div class="stacked-bar">
+      <div class="segment" style="flex: 5; background: var(--cyan);">50% Search</div>
+      <div class="segment" style="flex: 3; background: var(--cyan-mid);">30% Trending</div>
+      <div class="segment" style="flex: 2; background: var(--cyan-dim);">20% Community</div>
+    </div>
+    <p style="font-size: 13px; color: var(--gray);">Search = evergreen SEO videos. Trending = timely topics. Community = Q&A, behind-the-scenes, polls.</p>
+  </div>
+  <!-- MODULE 04: PRODUCTION PIPELINE -->
+  <div class="module">
+    <div class="module-number">04 -- Production Pipeline</div>
+    <h2 class="module-title">Production Pipeline</h2>
+    <div class="label">Video Production Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Research</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Script</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Record</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Edit</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Thumbnail</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Upload + SEO</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Promote</div>
+    </div>
+    <hr class="section-divider">
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Equipment</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Software</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <div class="label">Time Budget Per Video</div>
+    <table class="clean">
+      <tr><th>Phase</th><th>Hours</th><th>Notes</th></tr>
+      <tr><td>Research + Scripting</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Recording</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Editing</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Thumbnail + Upload</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td><strong>Total per video</strong></td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td></td></tr>
+    </table>
+  </div>
+  <!-- MODULE 05: YOUTUBE SEO -->
+  <div class="module">
+    <div class="module-number">05 -- YouTube SEO</div>
+    <h2 class="module-title">YouTube SEO</h2>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Title Formula</div>
+        <div class="fill-line"></div>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">Include primary keyword in first 5 words. Under 60 characters.</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Description Template</div>
+        <div class="fill-line"></div>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 8px;">First 2 lines visible before "Show more". Include keyword + CTA.</p>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">SEO Checklist (per video)</div>
+    <ul class="checklist">
+      <li>Primary keyword researched (volume + competition)</li>
+      <li>Title includes keyword in first 5 words</li>
+      <li>Description: 200+ words, keyword in first sentence</li>
+      <li>Tags: 5-10 relevant tags, mix broad and specific</li>
+      <li>Custom thumbnail with text overlay</li>
+      <li>Cards and end screens added</li>
+      <li>Chapters/timestamps in description</li>
+      <li>Pinned comment with CTA</li>
+    </ul>
+    <hr class="section-divider">
+    <div class="label">Keyword Research Tools</div>
+    <div class="pills">
+      <span class="pill">TubeBuddy</span>
+      <span class="pill">vidIQ</span>
+      <span class="pill">YouTube Search Suggest</span>
+      <span class="pill">Google Trends</span>
+      <span class="pill">Ahrefs</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+  <!-- MODULE 06: MONETIZATION LADDER -->
+  <div class="module">
+    <div class="module-number">06 -- Monetization</div>
+    <h2 class="module-title">Monetization Ladder</h2>
+    <div class="grid-4">
+      <div class="phase-card">
+        <div class="phase-header">Level 1</div>
+        <div class="phase-range">0 <span>subs</span></div>
+        <ul class="checklist">
+          <li>Affiliate links in description</li>
+          <li>Digital product (PDF, template)</li>
+          <li>Email list building</li>
+        </ul>
+        <div class="revenue-target">Revenue<strong>$0 - $100/mo</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Level 2</div>
+        <div class="phase-range">1K <span>subs</span></div>
+        <ul class="checklist">
+          <li>YouTube Partner Program</li>
+          <li>Small brand deals</li>
+          <li>Course or membership</li>
+        </ul>
+        <div class="revenue-target">Revenue<strong>$100 - $1K/mo</strong></div>
+      </div>
+      <div class="phase-card target">
+        <div class="phase-header">Level 3</div>
+        <div class="phase-range">10K <span>subs</span></div>
+        <ul class="checklist">
+          <li>Sponsored videos ($500+)</li>
+          <li>Premium products</li>
+          <li>Community / membership</li>
+        </ul>
+        <div class="revenue-target">Revenue<strong>$1K - $5K/mo</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Level 4</div>
+        <div class="phase-range">100K <span>subs</span></div>
+        <ul class="checklist">
+          <li>Major sponsors ($2K+)</li>
+          <li>Own brand / merch</li>
+          <li>Team + delegation</li>
+        </ul>
+        <div class="revenue-target">Revenue<strong>$5K - $50K/mo</strong></div>
+      </div>
+    </div>
+  </div>
+  <!-- MODULE 07: GROWTH METRICS -->
+  <div class="module">
+    <div class="module-number">07 -- Growth Metrics</div>
+    <h2 class="module-title">Growth Metrics</h2>
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">CTR</div>
+        <div class="kpi-value">____%</div>
+        <div class="kpi-desc">Click-Through Rate. Target: 5-10%. Thumbnail + title quality.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">AVD</div>
+        <div class="kpi-value">____min</div>
+        <div class="kpi-desc">Average View Duration. Higher = algorithm loves you.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sub Rate</div>
+        <div class="kpi-value">____%</div>
+        <div class="kpi-desc">Views to subscribers. Target: 2-5% of viewers subscribe.</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">RPM</div>
+        <div class="kpi-value">$____</div>
+        <div class="kpi-desc">Revenue Per Mille. How much you earn per 1,000 views.</div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Monthly Review</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Total Views This Month</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">New Subscribers</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Top Performing Video</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Why It Worked</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+  <!-- MODULE 08: UPLOAD CALENDAR -->
+  <div class="module">
+    <div class="module-number">08 -- Upload Calendar</div>
+    <h2 class="module-title">Upload Calendar</h2>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Upload Frequency</div>
+        <div class="pills" style="margin-bottom: 16px;">
+          <span class="pill">1x/week</span>
+          <span class="pill">2x/week</span>
+          <span class="pill">3x/week</span>
+          <span class="pill">Daily</span>
+        </div>
+      </div>
+      <div>
+        <div class="label">Best Upload Day + Time</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+    <hr class="section-divider">
+    <div class="label">Weekly Content Calendar</div>
+    <div class="day-table" style="margin-bottom: 32px;">
+      <div class="day-cell">
+        <div class="day-name">Mon</div>
+        <div class="day-content">Research +<br>Outline</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Tue</div>
+        <div class="day-content">Script<br>Writing</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Wed</div>
+        <div class="day-content">Record</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Thu</div>
+        <div class="day-content">Edit</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Fri</div>
+        <div class="day-content">Thumbnail +<br>Upload</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Sat</div>
+        <div class="day-content">Promote +<br>Engage</div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">Sun</div>
+        <div class="day-content">Rest +<br>Plan Next</div>
+      </div>
+    </div>
+    <div class="label">Next 4 Videos Planned</div>
+    <table class="clean">
+      <tr><th>#</th><th>Title / Topic</th><th>Pillar</th><th>Upload Date</th></tr>
+      <tr><td>1</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>2</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>3</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>4</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>YOUTUBE CHANNEL BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+</div>
+</body>
+</html>

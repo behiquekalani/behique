@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba Agent Monitor</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --bg: #000; --card: #111; --text: #F5F5F7; --gray: #86868B; --blue: #0A84FF; --green: #34C759; --orange: #FF9F0A; --red: #FF453A; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', sans-serif; min-height: 100vh; padding: 24px; }
+
+.header { text-align: center; margin-bottom: 32px; }
+.header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 4px; }
+.header h1 span { color: var(--blue); }
+.header p { color: var(--gray); font-size: 14px; }
+.pulse-dot { display: inline-block; width: 8px; height: 8px; background: var(--green); border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+.stat { background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 24px; text-align: center; min-width: 120px; }
+.stat-num { font-size: 32px; font-weight: 700; letter-spacing: -0.04em; }
+.stat-num.green { color: var(--green); }
+.stat-num.blue { color: var(--blue); }
+.stat-num.orange { color: var(--orange); }
+.stat-label { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; }
+
+.agent-card { background: var(--card); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; transition: border-color 0.3s; }
+.agent-card.running { border-color: rgba(10,132,255,0.3); }
+.agent-card.done { border-color: rgba(52,199,89,0.3); }
+.agent-card.queued { border-color: rgba(255,159,10,0.2); }
+
+.agent-status { position: absolute; top: 16px; right: 16px; padding: 4px 10px; border-radius: 980px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.agent-status.running { background: rgba(10,132,255,0.15); color: var(--blue); }
+.agent-status.done { background: rgba(52,199,89,0.15); color: var(--green); }
+.agent-status.queued { background: rgba(255,159,10,0.15); color: var(--orange); }
+
+.agent-icon { font-size: 28px; margin-bottom: 12px; }
+.agent-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.01em; padding-right: 80px; }
+.agent-desc { font-size: 13px; color: var(--gray); line-height: 1.5; margin-bottom: 12px; }
+
+.agent-progress { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+.agent-progress-bar { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.agent-progress-bar.running { background: var(--blue); animation: shimmer 2s infinite; }
+.agent-progress-bar.done { background: var(--green); }
+@keyframes shimmer { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
+.agent-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); }
+.agent-output { font-size: 12px; color: var(--gray); margin-top: 8px; font-family: 'SF Mono', 'Fira Code', monospace; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; max-height: 60px; overflow: hidden; line-height: 1.4; }
+
+.log { max-width: 1200px; margin: 32px auto 0; }
+.log h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; }
+.log-entry { font-size: 12px; font-family: 'SF Mono', monospace; color: var(--gray); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.log-entry .time { color: var(--blue); margin-right: 12px; }
+.log-entry .msg { color: var(--text); }
+
+@media (max-width: 600px) { .grid { grid-template-columns: 1fr; } .stats { gap: 8px; } .stat { min-width: 90px; padding: 12px 16px; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span class="pulse-dot"></span>Ceiba <span>Agent Monitor</span></h1>
+  <p>Session 20 — Live agent status</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num green" id="done-count">0</div><div class="stat-label">Completed</div></div>
+  <div class="stat"><div class="stat-num blue" id="running-count">0</div><div class="stat-label">Running</div></div>
+  <div class="stat"><div class="stat-num orange" id="queued-count">0</div><div class="stat-label">Queued</div></div>
+  <div class="stat"><div class="stat-num" id="total-files">0</div><div class="stat-label">Files Built</div></div>
+</div>
+
+<div class="grid" id="agent-grid"></div>
+
+<div class="log">
+  <h3>Activity Log</h3>
+  <div id="log-entries"></div>
+</div>
+
+<script>
+const agents = [
+  { id: 1, icon: '🏗️', name: 'Product Landing Pages', desc: 'AI Employee Guide, Budget Template, Theme Bundle landing pages', status: 'done', progress: 100, output: '3 HTML files, Apple dark design, mobile responsive', files: 3, time: '4m 12s' },
+  { id: 2, icon: '🔒', name: 'Deep Security Audit', desc: '27 findings across entire repo. 4 critical fixed.', status: 'done', progress: 100, output: 'Biography moved, student names anonymized, .gitignore hardened', files: 1, time: '5m 24s' },
+  { id: 3, icon: '📋', name: 'Legal Filing Compiler', desc: 'Copyright package, trademark package, brand registry, timeline, inventory', status: 'done', progress: 100, output: '5 legal documents, $435 filing cost calculated', files: 5, time: '6m 09s' },
+  { id: 4, icon: '🎨', name: 'Shopify Theme Builder', desc: '3 original themes from Dawn (MIT). Starter, Pro, Empire.', status: 'done', progress: 100, output: '139 files, 3 themes + bundle zips', files: 139, time: '16m 17s' },
+  { id: 5, icon: '🖼️', name: 'Product Proof Previews', desc: 'Sample chapter, working spreadsheet, template showcase', status: 'done', progress: 100, output: '3 interactive preview pages', files: 3, time: '3m 24s' },
+  { id: 6, icon: '🏪', name: 'Theme Demo Storefronts', desc: 'MINIMA (starter), NEXUS (pro), AURUM (empire) fake stores', status: 'done', progress: 100, output: '3 full fake storefronts with products, testimonials, pricing', files: 3, time: '3m 42s' },
+  { id: 7, icon: '🏠', name: 'Store Homepage + Deploy', desc: 'Homepage, chat widget, deploy script, Cobo instructions', status: 'done', progress: 100, output: 'index.html, chat-widget.js, deploy.sh, cobo-chatbot-instructions.md', files: 4, time: '4m 16s' },
+  { id: 8, icon: '✍️', name: 'AI Employee Guide Rewrite', desc: 'Genericized, polished, step-by-step commands, troubleshooting', status: 'done', progress: 100, output: '8,825 words, prerequisites, quick start, cost comparison added', files: 1, time: '7m 51s' },
+  { id: 9, icon: '🗺️', name: 'Hutia Rebuild Plan', desc: 'Backup script, fresh install, old laptop guide, fleet integration', status: 'done', progress: 100, output: '954 lines, 7 phases, model-by-RAM table', files: 1, time: '3m 15s' },
+  { id: 10, icon: '📊', name: 'Session Log + Master TODO', desc: 'Permanent session record, 57 tasks compiled across all projects', status: 'done', progress: 100, output: 'SESSION_LOG + MASTER_TODO.md', files: 2, time: '4m 07s' },
+  { id: 11, icon: '💰', name: 'Upsell Implementation', desc: 'Hormozi value stacks, PAS copy, bundles, exit popups on all 4 pages', status: 'done', progress: 100, output: 'All pages updated: +500 lines each, value stacks, cross-sells, popups', files: 4, time: '11m 07s' },
+  { id: 12, icon: '📖', name: 'Ecommerce Playbook v2', desc: '10 chapters, 7,816 words, 100% original content + PDF', status: 'done', progress: 100, output: 'ecommerce-playbook-v2.md + .pdf', files: 2, time: '5m 05s' },
+  { id: 13, icon: '🎯', name: 'Automation Audit Template', desc: 'Interactive 15-question lead magnet with ROI scoring', status: 'done', progress: 100, output: 'automation-audit-template.html, saves to localStorage', files: 1, time: '4m 41s' },
+  { id: 14, icon: '⚙️', name: 'Solopreneur OS Landing Page', desc: 'Product page with 5 modules, Hormozi value stack', status: 'done', progress: 100, output: 'solopreneur-os.html with PAS, value stack, FAQ', files: 1, time: '4m 41s' },
+  { id: 15, icon: '🖼️', name: 'Product Cover Images', desc: '9 CSS product covers for Gumroad (1280x720)', status: 'done', progress: 100, output: '9 covers: AI Guide, Budget, Cash Flow, Playbook, 3 Themes, Bundle, Solopreneur OS', files: 1, time: '2m 22s' },
+  { id: 16, icon: '📦', name: 'Landing Page Template Product', desc: 'Packaged template with README, settings widget, LICENSE', status: 'done', progress: 100, output: 'index.html + settings-widget.js + README.md + LICENSE, zipped for Gumroad', files: 4, time: '7m 08s' },
+  { id: 17, icon: '📘', name: 'Behike Method Guide', desc: '6 chapters, ADHD+faith+AI framework, landing page', status: 'done', progress: 100, output: '5,303 words + landing page + PDF. Your own framework, 100% original.', files: 3, time: '6m 05s' },
+];
+
+function render() {
+  const grid = document.getElementById('agent-grid');
+  const log = document.getElementById('log-entries');
+  let done = 0, running = 0, queued = 0, totalFiles = 0;
+
+  grid.innerHTML = '';
+  agents.forEach(a => {
+    if (a.status === 'done') done++;
+    else if (a.status === 'running') running++;
+    else queued++;
+    totalFiles += a.files;
+
+    grid.innerHTML += `
+      <div class="agent-card ${a.status}">
+        <div class="agent-status ${a.status}">${a.status}</div>
+        <div class="agent-icon">${a.icon}</div>
+        <div class="agent-name">${a.name}</div>
+        <div class="agent-desc">${a.desc}</div>
+        <div class="agent-progress"><div class="agent-progress-bar ${a.status}" style="width:${a.progress}%"></div></div>
+        <div class="agent-meta"><span>${a.files} file${a.files !== 1 ? 's' : ''}</span><span>${a.time}</span></div>
+        <div class="agent-output">${a.output}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById('done-count').textContent = done;
+  document.getElementById('running-count').textContent = running;
+  document.getElementById('queued-count').textContent = queued;
+  document.getElementById('total-files').textContent = totalFiles;
+
+  // Activity log
+  const logData = [
+    { time: '00:12', msg: 'Session 20 started. Full autonomy mode.' },
+    { time: '00:15', msg: 'Launched 3 agents: landing pages, security audit, legal compiler' },
+    { time: '00:19', msg: 'Landing pages complete. 3 HTML files built.' },
+    { time: '00:22', msg: 'Launched theme builder agent (3 themes from Dawn)' },
+    { time: '00:28', msg: 'Security audit complete. 4 critical findings fixed.' },
+    { time: '00:31', msg: 'Legal filing package complete. 5 documents ready.' },
+    { time: '00:35', msg: 'Launched product proof agents (previews + theme demos)' },
+    { time: '00:38', msg: 'Theme builder complete. 139 files, 3 themes + bundle.' },
+    { time: '00:42', msg: 'Product previews + theme demos complete. 6 pages.' },
+    { time: '00:45', msg: 'Store homepage + deploy script + chat widget built.' },
+    { time: '00:50', msg: 'AI Employee Guide rewritten. 8,825 words.' },
+    { time: '00:55', msg: 'Hutia rebuild plan saved. 954 lines.' },
+    { time: '01:00', msg: 'Upsell implementation started on all 4 pages.' },
+    { time: '01:05', msg: 'Ecommerce Playbook v2 started. Original content.' },
+    { time: '01:08', msg: 'Automation audit + Solopreneur OS launched.' },
+    { time: '01:12', msg: 'Automation audit template complete. Interactive scoring.' },
+    { time: '01:15', msg: 'Solopreneur OS landing page complete.' },
+    { time: '01:18', msg: 'Ecommerce Playbook v2 complete. 7,816 words + PDF.' },
+    { time: '01:22', msg: 'Cover images + template product + Behike Method launched.' },
+    { time: '01:33', msg: 'Upsell implementation complete. All 4 pages updated.' },
+    { time: '01:35', msg: 'Cover images complete. 9 Gumroad covers.' },
+    { time: '01:38', msg: 'Landing page template packaged. ZIP ready.' },
+    { time: '01:42', msg: 'Behike Method guide + landing page complete. 5,303 words.' },
+    { time: '01:45', msg: 'Bio link page rebuilt. Premium Linktree replacement.' },
+    { time: '01:48', msg: 'AI Chatbot Guide complete. $4.99 impulse buy.' },
+    { time: '01:52', msg: '3 quick tutorials complete. News tracker, social pipeline, self-hosted store.' },
+    { time: '01:55', msg: '69 video topics extracted from gym transcripts.' },
+    { time: '02:00', msg: '5 YouTube scripts written (Dan Koe, Hormozi, Iman, Biaheza, MrBeast styles).' },
+    { time: '02:05', msg: 'Final security audit complete. 8 FAILs found and fixed.' },
+    { time: '02:10', msg: 'All IPs genericized. PDFs regenerated. Links fixed.' },
+    { time: '02:15', msg: '26 agents complete. 0 failures. Session 20 done.' },
+  ];
+
+  log.innerHTML = logData.map(l =>
+    `<div class="log-entry"><span class="time">${l.time}</span><span class="msg">${l.msg}</span></div>`
+  ).join('');
+}
+
+render();
+
+// Simulate progress on running agents
+setInterval(() => {
+  agents.forEach(a => {
+    if (a.status === 'running' && a.progress < 95) {
+      a.progress += Math.random() * 3;
+      if (a.progress > 95) a.progress = 95;
+    }
+  });
+  render();
+}, 5000);
+</script>
+</body>
+</html>

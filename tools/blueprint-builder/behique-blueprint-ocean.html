@@ -1,0 +1,2591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEHIQUE Business Blueprint V2.0</title>
+    <style>
+
+/* ========================================================================
+   BLUEPRINT V2 - CORE STYLES
+   ======================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #0a0a0a;
+    --bg-secondary: #111111;
+    --text: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    --border: #333333;
+    --border-light: #222222;
+    --accent: #f0c040;
+    --accent-secondary: #d4a017;
+    --card-bg: #0f0f0f;
+    --nav-bg: rgba(10,10,10,0.95);
+    --hover: #1a1a1a;
+    --success: #22c55e;
+    --info: #3b82f6;
+    --font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+}
+
+html { scroll-behavior: smooth; font-size: 14px; transition: font-size 0.3s ease; }
+html.fs-small { font-size: 12px; }
+html.fs-medium { font-size: 14px; }
+html.fs-large { font-size: 18px; }
+html.fs-xl { font-size: 22px; }
+
+body {
+    font-family: var(--font-family);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- NAVIGATION ---- */
+
+.bp-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.bp-nav-brand {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-right: 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.bp-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex: 1;
+    min-width: 0;
+}
+
+.bp-nav-links::-webkit-scrollbar { display: none; }
+
+.bp-nav-link {
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.85rem 0.6rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+/* ---- FONT SIZE CONTROLS ---- */
+
+.bp-font-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.bp-font-controls span {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 2px;
+}
+
+.bp-font-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.bp-font-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--hover);
+}
+
+.bp-font-btn.active {
+    border-color: var(--accent);
+    color: var(--bg);
+    background: var(--accent);
+}
+
+.bp-nav-link:hover {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+}
+
+.bp-nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.bp-nav-version {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ---- MAIN CONTENT ---- */
+
+.bp-main { padding-top: 48px; }
+
+.bp-section {
+    padding: 4rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    scroll-margin-top: 48px;
+}
+
+/* ---- SECTION HEADERS ---- */
+
+.bp-section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.bp-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.bp-section-name {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-section-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.bp-section-line {
+    width: 60px;
+    height: 1px;
+    background: var(--accent);
+    margin: 1.5rem auto 0;
+}
+
+/* ---- GRID LAYOUTS ---- */
+
+.bp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ---- CARDS ---- */
+
+.bp-card {
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.bp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.bp-card-icon {
+    font-size: 1.2rem;
+    width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.bp-card-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.bp-card-number {
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-family: var(--font-mono);
+}
+
+.bp-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-card-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ---- LISTS ---- */
+
+.bp-list {
+    list-style: none;
+    padding: 0;
+}
+
+.bp-list li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 0.4rem 0;
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.bp-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+}
+
+.bp-list-numbered li {
+    padding-left: 1.5rem;
+    counter-increment: bp-counter;
+}
+
+.bp-list-numbered li::before {
+    content: counter(bp-counter, decimal-leading-zero);
+    background: none;
+    width: auto;
+    height: auto;
+    top: 0.4rem;
+    font-size: 0.6rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+.bp-list-numbered { counter-reset: bp-counter; }
+
+/* ---- KEY-VALUE PAIRS ---- */
+
+.bp-kv {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.8rem;
+}
+
+.bp-kv:last-child { border-bottom: none; }
+
+.bp-kv-key {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.bp-kv-value {
+    color: var(--text);
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ---- TAGS / BADGES ---- */
+
+.bp-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.bp-tag {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+}
+
+.bp-tag-accent {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ---- FLOW DIAGRAM ---- */
+
+.bp-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.bp-flow-node {
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    text-align: center;
+    min-width: 140px;
+    background: var(--card-bg);
+    position: relative;
+}
+
+.bp-flow-node-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.bp-flow-node-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.bp-flow-arrow {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.bp-flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid var(--border);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+}
+
+.bp-flow-arrow-accent { background: var(--accent); }
+.bp-flow-arrow-accent::after { border-left-color: var(--accent); }
+
+/* ---- PHASE TIMELINE ---- */
+
+.bp-phases {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    border: 1px solid var(--border);
+}
+
+.bp-phase {
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+}
+
+.bp-phase:last-child { border-right: none; }
+
+.bp-phase-number {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    margin-bottom: 0.75rem;
+}
+
+.bp-phase-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-phase-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.bp-phase-timeline {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+/* ---- TOOLS GRID ---- */
+
+.bp-tool {
+    border: 1px solid var(--border);
+    padding: 1rem;
+    text-align: center;
+    background: var(--card-bg);
+    transition: border-color 0.2s;
+}
+
+.bp-tool:hover { border-color: var(--accent); }
+
+.bp-tool-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.bp-tool-name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.bp-tool-category {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+}
+
+/* ---- DEPARTMENT NAV CARDS ---- */
+
+.bp-dept-card {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    background: var(--card-bg);
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.bp-dept-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.bp-dept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.bp-dept-card:hover::before { opacity: 1; }
+
+.bp-dept-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.bp-dept-card-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-dept-card-desc {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.bp-dept-card-count {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    margin-top: 0.75rem;
+}
+
+/* ---- DEPARTMENT BLUEPRINT LAYOUT ---- */
+
+.bp-dept-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-dept-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* ---- GROWTH WHEEL ---- */
+
+.bp-wheel {
+    width: 500px;
+    height: 500px;
+    margin: 2rem auto;
+    position: relative;
+}
+
+.bp-wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 2;
+}
+
+.bp-wheel-center-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.bp-wheel-spoke {
+    position: absolute;
+    width: 160px;
+    text-align: center;
+    z-index: 2;
+}
+
+.bp-wheel-spoke-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.bp-wheel-spoke-desc {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.bp-wheel-line {
+    position: absolute;
+    background: var(--border);
+    transform-origin: center center;
+    z-index: 1;
+}
+
+/* Spoke positions (5 spokes, evenly distributed) */
+.bp-wheel-spoke:nth-child(2) { top: -10px; left: 50%; transform: translateX(-50%); }
+.bp-wheel-spoke:nth-child(3) { top: 25%; right: -40px; }
+.bp-wheel-spoke:nth-child(4) { bottom: 5%; right: -20px; }
+.bp-wheel-spoke:nth-child(5) { bottom: 5%; left: -20px; }
+.bp-wheel-spoke:nth-child(6) { top: 25%; left: -40px; }
+
+/* Connecting lines */
+.bp-wheel-line:nth-child(7) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(-90deg) translateY(-65px); }
+.bp-wheel-line:nth-child(8) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(-18deg) translateY(-65px); }
+.bp-wheel-line:nth-child(9) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(54deg) translateY(-65px); }
+.bp-wheel-line:nth-child(10) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(126deg) translateY(-65px); }
+.bp-wheel-line:nth-child(11) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(198deg) translateY(-65px); }
+
+/* ---- FUNNEL ---- */
+
+.bp-funnel {
+    max-width: 700px;
+    margin: 2rem auto;
+}
+
+.bp-funnel-step {
+    border: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    margin-bottom: -1px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    background: var(--card-bg);
+}
+
+.bp-funnel-step::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+}
+
+.bp-funnel-num {
+    font-size: 1.5rem;
+    font-weight: 200;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    min-width: 2rem;
+}
+
+.bp-funnel-content { flex: 1; }
+
+.bp-funnel-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+}
+
+.bp-funnel-text {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* ---- ARCHITECTURE DIAGRAM ---- */
+
+.bp-arch {
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+
+.bp-arch-layer {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.bp-arch-layer::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 12px;
+    background: var(--border);
+}
+
+.bp-arch-layer:last-child::after { display: none; }
+
+.bp-arch-layer-title {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.bp-arch-nodes {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.bp-arch-node {
+    border: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+}
+
+/* ---- STAT BOX ---- */
+
+.bp-stat {
+    text-align: center;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.bp-stat-value {
+    font-size: 2rem;
+    font-weight: 200;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    margin-bottom: 0.25rem;
+}
+
+.bp-stat-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ---- SEPARATOR ---- */
+
+.bp-sep {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 2rem 0;
+}
+
+/* ---- CONTAINER ---- */
+
+.bp-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ---- SECTION LABEL (inline) ---- */
+
+.bp-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bp-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ---- FOOTER ---- */
+
+.bp-footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.bp-footer-text {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.bp-footer-brand {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 0.5rem;
+}
+
+/* ---- RESPONSIVE ---- */
+
+@media (max-width: 1200px) {
+    .bp-grid-6 { grid-template-columns: repeat(3, 1fr); }
+    .bp-dept-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .bp-phases { grid-template-columns: 1fr; }
+    .bp-phase { border-right: none; border-bottom: 1px solid var(--border); }
+    .bp-phase:last-child { border-bottom: none; }
+    .bp-grid-2, .bp-grid-3, .bp-grid-4 { grid-template-columns: 1fr; }
+    .bp-nav { padding: 0 0.75rem; }
+    .bp-nav-brand { margin-right: 0.5rem; font-size: 0.6rem; }
+    .bp-nav-link { padding: 0.85rem 0.4rem; font-size: 0.55rem; }
+    .bp-nav-version { display: none; }
+    .bp-section { padding: 2rem 1rem; }
+    .bp-flow { flex-direction: column; }
+    .bp-flow-arrow { width: 1px; height: 30px; }
+    .bp-flow-arrow::after {
+        right: -4px;
+        top: auto;
+        bottom: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 6px solid var(--border);
+        border-bottom: none;
+    }
+    .bp-wheel { width: 300px; height: 300px; }
+}
+
+@media (max-width: 480px) {
+    .bp-font-controls span { display: none; }
+    .bp-nav-brand { letter-spacing: 0.1em; }
+}
+
+/* ---- PRINT ---- */
+
+@media print {
+    .bp-nav { display: none; }
+    .bp-main { padding-top: 0; }
+    .bp-section {
+        min-height: auto;
+        page-break-after: always;
+        page-break-inside: avoid;
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+    .bp-section:last-child { page-break-after: auto; }
+    body { background: white; color: #1a1a1a; font-size: 10pt; }
+    .bp-card, .bp-tool, .bp-dept-card, .bp-flow-node, .bp-arch-node, .bp-funnel-step, .bp-stat {
+        border-color: #ccc;
+        background: white;
+    }
+    .bp-section-name, .bp-card-title, .bp-flow-node-title, .bp-dept-card-title { color: #1a1a1a; }
+    .bp-nav-link, .bp-tag, .bp-card-text, .bp-list li, .bp-kv-key, .bp-kv-value { color: #333; }
+    .bp-accent-print { color: #333 !important; border-color: #333 !important; }
+}
+
+:root {
+    --bg: #060c10;
+    --bg-secondary: #0a1420;
+    --text: #e0eef5;
+    --text-secondary: #7ab0d4;
+    --text-muted: #456580;
+    --border: #102a3a;
+    --border-light: #081e2e;
+    --accent: #06b6d4;
+    --accent-secondary: #0891b2;
+    --card-bg: #081018;
+    --nav-bg: rgba(6,12,16,0.95);
+    --hover: #0a1a28;
+    --success: #22d3ee;
+    --info: #06b6d4;
+}
+    </style>
+</head>
+<body>
+
+<nav class="bp-nav">
+    <span class="bp-nav-brand">BEHIQUE</span>
+    <div class="bp-nav-links"><a class="bp-nav-link" href="#overview">OVERVIEW</a><a class="bp-nav-link" href="#dept-marketing">MARKETING</a><a class="bp-nav-link" href="#dept-sales">SALES</a><a class="bp-nav-link" href="#dept-operations">OPERATIONS</a><a class="bp-nav-link" href="#dept-finance">FINANCE</a><a class="bp-nav-link" href="#dept-ai_automations">AI & AUTO</a><a class="bp-nav-link" href="#dept-content">CONTENT</a><a class="bp-nav-link" href="#growth-wheel">GROWTH</a><a class="bp-nav-link" href="#offer">OFFER</a><a class="bp-nav-link" href="#retention">RETENTION</a></div>
+    <div class="bp-font-controls">
+        <span>Aa</span>
+        <button class="bp-font-btn" data-size="fs-small" title="Small text">S</button>
+        <button class="bp-font-btn active" data-size="fs-medium" title="Medium text (default)">M</button>
+        <button class="bp-font-btn" data-size="fs-large" title="Large text">L</button>
+        <button class="bp-font-btn" data-size="fs-xl" title="Extra large text (accessibility)">XL</button>
+    </div>
+    <span class="bp-nav-version">V2.0 / OCEAN</span>
+</nav>
+<main class="bp-main">
+
+<section class="bp-section" id="overview">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE</div>
+        <div class="bp-section-name">Business Blueprint</div>
+        <div class="bp-section-subtitle">Version 2.0 / Generated 2026-03-20</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-label">ROLLOUT PHASES</div>
+    <div class="bp-phases">
+
+        <div class="bp-phase">
+            <div class="bp-phase-number">PHASE 01</div>
+            <div class="bp-phase-title">Foundation</div>
+            <div class="bp-phase-desc">Build the core systems, validate products on eBay/Marketplace, establish AI workflows, launch first content. Get the machine running.</div>
+            <div class="bp-phase-timeline">MONTHS 1-3</div>
+        </div>
+
+        <div class="bp-phase">
+            <div class="bp-phase-number">PHASE 02</div>
+            <div class="bp-phase-title">Scale</div>
+            <div class="bp-phase-desc">Automate product research, scale winning listings to Shopify, deploy AI agents for content and operations, build recurring revenue streams.</div>
+            <div class="bp-phase-timeline">MONTHS 4-8</div>
+        </div>
+
+        <div class="bp-phase">
+            <div class="bp-phase-number">PHASE 03</div>
+            <div class="bp-phase-title">Autonomy</div>
+            <div class="bp-phase-desc">Full autonomous operation. AI agents handle research, content, and operations. Human oversight on strategy only. Sell the system itself.</div>
+            <div class="bp-phase-timeline">MONTHS 9-12</div>
+        </div>
+    </div>
+    <hr class="bp-sep">
+    <div class="bp-label">TOOLS &amp; SOFTWARE ASSETS</div>
+    <div class="bp-grid-6">
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">✨</div>
+            <div class="bp-tool-name">Claude</div>
+            <div class="bp-tool-category">AI / Brain</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">⌨️</div>
+            <div class="bp-tool-name">Cursor</div>
+            <div class="bp-tool-category">Dev / IDE</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">⚡</div>
+            <div class="bp-tool-name">n8n</div>
+            <div class="bp-tool-category">Automation</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🛍️</div>
+            <div class="bp-tool-name">Shopify</div>
+            <div class="bp-tool-category">Commerce</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">📦</div>
+            <div class="bp-tool-name">eBay</div>
+            <div class="bp-tool-category">Commerce</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">💬</div>
+            <div class="bp-tool-name">Telegram</div>
+            <div class="bp-tool-category">Comms</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🗒️</div>
+            <div class="bp-tool-name">Notion</div>
+            <div class="bp-tool-category">Knowledge</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">💎</div>
+            <div class="bp-tool-name">Obsidian</div>
+            <div class="bp-tool-category">Vault</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🚂</div>
+            <div class="bp-tool-name">Railway</div>
+            <div class="bp-tool-category">Deploy</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🐙</div>
+            <div class="bp-tool-name">GitHub</div>
+            <div class="bp-tool-category">Code</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🎬</div>
+            <div class="bp-tool-name">CapCut</div>
+            <div class="bp-tool-category">Video</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🎭</div>
+            <div class="bp-tool-name">Playwright</div>
+            <div class="bp-tool-category">Scraping</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🧬</div>
+            <div class="bp-tool-name">Ollama</div>
+            <div class="bp-tool-category">Local AI</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🚀</div>
+            <div class="bp-tool-name">Warp</div>
+            <div class="bp-tool-category">Terminal</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">📓</div>
+            <div class="bp-tool-name">NotebookLM</div>
+            <div class="bp-tool-category">Research</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🌟</div>
+            <div class="bp-tool-name">Gumroad</div>
+            <div class="bp-tool-category">Digital Sales</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">⚔️</div>
+            <div class="bp-tool-name">Habitica</div>
+            <div class="bp-tool-category">Gamification</div>
+        </div>
+
+        <div class="bp-tool">
+            <div class="bp-tool-icon">🔄</div>
+            <div class="bp-tool-name">Syncthing</div>
+            <div class="bp-tool-category">Sync</div>
+        </div>
+    </div>
+    <hr class="bp-sep">
+    <div class="bp-label">DEPARTMENT BLUEPRINTS</div>
+    <div class="bp-grid-3">
+
+        <a class="bp-dept-card" href="#dept-marketing">
+            <div class="bp-dept-card-icon">📣</div>
+            <div class="bp-dept-card-title">Marketing Blueprint</div>
+            <div class="bp-dept-card-desc">Build organic reach through AI-powered content, product research signals, and community engagement. Zero ad spend until product-market fit confirmed.</div>
+            <div class="bp-dept-card-count">5 SECTIONS</div>
+        </a>
+
+        <a class="bp-dept-card" href="#dept-sales">
+            <div class="bp-dept-card-icon">💰</div>
+            <div class="bp-dept-card-title">Sales Blueprint</div>
+            <div class="bp-dept-card-desc">Test products on eBay and Facebook Marketplace. Scale winners to Shopify. Build digital product revenue through Gumroad. Multiple income streams feeding one system.</div>
+            <div class="bp-dept-card-count">6 SECTIONS</div>
+        </a>
+
+        <a class="bp-dept-card" href="#dept-operations">
+            <div class="bp-dept-card-icon">⚙️</div>
+            <div class="bp-dept-card-title">Operations Map</div>
+            <div class="bp-dept-card-desc">Run the entire business with minimal friction. Two machines (Ceiba + Cobo), synced memory, automated workflows, clear processes for every repeatable task.</div>
+            <div class="bp-dept-card-count">5 SECTIONS</div>
+        </a>
+
+        <a class="bp-dept-card" href="#dept-finance">
+            <div class="bp-dept-card-icon">💵</div>
+            <div class="bp-dept-card-title">Financial Blueprint</div>
+            <div class="bp-dept-card-desc">Track every dollar in, every dollar out. Maintain positive cash flow. Reinvest profits into growth. Build toward financial independence through multiple revenue streams.</div>
+            <div class="bp-dept-card-count">5 SECTIONS</div>
+        </a>
+
+        <a class="bp-dept-card" href="#dept-ai_automations">
+            <div class="bp-dept-card-icon">🤖</div>
+            <div class="bp-dept-card-title">AI &amp; Automations Blueprint</div>
+            <div class="bp-dept-card-desc">Build an AI-native business where agents handle research, content, operations, and communication. Human sets direction. Machines execute. The system learns and improves.</div>
+            <div class="bp-dept-card-count">5 SECTIONS</div>
+        </a>
+
+        <a class="bp-dept-card" href="#dept-content">
+            <div class="bp-dept-card-icon">🎬</div>
+            <div class="bp-dept-card-title">Content Strategy Blueprint</div>
+            <div class="bp-dept-card-desc">Build a content engine that runs on AI assistance and human curation. Create once, distribute everywhere. Every piece serves the business, not just the algorithm.</div>
+            <div class="bp-dept-card-count">5 SECTIONS</div>
+        </a>
+    </div>
+    <hr class="bp-sep">
+    <div class="bp-grid-4">
+
+        <div class="bp-stat">
+            <div class="bp-stat-value">8</div>
+            <div class="bp-stat-label">Active Projects</div>
+        </div>
+
+        <div class="bp-stat">
+            <div class="bp-stat-value">2</div>
+            <div class="bp-stat-label">Machines (Ceiba + Cobo)</div>
+        </div>
+
+        <div class="bp-stat">
+            <div class="bp-stat-value">6</div>
+            <div class="bp-stat-label">Department Blueprints</div>
+        </div>
+
+        <div class="bp-stat">
+            <div class="bp-stat-value">18</div>
+            <div class="bp-stat-label">Tools in Stack</div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="dept-marketing">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">Marketing Blueprint</div>
+        <div class="bp-section-subtitle">Build organic reach through AI-powered content, product research signals, and community engagement. Zero ad spend until product-market fit confirmed.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">⭐</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">Every piece of content is a seed. Plant systematically, measure ruthlessly, double down on what grows.</div>
+<ul class="bp-list">
+<li>Content-first marketing. No paid ads until organic proves the market.</li>
+<li>Every eBay listing is a market test. Data feeds strategy.</li>
+<li>Build in public. Share the journey, attract the tribe.</li>
+<li>Spanish-first for PR market, English for global scale.</li>
+<li>AI generates volume. Human curates quality.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">🔄</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The Content Flywheel. Content creates attention, attention creates data, data improves content.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>Research</strong> - Google Trends, eBay sold data, competitor analysis</li>
+<li><strong>Create</strong> - AI-assisted content generation across all channels</li>
+<li><strong>Distribute</strong> - Multi-platform posting. Reels, TikTok, Telegram, Shopify blog</li>
+<li><strong>Measure</strong> - Track engagement, conversion, and revenue per content piece</li>
+<li><strong>Optimize</strong> - Kill underperformers, scale winners, feed data back to research</li>
+</ul>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">RESEARCH</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">CREATE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">DISTRIBUTE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">MEASURE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">OPTIMIZE</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Monthly Content Output</span>
+                    <span class="bp-kv-value">30+ pieces</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Engagement Rate</span>
+                    <span class="bp-kv-value">&gt; 3%</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Content to Sale Conversion</span>
+                    <span class="bp-kv-value">&gt; 1%</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Organic Reach Growth</span>
+                    <span class="bp-kv-value">20% month-over-month</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Video editing and AI effects">CapCut</span>
+<span class="bp-tag bp-tag-accent" title="Copy and strategy generation">Claude</span>
+<span class="bp-tag bp-tag-accent" title="Market signal detection">Google Trends</span>
+<span class="bp-tag bp-tag-accent" title="Research synthesis">NotebookLM</span>
+<span class="bp-tag bp-tag-accent" title="Visual content creation">Canva</span>
+<span class="bp-tag bp-tag-accent" title="Content scheduling automation">n8n</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Content Calendar</strong> - Weekly posting schedule across all platforms</li>
+<li><strong>Brand Voice Guide</strong> - Tone, style, vocabulary guidelines for Behique</li>
+<li><strong>Hashtag Library</strong> - Tested hashtag sets per platform and niche</li>
+<li><strong>Thumbnail Templates</strong> - Proven thumbnail formats for video content</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>No paid advertising until 1000 organic followers on primary platform</li>
+<li>Every content piece must have a clear CTA</li>
+<li>Spanish and English versions for all core content</li>
+<li>48-hour content review before publishing strategy pieces</li>
+<li>Track ROI per content type monthly</li>
+</ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="dept-sales">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">Sales Blueprint</div>
+        <div class="bp-section-subtitle">Test products on eBay and Facebook Marketplace. Scale winners to Shopify. Build digital product revenue through Gumroad. Multiple income streams feeding one system.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">🎯</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">Sell before you build. Validate with real money, then invest in winners.</div>
+<ul class="bp-list">
+<li>eBay is the testing ground. Shopify is the scale platform.</li>
+<li>Every product gets 30 days to prove itself or gets cut.</li>
+<li>Digital products (ebooks, templates, blueprints) have infinite margin.</li>
+<li>Price for value, not for competition.</li>
+<li>Automate the pipeline, humanize the relationship.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">📊</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The Product Validation Pipeline. Find, test, scale, automate.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>Source</strong> - Google Trends scraper, eBay sold data, competitor watching</li>
+<li><strong>List</strong> - Create eBay/FB Marketplace listings with AI-optimized copy</li>
+<li><strong>Test</strong> - 30-day validation period. Track views, watchers, sales</li>
+<li><strong>Score</strong> - Product scoring algorithm. margin, velocity, competition</li>
+<li><strong>Scale</strong> - Winners move to Shopify. Losers get cut. No emotions.</li>
+</ul>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">SOURCE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">LIST</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">TEST</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">SCORE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">SCALE</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">03</div>
+                    <div class="bp-card-icon">⚙️</div>
+                    <div class="bp-card-label">THE WORKFLOW</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">Daily sales operations workflow</div>
+<div class="bp-flow">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-label">Morning</div>
+                    <div class="bp-flow-node-title">CHECK METRICS</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-label">Research</div>
+                    <div class="bp-flow-node-title">SOURCE PRODUCTS</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-label">Create</div>
+                    <div class="bp-flow-node-title">BUILD LISTINGS</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-label">Optimize</div>
+                    <div class="bp-flow-node-title">UPDATE PRICES</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-label">Evening</div>
+                    <div class="bp-flow-node-title">LOG RESULTS</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Monthly Revenue</span>
+                    <span class="bp-kv-value">$2,000+</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Average Margin</span>
+                    <span class="bp-kv-value">&gt; 35%</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Products Tested / Month</span>
+                    <span class="bp-kv-value">10+</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Digital Product Revenue</span>
+                    <span class="bp-kv-value">$500+ / month</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Product testing marketplace">eBay</span>
+<span class="bp-tag bp-tag-accent" title="Local product testing">Facebook Marketplace</span>
+<span class="bp-tag bp-tag-accent" title="Scale platform for winners">Shopify</span>
+<span class="bp-tag bp-tag-accent" title="Digital product sales">Gumroad</span>
+<span class="bp-tag bp-tag-accent" title="Product discovery automation">Google Trends Scraper</span>
+<span class="bp-tag bp-tag-accent" title="Listing copy optimization">Claude</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Product Research Database</strong> - Scored product candidates with market data</li>
+<li><strong>Listing Templates</strong> - Optimized eBay/Shopify listing formats</li>
+<li><strong>Pricing Calculator</strong> - Margin analysis with fees and shipping</li>
+<li><strong>Supplier Directory</strong> - Verified suppliers with lead times and MOQs</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>Minimum 30% margin after all fees or product gets dropped</li>
+<li>No inventory purchase over $200 without 3+ validation signals</li>
+<li>Digital products ship same day, physical within 48 hours</li>
+<li>Weekly P&amp;L review, every single product</li>
+<li>Kill slow movers after 30 days, no exceptions</li>
+</ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="dept-operations">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">Operations Map</div>
+        <div class="bp-section-subtitle">Run the entire business with minimal friction. Two machines (Ceiba + Cobo), synced memory, automated workflows, clear processes for every repeatable task.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">🏭</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">If you do it twice, automate it. If you can not automate it, document it. If you can not document it, simplify it.</div>
+<ul class="bp-list">
+<li>Every process gets documented before it gets delegated.</li>
+<li>Two-machine architecture. Ceiba (M4) for brain work, Cobo (GTX 1080 Ti) for compute.</li>
+<li>Syncthing keeps shared-memory.md as single source of truth.</li>
+<li>Pre-build gate. Every project answers WHY before touching code.</li>
+<li>Weekly system audit. Kill dead weight, fix broken connectors.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">🔄</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The Operations Flow. Inputs become outputs through documented, repeatable processes.</div>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">INPUTS</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">TRIAGE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">PROCESSING</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">DELIVERY</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">OUTPUTS</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">System Uptime</span>
+                    <span class="bp-kv-value">99%</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Process Documentation</span>
+                    <span class="bp-kv-value">100% of repeatable tasks</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Weekly Audit Completion</span>
+                    <span class="bp-kv-value">Every Sunday</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Dead Weight Ratio</span>
+                    <span class="bp-kv-value">&lt; 20%</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Cross-machine memory sync">Syncthing</span>
+<span class="bp-tag bp-tag-accent" title="Version control and collaboration">GitHub</span>
+<span class="bp-tag bp-tag-accent" title="Workflow automation engine">n8n</span>
+<span class="bp-tag bp-tag-accent" title="Bot and service deployment">Railway</span>
+<span class="bp-tag bp-tag-accent" title="Knowledge vault and documentation">Obsidian</span>
+<span class="bp-tag bp-tag-accent" title="Terminal with AI assistance">Warp</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Memory Stack</strong> - CLAUDE.md + primer.md + context.md + vault</li>
+<li><strong>Process Library</strong> - SOPs for every repeatable operation</li>
+<li><strong>Bridge Protocol</strong> - Cross-machine task delegation via bridge/</li>
+<li><strong>System Audit Checklist</strong> - Weekly health check for all systems</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>Pre-build gate: every new project must answer WHO, WHY, WHAT, HOW</li>
+<li>Connector-first policy. New tools must integrate before they are adopted.</li>
+<li>59% dead weight threshold. If over half the system is unused, audit.</li>
+<li>Session protocol. primer.md gets rewritten every single session.</li>
+<li>No orphan projects. Every project tracked in VAULT_INDEX.md.</li>
+</ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="dept-finance">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">Financial Blueprint</div>
+        <div class="bp-section-subtitle">Track every dollar in, every dollar out. Maintain positive cash flow. Reinvest profits into growth. Build toward financial independence through multiple revenue streams.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">📈</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">Revenue is vanity. Profit is sanity. Cash flow is reality.</div>
+<ul class="bp-list">
+<li>Track P&amp;L per product, per channel, per week.</li>
+<li>Reinvest 60% of profits into inventory and tools.</li>
+<li>Keep monthly fixed costs under $100 until revenue exceeds $2K.</li>
+<li>Digital products are the margin play. Physical is the volume play.</li>
+<li>Family is the why. Financial freedom is the how.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">📊</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">Revenue stack. Multiple streams feeding one central account.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>eBay Sales</strong> - Physical product testing and validation revenue</li>
+<li><strong>Shopify Store</strong> - Scaled winners, branded experience</li>
+<li><strong>Gumroad Digital</strong> - Ebooks, templates, blueprints. Infinite margin.</li>
+<li><strong>n8n Agency</strong> - AI automation services for businesses</li>
+<li><strong>Content Monetization</strong> - Future. Sponsorships, affiliates, courses</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Monthly Net Profit</span>
+                    <span class="bp-kv-value">$1,000+</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Gross Margin</span>
+                    <span class="bp-kv-value">&gt; 40%</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Monthly Fixed Costs</span>
+                    <span class="bp-kv-value">&lt; $100</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Revenue Streams Active</span>
+                    <span class="bp-kv-value">3+</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="P&amp;L tracking and projections">Spreadsheets</span>
+<span class="bp-tag bp-tag-accent" title="Store performance metrics">Shopify Analytics</span>
+<span class="bp-tag bp-tag-accent" title="Sales data and fee tracking">eBay Seller Hub</span>
+<span class="bp-tag bp-tag-accent" title="Digital product revenue">Gumroad Dashboard</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Monthly P&amp;L Template</strong> - Revenue, COGS, fees, profit per stream</li>
+<li><strong>Product Margin Calculator</strong> - All-in cost including platform fees, shipping</li>
+<li><strong>Cash Flow Projection</strong> - 12-month forecast by revenue stream</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>No expense over $50 without ROI justification</li>
+<li>Monthly fixed costs cap: $100 until $2K revenue</li>
+<li>Weekly financial review every Monday</li>
+<li>Emergency fund: maintain 2 months of fixed costs</li>
+<li>Every tool must pay for itself within 60 days</li>
+</ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="dept-ai_automations">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">AI &amp; Automations Blueprint</div>
+        <div class="bp-section-subtitle">Build an AI-native business where agents handle research, content, operations, and communication. Human sets direction. Machines execute. The system learns and improves.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">🧠</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">AI is not a feature. It is the operating system. Every business function runs through an intelligent layer that learns, adapts, and executes.</div>
+<ul class="bp-list">
+<li>AI-first, not AI-added. Every workflow starts with &#39;can an agent do this?&#39;</li>
+<li>Three-layer architecture: Brain (planning), Hands (execution), Memory (context).</li>
+<li>Local-first when possible (Ollama), cloud when necessary (Claude, GPT).</li>
+<li>Human-in-the-loop for strategy. AI autonomous for execution.</li>
+<li>The system teaches itself. Every session improves the next.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">⚡</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The AI Operating System. How tasks flow from human intent to autonomous execution.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>Intent</strong> - Human defines objective and constraints</li>
+<li><strong>Planning</strong> - Claude/Ceiba breaks task into subtasks, assigns agents</li>
+<li><strong>Execution</strong> - Agents run via MCP servers, bridge, n8n workflows</li>
+<li><strong>Review</strong> - Human reviews output, provides feedback</li>
+<li><strong>Learning</strong> - System stores patterns, improves prompts, updates memory</li>
+</ul>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">INTENT</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">PLAN</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">EXECUTE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">REVIEW</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">LEARN</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Tasks Automated</span>
+                    <span class="bp-kv-value">80% of repeatable work</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">AI Accuracy</span>
+                    <span class="bp-kv-value">&gt; 90% useful outputs</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Session Context Loss</span>
+                    <span class="bp-kv-value">0% (memory system)</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Agent Uptime</span>
+                    <span class="bp-kv-value">99% for BehiqueBot</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Primary AI brain and coding agent">Claude / Claude Code</span>
+<span class="bp-tag bp-tag-accent" title="BehiqueBot classification and Whisper transcription">GPT-4o-mini</span>
+<span class="bp-tag bp-tag-accent" title="Local LLM for privacy-sensitive and compute tasks">Ollama</span>
+<span class="bp-tag bp-tag-accent" title="Visual workflow automation and API orchestration">n8n</span>
+<span class="bp-tag bp-tag-accent" title="Tool access layer for Claude Code agents">MCP Servers</span>
+<span class="bp-tag bp-tag-accent" title="Cross-machine task delegation (Ceiba to Cobo)">Bridge Protocol</span>
+<span class="bp-tag bp-tag-accent" title="Autonomous agent orchestration platform">Behique Hub</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Memory Stack</strong> - 7-file persistent context system</li>
+<li><strong>Prompt Library</strong> - Categorized prompt templates for all functions</li>
+<li><strong>Agent Configurations</strong> - Spawn configs for each agent type</li>
+<li><strong>n8n Workflow Library</strong> - Reusable automation templates</li>
+<li><strong>MCP Server Registry</strong> - Available tool servers and capabilities</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>AI suggests, human decides on strategy</li>
+<li>Every AI-generated output gets human review before external use</li>
+<li>No API keys in code. Environment variables only.</li>
+<li>Rate limiting on all external API calls</li>
+<li>Fallback to manual process if automation fails</li>
+<li>Document every new automation in process library</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">08</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">AGENT ROLES</div>
+                </div>
+                
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Ceiba (Core Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Primary thinking partner, planning, code generation, memory management. Runs on Claude via Claude Code.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Claude Code</span>
+<span class="bp-tag">MCP</span>
+<span class="bp-tag">Git</span>
+<span class="bp-tag">Obsidian</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Cobo (Compute Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">GPU-powered tasks. Local LLM inference, heavy scraping, video processing. Connected via bridge protocol.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Ollama</span>
+<span class="bp-tag">Playwright</span>
+<span class="bp-tag">GTX 1080 Ti</span>
+<span class="bp-tag">Bridge</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">BehiqueBot (Accountability Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Telegram bot. Captures ideas, classifies by category and pillar, sends check-ins. Built on psychologist framework.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Telegram</span>
+<span class="bp-tag">GPT-4o-mini</span>
+<span class="bp-tag">Whisper</span>
+<span class="bp-tag">Railway</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Research Agent</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Product discovery, trend analysis, competitor monitoring. Feeds the sales pipeline.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Google Trends</span>
+<span class="bp-tag">eBay API</span>
+<span class="bp-tag">Playwright</span>
+<span class="bp-tag">n8n</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Content Agent</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Generates marketing content, social posts, product descriptions. Human reviews before publish.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Claude</span>
+<span class="bp-tag">CapCut</span>
+<span class="bp-tag">Canva</span>
+<span class="bp-tag">n8n</span>
+</div></div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">09</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE PROMPT LIBRARY</div>
+                </div>
+                <div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Product Research</div>
+<ul class="bp-list">
+<li>Analyze Google Trends data for niche product opportunities</li>
+<li>Score product viability based on margin, competition, demand</li>
+<li>Generate eBay listing copy optimized for search</li>
+<li>Compare supplier pricing and calculate true landed cost</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Content Creation</div>
+<ul class="bp-list">
+<li>Write social media post series for product launch</li>
+<li>Generate video script for product review (60s format)</li>
+<li>Create SEO-optimized blog post from research notes</li>
+<li>Build email sequence for new subscriber onboarding</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Operations</div>
+<ul class="bp-list">
+<li>Generate morning briefing from overnight metrics</li>
+<li>Audit system health and identify broken connectors</li>
+<li>Create SOP documentation from process description</li>
+<li>Triage incoming ideas into actionable tasks</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Strategy</div>
+<ul class="bp-list">
+<li>Analyze last 30 days and recommend next moves</li>
+<li>Identify bottlenecks in current workflow</li>
+<li>Compare revenue streams and suggest reallocation</li>
+<li>Generate quarterly goal breakdown with milestones</li>
+</ul></div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">10</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">MEMORY SYSTEM</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">Persistent context across sessions. The AI never starts from zero.</div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">CLAUDE.md</span>
+                    <span class="bp-kv-value">Static rules, identity, project list, frameworks</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">primer.md</span>
+                    <span class="bp-kv-value">Live session state. Rewritten every session.</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">shared-memory.md</span>
+                    <span class="bp-kv-value">Cross-machine synced state (Syncthing)</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">context.md</span>
+                    <span class="bp-kv-value">Big picture vision, goals, WHY behind work</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">VAULT_INDEX.md</span>
+                    <span class="bp-kv-value">Master index of all projects and infrastructure</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">observations.md</span>
+                    <span class="bp-kv-value">Pattern recognition, session history, behavioral notes</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">project_memory.md</span>
+                    <span class="bp-kv-value">Auto-logged via git post-commit hook</span>
+                </div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">11</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">SAFETY RAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>Pre-build gate: every new feature answers WHO, WHY, WHAT before code</li>
+<li>Human-in-the-loop for all publishing and financial decisions</li>
+<li>Audit trail via git commits and project_memory.md</li>
+<li>No autonomous spending. All purchases require human approval.</li>
+<li>Weekly system audit catches drift before it compounds</li>
+<li>Local-first processing for sensitive data (Ollama, not cloud)</li>
+<li>Session protocol ensures nothing gets lost between conversations</li>
+</ul>
+            </div>
+        </div>
+    </div>
+    <hr class="bp-sep">
+    <div class="bp-label">ARCHITECTURE</div>
+<div class="bp-arch">
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Brain Layer (Planning &amp; Reasoning)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">Claude (Ceiba)</div>
+<div class="bp-arch-node">GPT-4o-mini</div>
+<div class="bp-arch-node">Ollama Local</div>
+<div class="bp-arch-node">NotebookLM</div>
+</div></div>
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Hands Layer (Execution &amp; Tools)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">MCP Servers</div>
+<div class="bp-arch-node">n8n Workflows</div>
+<div class="bp-arch-node">Playwright Scraper</div>
+<div class="bp-arch-node">Telegram Bots</div>
+<div class="bp-arch-node">Bridge Protocol</div>
+</div></div>
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Memory Layer (Context &amp; Learning)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">CLAUDE.md</div>
+<div class="bp-arch-node">primer.md</div>
+<div class="bp-arch-node">Obsidian Vault</div>
+<div class="bp-arch-node">Notion DB</div>
+<div class="bp-arch-node">Git History</div>
+</div></div>
+</div>
+</section>
+
+<section class="bp-section" id="dept-content">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">Content Strategy Blueprint</div>
+        <div class="bp-section-subtitle">Build a content engine that runs on AI assistance and human curation. Create once, distribute everywhere. Every piece serves the business, not just the algorithm.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">🌟</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">Content is the bridge between what you build and who needs it. Make it useful, make it authentic, make it relentless.</div>
+<ul class="bp-list">
+<li>Create once, distribute everywhere. One idea becomes 5+ content pieces.</li>
+<li>Authenticity over polish. Real journey content outperforms generic advice.</li>
+<li>AI generates drafts. Human adds soul and story.</li>
+<li>Every content piece links to a product, service, or community.</li>
+<li>Build in public. The process IS the content.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">🔄</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The Content Multiplication Framework. One core idea becomes a content ecosystem.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>Core Idea</strong> - One insight, lesson, or discovery from real work</li>
+<li><strong>Long Form</strong> - Blog post, video essay, or in-depth thread</li>
+<li><strong>Short Form</strong> - Reels, TikToks, carousels from the long form</li>
+<li><strong>Micro</strong> - Tweets, quotes, one-liners from the short form</li>
+<li><strong>Evergreen</strong> - Best performers become templates, guides, products</li>
+</ul>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">IDEA</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">LONG FORM</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">SHORT FORM</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">MICRO</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">EVERGREEN</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Weekly Output</span>
+                    <span class="bp-kv-value">7+ pieces across platforms</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Content-to-Revenue</span>
+                    <span class="bp-kv-value">Track attribution per piece</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Repurpose Ratio</span>
+                    <span class="bp-kv-value">1 idea = 5+ pieces</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Audience Growth</span>
+                    <span class="bp-kv-value">15% month-over-month</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Video editing with AI effects and templates">CapCut</span>
+<span class="bp-tag bp-tag-accent" title="Script writing, copy, content strategy">Claude</span>
+<span class="bp-tag bp-tag-accent" title="Graphics, carousels, thumbnails">Canva</span>
+<span class="bp-tag bp-tag-accent" title="Research synthesis into content ideas">NotebookLM</span>
+<span class="bp-tag bp-tag-accent" title="Cross-platform scheduling and distribution">n8n</span>
+<span class="bp-tag bp-tag-accent" title="AI video generation (learning)">Veo3 / Kling / Sora+</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Content Calendar</strong> - Weekly schedule across all platforms</li>
+<li><strong>Script Templates</strong> - Proven formats for hooks, stories, CTAs</li>
+<li><strong>B-Roll Library</strong> - Reusable footage organized by theme</li>
+<li><strong>Thumbnail Playbook</strong> - Click-tested formats and color schemes</li>
+<li><strong>Content Swipe File</strong> - Competitor content that performs well</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>No publishing without clear CTA</li>
+<li>Spanish and English versions for key content</li>
+<li>Batch creation: produce 1 week of content in 1 session</li>
+<li>Every video under 90 seconds unless educational deep-dive</li>
+<li>Repurpose before creating net new</li>
+<li>Track which content drives actual revenue, not just views</li>
+</ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="growth-wheel">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / STRATEGY</div>
+        <div class="bp-section-name">Content Growth Wheel</div>
+        <div class="bp-section-subtitle">The five forces that drive sustainable content growth</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-container">
+        <div class="bp-wheel">
+            <div class="bp-wheel-center">
+                <span class="bp-wheel-center-text">GROWTH</span>
+            </div>
+
+            <div class="bp-wheel-spoke">
+                <div class="bp-wheel-spoke-title">Systems</div>
+                <div class="bp-wheel-spoke-desc">Repeatable processes that scale without you</div>
+            </div>
+
+            <div class="bp-wheel-spoke">
+                <div class="bp-wheel-spoke-title">Stories</div>
+                <div class="bp-wheel-spoke-desc">Authentic narratives that attract your people</div>
+            </div>
+
+            <div class="bp-wheel-spoke">
+                <div class="bp-wheel-spoke-title">Questions</div>
+                <div class="bp-wheel-spoke-desc">Curiosity-driven content that educates and sells</div>
+            </div>
+
+            <div class="bp-wheel-spoke">
+                <div class="bp-wheel-spoke-title">Metaphors</div>
+                <div class="bp-wheel-spoke-desc">Mental models that make complex ideas stick</div>
+            </div>
+
+            <div class="bp-wheel-spoke">
+                <div class="bp-wheel-spoke-title">Mistakes</div>
+                <div class="bp-wheel-spoke-desc">Lessons from failures that build trust and prevent repeats</div>
+            </div>
+            <div class="bp-wheel-line"></div>
+            <div class="bp-wheel-line"></div>
+            <div class="bp-wheel-line"></div>
+            <div class="bp-wheel-line"></div>
+            <div class="bp-wheel-line"></div>
+        </div>
+        <hr class="bp-sep">
+        <div class="bp-label">SPOKE DETAILS</div>
+        <div class="bp-grid-3">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-icon">⚙️</div>
+                    <div>
+                        <div class="bp-card-title">Systems</div>
+                        <div class="bp-card-text">Repeatable processes that scale without you</div>
+                    </div>
+                </div>
+                <ul class="bp-list"><li>Document every process as an SOP</li><li>Automate with n8n before delegating</li><li>Memory stack ensures zero context loss</li><li>Weekly audit keeps systems lean</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-icon">📝</div>
+                    <div>
+                        <div class="bp-card-title">Stories</div>
+                        <div class="bp-card-text">Authentic narratives that attract your people</div>
+                    </div>
+                </div>
+                <ul class="bp-list"><li>Build in public content</li><li>Customer transformation stories</li><li>Behind-the-scenes of AI workflows</li><li>Failure lessons, not just wins</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-icon">❓</div>
+                    <div>
+                        <div class="bp-card-title">Questions</div>
+                        <div class="bp-card-text">Curiosity-driven content that educates and sells</div>
+                    </div>
+                </div>
+                <ul class="bp-list"><li>Answer real customer questions</li><li>Create FAQ content from support interactions</li><li>Use questions as hooks for short-form video</li><li>Research-backed answers build authority</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-icon">🌳</div>
+                    <div>
+                        <div class="bp-card-title">Metaphors</div>
+                        <div class="bp-card-text">Mental models that make complex ideas stick</div>
+                    </div>
+                </div>
+                <ul class="bp-list"><li>Ceiba tree as the central connector</li><li>Blueprint as business architecture</li><li>Seeds as content investments</li><li>Bridge as cross-system integration</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-icon">⚠️</div>
+                    <div>
+                        <div class="bp-card-title">Mistakes</div>
+                        <div class="bp-card-text">Lessons from failures that build trust and prevent repeats</div>
+                    </div>
+                </div>
+                <ul class="bp-list"><li>Post-mortem every failed product</li><li>Share real numbers, including losses</li><li>Document what NOT to do</li><li>Turn mistakes into teachable content</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="offer">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / FRAMEWORK</div>
+        <div class="bp-section-name">Offer Framework</div>
+        <div class="bp-section-subtitle">From target market to deliverables. The complete offer construction.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-container">
+        <div class="bp-funnel">
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">1</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Target Market</div>
+                    <div class="bp-funnel-text">Solo entrepreneurs and small business owners who want AI-powered operations but lack technical skills</div>
+                </div>
+            </div>
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">2</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Core Pain</div>
+                    <div class="bp-funnel-text">Overwhelmed by manual processes, missing sales because they cannot keep up, know AI exists but do not know how to implement it</div>
+                </div>
+            </div>
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">3</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Dream Outcome</div>
+                    <div class="bp-funnel-text">A business that runs itself. AI handles research, content, and operations while they focus on strategy and growth.</div>
+                </div>
+            </div>
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">4</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Unique Mechanism</div>
+                    <div class="bp-funnel-text">The Behique System. AI agents built on real business workflows, not theory. Tested on our own business first.</div>
+                </div>
+            </div>
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">5</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Key Features</div>
+                    <div class="bp-funnel-text">Product research automation, AI content generation, autonomous operations workflows, persistent memory system</div>
+                </div>
+            </div>
+
+            <div class="bp-funnel-step">
+                <div class="bp-funnel-num">6</div>
+                <div class="bp-funnel-content">
+                    <div class="bp-funnel-label">Deliverables</div>
+                    <div class="bp-funnel-text">Business Blueprint (this document), n8n workflow templates, prompt libraries, agent configurations, setup guide</div>
+                </div>
+            </div>
+        </div>
+        <hr class="bp-sep">
+        <div class="bp-label">OFFER CHECKLIST</div>
+        <div class="bp-grid-2">
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Product-market fit validated</span>
+                <span class="bp-kv-value">IN PROGRESS</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Core offer defined</span>
+                <span class="bp-kv-value">COMPLETE</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Pricing tested</span>
+                <span class="bp-kv-value">TESTING</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Sales page built</span>
+                <span class="bp-kv-value">PENDING</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Email sequence written</span>
+                <span class="bp-kv-value">PENDING</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Testimonials collected</span>
+                <span class="bp-kv-value">PENDING</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Digital delivery system</span>
+                <span class="bp-kv-value">COMPLETE (Gumroad)</span>
+            </div>
+
+            <div class="bp-kv">
+                <span class="bp-kv-key">Support workflow defined</span>
+                <span class="bp-kv-value">IN PROGRESS</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bp-section" id="retention">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / RETENTION</div>
+        <div class="bp-section-name">Retention Hooks</div>
+        <div class="bp-section-subtitle">Systems that keep customers engaged and coming back</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-container">
+        <div class="bp-grid-3">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">HOOK 01</div>
+                    <div class="bp-card-title">Community</div>
+                </div>
+                <div class="bp-card-text">Build a community around the system, not just the product</div>
+                <ul class="bp-list" style="margin-top: 0.75rem;"><li>Telegram group for buyers</li><li>Weekly live Q&amp;A sessions</li><li>User showcase of their blueprints</li><li>Spanish-language community hub</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">HOOK 02</div>
+                    <div class="bp-card-title">Updates</div>
+                </div>
+                <div class="bp-card-text">Living product that improves over time</div>
+                <ul class="bp-list" style="margin-top: 0.75rem;"><li>Monthly blueprint updates with new sections</li><li>New prompt templates added quarterly</li><li>Workflow library grows with community input</li><li>Version changelog shows continued development</li></ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">HOOK 03</div>
+                    <div class="bp-card-title">Gamification</div>
+                </div>
+                <div class="bp-card-text">Progress tracking that makes implementation rewarding</div>
+                <ul class="bp-list" style="margin-top: 0.75rem;"><li>Habitica integration for task completion</li><li>Implementation checklist with progress bar</li><li>Achievement badges for milestones</li><li>Leaderboard in community group</li></ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="bp-footer">
+    <div class="bp-footer-text">GENERATED 2026-03-20 15:16 / THEME: OCEAN</div>
+    <div class="bp-footer-brand">BEHIQUE BLUEPRINT V2.0</div>
+</footer>
+
+</main>
+<script>
+// Highlight active nav link on scroll
+(function() {
+    var links = document.querySelectorAll('.bp-nav-link');
+    var sections = [];
+    links.forEach(function(link) {
+        var id = link.getAttribute('href');
+        if (id && id.startsWith('#')) {
+            var el = document.querySelector(id);
+            if (el) sections.push({ el: el, link: link });
+        }
+    });
+    function onScroll() {
+        var scrollY = window.scrollY + 100;
+        var active = null;
+        sections.forEach(function(s) {
+            if (s.el.offsetTop <= scrollY) active = s;
+        });
+        links.forEach(function(l) { l.classList.remove('active'); });
+        if (active) active.link.classList.add('active');
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+
+    // --- Font Size Controls ---
+    var fontBtns = document.querySelectorAll('.bp-font-btn');
+    fontBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var size = this.getAttribute('data-size');
+            document.documentElement.className = size;
+            fontBtns.forEach(function(b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            try { localStorage.setItem('bp-font-size', size); } catch(e) {}
+        });
+    });
+    // Restore saved font size preference
+    try {
+        var saved = localStorage.getItem('bp-font-size');
+        if (saved) {
+            document.documentElement.className = saved;
+            fontBtns.forEach(function(b) {
+                b.classList.remove('active');
+                if (b.getAttribute('data-size') === saved) b.classList.add('active');
+            });
+        }
+    } catch(e) {}
+})();
+</script>
+</body>
+</html>

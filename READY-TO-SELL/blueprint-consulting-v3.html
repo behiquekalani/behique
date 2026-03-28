@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulting Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+  .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .stacked-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Consulting Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">Position your expertise. Design your offer. Close clients. Deliver results.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and build your entire consulting practice on paper before taking your first client.</p>
+  </div>
+
+  <!-- MODULE 01: EXPERTISE POSITIONING -->
+  <div class="module">
+    <div class="module-number">01 -- Expertise Positioning</div>
+    <h2 class="module-title">Expertise Positioning</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Your Positioning</div>
+        <div class="label" style="margin-top: 12px;">Industry / Vertical</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Specific Problem You Solve</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Target Company Size</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Decision Maker Title</div>
+        <div class="fill-line"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label">Credibility Checklist</div>
+        <ul class="checklist">
+          <li>Documented case studies / results</li>
+          <li>Industry certifications or degrees</li>
+          <li>Published content (articles, talks)</li>
+          <li>Professional network in the space</li>
+          <li>Previous employer credibility</li>
+          <li>Specific ROI numbers you can cite</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Positioning Statement</div>
+    <p style="font-size: 14px; color: var(--gray); margin-bottom: 12px;">I help [type of company] solve [specific problem] so they can [desired outcome], typically within [timeframe].</p>
+    <div class="fill-line"></div>
+    <div class="fill-line"></div>
+  </div>
+
+  <!-- MODULE 02: OFFER DESIGN -->
+  <div class="module">
+    <div class="module-number">02 -- Offer Design</div>
+    <h2 class="module-title">Offer Design</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Strategy Session</div>
+        <h4>One-Time Deep Dive</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>2-4 hour intensive session</li>
+          <li>Audit + recommendations</li>
+          <li>Recorded with action plan</li>
+          <li>No ongoing commitment</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Price: $1,500 - $5,000</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Retainer</div>
+        <h4>Ongoing Advisory</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Monthly strategy calls</li>
+          <li>Async support (email/Slack)</li>
+          <li>Quarterly reviews</li>
+          <li>3-6 month minimum</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Price: $3,000 - $10,000/mo</p>
+      </div>
+      <div class="inner-card">
+        <div class="label">Project-Based</div>
+        <h4>Defined Scope</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Clear deliverables and timeline</li>
+          <li>Fixed price or milestone-based</li>
+          <li>SOW (Statement of Work)</li>
+          <li>Handoff at completion</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--gray); margin-top: 12px;">Price: $5,000 - $50,000+</p>
+      </div>
+    </div>
+
+    <div class="label">Your Primary Offer</div>
+    <div class="fill-line"></div>
+    <div class="label" style="margin-top: 12px;">Pricing Model (hourly / retainer / project)</div>
+    <div class="fill-line"></div>
+  </div>
+
+  <!-- MODULE 03: LEAD GENERATION FUNNEL -->
+  <div class="module">
+    <div class="module-number">03 -- Lead Generation Funnel</div>
+    <h2 class="module-title">Lead Generation Funnel</h2>
+
+    <div class="label">Client Acquisition Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Authority Content</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Lead Magnet</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Email Nurture</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Discovery Call</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Proposal</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Close</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Inbound Channels</div>
+        <ul class="checklist">
+          <li>LinkedIn content + DM outreach</li>
+          <li>Blog / SEO (case studies)</li>
+          <li>YouTube (educational content)</li>
+          <li>Podcast guesting</li>
+          <li>Speaking at industry events</li>
+          <li>Referral partnerships</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Outbound Channels</div>
+        <ul class="checklist">
+          <li>Cold email sequences</li>
+          <li>LinkedIn connection + message</li>
+          <li>Warm introductions via network</li>
+          <li>Industry association directories</li>
+          <li>Upwork / Toptal (early stage)</li>
+          <li>Strategic partner referrals</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div>
+        <div class="label">Lead Magnet</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Primary Channel</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Leads Needed / Month</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 04: SALES PROCESS -->
+  <div class="module">
+    <div class="module-number">04 -- Sales Process</div>
+    <h2 class="module-title">Sales Process</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Discovery Call Structure</div>
+        <ul class="checklist">
+          <li>Build rapport (5 min)</li>
+          <li>Understand their situation (10 min)</li>
+          <li>Identify pain points and goals (10 min)</li>
+          <li>Present your approach (10 min)</li>
+          <li>Next steps and timeline (5 min)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Proposal Template</div>
+        <ul class="checklist">
+          <li>Executive summary of their problem</li>
+          <li>Scope of work and deliverables</li>
+          <li>Timeline with milestones</li>
+          <li>Investment and payment terms</li>
+          <li>Case studies / social proof</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Sales Pipeline</div>
+    <table class="clean">
+      <tr><th>Prospect</th><th>Company</th><th>Stage</th><th>Deal Size</th><th>Next Step</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 05: DELIVERY FRAMEWORK -->
+  <div class="module">
+    <div class="module-number">05 -- Delivery Framework</div>
+    <h2 class="module-title">Delivery Framework</h2>
+
+    <div class="label">Engagement Flow</div>
+    <div class="h-flow" style="margin-bottom: 40px;">
+      <div class="step">Kickoff Call</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Discovery / Audit</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Strategy Build</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Implementation</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Review + Handoff</div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Client Onboarding</div>
+        <ul class="checklist">
+          <li>Contract signed and payment received</li>
+          <li>Kickoff meeting scheduled</li>
+          <li>Access to systems / data granted</li>
+          <li>Communication channel established</li>
+          <li>Project timeline shared</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Delivery Tools</div>
+        <div class="pills">
+          <span class="pill">Notion</span>
+          <span class="pill">Loom</span>
+          <span class="pill">Zoom</span>
+          <span class="pill">Slack</span>
+          <span class="pill">____</span>
+        </div>
+        <div class="label" style="margin-top: 24px;">Reporting Frequency</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 06: TESTIMONIALS & CASE STUDIES -->
+  <div class="module">
+    <div class="module-number">06 -- Testimonials & Case Studies</div>
+    <h2 class="module-title">Testimonials & Case Studies</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Case Study Framework</div>
+        <ul class="checklist">
+          <li>Client background and challenge</li>
+          <li>Your approach and methodology</li>
+          <li>Specific actions taken</li>
+          <li>Measurable results (ROI, %, $)</li>
+          <li>Client quote / testimonial</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Where to Publish</div>
+        <ul class="checklist">
+          <li>Website / portfolio page</li>
+          <li>LinkedIn articles</li>
+          <li>Proposals and pitch decks</li>
+          <li>Email sequences to prospects</li>
+          <li>Conference presentations</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Case Study Tracker</div>
+    <table class="clean">
+      <tr><th>Client</th><th>Problem</th><th>Result</th><th>Format</th><th>Published</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 07: SCALING -->
+  <div class="module">
+    <div class="module-number">07 -- Scaling</div>
+    <h2 class="module-title">Scaling</h2>
+
+    <div class="grid-4">
+      <div class="phase-card">
+        <div class="phase-header">Phase 1</div>
+        <div class="phase-range">Solo <span>Consultant</span></div>
+        <ul class="checklist">
+          <li>Land first 3 clients</li>
+          <li>Refine your process</li>
+          <li>Build case studies</li>
+          <li>Establish pricing</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$5K - $10K/mo</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Phase 2</div>
+        <div class="phase-range">Premium <span>Expert</span></div>
+        <ul class="checklist">
+          <li>Raise rates 2-3x</li>
+          <li>Productize your service</li>
+          <li>Build referral engine</li>
+          <li>Create waitlist demand</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$15K - $30K/mo</strong></div>
+      </div>
+      <div class="phase-card target">
+        <div class="phase-header">Phase 3</div>
+        <div class="phase-range">Leverage <span>+ Scale</span></div>
+        <ul class="checklist">
+          <li>Hire subcontractors</li>
+          <li>Group advisory programs</li>
+          <li>Digital products from IP</li>
+          <li>Speaking and workshops</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$30K - $75K/mo</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Phase 4</div>
+        <div class="phase-range">Firm <span>/ Agency</span></div>
+        <ul class="checklist">
+          <li>Build a team</li>
+          <li>Systematize delivery</li>
+          <li>Enterprise clients</li>
+          <li>Equity / exits possible</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$100K+/mo</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 08: BUSINESS TRACKER -->
+  <div class="module">
+    <div class="module-number">08 -- Business Tracker</div>
+    <h2 class="module-title">Business Tracker</h2>
+
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Active Clients</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Current engagements</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Monthly Revenue</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Retainers + project income</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Pipeline Value</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Total proposals outstanding</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Close Rate</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Discovery calls to signed deals</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Monthly Review</div>
+    <div class="grid-2">
+      <div>
+        <div class="label">Wins This Month</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Areas to Improve</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>CONSULTING BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+
+</div>
+
+</body>
+</html>

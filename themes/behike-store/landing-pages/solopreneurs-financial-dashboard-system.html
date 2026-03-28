@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur's Financial Dashboard System — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1C1C1E;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: #F5F5F7;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: #98989D;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 20px;
+    }
+    .hero-title {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: #F5F5F7;
+    }
+    .hero-subtitle {
+      font-size: 20px;
+      color: #98989D;
+      max-width: 640px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -1px;
+    }
+    .price-note {
+      font-size: 14px;
+      color: #636366;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+      transition: opacity 0.15s ease;
+    }
+    .cta-btn:hover { opacity: 0.85; }
+    .hero-trust {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #48484A;
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: #1C1C1E;
+      margin: 0;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: #EBEBF5CC;
+      max-width: 680px;
+      line-height: 1.75;
+    }
+    .section-body p + p {
+      margin-top: 16px;
+    }
+
+    /* FIVE NUMBERS */
+    .numbers-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+      margin-top: 48px;
+    }
+    .number-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+    .number-card-num {
+      font-size: 32px;
+      font-weight: 700;
+      color: #0A84FF;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .number-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+    }
+    .number-card-desc {
+      font-size: 12px;
+      color: #636366;
+      line-height: 1.4;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      margin-top: 48px;
+    }
+    .inside-item {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px 28px 28px 24px;
+    }
+    .inside-item-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0A84FF;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .inside-item-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .inside-item-desc {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      list-style: none;
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 660px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 17px;
+      color: #EBEBF5CC;
+    }
+    .for-list li::before {
+      content: "";
+      display: block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #0A84FF;
+      margin-top: 9px;
+      flex-shrink: 0;
+    }
+
+    .not-for {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 32px;
+      margin-top: 32px;
+      max-width: 660px;
+    }
+    .not-for-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #48484A;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .not-for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .not-for-list li {
+      font-size: 15px;
+      color: #48484A;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .not-for-list li::before {
+      content: "x";
+      font-size: 12px;
+      font-weight: 700;
+      color: #3A3A3C;
+      margin-top: 2px;
+    }
+
+    /* STAT ROW */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 48px;
+    }
+    .stat-item {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 40px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -1.5px;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #636366;
+    }
+
+    /* CTA FOOTER */
+    .cta-footer {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid #1C1C1E;
+    }
+    .cta-footer-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cta-footer-sub {
+      font-size: 17px;
+      color: #636366;
+      margin-bottom: 40px;
+    }
+    .cta-footer-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: #F5F5F7;
+      margin-bottom: 28px;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid #1C1C1E;
+      text-align: center;
+      font-size: 13px;
+      color: #3A3A3C;
+    }
+
+    @media (max-width: 700px) {
+      .hero { padding: 64px 0 56px; }
+      .section { padding: 56px 0; }
+      .numbers-row { grid-template-columns: repeat(2, 1fr); }
+      .inside-grid { grid-template-columns: 1fr; }
+      .stat-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 400px) {
+      .numbers-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-brand" href="#">Behike</a>
+      <span class="nav-price">$18.99 one-time</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-label">Digital System</p>
+      <h1 class="hero-title">The Solopreneur's<br>Financial Dashboard System</h1>
+      <p class="hero-subtitle">A simple financial tracking system for one-person businesses that gives clarity without requiring a finance background.</p>
+      <div class="price-block">
+        <span class="price">$18.99</span>
+        <span class="price-note">One-time purchase.<br>No subscription.</span>
+      </div>
+      <a href="#" class="cta-btn">Get Instant Access</a>
+      <p class="hero-trust">PDF download. 3,000+ words. Built for one-person businesses.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Problem</p>
+      <h2 class="section-title">Most solopreneurs can't tell you their profit margin without pausing.</h2>
+      <div class="section-body">
+        <p>This is not stupidity. It is what happens when one person runs every function of a business simultaneously. Numbers fall to the bottom of the list. There is always something more urgent.</p>
+        <p>Ignoring your numbers does not make them neutral. It makes them dangerous. You cannot fix a financial leak you have not measured. You cannot plan for taxes you have not tracked. You cannot grow revenue intentionally when you do not know which streams are actually profitable.</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Numbers that actually matter</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">30</div>
+          <div class="stat-label">Minutes per month to maintain</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">$0</div>
+          <div class="stat-label">Software required</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- THE 5 NUMBERS -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Core Framework</p>
+      <h2 class="section-title">Five numbers. Complete financial clarity.</h2>
+      <div class="numbers-row">
+        <div class="number-card">
+          <div class="number-card-num">01</div>
+          <div class="number-card-title">Revenue</div>
+          <div class="number-card-desc">Total earned before expenses, tracked by source.</div>
+        </div>
+        <div class="number-card">
+          <div class="number-card-num">02</div>
+          <div class="number-card-title">Expenses</div>
+          <div class="number-card-desc">Categorized spending that reveals where the money goes.</div>
+        </div>
+        <div class="number-card">
+          <div class="number-card-num">03</div>
+          <div class="number-card-title">Profit Margin</div>
+          <div class="number-card-desc">The percentage that tells you if the business is efficient.</div>
+        </div>
+        <div class="number-card">
+          <div class="number-card-num">04</div>
+          <div class="number-card-title">Runway</div>
+          <div class="number-card-desc">How many months you can operate if revenue stops today.</div>
+        </div>
+        <div class="number-card">
+          <div class="number-card-num">05</div>
+          <div class="number-card-title">MRR</div>
+          <div class="number-card-desc">Predictable monthly income that removes feast-and-famine.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <h2 class="section-title">Seven complete sections.<br>Each one actionable.</h2>
+      <div class="inside-grid">
+        <div class="inside-item">
+          <div class="inside-item-num">01</div>
+          <div class="inside-item-title">Why Solopreneurs Avoid Their Numbers</div>
+          <div class="inside-item-desc">The psychology of financial avoidance, why it is predictable, and why clarity beats comfort in the long run.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">02</div>
+          <div class="inside-item-title">The 5 Numbers That Actually Matter</div>
+          <div class="inside-item-desc">Revenue, expenses, profit margin, runway, and MRR. What each one means and what it tells you about the health of your business.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">03</div>
+          <div class="inside-item-title">Building Your Monthly Dashboard</div>
+          <div class="inside-item-desc">The one-spreadsheet system with exact tab structure, category lists, and the 30-minute monthly update ritual.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">04</div>
+          <div class="inside-item-title">Separating Business and Personal Finances</div>
+          <div class="inside-item-desc">The owner's pay system, the tax hold account, and why separation is a practice, not a legal requirement.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">05</div>
+          <div class="inside-item-title">The Quarterly Review Process</div>
+          <div class="inside-item-desc">A 90-minute review template that surfaces trends and drives structural decisions about pricing, expenses, and growth.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">06</div>
+          <div class="inside-item-title">Spotting Financial Leaks</div>
+          <div class="inside-item-desc">Zombie subscriptions, scope creep, underpriced services, and the quarterly leak audit that finds $1,000 to $5,000 in recoverable waste.</div>
+        </div>
+        <div class="inside-item">
+          <div class="inside-item-num">07</div>
+          <div class="inside-item-title">Planning for Taxes Year-Round</div>
+          <div class="inside-item-desc">Quarterly estimated taxes, deduction tracking, retirement contributions, and the November tax projection that eliminates surprises.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2 class="section-title">One-person businesses who want clarity, not complexity.</h2>
+      <ul class="for-list">
+        <li>Solopreneurs in their first one to three years who have never had a formal financial system.</li>
+        <li>Freelancers and consultants dealing with irregular income who want to stop guessing at their real profit.</li>
+        <li>Creators with digital products who are not sure which revenue streams are actually worth their time.</li>
+        <li>Service providers who want to move from reactive financial management to a quarterly planning rhythm.</li>
+        <li>Anyone who has felt surprised or stressed by a tax bill, a slow month, or an unexpected expense.</li>
+      </ul>
+      <div class="not-for">
+        <div class="not-for-title">This is not for you if</div>
+        <ul class="not-for-list">
+          <li>You run a business with employees, inventory, or complex cost structures.</li>
+          <li>You are looking for advanced investment or business valuation strategy.</li>
+          <li>You want someone else to manage your finances rather than understand them yourself.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CTA FOOTER -->
+  <section class="cta-footer">
+    <div class="container">
+      <h2 class="cta-footer-title">Know your numbers.<br>Run your business with clarity.</h2>
+      <p class="cta-footer-sub">3,000+ words. Seven frameworks. One spreadsheet system. 30 minutes per month.</p>
+      <p class="cta-footer-price">$18.99 one-time</p>
+      <a href="#" class="cta-btn">Get Instant Access</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      &copy; 2026 Behike. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>

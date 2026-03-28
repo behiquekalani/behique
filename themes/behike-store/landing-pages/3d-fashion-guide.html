@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="3D Fashion Design: From Concept to Game-Ready Assets. Learn cloth simulation, topology, texturing, and presentation for games and virtual worlds.">
+    <title>3D Fashion Design Guide | Behike</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --cta: #30D158;
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --gray: #86868B;
+            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up { animation: fadeUp 0.75s ease-out both; }
+        .d1 { animation-delay: 0.05s; }
+        .d2 { animation-delay: 0.15s; }
+        .d3 { animation-delay: 0.25s; }
+        .d4 { animation-delay: 0.35s; }
+        .d5 { animation-delay: 0.45s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245,245,247,0.07);
+        }
+
+        .nav-logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+
+        .nav-cta {
+            background: var(--cta);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .nav-cta:hover { opacity: 0.85; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 140px 24px 100px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border: 1px solid rgba(10,132,255,0.35);
+            border-radius: 980px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 7.5vw, 76px);
+            font-weight: 700;
+            letter-spacing: -0.045em;
+            line-height: 1.02;
+            margin-bottom: 24px;
+            max-width: 820px;
+        }
+
+        .hero h1 span { color: var(--blue); }
+
+        .hero-sub {
+            font-size: clamp(17px, 2.2vw, 21px);
+            color: var(--gray);
+            max-width: 580px;
+            margin-bottom: 16px;
+            line-height: 1.55;
+        }
+
+        .price-badge {
+            display: inline-block;
+            background: rgba(10,132,255,0.12);
+            border: 1px solid rgba(10,132,255,0.25);
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 36px;
+        }
+
+        .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .btn-cta {
+            display: inline-block;
+            background: var(--cta);
+            color: #000;
+            padding: 16px 44px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-cta:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(48,209,88,0.28);
+        }
+
+        .hero-note { font-size: 14px; color: var(--gray); }
+
+        /* Problem */
+        .problem-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .problem-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .problem-inner h2 {
+            font-size: clamp(26px, 4.5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+            margin-bottom: 48px;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .pain-card {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(245,245,247,0.07);
+            border-radius: 14px;
+            padding: 28px;
+        }
+        .pain-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+        .pain-card p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Inside */
+        .inside-section { padding: 100px 24px; max-width: 980px; margin: 0 auto; }
+
+        .inside-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .inside-sub {
+            text-align: center;
+            color: var(--gray);
+            font-size: 18px;
+            margin-bottom: 56px;
+        }
+
+        .chapter-list { display: grid; gap: 20px; }
+
+        .chapter-item {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(245,245,247,0.07);
+            border-radius: 14px;
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 20px;
+            align-items: start;
+            transition: border-color 0.3s;
+        }
+        .chapter-item:hover { border-color: rgba(10,132,255,0.3); }
+
+        .chapter-num {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--blue);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding-top: 3px;
+        }
+
+        .chapter-item h3 {
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .chapter-item p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Who */
+        .who-section { padding: 100px 24px; max-width: 980px; margin: 0 auto; text-align: center; }
+
+        .who-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 48px;
+        }
+
+        .who-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .who-card { background: var(--secondary-bg); border-radius: 14px; padding: 28px; }
+        .who-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+        .who-card p { font-size: 15px; color: var(--gray); line-height: 1.5; }
+
+        /* Social Proof */
+        .proof-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .proof-inner { max-width: 980px; margin: 0 auto; text-align: center; }
+
+        .proof-inner h2 {
+            font-size: clamp(26px, 4.5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 48px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .testimonial {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(245,245,247,0.08);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .testimonial blockquote {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--light);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .testimonial cite {
+            font-size: 14px;
+            color: var(--gray);
+            font-style: normal;
+            font-weight: 500;
+        }
+        .testimonial cite strong {
+            color: var(--light);
+            display: block;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        /* Price + Guarantee */
+        .price-section {
+            padding: 100px 24px;
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .price-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 16px;
+        }
+
+        .price-display {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--cta);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin: 24px 0 8px;
+        }
+
+        .price-desc {
+            font-size: 17px;
+            color: var(--gray);
+            margin-bottom: 36px;
+        }
+
+        .guarantee-box {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(48,209,88,0.2);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+
+        .guarantee-box h3 { font-size: 17px; font-weight: 600; color: var(--cta); margin-bottom: 8px; }
+        .guarantee-box p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Final CTA */
+        .final-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .final-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+
+        .final-inner h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 20px;
+        }
+
+        .final-inner p {
+            font-size: 19px;
+            color: var(--gray);
+            line-height: 1.55;
+            margin-bottom: 36px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--gray);
+            font-size: 13px;
+            border-top: 1px solid rgba(245,245,247,0.07);
+        }
+
+        @media (max-width: 600px) {
+            .chapter-item { grid-template-columns: 1fr; }
+            .chapter-num { padding-top: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">Behike</div>
+    <a href="#buy" class="nav-cta">Get the Guide &mdash; $9.99</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <span class="badge fade-up">New Release</span>
+    <h1 class="fade-up d1">3D Fashion<br><span>Design Guide</span></h1>
+    <p class="hero-sub fade-up d2">From concept to game-ready assets. The complete pipeline: cloth simulation, sculpting, retopology, texturing, and presentation for games and virtual worlds.</p>
+    <div class="price-badge fade-up d3">$9.99</div>
+    <div class="hero-actions fade-up d4">
+        <a href="https://behikeai.gumroad.com/l/3d-fashion-guide" class="btn-cta">Get the Guide</a>
+        <p class="hero-note">Instant PDF download. No subscriptions.</p>
+    </div>
+</section>
+
+<!-- Problem -->
+<div class="problem-section">
+    <div class="problem-inner reveal">
+        <p class="section-label">The Problem</p>
+        <h2>Digital fashion is a billion-dollar market. Most 3D artists have no entry point.</h2>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <h3>The pipeline is not taught anywhere coherently</h3>
+                <p>Cloth simulation, pattern design, fold anatomy, retopology, texturing. Each piece lives in a different tutorial. Figuring out how they connect takes months of trial and error.</p>
+            </div>
+            <div class="pain-card">
+                <h3>Simulation artifacts kill the work</h3>
+                <p>Garments clip through the body. Folds look artificial. Topology from simulation is usable in sculpting software but broken in game engines. Most guides stop before addressing any of this.</p>
+            </div>
+            <div class="pain-card">
+                <h3>No clear path to professional output</h3>
+                <p>You can simulate a shirt. Getting it to a portfolio-quality, game-ready asset with correct UVs, baked normals, and a render that gets you hired is a different level of work with no clear guide.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What's Inside -->
+<div class="inside-section reveal">
+    <h2>What's Inside</h2>
+    <p class="inside-sub">Five chapters. Exercises after every chapter.</p>
+    <div class="chapter-list">
+        <div class="chapter-item">
+            <div class="chapter-num">Ch. 1</div>
+            <div>
+                <h3>The Digital Fashion Pipeline</h3>
+                <p>Core tools (Marvelous Designer, ZBrush, Blender or Maya), essential terminology, material properties (weft, warp, bias), and how to build a four-category reference library before touching any software.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">Ch. 2</div>
+            <div>
+                <h3>Cloth Simulation Fundamentals</h3>
+                <p>Drawing patterns, sewing panels, particle distance, first simulation, internal lines, seam folds, layered outfits, fabric presets, the 200% scale technique for higher fold detail, and common simulation problems with fixes.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">Ch. 3</div>
+            <div>
+                <h3>Mastering Folds, Layers, and Fit</h3>
+                <p>Primary, secondary, and tertiary fold types. Fold appeal. Controlling fit through pattern scaling and shrinkage. Complex garments, elastic materials, ties, laces, accessories, and simulation artifacts.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">Ch. 4</div>
+            <div>
+                <h3>Topology, Retopology, and Game-Ready Meshes</h3>
+                <p>Why simulation meshes fail in game engines. Polygon budgets. Automatic, semi-automatic, and manual retopology methods. Topology flow principles, projection workflows, adding thickness, and decimation for optimization.</p>
+            </div>
+        </div>
+        <div class="chapter-item">
+            <div class="chapter-num">Ch. 5</div>
+            <div>
+                <h3>Texturing, Detailing, and Final Presentation</h3>
+                <p>UV layout, texture blockout, leather and denim workflows, stitch maps, fabric damage, normal map baking, posing for presentation, three-point lighting, and building a portfolio that gets hired.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Who it's for -->
+<div class="who-section reveal">
+    <h2>Who This Is For</h2>
+    <div class="who-grid">
+        <div class="who-card">
+            <h3>3D artists entering digital fashion</h3>
+            <p>You know modeling and sculpting. You need to understand cloth simulation, pattern design, and the fashion-specific pipeline that connects simulation to a game engine.</p>
+        </div>
+        <div class="who-card">
+            <h3>Game character artists</h3>
+            <p>You build characters but your clothing looks sculpted, not simulated. You need realistic fold behavior and proper game-ready topology, not just a clean silhouette.</p>
+        </div>
+        <div class="who-card">
+            <h3>Virtual fashion creators</h3>
+            <p>You want to sell digital clothing on Roblox, Fortnite, or VRChat. You need the technical skills to produce assets that meet platform standards and attract buyers.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Social Proof -->
+<div class="proof-section">
+    <div class="proof-inner reveal">
+        <h2>From Readers</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <blockquote>"I spent two months on YouTube trying to understand Marvelous Designer before this. Chapter 2 alone covered more ground than anything I had watched. The particle distance and shrinkage explanation finally clicked."</blockquote>
+                <cite><strong>Aiko S.</strong>3D character artist, Tokyo</cite>
+            </div>
+            <div class="testimonial">
+                <blockquote>"The retopology chapter is the one nobody else writes. I always knew how to simulate. I never understood why the topology had to change for game engines. Now I do, and my workflow is completely different."</blockquote>
+                <cite><strong>Rafael D.</strong>Indie game developer</cite>
+            </div>
+            <div class="testimonial">
+                <blockquote>"The 200% scale technique doubled the fold detail on my next project without changing any other settings. That single tip has already paid back the price ten times over."</blockquote>
+                <cite><strong>Yolanda C.</strong>Digital fashion designer, VRChat creator</cite>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Price + Guarantee -->
+<div class="price-section reveal" id="buy">
+    <p class="section-label">Pricing</p>
+    <h2>One purchase. The complete pipeline.</h2>
+    <div class="price-display">$9.99</div>
+    <p class="price-desc">Instant PDF download. No subscription. No upsells.</p>
+    <div class="guarantee-box">
+        <h3>30-Day Guarantee</h3>
+        <p>If you read it and do not come away with a clearer understanding of the full digital fashion pipeline, send a message. Full refund, no questions asked. The risk is zero.</p>
+    </div>
+    <a href="https://behikeai.gumroad.com/l/3d-fashion-guide" class="btn-cta">Get the Guide for $9.99</a>
+    <p class="hero-note" style="margin-top:14px;">Delivered immediately via Gumroad.</p>
+</div>
+
+<!-- Final CTA -->
+<div class="final-section">
+    <div class="final-inner reveal">
+        <h2>Build your first garment today.</h2>
+        <p>Five chapters. Exercises after every chapter. From flat pattern to portfolio-ready render, explained in the order you actually need it.</p>
+        <a href="https://behikeai.gumroad.com/l/3d-fashion-guide" class="btn-cta">Get the Guide for $9.99</a>
+        <p class="hero-note" style="margin-top:14px;">Instant download. 30-day guarantee.</p>
+    </div>
+</div>
+
+<footer>
+    <p>Copyright 2026 Behike. All rights reserved.</p>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

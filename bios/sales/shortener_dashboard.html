@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Link Shortener</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Inter', sans-serif;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #00e5ff;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 20px 24px;
+    flex: 1;
+    min-width: 160px;
+  }
+  .stat-card .label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .stat-card .value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #00e5ff;
+  }
+  .stat-card .value.white { color: #fff; }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  /* Links table */
+  .links-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+  }
+  .links-table th {
+    text-align: left;
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .links-table td {
+    padding: 12px;
+    border-bottom: 1px solid #111;
+    font-size: 14px;
+  }
+  .links-table tr:hover { background: #111; }
+  .slug-cell {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #00e5ff;
+    font-weight: 600;
+  }
+  .slug-cell a { color: #00e5ff; text-decoration: none; }
+  .slug-cell a:hover { text-decoration: underline; }
+  .dest-cell {
+    color: #888;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dest-cell a { color: #888; text-decoration: none; }
+  .dest-cell a:hover { color: #ccc; }
+  .clicks-cell {
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    text-align: right;
+  }
+  .tag {
+    display: inline-block;
+    background: #1a2a2a;
+    color: #00e5ff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin: 1px 2px;
+  }
+
+  /* Chart area */
+  .chart-container {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .chart-select {
+    background: #0a0a0a;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .chart-select:focus { outline: none; border-color: #00e5ff; }
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 140px;
+    padding-top: 10px;
+  }
+  .chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .chart-bar {
+    width: 100%;
+    max-width: 40px;
+    background: linear-gradient(to top, #006064, #00e5ff);
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+    transition: height 0.3s ease;
+  }
+  .chart-bar:hover { opacity: 0.8; }
+  .chart-label {
+    font-size: 10px;
+    color: #555;
+    margin-top: 6px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    height: 40px;
+    overflow: hidden;
+  }
+  .chart-count {
+    font-size: 10px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+
+  /* Top links */
+  .top-links {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .top-link-card {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 200px;
+    flex: 1;
+  }
+  .top-link-card .rank {
+    font-size: 11px;
+    color: #555;
+    margin-bottom: 4px;
+  }
+  .top-link-card .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #00e5ff;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .top-link-card .count {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 8px;
+  }
+  .top-link-card .count span {
+    font-size: 12px;
+    color: #666;
+    font-weight: 400;
+  }
+
+  /* Create form */
+  .create-form {
+    background: #111;
+    border: 1px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .form-row input {
+    flex: 1;
+    min-width: 140px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #e0e0e0;
+    font-size: 14px;
+  }
+  .form-row input:focus { outline: none; border-color: #00e5ff; }
+  .form-row input::placeholder { color: #444; }
+  .btn-create {
+    background: #00e5ff;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-create:hover { opacity: 0.85; }
+  .form-msg {
+    font-size: 13px;
+    margin-top: 8px;
+    min-height: 20px;
+  }
+  .form-msg.ok { color: #4caf50; }
+  .form-msg.err { color: #f44336; }
+
+  .loading {
+    color: #555;
+    padding: 40px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 16px; }
+    .stats-row { flex-direction: column; }
+    .chart-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Link Shortener</h1>
+<p class="subtitle">Behike self-hosted analytics</p>
+
+<div class="stats-row" id="statsRow">
+  <div class="stat-card"><div class="label">Total Links</div><div class="value" id="totalLinks">-</div></div>
+  <div class="stat-card"><div class="label">Total Clicks</div><div class="value" id="totalClicks">-</div></div>
+  <div class="stat-card"><div class="label">Top Slug</div><div class="value white" id="topSlug" style="font-size:20px">-</div></div>
+  <div class="stat-card"><div class="label">Today</div><div class="value" id="todayClicks">-</div></div>
+</div>
+
+<!-- Top performing -->
+<div class="section-title">Top Performing</div>
+<div class="top-links" id="topLinks"><div class="loading">Loading...</div></div>
+
+<!-- 7-day chart -->
+<div class="section-title">Click Trend (Last 7 Days)</div>
+<div class="chart-container">
+  <select class="chart-select" id="chartSelect"><option value="__all__">All links</option></select>
+  <div class="chart-bars" id="chartBars"><div class="loading">Loading...</div></div>
+</div>
+
+<!-- All links table -->
+<div class="section-title">All Links</div>
+<table class="links-table">
+  <thead><tr><th>Slug</th><th>Destination</th><th>Tags</th><th style="text-align:right">Clicks</th></tr></thead>
+  <tbody id="linksBody"><tr><td colspan="4" class="loading">Loading...</td></tr></tbody>
+</table>
+
+<!-- Create link -->
+<div class="section-title">Create Link</div>
+<div class="create-form">
+  <div class="form-row">
+    <input type="text" id="newSlug" placeholder="slug (e.g. promo)">
+    <input type="text" id="newDest" placeholder="https://destination-url.com">
+    <input type="text" id="newTags" placeholder="tags (comma-separated)">
+    <button class="btn-create" onclick="createLink()">Create</button>
+  </div>
+  <div class="form-msg" id="formMsg"></div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+let allLinksData = [];
+let allStatsCache = {};
+
+async function fetchAdmin() {
+  try {
+    const res = await fetch(`${API_BASE}/s/admin`);
+    const data = await res.json();
+    allLinksData = data.links || [];
+    renderStats(data);
+    renderTable(allLinksData);
+    renderTopLinks(allLinksData);
+    populateChartSelect(allLinksData);
+    // fetch stats for all links
+    for (const link of allLinksData) {
+      fetchLinkStats(link.slug);
+    }
+  } catch (e) {
+    document.getElementById('linksBody').innerHTML = `<tr><td colspan="4" class="loading">Error loading data</td></tr>`;
+  }
+}
+
+function renderStats(data) {
+  const links = data.links || [];
+  const totalClicks = links.reduce((s, l) => s + l.total_clicks, 0);
+  const top = links.length > 0 ? links[0] : null;
+  document.getElementById('totalLinks').textContent = data.total_links || 0;
+  document.getElementById('totalClicks').textContent = totalClicks;
+  document.getElementById('topSlug').textContent = top ? `/s/${top.slug}` : '-';
+
+  const today = new Date().toISOString().slice(0, 10);
+  // today clicks will be filled from stats
+  document.getElementById('todayClicks').textContent = '-';
+}
+
+function renderTable(links) {
+  const tbody = document.getElementById('linksBody');
+  if (!links.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">No links yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = links.map(l => `
+    <tr>
+      <td class="slug-cell"><a href="/s/${l.slug}/stats" target="_blank">/s/${l.slug}</a></td>
+      <td class="dest-cell"><a href="${l.destination}" target="_blank">${l.destination}</a></td>
+      <td>${(l.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}</td>
+      <td class="clicks-cell">${l.total_clicks}</td>
+    </tr>
+  `).join('');
+}
+
+function renderTopLinks(links) {
+  const container = document.getElementById('topLinks');
+  const top = links.slice(0, 5);
+  if (!top.length) {
+    container.innerHTML = '<div class="loading">No data yet</div>';
+    return;
+  }
+  container.innerHTML = top.map((l, i) => `
+    <div class="top-link-card">
+      <div class="rank">#${i + 1}</div>
+      <div class="name">/s/${l.slug}</div>
+      <div class="count">${l.total_clicks} <span>clicks</span></div>
+    </div>
+  `).join('');
+}
+
+function populateChartSelect(links) {
+  const sel = document.getElementById('chartSelect');
+  links.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.slug;
+    opt.textContent = `/s/${l.slug}`;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => renderChart(sel.value));
+}
+
+async function fetchLinkStats(slug) {
+  try {
+    const res = await fetch(`${API_BASE}/s/${slug}/stats`);
+    const data = await res.json();
+    allStatsCache[slug] = data;
+    // update today clicks
+    updateTodayClicks();
+    // if chart showing all or this slug, re-render
+    const sel = document.getElementById('chartSelect');
+    if (sel.value === '__all__' || sel.value === slug) {
+      renderChart(sel.value);
+    }
+  } catch (e) { /* skip */ }
+}
+
+function updateTodayClicks() {
+  const today = new Date().toISOString().slice(0, 10);
+  let total = 0;
+  Object.values(allStatsCache).forEach(s => {
+    const day = (s.daily_clicks || []).find(d => d.date === today);
+    if (day) total += day.clicks;
+  });
+  document.getElementById('todayClicks').textContent = total;
+}
+
+function renderChart(selected) {
+  const container = document.getElementById('chartBars');
+  const today = new Date();
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+
+  // aggregate clicks per day
+  const dayCounts = {};
+  days.forEach(d => dayCounts[d] = 0);
+
+  const sources = selected === '__all__' ? Object.keys(allStatsCache) : [selected];
+  sources.forEach(slug => {
+    const stats = allStatsCache[slug];
+    if (!stats) return;
+    (stats.daily_clicks || []).forEach(dc => {
+      if (dc.date in dayCounts) dayCounts[dc.date] += dc.clicks;
+    });
+  });
+
+  const max = Math.max(1, ...Object.values(dayCounts));
+
+  container.innerHTML = days.map(day => {
+    const count = dayCounts[day] || 0;
+    const pct = (count / max) * 100;
+    const label = day.slice(5); // MM-DD
+    return `
+      <div class="chart-bar-wrap">
+        <div class="chart-count">${count}</div>
+        <div class="chart-bar" style="height: ${Math.max(pct, 2)}%"></div>
+        <div class="chart-label">${label}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function createLink() {
+  const slug = document.getElementById('newSlug').value.trim();
+  const dest = document.getElementById('newDest').value.trim();
+  const tagsRaw = document.getElementById('newTags').value.trim();
+  const msg = document.getElementById('formMsg');
+
+  if (!slug || !dest) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Slug and destination are required.';
+    return;
+  }
+
+  const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  try {
+    const res = await fetch(`${API_BASE}/s/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, destination: dest, tags })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      msg.className = 'form-msg ok';
+      msg.textContent = `Created: ${data.short_url}`;
+      document.getElementById('newSlug').value = '';
+      document.getElementById('newDest').value = '';
+      document.getElementById('newTags').value = '';
+      fetchAdmin();
+    } else {
+      msg.className = 'form-msg err';
+      msg.textContent = data.detail || 'Error creating link';
+    }
+  } catch (e) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Network error';
+  }
+}
+
+// Init
+fetchAdmin();
+</script>
+</body>
+</html>

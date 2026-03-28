@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Consulting Blueprint — Behike</title>
+  <meta name="description" content="How to build a consulting practice that pays $5K-$15K per month as a solo operator. No agency, no team, no sales force." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --border: #1D1D1F;
+      --card: #0A0A0A;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* ANIMATIONS */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-in.delay-1 { transition-delay: 0.1s; }
+    .fade-in.delay-2 { transition-delay: 0.2s; }
+    .fade-in.delay-3 { transition-delay: 0.3s; }
+    .fade-in.delay-4 { transition-delay: 0.4s; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 780px;
+      margin: 0 auto 24px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+    .hero-price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .price-tag {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.4;
+    }
+    .hero-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 42px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .hero-cta:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .hero-micro {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-intro {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.55;
+      margin-bottom: 52px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-number {
+      font-size: 48px;
+      font-weight: 800;
+      color: #2A2A2E;
+      line-height: 1;
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ARCHETYPES */
+    .archetype-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .archetype-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .archetype-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+    .archetype-card.advisor::before { background: var(--accent); }
+    .archetype-card.implementer::before { background: #FF6B35; }
+    .archetype-card.trainer::before { background: var(--cta); }
+
+    .archetype-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .archetype-card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .archetype-card .archetype-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+    .archetype-revenue {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cta);
+      background: rgba(48, 209, 88, 0.1);
+      border: 1px solid rgba(48, 209, 88, 0.2);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: inline-block;
+    }
+
+    /* CONTENTS */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2px;
+      background: var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .chapter-item {
+      background: var(--card);
+      padding: 24px 28px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-body h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .chapter-body p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .testimonial-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .testimonial-quote {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      color: #D1D1D6;
+    }
+    .testimonial-quote::before {
+      content: '"';
+      color: var(--accent);
+      font-size: 32px;
+      line-height: 1;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .avatar-blue { background: rgba(10, 132, 255, 0.15); color: var(--accent); }
+    .avatar-green { background: rgba(48, 209, 88, 0.12); color: var(--cta); }
+    .avatar-orange { background: rgba(255, 107, 53, 0.12); color: #FF6B35; }
+
+    .author-info strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .author-info span {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* FOR SECTION */
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 640px) { .for-grid { grid-template-columns: 1fr; } }
+
+    .for-col h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .for-col.yes h3 { color: var(--cta); }
+    .for-col.no h3 { color: var(--muted); }
+
+    .for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .for-list li {
+      font-size: 15px;
+      color: var(--muted);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      line-height: 1.45;
+    }
+    .for-list li .check { color: var(--cta); font-weight: 700; }
+    .for-list li .cross { color: #3A3A3C; font-weight: 700; }
+
+    /* PRICING */
+    .pricing-card {
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .pricing-top {
+      background: linear-gradient(135deg, rgba(10, 132, 255, 0.08) 0%, rgba(48, 209, 88, 0.06) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 36px;
+      text-align: center;
+    }
+    .pricing-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .pricing-tagline {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .pricing-amount {
+      font-size: 60px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .pricing-amount sup {
+      font-size: 28px;
+      font-weight: 700;
+      vertical-align: super;
+    }
+    .pricing-once {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .pricing-body {
+      padding: 32px 36px;
+    }
+    .pricing-includes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .pricing-includes li {
+      display: flex;
+      gap: 12px;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+    .pricing-includes li .tick { color: var(--cta); font-weight: 700; }
+    .pricing-cta {
+      display: block;
+      background: var(--cta);
+      color: #000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px;
+      border-radius: 12px;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+      margin-bottom: 18px;
+    }
+    .pricing-cta:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .guarantee {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+      border-bottom: none;
+    }
+    .final-cta h2 {
+      max-width: 640px;
+      margin: 0 auto 16px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+    .final-cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .final-cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .final-micro {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 60px 0 52px; }
+      section { padding: 60px 0; }
+      .hero-price-block { flex-direction: column; gap: 12px; }
+      .price-note { text-align: center; }
+      .for-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a class="nav-brand" href="#">Behike</a>
+    <a class="nav-cta" href="#pricing">Get the Blueprint &#8212; $27.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge fade-in">Solo Operator Playbook</div>
+    <h1 class="fade-in delay-1">
+      The highest-margin solo business is still consulting.<br>
+      <em>Most people just don't know how to sell it.</em>
+    </h1>
+    <p class="hero-sub fade-in delay-2">
+      How to build a consulting practice that pays $5K-$15K per month as a solo operator. Without an agency, a team, or a sales force.
+    </p>
+    <div class="hero-price-block fade-in delay-3">
+      <div class="price-tag">$27.99</div>
+      <div class="price-note">
+        One-time. Instant PDF delivery.<br>
+        Full 30-day guarantee.
+      </div>
+    </div>
+    <a href="#pricing" class="hero-cta fade-in delay-4">Get The Consulting Blueprint</a>
+    <p class="hero-micro fade-in delay-4">Instant download. 5,500+ words. 8 chapters. Full appendix.</p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="section-label fade-in">The Real Problem</div>
+    <h2 class="fade-in">Three reasons solo consultants stay broke.</h2>
+    <p class="section-intro fade-in">None of them are about expertise. The knowledge is usually there. The infrastructure is not.</p>
+    <div class="problem-grid">
+      <div class="problem-card fade-in">
+        <div class="problem-number">01</div>
+        <h3>Hourly pricing kills the ceiling</h3>
+        <p>When you charge by the hour, clients pay for your input. Your income is capped by the hours you can work. Consultants who bill $200/hour and work 40 hours per week earn $32,000 per month gross. Consultants who price on value bill the same 40 hours and earn $80,000. The difference is not talent. It is structure.</p>
+      </div>
+      <div class="problem-card fade-in delay-1">
+        <div class="problem-number">02</div>
+        <h3>No positioning means no referrals</h3>
+        <p>"I help businesses grow" is not a position. Nobody refers that consultant because nobody remembers what they do or who they do it for. The consultant who "builds post-purchase retention systems for Shopify brands between $1M and $10M" gets referred constantly, because the description is specific enough to match against a name in someone's contact list.</p>
+      </div>
+      <div class="problem-card fade-in delay-2">
+        <div class="problem-number">03</div>
+        <h3>No sales process means inconsistent revenue</h3>
+        <p>Most solo consultants have no structured way to move from a conversation to a signed agreement. They send proposals too late, follow up once or not at all, and handle pricing objections by discounting. The result is a revenue line that spikes and collapses with every project cycle. This guide installs the process that fixes it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHETYPES -->
+<section id="archetypes">
+  <div class="container">
+    <div class="section-label fade-in">The 3 Models</div>
+    <h2 class="fade-in">Which consulting archetype are you?</h2>
+    <p class="section-intro fade-in">Every solo consulting practice is built on one of three operational models. Knowing yours is the first structural decision you make.</p>
+    <div class="archetype-grid">
+      <div class="archetype-card advisor fade-in">
+        <div class="archetype-icon">&#9670;</div>
+        <h3>The Advisor</h3>
+        <p class="archetype-desc">Brought in to think. Assesses, analyzes, and recommends without executing. The value is judgment. Typically works on monthly retainer. Common models: fractional executives, strategy advisors, board-level consultants.</p>
+        <span class="archetype-revenue">$3K-$15K per client per month</span>
+      </div>
+      <div class="archetype-card implementer fade-in delay-1">
+        <div class="archetype-icon">&#9654;</div>
+        <h3>The Implementer</h3>
+        <p class="archetype-desc">Advises and executes. Comes in with a diagnosis and a plan, then builds the thing. Sets up systems, trains teams, launches campaigns. Charges per project or retainer with hands-on deliverables included.</p>
+        <span class="archetype-revenue">$5K-$25K per project</span>
+      </div>
+      <div class="archetype-card trainer fade-in delay-2">
+        <div class="archetype-icon">&#9671;</div>
+        <h3>The Trainer</h3>
+        <p class="archetype-desc">Teaches teams how to do something. Runs workshops, builds internal capability, transfers methodology. Charges per day or per workshop. Productized content makes this model highly scalable once materials are built.</p>
+        <span class="archetype-revenue">$3K-$15K per engagement</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section id="contents">
+  <div class="container">
+    <div class="section-label fade-in">What You Get</div>
+    <h2 class="fade-in">8 chapters. 1 complete appendix. Zero filler.</h2>
+    <p class="section-intro fade-in">Every chapter is specific. Real pricing examples, real frameworks, real processes. Not theory.</p>
+    <div class="chapters-grid fade-in">
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.1</span>
+        <div class="chapter-body">
+          <h4>The Consulting Model for Solo Operators</h4>
+          <p>Why consulting beats freelancing at scale. The 3 archetypes. Revenue potential of each model.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.2</span>
+        <div class="chapter-body">
+          <h4>Positioning Your Expertise</h4>
+          <p>The niche-down requirement. Building a consulting thesis. The one-sentence positioning statement.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.3</span>
+        <div class="chapter-body">
+          <h4>Packaging Your Services</h4>
+          <p>The 3-tier offer structure: audit, retainer, intensive. How to productize without losing flexibility.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.4</span>
+        <div class="chapter-body">
+          <h4>Pricing for Consulting</h4>
+          <p>Why hourly pricing fails. Daily rate vs. project rate. Value-based pricing. The $5K minimum threshold.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.5</span>
+        <div class="chapter-body">
+          <h4>Finding Your First Clients</h4>
+          <p>Warm market activation. The content-to-consulting pipeline. Platform-specific outreach for 2026.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.6</span>
+        <div class="chapter-body">
+          <h4>The Sales Conversation</h4>
+          <p>Discovery call structure. Proposal framework. Handling pricing objections. The follow-up system.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.7</span>
+        <div class="chapter-body">
+          <h4>Delivery and Client Management</h4>
+          <p>Project management for solo operators. Kickoff process. Expectation setting. Results documentation.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">Ch.8</span>
+        <div class="chapter-body">
+          <h4>Scaling Without Hiring</h4>
+          <p>Templates, async delivery, the product-consulting flywheel. When to bring in contractors.</p>
+        </div>
+      </div>
+      <div class="chapter-item">
+        <span class="chapter-num">App.</span>
+        <div class="chapter-body">
+          <h4>Appendix</h4>
+          <p>Positioning statement templates. Full proposal framework. Discovery call script. Contract essentials.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-label fade-in">From the Field</div>
+    <h2 class="fade-in">Solo operators who built the practice.</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-in">
+        <p class="testimonial-quote">I had been freelancing for four years and always thought consulting was just what agencies did. This guide clarified the structural difference in about 10 minutes of reading. I restructured two of my retainers the same week. Same work, 40% more revenue per client.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar avatar-blue">M</div>
+          <div class="author-info">
+            <strong>Marcus T.</strong>
+            <span>Operations Consultant, Chicago</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in delay-1">
+        <p class="testimonial-quote">The positioning chapter alone was worth the price. I had been saying "I help B2B companies with marketing" for two years. Two weeks after writing my first real positioning statement, I landed a $9,500 project from a cold LinkedIn message. The specificity changes everything.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar avatar-green">R</div>
+          <div class="author-info">
+            <strong>Renata S.</strong>
+            <span>B2B Marketing Consultant, Austin</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in delay-2">
+        <p class="testimonial-quote">The discovery call script is what I kept coming back to. I had been running those calls as informal conversations and closing maybe 30% of them. Using the structure from Chapter 6, that number went to about 60% in the first month. Not because I got more persuasive. Because I stopped guessing what the real objection was.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar avatar-orange">J</div>
+          <div class="author-info">
+            <strong>James K.</strong>
+            <span>Finance Consultant, New York</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section id="for">
+  <div class="container">
+    <div class="section-label fade-in">Fit Check</div>
+    <h2 class="fade-in">Who this is for. Who it is not for.</h2>
+    <p class="section-intro fade-in">This guide is not for everyone. Here is an honest breakdown.</p>
+    <div class="for-grid fade-in">
+      <div class="for-col yes">
+        <h3>This is for you if:</h3>
+        <ul class="for-list">
+          <li><span class="check">+</span> You have 3+ years of real experience in a specific function, industry, or system</li>
+          <li><span class="check">+</span> You want to work independently without building a team or an agency</li>
+          <li><span class="check">+</span> You are currently undercharging, under-positioned, or both</li>
+          <li><span class="check">+</span> You want a repeatable process for finding and closing clients</li>
+          <li><span class="check">+</span> You are willing to specialize rather than serve everyone</li>
+          <li><span class="check">+</span> You want $5K-$15K months without 60-hour weeks</li>
+        </ul>
+      </div>
+      <div class="for-col no">
+        <h3>This is not for you if:</h3>
+        <ul class="for-list">
+          <li><span class="cross">-</span> You have no real domain expertise and want to start from zero</li>
+          <li><span class="cross">-</span> You want a passive income model with no client interaction</li>
+          <li><span class="cross">-</span> You expect a templated path that works without any adaptation to your situation</li>
+          <li><span class="cross">-</span> You are looking to build a team and scale an agency in the first year</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-label fade-in" style="text-align:center">The Investment</div>
+    <h2 class="fade-in" style="text-align:center">One price. No subscription. Yours to keep.</h2>
+    <p class="section-intro fade-in" style="text-align:center; margin-left:auto; margin-right:auto">A single consulting retainer using one framework from this guide pays back the price of the guide 350 times over.</p>
+    <div class="pricing-card fade-in">
+      <div class="pricing-top">
+        <div class="pricing-title">The Consulting Blueprint</div>
+        <p class="pricing-tagline">Complete solo operator guide to $5K-$15K per month</p>
+        <div class="pricing-amount"><sup>$</sup>27.99</div>
+        <div class="pricing-once">One-time payment. Instant access.</div>
+      </div>
+      <div class="pricing-body">
+        <ul class="pricing-includes">
+          <li><span class="tick">+</span> Full 5,500+ word guide in PDF format</li>
+          <li><span class="tick">+</span> 8 complete chapters covering the full consulting business model</li>
+          <li><span class="tick">+</span> Complete appendix: positioning templates, proposal framework, discovery call script</li>
+          <li><span class="tick">+</span> Client contract essentials checklist</li>
+          <li><span class="tick">+</span> Real pricing examples across consulting archetypes</li>
+          <li><span class="tick">+</span> The 3-tier offer structure for productizing without rigidity</li>
+          <li><span class="tick">+</span> The product-consulting flywheel model for $15K-$25K months</li>
+        </ul>
+        <a href="#" class="pricing-cta">Get The Consulting Blueprint Now</a>
+        <p class="guarantee">30-day full refund if it does not deliver. No questions asked. The risk is on us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <div class="section-label fade-in" style="text-align:center">One More Thing</div>
+    <h2 class="fade-in">You already have the expertise. This is the missing structure.</h2>
+    <p class="fade-in">Most people who could consult are not consulting. Not because the market is closed. Because they never built the system to enter it.</p>
+    <a href="#pricing" class="final-cta-btn fade-in">Get The Blueprint for $27.99</a>
+    <p class="final-micro fade-in">Instant PDF. 30-day guarantee. No subscription.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>Behike &copy; 2026. All rights reserved.</p>
+    <p>Questions? <a href="mailto:hello@behike.co" style="color: var(--accent); text-decoration: none;">hello@behike.co</a></p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Immediately show hero elements (above the fold)
+  document.querySelectorAll('.hero .fade-in').forEach(el => {
+    el.classList.add('visible');
+  });
+</script>
+</body>
+</html>

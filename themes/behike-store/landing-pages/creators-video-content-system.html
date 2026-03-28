@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Video Content System — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --card-bg: #111111;
+      --border: #1D1D1F;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-brand span { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+    .hero h1 .accent { color: var(--accent); }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.4;
+    }
+    .cta-btn {
+      display: inline-block;
+      padding: 18px 48px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.2px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover { opacity: 0.88; transform: scale(1.02); }
+    .guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTIONS */
+    section { padding: 80px 0; }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.12;
+      margin-bottom: 20px;
+    }
+    .section-desc {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM */
+    .problem { border-top: 1px solid var(--border); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside { border-top: 1px solid var(--border); }
+    .chapters {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .chapter {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 28px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.2s;
+    }
+    .chapter:hover { border-color: var(--accent); }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .chapter-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    .chapter-content p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .who { border-top: 1px solid var(--border); }
+    .who-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .who-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .who-card .check {
+      width: 28px;
+      height: 28px;
+      background: rgba(48, 209, 88, 0.1);
+      border: 1px solid rgba(48, 209, 88, 0.25);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: var(--cta);
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .who-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .final-cta h2 { margin-bottom: 16px; }
+    .final-cta .section-desc { margin: 0 auto 48px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ANIMATIONS */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .hero { padding: 64px 0 56px; }
+      section { padding: 56px 0; }
+      .price { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="../index.html" class="nav-brand">Behi<span>que</span></a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Digital Product</div>
+      <h1>Creator's <span class="accent">Video Content</span> System</h1>
+      <p class="hero-sub">Build a sustainable video engine that runs on one recording session per week. One long-form video. Ten pieces of content. Consistent output without burnout.</p>
+      <div class="price-block">
+        <div class="price">$22.99</div>
+        <div class="price-note">One-time purchase<br>Instant PDF download</div>
+      </div>
+      <a href="#" class="cta-btn">Get the System Now</a>
+      <p class="guarantee">5000+ word guide. 8 chapters. Immediate access.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">The Real Problem</p>
+        <h2>Why most creators burn out before they build anything</h2>
+        <p class="section-desc">The creators who sustain output over years are not more motivated. They built infrastructure that multiplies their time. You can build the same infrastructure.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-up">
+          <span class="icon">&#x1F4C5;</span>
+          <h3>Posting without a system</h3>
+          <p>Creating unique content for every platform every day is three separate jobs. Solo creators cannot maintain three content jobs alongside an actual business.</p>
+        </div>
+        <div class="problem-card fade-up">
+          <span class="icon">&#x1F3AF;</span>
+          <h3>No content thesis</h3>
+          <p>Without a clear answer to what someone becomes by following you for one year, your content stays random. Random content builds random audiences that do not convert.</p>
+        </div>
+        <div class="problem-card fade-up">
+          <span class="icon">&#x26A1;</span>
+          <h3>Chasing virality over depth</h3>
+          <p>Viral content brings people in. Deep content keeps them. A creator who builds a library of specific, deep content will outlast a creator chasing trending sounds every time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="inside">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">What's Inside</p>
+        <h2>Eight chapters. One complete system.</h2>
+        <p class="section-desc">From building your content thesis to monetizing your audience. Every stage of the video content system, in order.</p>
+      </div>
+      <div class="chapters">
+        <div class="chapter fade-up">
+          <div class="chapter-num">01</div>
+          <div class="chapter-content">
+            <h3>The Foundation — Why Most Video Strategies Collapse</h3>
+            <p>The five failure points that kill content strategies before month three, and the structural fixes that prevent each one.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">02</div>
+          <div class="chapter-content">
+            <h3>Your Content Architecture — The Pillar System</h3>
+            <p>How to define three to four content pillars that map directly to your business, so you never run out of topics and your content builds pattern recognition.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">03</div>
+          <div class="chapter-content">
+            <h3>Batch Recording — The Single Most Valuable Habit in Video</h3>
+            <p>Film four videos in one session. How to prepare, record, and build a two-week content buffer that protects you when life interrupts.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">04</div>
+          <div class="chapter-content">
+            <h3>The Repurposing Engine — One Video Into 10+ Pieces</h3>
+            <p>A step-by-step breakdown of every asset extractable from a single long-form video: YouTube Shorts, Reels, threads, quote graphics, newsletters, and more.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">05</div>
+          <div class="chapter-content">
+            <h3>YouTube vs. Short-Form — Understanding the Strategic Difference</h3>
+            <p>These formats serve different functions. Confusing them creates misaligned expectations. This chapter clarifies what each does and how they work together.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">06</div>
+          <div class="chapter-content">
+            <h3>Video SEO Basics — Getting Found Without an Existing Audience</h3>
+            <p>Keyword research, title optimization, thumbnail principles, description structure, and the first-48-hours strategy for maximizing algorithmic distribution.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">07</div>
+          <div class="chapter-content">
+            <h3>Monetizing Through Video — The Revenue Architecture</h3>
+            <p>Four revenue streams for video creators: digital products, services, sponsorships, and memberships. How to structure calls to action without hard-selling.</p>
+          </div>
+        </div>
+        <div class="chapter fade-up">
+          <div class="chapter-num">08</div>
+          <div class="chapter-content">
+            <h3>The Weekly Operations System — Running This Without Burning Out</h3>
+            <p>A day-by-day rhythm for running the full video system alongside an actual business. Tools, scheduling, editing, repurposing, and the two-video buffer rule.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="who">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">Who This Is For</p>
+        <h2>Built for solopreneurs who create.</h2>
+        <p class="section-desc">This system is not designed for a team with a full-time video editor and a content manager. It is designed for one person doing everything.</p>
+      </div>
+      <div class="who-grid">
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You want to use video to build an audience but cannot sustain daily filming on top of running a business.</p>
+        </div>
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You have started posting before and burned out. You need a system, not more motivation.</p>
+        </div>
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You want to be present on multiple platforms without creating entirely separate content for each one.</p>
+        </div>
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You are building toward monetization through digital products, services, or brand partnerships.</p>
+        </div>
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You want a content library that compounds over time rather than a posting schedule that exhausts you.</p>
+        </div>
+        <div class="who-card fade-up">
+          <div class="check">&#x2713;</div>
+          <p>You are a freelancer, coach, consultant, or digital product creator who sees video as a long-term asset.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <div class="fade-up">
+        <p class="section-label">Get Started</p>
+        <h2>One recording session. Ten pieces of content. Start this week.</h2>
+        <p class="section-desc">The system is in the guide. The guide is ready. Build the infrastructure now, before you need it.</p>
+        <a href="#" class="cta-btn">Get the Creator's Video Content System</a>
+        <p class="guarantee" style="margin-top:20px;">$22.99 one-time. Instant PDF download. 8 chapters, 5000+ words.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved. &nbsp;|&nbsp; <a href="../privacy.html">Privacy</a> &nbsp;|&nbsp; <a href="../refund.html">Refund Policy</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach((el, i) => {
+      el.style.transitionDelay = `${(i % 4) * 80}ms`;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

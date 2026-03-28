@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>BEHIKE - Builder. Engineer. Puerto Rico.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ── CSS Variables (default: midnight) ── */
+  :root {
+    --black: #000000;
+    --blue: #0A84FF;
+    --light: #F5F5F7;
+    --secondary-bg: #1D1D1F;
+    --gray: #86868B;
+    --nav-bg: rgba(0,0,0,0.8);
+    --card-bg: rgba(29,29,31,0.6);
+    --border: rgba(245,245,247,0.08);
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+
+  /* ── Reset ── */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--black);
+    color: var(--light);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── VHS Scanline Overlay ── */
+  #scanlines {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    opacity: 0.5;
+  }
+
+  /* Warm VHS color shift */
+  #vhs-warm {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(120, 80, 40, 0.04) 100%);
+  }
+
+  /* ── Navigation ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 9000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--light);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--light); }
+
+  /* ── Sections ── */
+  section {
+    padding: 120px 40px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--light);
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--gray);
+    max-width: 600px;
+    margin-bottom: 48px;
+  }
+
+  /* ── Hero ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-top: 56px;
+    position: relative;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(64px, 12vw, 120px);
+    font-weight: 900;
+    color: var(--light);
+    letter-spacing: 0.06em;
+    line-height: 1;
+    margin-bottom: 20px;
+    position: relative;
+    display: inline-block;
+  }
+
+  /* VHS Glitch animation on hero title */
+  .hero-title {
+    animation: subtle-glitch 8s infinite;
+  }
+
+  @keyframes subtle-glitch {
+    0%, 95%, 100% {
+      text-shadow: none;
+      transform: translate(0);
+    }
+    96% {
+      text-shadow:
+        -2px 0 rgba(255, 0, 80, 0.4),
+        2px 0 rgba(0, 255, 200, 0.4);
+      transform: translate(-1px, 0);
+    }
+    97% {
+      text-shadow:
+        2px 0 rgba(255, 0, 80, 0.4),
+        -2px 0 rgba(0, 255, 200, 0.4);
+      transform: translate(1px, 0);
+    }
+    98% {
+      text-shadow:
+        -1px 0 rgba(255, 0, 80, 0.3),
+        1px 0 rgba(0, 255, 200, 0.3);
+      transform: translate(0);
+    }
+  }
+
+  .hero-subtitle {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--gray);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    margin-bottom: 48px;
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ── Journal Cards ── */
+  .journal-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .journal-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: transform 0.2s, border-color 0.3s;
+    cursor: pointer;
+  }
+
+  .journal-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 245, 247, 0.15);
+  }
+
+  .journal-date {
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .journal-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--light);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .journal-preview {
+    font-size: 15px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .journal-expand {
+    font-size: 13px;
+    color: var(--blue);
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    transition: opacity 0.2s;
+  }
+
+  .journal-expand:hover { opacity: 0.7; }
+
+  .journal-full {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    color: var(--gray);
+    line-height: 1.8;
+  }
+
+  .journal-full.open { display: block; }
+
+  /* ── Project Grid ── */
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .project-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: transform 0.2s, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .project-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 245, 247, 0.15);
+  }
+
+  .project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .project-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--light);
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .badge-live {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+  }
+
+  .badge-built {
+    background: rgba(10, 132, 255, 0.15);
+    color: #0A84FF;
+    border: 1px solid rgba(10, 132, 255, 0.3);
+  }
+
+  .badge-idea {
+    background: rgba(255, 159, 10, 0.15);
+    color: #FF9F0A;
+    border: 1px solid rgba(255, 159, 10, 0.3);
+  }
+
+  .project-desc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* ── Lab Grid ── */
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .lab-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: transform 0.2s, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lab-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 245, 247, 0.15);
+  }
+
+  .lab-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+
+  .lab-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--light);
+  }
+
+  .lab-desc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  .lab-btn {
+    display: inline-block;
+    margin-top: auto;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blue);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .lab-btn:hover { opacity: 0.7; }
+
+  /* ── Text Shaper (inline lab demo) ── */
+  .shaper-demo {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .shaper-textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    color: var(--light);
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 12px;
+    resize: vertical;
+    min-height: 60px;
+    margin-bottom: 8px;
+  }
+
+  .shaper-textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+
+  .shaper-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .shaper-select {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--light);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .shaper-btn {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .shaper-btn:hover { opacity: 0.8; }
+
+  .shaper-output {
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--blue);
+    white-space: pre;
+    text-align: center;
+    line-height: 1.3;
+    min-height: 40px;
+    overflow-x: auto;
+  }
+
+  /* ── Minecraft Section ── */
+  #minecraft {
+    text-align: center;
+  }
+
+  .mc-canvas-wrap {
+    margin: 32px auto;
+    max-width: 800px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+
+  #mc-canvas {
+    display: block;
+    width: 100%;
+    height: 500px;
+    background: #000;
+    cursor: crosshair;
+  }
+
+  .mc-controls {
+    background: var(--card-bg);
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--gray);
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    letter-spacing: 0.04em;
+    border-top: 1px solid var(--border);
+  }
+
+  .mc-controls span { color: var(--blue); }
+
+  .mc-tagline {
+    font-size: 14px;
+    color: var(--gray);
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  /* Block selector */
+  .mc-block-selector {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .mc-block-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .mc-block-btn:hover { transform: scale(1.15); }
+  .mc-block-btn.active { border-color: var(--light); }
+
+  /* ── Store Grid ── */
+  .store-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .store-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: transform 0.2s, border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .store-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(245, 245, 247, 0.15);
+  }
+
+  .store-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--light);
+  }
+
+  .store-desc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .store-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+
+  .store-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  .store-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .store-btn:hover { opacity: 0.8; }
+
+  .store-link {
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  .store-link a {
+    color: var(--blue);
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+
+  .store-link a:hover { opacity: 0.7; }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 80px 40px 40px;
+    border-top: 1px solid var(--border);
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-tagline {
+    font-size: 15px;
+    color: var(--gray);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .social-links a {
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .social-links a:hover { color: var(--light); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: var(--gray);
+    opacity: 0.6;
+  }
+
+  /* ── Scroll Animations ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── Glitch effect for lab title ── */
+  .glitch-text {
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch-text:hover {
+    animation: glitch-hover 0.3s linear;
+  }
+
+  @keyframes glitch-hover {
+    0% { text-shadow: -2px 0 #ff0050, 2px 0 #00ffc8; transform: translate(0); }
+    20% { text-shadow: 2px 0 #ff0050, -2px 0 #00ffc8; transform: translate(-2px, 1px); }
+    40% { text-shadow: -1px 0 #ff0050, 1px 0 #00ffc8; transform: translate(1px, -1px); }
+    60% { text-shadow: 2px 0 #ff0050, -2px 0 #00ffc8; transform: translate(-1px, 0); }
+    80% { text-shadow: -2px 0 #ff0050, 2px 0 #00ffc8; transform: translate(2px, 1px); }
+    100% { text-shadow: none; transform: translate(0); }
+  }
+
+  /* ── Mobile Nav Toggle ── */
+  .nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--light);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .project-grid, .lab-grid, .store-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    section { padding: 80px 24px 60px; }
+    .section-title { font-size: 36px; }
+  }
+
+  @media (max-width: 640px) {
+    .project-grid, .lab-grid, .store-grid {
+      grid-template-columns: 1fr;
+    }
+
+    nav { padding: 0 20px; }
+
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 100%;
+      background: var(--nav-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      flex-direction: column;
+      padding: 20px;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-links.open { display: flex; }
+    .nav-toggle { display: block; }
+
+    section { padding: 60px 16px 40px; }
+    .section-title { font-size: 28px; }
+    .journal-card { padding: 20px; }
+    .project-card, .lab-card, .store-card { padding: 20px; }
+    #mc-canvas { height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- VHS Overlays -->
+<div id="scanlines"></div>
+<div id="vhs-warm"></div>
+
+<!-- Navigation -->
+<nav>
+  <a href="#hero" class="nav-brand">Behike</a>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+  <ul class="nav-links">
+    <li><a href="#journal" onclick="closeNav()">Journal</a></li>
+    <li><a href="#projects" onclick="closeNav()">Projects</a></li>
+    <li><a href="#lab" onclick="closeNav()">Lab</a></li>
+    <li><a href="#store" onclick="closeNav()">Store</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <h1 class="hero-title">BEHIKE</h1>
+  <p class="hero-subtitle">Builder. Engineer. Puerto Rico.</p>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ═══ JOURNAL ═══ -->
+<section id="journal">
+  <div class="fade-in">
+    <div class="section-label">Journal</div>
+    <h2 class="section-title">Build Log</h2>
+    <p class="section-subtitle">Notes from the trenches. What I'm building, what broke, and what I learned.</p>
+  </div>
+
+  <div class="journal-grid">
+
+    <div class="journal-card fade-in" onclick="toggleJournal(this)">
+      <div class="journal-date">2026-03-21</div>
+      <h3 class="journal-title">Day 1: I built 20 products in one night</h3>
+      <p class="journal-preview">Started at midnight. By 6am I had 20 digital products listed on Gumroad with landing pages, descriptions, and pricing. No templates. No course telling me what to sell. Just execution.</p>
+      <button class="journal-expand">Read more</button>
+      <div class="journal-full">
+        <p>The idea was simple: stop planning, start shipping. I had a list of things I knew how to do. AI automation guides, Shopify themes, prompt libraries, budget templates. Each one could be a product. So I built them.</p>
+        <br>
+        <p>The stack was lean. HTML landing pages with inline CSS. A settings widget for theme switching. Gumroad for payments. No monthly fees. No Shopify subscription eating into margins I hadn't earned yet.</p>
+        <br>
+        <p>Most people spend weeks choosing a color palette. I spent that time writing sales copy and building checkout flows. The products aren't perfect. They don't need to be. They need to exist.</p>
+        <br>
+        <p>Twenty products. One night. Zero excuses left.</p>
+      </div>
+    </div>
+
+    <div class="journal-card fade-in" onclick="toggleJournal(this)">
+      <div class="journal-date">2026-03-19</div>
+      <h3 class="journal-title">The $0 AI fleet: 3 computers, zero subscriptions</h3>
+      <p class="journal-preview">Running an AI employee system across three machines. Ceiba on the M4, Cobo on the GTX 1080 Ti, Hutia as the bridge. No cloud bills. No API costs. Just local inference and shell scripts.</p>
+      <button class="journal-expand">Read more</button>
+      <div class="journal-full">
+        <p>Everyone talks about AI costs. GPT-4 API bills, cloud compute, monthly SaaS stacks that eat $200 before you've made a dollar. I took a different approach.</p>
+        <br>
+        <p>Ceiba runs on my M4 MacBook. 16GB unified memory, enough for most inference tasks. Cobo sits on an old desktop with a GTX 1080 Ti. 11GB of VRAM that handles Ollama models without breaking a sweat. Hutia is the bridge, a dedicated machine that keeps everything connected.</p>
+        <br>
+        <p>The result: an AI fleet that runs 24/7 with zero recurring costs. The machines talk to each other through a task bridge. Ceiba delegates heavy compute to Cobo. Hutia manages the queue. It's not elegant, but it works. And it's mine.</p>
+        <br>
+        <p>When your infrastructure costs $0/month, every dollar of revenue is profit. That changes the math on everything.</p>
+      </div>
+    </div>
+
+    <div class="journal-card fade-in" onclick="toggleJournal(this)">
+      <div class="journal-date">2026-03-15</div>
+      <h3 class="journal-title">Why I'm building from Puerto Rico</h3>
+      <p class="journal-preview">No Silicon Valley. No VC funding. No co-working space with $12 lattes. Just a desk in PR, fast internet, and the pressure of knowing nobody's coming to save you.</p>
+      <button class="journal-expand">Read more</button>
+      <div class="journal-full">
+        <p>People ask why I don't move to the mainland. Better networking, bigger market, more opportunities. All true. All irrelevant.</p>
+        <br>
+        <p>Building from Puerto Rico means building with constraints. Slower shipping times for physical products. A smaller local market. Infrastructure that doesn't always cooperate. But constraints breed creativity.</p>
+        <br>
+        <p>The internet doesn't care where you live. My landing pages load the same speed in San Juan as they do in San Francisco. My AI models don't run slower because they're in the Caribbean. And my overhead is a fraction of what it would be in Austin or NYC.</p>
+        <br>
+        <p>This island made me. The resilience, the resourcefulness, the ability to make something out of nothing. That's not a limitation. That's a competitive advantage.</p>
+      </div>
+    </div>
+
+    <div class="journal-card fade-in" onclick="toggleJournal(this)">
+      <div class="journal-date">2026-03-10</div>
+      <h3 class="journal-title">ADHD is not a weakness. It's a different OS.</h3>
+      <p class="journal-preview">Diagnosed ADHD. Working with a psychologist. Building systems that work WITH my brain instead of against it. Here's what actually helps.</p>
+      <button class="journal-expand">Read more</button>
+      <div class="journal-full">
+        <p>For years I thought something was wrong with me. Couldn't focus on boring tasks. Could hyperfocus on interesting ones for 14 hours straight. Started a hundred projects, finished twelve. The ones I finished were exceptional.</p>
+        <br>
+        <p>Getting diagnosed changed the framing. ADHD isn't a deficit of attention. It's a different allocation system. My brain doesn't do well with arbitrary priorities. It does extremely well with things that matter.</p>
+        <br>
+        <p>So I stopped fighting it. Built systems instead. BehiqueBot captures every idea the moment it hits, so I don't lose the spark trying to remember it later. Pomodoro sessions with hard stops. One task at a time, visually tracked. Small wins logged and celebrated.</p>
+        <br>
+        <p>The psychologist framework I'm using became the backbone of BehiqueBot. Break tasks small. Validate effort over result. Name avoidance without judgment. Reduce scope when stuck. It works because it respects how my brain actually operates instead of pretending it's something it's not.</p>
+        <br>
+        <p>I'm not building despite ADHD. I'm building because of how it wired me to think.</p>
+      </div>
+    </div>
+
+    <div class="journal-card fade-in" onclick="toggleJournal(this)">
+      <div class="journal-date">2026-03-05</div>
+      <h3 class="journal-title">Faith, family, and shipping code at 3am</h3>
+      <p class="journal-preview">The real motivation isn't money or status. It's making sure my family never has to worry. Everything I build connects back to that.</p>
+      <button class="journal-expand">Read more</button>
+      <div class="journal-full">
+        <p>At 3am the house is quiet. Everyone's asleep. The screen light is the only thing on. This is when the best code gets written, not because of some productivity hack, but because the silence makes the purpose clear.</p>
+        <br>
+        <p>I build for my family. That's the foundation. Every product, every automation, every late-night debugging session is connected to a simple goal: build something that provides. Not just money. Security. Freedom. The ability to say "we're good" and mean it.</p>
+        <br>
+        <p>Faith keeps me grounded when the metrics are flat and nobody's buying. It's easy to lose perspective when you're measuring success in page views and conversion rates. But the work has meaning beyond the dashboard. It's an act of stewardship. Using what I've been given to build something real.</p>
+        <br>
+        <p>The tech world loves to talk about passion and disruption. My motivation is quieter than that. It's a family that deserves stability. It's a faith that says the work matters even when the results don't show yet. It's the belief that consistent effort, compounded over time, changes everything.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ PROJECTS ═══ -->
+<section id="projects">
+  <div class="fade-in">
+    <div class="section-label">Projects</div>
+    <h2 class="section-title">What I've Built</h2>
+    <p class="section-subtitle">Some are live. Some are shipped. All of them taught me something.</p>
+  </div>
+
+  <div class="project-grid">
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">AI Employee System</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <p class="project-desc">3 machines running AI 24/7. Local inference, zero cloud costs, task delegation across a custom bridge.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">Behike Store</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <p class="project-desc">20 digital products, $0/month hosting. Custom landing pages, Gumroad checkout, 8-theme settings widget.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">BehiqueBot</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <p class="project-desc">Telegram accountability bot built on a real psychologist's framework. Voice input, idea classification, daily archives.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">Reel Pipeline</span>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <p class="project-desc">Automated video production workflow. Script generation, CapCut templates, batch rendering for social content.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">AI News Tracker</span>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <p class="project-desc">RSS feed aggregation with AI-powered impact scoring. Surfaces the news that actually matters.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">Reddit Story Scraper</span>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <p class="project-desc">Automated content extraction from Reddit. Finds stories worth telling, formats them for video scripts.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">Shopify Themes</span>
+        <span class="badge badge-built">Built</span>
+      </div>
+      <p class="project-desc">3 original Shopify themes, MIT licensed. Clean, fast, conversion-focused designs.</p>
+    </div>
+
+    <div class="project-card fade-in">
+      <div class="project-header">
+        <span class="project-name">Transcription SaaS</span>
+        <span class="badge badge-idea">Idea</span>
+      </div>
+      <p class="project-desc">Video to text, self-hosted. Whisper-based transcription service with zero API dependency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ THE LAB ═══ -->
+<section id="lab">
+  <div class="fade-in">
+    <div class="section-label">Experiments</div>
+    <h2 class="section-title"><span class="glitch-text">The Lab</span></h2>
+    <p class="section-subtitle">Interactive tools, experiments, and things I built for fun.</p>
+  </div>
+
+  <div class="lab-grid">
+
+    <div class="lab-card fade-in">
+      <div class="lab-icon" style="background: rgba(147, 130, 220, 0.15);">&#x1f9d8;</div>
+      <h3 class="lab-title">Meditation</h3>
+      <p class="lab-desc">Guided breathing exercises with visual feedback. Dark mode, ambient sounds, session tracking.</p>
+      <a href="meditation.html" class="lab-btn">Try It &#8594;</a>
+    </div>
+
+    <div class="lab-card fade-in">
+      <div class="lab-icon" style="background: rgba(0, 240, 255, 0.15);">&#x1f916;</div>
+      <h3 class="lab-title">Agent Faces</h3>
+      <p class="lab-desc">Generative particle faces for AI agents. Each one reacts to mouse movement and changes state.</p>
+      <a href="index.html" class="lab-btn">Try It &#8594;</a>
+    </div>
+
+    <div class="lab-card fade-in" id="shaper-card">
+      <div class="lab-icon" style="background: rgba(52, 199, 89, 0.15);">&#x270D;</div>
+      <h3 class="lab-title">Text Shaper</h3>
+      <p class="lab-desc">Type text, pick a shape, watch it transform into ASCII art.</p>
+      <button class="lab-btn" onclick="toggleShaper()">Try It &#8594;</button>
+      <div class="shaper-demo" id="shaper-demo" style="display:none;">
+        <textarea class="shaper-textarea" id="shaper-input" placeholder="Type something here...">Build things that matter.</textarea>
+        <div class="shaper-controls">
+          <select class="shaper-select" id="shaper-shape">
+            <option value="diamond">Diamond</option>
+            <option value="circle">Circle</option>
+            <option value="triangle">Triangle</option>
+            <option value="wave">Wave</option>
+          </select>
+          <button class="shaper-btn" onclick="shapeText()">Shape It</button>
+        </div>
+        <div class="shaper-output" id="shaper-output"></div>
+      </div>
+    </div>
+
+    <div class="lab-card fade-in">
+      <div class="lab-icon" style="background: rgba(255, 159, 10, 0.15);">&#x1f3a8;</div>
+      <h3 class="lab-title">Theme Switcher</h3>
+      <p class="lab-desc">8 color themes. Change this entire page with one click. Look for the gear icon in the bottom right.</p>
+      <button class="lab-btn" onclick="document.getElementById('behike-settings-toggle').click()">Try It &#8594;</button>
+    </div>
+
+    <div class="lab-card fade-in">
+      <div class="lab-icon" style="background: rgba(255, 69, 58, 0.15);">&#x1f50d;</div>
+      <h3 class="lab-title">Automation Audit</h3>
+      <p class="lab-desc">Free tool that analyzes your business workflows and identifies what can be automated with AI.</p>
+      <a href="../../themes/behike-store/landing-pages/automation-audit.html" class="lab-btn">Try It &#8594;</a>
+    </div>
+
+    <div class="lab-card fade-in">
+      <div class="lab-icon" style="background: rgba(10, 132, 255, 0.15);">&#x1f4dc;</div>
+      <h3 class="lab-title">Quest Journal</h3>
+      <p class="lab-desc">Gamified task tracker. Turn your daily work into quests with XP, levels, and achievement tracking.</p>
+      <a href="quest-dashboard.html" class="lab-btn">Try It &#8594;</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ MINECRAFT ═══ -->
+<section id="minecraft">
+  <div class="fade-in">
+    <div class="section-label">Break Time</div>
+    <h2 class="section-title">Take a break. Play some Minecraft.</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">A tiny voxel sandbox. No libraries. Just JavaScript and math.</p>
+  </div>
+
+  <div class="mc-canvas-wrap fade-in">
+    <canvas id="mc-canvas"></canvas>
+    <div class="mc-controls">
+      <span>WASD</span> move &nbsp;&nbsp; <span>Mouse</span> look &nbsp;&nbsp; <span>Left click</span> remove &nbsp;&nbsp; <span>Right click</span> place &nbsp;&nbsp; <span>1-3</span> block type
+      <div class="mc-block-selector">
+        <div class="mc-block-btn active" style="background: #5B8C3E;" data-block="1" onclick="selectBlock(1)" title="Grass"></div>
+        <div class="mc-block-btn" style="background: #8B6914;" data-block="2" onclick="selectBlock(2)" title="Dirt"></div>
+        <div class="mc-block-btn" style="background: #808080;" data-block="3" onclick="selectBlock(3)" title="Stone"></div>
+      </div>
+    </div>
+  </div>
+  <p class="mc-tagline fade-in">Built with JavaScript. No libraries. Just math.</p>
+</section>
+
+<!-- ═══ STORE ═══ -->
+<section id="store">
+  <div class="fade-in">
+    <div class="section-label">Store</div>
+    <h2 class="section-title">Products</h2>
+    <p class="section-subtitle">Digital tools and guides. Built from experience, not theory.</p>
+  </div>
+
+  <div class="store-grid">
+    <div class="store-card fade-in">
+      <span class="store-name">AI Employee Guide</span>
+      <p class="store-desc">Step-by-step guide to building your own AI workforce with local models and zero monthly costs.</p>
+      <div class="store-footer">
+        <span class="store-price">$19</span>
+        <a href="../../themes/behike-store/landing-pages/ai-employee-guide.html" class="store-btn">View</a>
+      </div>
+    </div>
+
+    <div class="store-card fade-in">
+      <span class="store-name">Claude Code Course</span>
+      <p class="store-desc">Master Claude Code from zero to production. Real projects, real workflows, no fluff.</p>
+      <div class="store-footer">
+        <span class="store-price">$29</span>
+        <a href="../../themes/behike-store/landing-pages/claude-code-course.html" class="store-btn">View</a>
+      </div>
+    </div>
+
+    <div class="store-card fade-in">
+      <span class="store-name">Solopreneur OS</span>
+      <p class="store-desc">Complete Notion system for running a one-person business. Tasks, finances, content calendar.</p>
+      <div class="store-footer">
+        <span class="store-price">$14</span>
+        <a href="../../themes/behike-store/landing-pages/solopreneur-os.html" class="store-btn">View</a>
+      </div>
+    </div>
+
+    <div class="store-card fade-in">
+      <span class="store-name">AI Chatbot Guide</span>
+      <p class="store-desc">Build and deploy your own AI chatbot. Telegram, Discord, or web. Self-hosted, privacy-first.</p>
+      <div class="store-footer">
+        <span class="store-price">$12</span>
+        <a href="../../themes/behike-store/landing-pages/ai-chatbot-guide.html" class="store-btn">View</a>
+      </div>
+    </div>
+
+    <div class="store-card fade-in">
+      <span class="store-name">Shopify Theme Bundle</span>
+      <p class="store-desc">3 original, conversion-focused Shopify themes. Clean code, fast load times, MIT licensed.</p>
+      <div class="store-footer">
+        <span class="store-price">$39</span>
+        <a href="../../themes/behike-store/landing-pages/theme-bundle.html" class="store-btn">View</a>
+      </div>
+    </div>
+
+    <div class="store-card fade-in">
+      <span class="store-name">Budget Template</span>
+      <p class="store-desc">Simple spreadsheet system for tracking income, expenses, and savings. Built for people who hate spreadsheets.</p>
+      <div class="store-footer">
+        <span class="store-price">$7</span>
+        <a href="../../themes/behike-store/landing-pages/budget-template.html" class="store-btn">View</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="store-link fade-in">
+    <a href="../../themes/behike-store/landing-pages/index.html">View all products &#8594;</a>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <p class="footer-tagline">Built from Puerto Rico with 3 computers and zero subscriptions.</p>
+  <div class="social-links">
+    <a href="https://instagram.com/kalaniandrez" target="_blank">@kalaniandrez</a>
+    <a href="https://instagram.com/behikeai" target="_blank">@behikeai</a>
+    <a href="https://twitter.com/s0ftrewind" target="_blank">@s0ftrewind</a>
+    <a href="https://twitter.com/dulc3recuerdo" target="_blank">@dulc3recuerdo</a>
+  </div>
+  <p class="footer-copy">&copy; 2026 Behike. All rights reserved.</p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function closeNav() {
+  document.querySelector('.nav-links').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+// SCROLL ANIMATIONS
+// ═══════════════════════════════════════════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ═══════════════════════════════════════════════
+// JOURNAL EXPAND/COLLAPSE
+// ═══════════════════════════════════════════════
+function toggleJournal(card) {
+  const full = card.querySelector('.journal-full');
+  const btn = card.querySelector('.journal-expand');
+  if (full.classList.contains('open')) {
+    full.classList.remove('open');
+    btn.textContent = 'Read more';
+  } else {
+    full.classList.add('open');
+    btn.textContent = 'Read less';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TEXT SHAPER
+// ═══════════════════════════════════════════════
+function toggleShaper() {
+  const demo = document.getElementById('shaper-demo');
+  demo.style.display = demo.style.display === 'none' ? 'block' : 'none';
+}
+
+function shapeText() {
+  const text = document.getElementById('shaper-input').value.replace(/\s+/g, ' ').trim();
+  const shape = document.getElementById('shaper-shape').value;
+  const output = document.getElementById('shaper-output');
+
+  if (!text) { output.textContent = ''; return; }
+
+  const chars = text.split('');
+  let lines = [];
+  let charIdx = 0;
+
+  function getChars(n) {
+    let result = '';
+    for (let i = 0; i < n; i++) {
+      result += chars[charIdx % chars.length];
+      charIdx++;
+    }
+    return result;
+  }
+
+  const rows = 15;
+
+  if (shape === 'diamond') {
+    const half = Math.floor(rows / 2);
+    for (let i = 0; i <= half; i++) {
+      const w = 1 + i * 2;
+      const pad = half - i;
+      lines.push(' '.repeat(pad) + getChars(w));
+    }
+    for (let i = half - 1; i >= 0; i--) {
+      const w = 1 + i * 2;
+      const pad = half - i;
+      lines.push(' '.repeat(pad) + getChars(w));
+    }
+  } else if (shape === 'circle') {
+    const r = Math.floor(rows / 2);
+    for (let y = -r; y <= r; y++) {
+      const w = Math.round(2 * Math.sqrt(r * r - y * y));
+      const pad = r - Math.floor(w / 2);
+      if (w > 0) lines.push(' '.repeat(pad) + getChars(w));
+      else lines.push(' '.repeat(r) + getChars(1));
+    }
+  } else if (shape === 'triangle') {
+    for (let i = 0; i < rows; i++) {
+      const w = 1 + i * 2;
+      const pad = rows - 1 - i;
+      lines.push(' '.repeat(pad) + getChars(w));
+    }
+  } else if (shape === 'wave') {
+    for (let i = 0; i < rows; i++) {
+      const offset = Math.round(Math.sin(i * 0.8) * 6 + 8);
+      const w = Math.round(Math.cos(i * 0.5) * 3 + 8);
+      lines.push(' '.repeat(offset) + getChars(Math.max(w, 2)));
+    }
+  }
+
+  output.textContent = lines.join('\n');
+}
+
+// ═══════════════════════════════════════════════
+// MINECRAFT VOXEL ENGINE
+// ═══════════════════════════════════════════════
+(function() {
+  const canvas = document.getElementById('mc-canvas');
+  const ctx = canvas.getContext('2d');
+  const W_SIZE = 20, H_SIZE = 20, D_SIZE = 5;
+
+  // World data: 3D array [x][y][z] = block type (0=air, 1=grass, 2=dirt, 3=stone)
+  let world = [];
+  for (let x = 0; x < W_SIZE; x++) {
+    world[x] = [];
+    for (let y = 0; y < H_SIZE; y++) {
+      world[x][y] = [];
+      for (let z = 0; z < D_SIZE; z++) {
+        if (z === 0) world[x][y][z] = 3;      // stone bottom
+        else if (z < 3) world[x][y][z] = 2;   // dirt middle
+        else if (z === 3) world[x][y][z] = 1;  // grass top
+        else world[x][y][z] = 0;               // air
+      }
+    }
+  }
+
+  // Camera
+  let camX = 10, camY = 10, camZ = 6;
+  let pitch = -0.5, yaw = 0;
+  let selectedBlock = 1;
+
+  // Colors
+  const BLOCK_COLORS = {
+    1: { top: '#5B8C3E', side: '#4A7A30', front: '#3D6B28' },  // grass
+    2: { top: '#8B6914', side: '#7A5C10', front: '#6B4F0C' },  // dirt
+    3: { top: '#909090', side: '#787878', front: '#686868' },   // stone
+  };
+
+  const SKY_TOP = '#1a1a2e';
+  const SKY_BOT = '#16213e';
+
+  let keys = {};
+  let mouseDown = false;
+  let mouseBtn = 0;
+  let locked = false;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = (canvas.parentElement.querySelector('#mc-canvas').offsetHeight || 500) * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Input
+  document.addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if (e.key >= '1' && e.key <= '3') selectBlock(parseInt(e.key));
+  });
+  document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+  canvas.addEventListener('click', () => {
+    if (!locked) {
+      canvas.requestPointerLock();
+    }
+  });
+
+  document.addEventListener('pointerlockchange', () => {
+    locked = document.pointerLockElement === canvas;
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    if (!locked) return;
+    yaw += e.movementX * 0.003;
+    pitch -= e.movementY * 0.003;
+    pitch = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pitch));
+  });
+
+  canvas.addEventListener('mousedown', e => {
+    if (!locked) return;
+    e.preventDefault();
+    castRay(e.button === 2);
+  });
+
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  function castRay(place) {
+    const dirX = Math.cos(pitch) * Math.sin(yaw);
+    const dirY = Math.cos(pitch) * Math.cos(yaw);
+    const dirZ = Math.sin(pitch);
+    let prevX, prevY, prevZ;
+
+    for (let t = 0; t < 8; t += 0.1) {
+      const rx = Math.floor(camX + dirX * t);
+      const ry = Math.floor(camY + dirY * t);
+      const rz = Math.floor(camZ + dirZ * t);
+
+      if (rx >= 0 && rx < W_SIZE && ry >= 0 && ry < H_SIZE && rz >= 0 && rz < D_SIZE) {
+        if (world[rx][ry][rz] !== 0) {
+          if (place && prevX !== undefined) {
+            if (prevX >= 0 && prevX < W_SIZE && prevY >= 0 && prevY < H_SIZE && prevZ >= 0 && prevZ < D_SIZE) {
+              world[prevX][prevY][prevZ] = selectedBlock;
+            }
+          } else if (!place) {
+            world[rx][ry][rz] = 0;
+          }
+          return;
+        }
+      }
+      prevX = rx; prevY = ry; prevZ = rz;
+    }
+  }
+
+  function update() {
+    const speed = 0.12;
+    const dx = Math.sin(yaw) * speed;
+    const dy = Math.cos(yaw) * speed;
+
+    if (keys['w']) { camX += dx; camY += dy; }
+    if (keys['s']) { camX -= dx; camY -= dy; }
+    if (keys['a']) { camX += dy; camY -= dx; }
+    if (keys['d']) { camX -= dy; camY += dx; }
+    if (keys[' ']) camZ += speed;
+    if (keys['shift']) camZ -= speed;
+  }
+
+  // Project 3D to 2D
+  function project(x, y, z) {
+    const rx = x - camX;
+    const ry = y - camY;
+    const rz = z - camZ;
+
+    // Rotate by yaw
+    const cosY = Math.cos(-yaw);
+    const sinY = Math.sin(-yaw);
+    const tx = rx * cosY - ry * sinY;
+    const ty = rx * sinY + ry * cosY;
+
+    // Rotate by pitch
+    const cosP = Math.cos(-pitch);
+    const sinP = Math.sin(-pitch);
+    const tz = rz * cosP - ty * sinP;
+    const ty2 = rz * sinP + ty * cosP;
+
+    if (ty2 < 0.1) return null;
+
+    const w = canvas.width / window.devicePixelRatio;
+    const h = canvas.height / window.devicePixelRatio;
+    const fov = 400;
+
+    return {
+      x: w / 2 + (tx / ty2) * fov,
+      y: h / 2 - (tz / ty2) * fov,
+      depth: ty2
+    };
+  }
+
+  function drawFace(points, color) {
+    if (points.some(p => p === null)) return false;
+    if (points.every(p => p.depth < 0.1)) return false;
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+    return true;
+  }
+
+  function render() {
+    const w = canvas.width / window.devicePixelRatio;
+    const h = canvas.height / window.devicePixelRatio;
+
+    // Sky gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, SKY_TOP);
+    grad.addColorStop(1, SKY_BOT);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Collect visible faces
+    let faces = [];
+
+    for (let x = 0; x < W_SIZE; x++) {
+      for (let y = 0; y < H_SIZE; y++) {
+        for (let z = 0; z < D_SIZE; z++) {
+          const b = world[x][y][z];
+          if (b === 0) continue;
+          const c = BLOCK_COLORS[b];
+
+          // Only draw faces adjacent to air or edges
+          // Top face (z+1)
+          if (z === D_SIZE - 1 || world[x][y][z + 1] === 0) {
+            const pts = [
+              project(x, y, z + 1),
+              project(x + 1, y, z + 1),
+              project(x + 1, y + 1, z + 1),
+              project(x, y + 1, z + 1),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.top, depth });
+          }
+
+          // Front face (y-1 visible)
+          if (y === 0 || world[x][y - 1][z] === 0) {
+            const pts = [
+              project(x, y, z),
+              project(x + 1, y, z),
+              project(x + 1, y, z + 1),
+              project(x, y, z + 1),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.front, depth });
+          }
+
+          // Back face (y+1)
+          if (y === H_SIZE - 1 || world[x][y + 1][z] === 0) {
+            const pts = [
+              project(x, y + 1, z),
+              project(x + 1, y + 1, z),
+              project(x + 1, y + 1, z + 1),
+              project(x, y + 1, z + 1),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.side, depth });
+          }
+
+          // Left face (x-1)
+          if (x === 0 || world[x - 1][y][z] === 0) {
+            const pts = [
+              project(x, y, z),
+              project(x, y + 1, z),
+              project(x, y + 1, z + 1),
+              project(x, y, z + 1),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.side, depth });
+          }
+
+          // Right face (x+1)
+          if (x === W_SIZE - 1 || world[x + 1][y][z] === 0) {
+            const pts = [
+              project(x + 1, y, z),
+              project(x + 1, y + 1, z),
+              project(x + 1, y + 1, z + 1),
+              project(x + 1, y, z + 1),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.side, depth });
+          }
+
+          // Bottom face (z-1)  - rarely visible but include
+          if (z === 0 || world[x][y][z - 1] === 0) {
+            const pts = [
+              project(x, y, z),
+              project(x + 1, y, z),
+              project(x + 1, y + 1, z),
+              project(x, y + 1, z),
+            ];
+            const depth = pts.reduce((s, p) => s + (p ? p.depth : 100), 0) / 4;
+            if (depth > 0) faces.push({ pts, color: c.front, depth });
+          }
+        }
+      }
+    }
+
+    // Sort back to front (painter's algorithm)
+    faces.sort((a, b) => b.depth - a.depth);
+
+    // Draw faces
+    faces.forEach(f => drawFace(f.pts, f.color));
+
+    // Crosshair
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.lineWidth = 1.5;
+    const cx = w / 2, cy = h / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy); ctx.lineTo(cx + 10, cy);
+    ctx.moveTo(cx, cy - 10); ctx.lineTo(cx, cy + 10);
+    ctx.stroke();
+
+    // Block indicator
+    const bc = BLOCK_COLORS[selectedBlock];
+    ctx.fillStyle = bc.top;
+    ctx.fillRect(w - 44, 12, 32, 32);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(w - 44, 12, 32, 32);
+
+    // Instructions overlay (when not locked)
+    if (!locked) {
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Click to play', w / 2, h / 2);
+      ctx.font = '12px -apple-system, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText('ESC to release mouse', w / 2, h / 2 + 24);
+    }
+  }
+
+  function loop() {
+    update();
+    render();
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+
+  // Expose selectBlock globally
+  window.selectBlock = function(n) {
+    selectedBlock = n;
+    document.querySelectorAll('.mc-block-btn').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.block) === n);
+    });
+  };
+})();
+
+// ═══════════════════════════════════════════════
+// SETTINGS WIDGET (inline version)
+// ═══════════════════════════════════════════════
+(function() {
+  const themes = {
+    midnight: {
+      name: 'Midnight', icon: '\u{1F319}',
+      black: '#000000', accent: '#0A84FF', light: '#F5F5F7',
+      secondaryBg: '#1D1D1F', gray: '#86868B',
+      navBg: 'rgba(0,0,0,0.8)', cardBg: 'rgba(29,29,31,0.6)',
+      border: 'rgba(245,245,247,0.08)',
+    },
+    snow: {
+      name: 'Snow', icon: '\u2600\uFE0F',
+      black: '#FFFFFF', accent: '#0066CC', light: '#1D1D1F',
+      secondaryBg: '#F5F5F7', gray: '#6E6E73',
+      navBg: 'rgba(255,255,255,0.85)', cardBg: 'rgba(245,245,247,0.8)',
+      border: 'rgba(0,0,0,0.08)',
+    },
+    ocean: {
+      name: 'Ocean', icon: '\u{1F30A}',
+      black: '#0A1628', accent: '#00D4AA', light: '#E0F7F0',
+      secondaryBg: '#112240', gray: '#8892B0',
+      navBg: 'rgba(10,22,40,0.9)', cardBg: 'rgba(17,34,64,0.7)',
+      border: 'rgba(0,212,170,0.12)',
+    },
+    sunset: {
+      name: 'Sunset', icon: '\u{1F305}',
+      black: '#1A0A1E', accent: '#FF6B6B', light: '#FFF0EC',
+      secondaryBg: '#2D1233', gray: '#B08EA8',
+      navBg: 'rgba(26,10,30,0.9)', cardBg: 'rgba(45,18,51,0.7)',
+      border: 'rgba(255,107,107,0.12)',
+    },
+    forest: {
+      name: 'Forest', icon: '\u{1F33F}',
+      black: '#0B1A0B', accent: '#4ADE80', light: '#E8F5E8',
+      secondaryBg: '#132613', gray: '#7DA67D',
+      navBg: 'rgba(11,26,11,0.9)', cardBg: 'rgba(19,38,19,0.7)',
+      border: 'rgba(74,222,128,0.12)',
+    },
+    royal: {
+      name: 'Royal', icon: '\u{1F451}',
+      black: '#0D0A1A', accent: '#A78BFA', light: '#EDE9FE',
+      secondaryBg: '#1E1635', gray: '#9B8EC4',
+      navBg: 'rgba(13,10,26,0.9)', cardBg: 'rgba(30,22,53,0.7)',
+      border: 'rgba(167,139,250,0.12)',
+    },
+    ember: {
+      name: 'Ember', icon: '\u{1F525}',
+      black: '#1A0C00', accent: '#FF9F43', light: '#FFF4E6',
+      secondaryBg: '#2D1800', gray: '#C4956D',
+      navBg: 'rgba(26,12,0,0.9)', cardBg: 'rgba(45,24,0,0.7)',
+      border: 'rgba(255,159,67,0.12)',
+    },
+    candy: {
+      name: 'Candy', icon: '\u{1F36C}',
+      black: '#FFF0F5', accent: '#FF1493', light: '#2D0A1E',
+      secondaryBg: '#FFE0EB', gray: '#9B5072',
+      navBg: 'rgba(255,240,245,0.9)', cardBg: 'rgba(255,224,235,0.7)',
+      border: 'rgba(255,20,147,0.12)',
+    },
+  };
+
+  const fontSizes = {
+    small: { label: 'S', scale: 0.85 },
+    medium: { label: 'M', scale: 1.0 },
+    large: { label: 'L', scale: 1.15 },
+    xl: { label: 'XL', scale: 1.3 },
+  };
+
+  const savedTheme = localStorage.getItem('behike-theme') || 'midnight';
+  const savedSize = localStorage.getItem('behike-fontsize') || 'medium';
+
+  function applyTheme(key) {
+    const t = themes[key];
+    if (!t) return;
+    const r = document.documentElement.style;
+    r.setProperty('--black', t.black);
+    r.setProperty('--blue', t.accent);
+    r.setProperty('--light', t.light);
+    r.setProperty('--secondary-bg', t.secondaryBg);
+    r.setProperty('--gray', t.gray);
+    r.setProperty('--nav-bg', t.navBg);
+    r.setProperty('--card-bg', t.cardBg);
+    r.setProperty('--border', t.border);
+
+    document.body.style.background = t.black;
+    document.body.style.color = t.light;
+
+    const nav = document.querySelector('nav');
+    if (nav) {
+      nav.style.background = t.navBg;
+      nav.style.borderBottomColor = t.border;
+    }
+
+    document.querySelectorAll('.journal-card, .project-card, .lab-card, .store-card, .mc-controls').forEach(el => {
+      el.style.background = t.cardBg;
+      el.style.borderColor = t.border;
+    });
+
+    document.querySelectorAll('.store-btn, .shaper-btn').forEach(el => {
+      el.style.background = t.accent;
+    });
+
+    document.querySelectorAll('.section-label, .store-price, .journal-expand, .lab-btn').forEach(el => {
+      el.style.color = t.accent;
+    });
+
+    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+    const activeDot = document.querySelector(`.theme-dot[data-theme="${key}"]`);
+    if (activeDot) activeDot.classList.add('active');
+
+    localStorage.setItem('behike-theme', key);
+  }
+
+  function applyFontSize(key) {
+    const s = fontSizes[key];
+    if (!s) return;
+    document.documentElement.style.fontSize = (16 * s.scale) + 'px';
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    const activeBtn = document.querySelector(`.size-btn[data-size="${key}"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    localStorage.setItem('behike-fontsize', key);
+  }
+
+  function createWidget() {
+    const widget = document.createElement('div');
+    widget.id = 'behike-settings';
+    widget.innerHTML = `
+      <style>
+        #behike-settings-toggle {
+          position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+          width: 48px; height: 48px; border-radius: 50%;
+          background: var(--blue, #0A84FF); border: none; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #behike-settings-toggle:hover {
+          transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,0,0,0.5);
+        }
+        #behike-settings-panel {
+          position: fixed; bottom: 84px; right: 24px; z-index: 9998;
+          background: rgba(20,20,20,0.95); backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px); border-radius: 16px;
+          padding: 20px; width: 280px;
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+          display: none; animation: slideUp 0.25s ease-out;
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        #behike-settings-panel.open { display: block; }
+        .settings-title { font-size: 13px; font-weight: 600; color: #F5F5F7; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+        .settings-section { margin-bottom: 16px; }
+        .settings-label { font-size: 11px; color: #86868B; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .theme-dot {
+          width: 100%; aspect-ratio: 1; border-radius: 10px;
+          border: 2px solid transparent; cursor: pointer;
+          transition: transform 0.15s, border-color 0.15s;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 16px; position: relative;
+        }
+        .theme-dot:hover { transform: scale(1.1); }
+        .theme-dot.active { border-color: #F5F5F7; }
+        .theme-dot::after {
+          content: attr(data-name); position: absolute; bottom: -16px;
+          font-size: 9px; color: #86868B; white-space: nowrap;
+        }
+        .size-row { display: flex; gap: 8px; }
+        .size-btn {
+          flex: 1; padding: 8px 0; border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: transparent; color: #F5F5F7;
+          font-size: 14px; font-weight: 600; cursor: pointer;
+          transition: background 0.15s, border-color 0.15s;
+        }
+        .size-btn:hover { background: rgba(255,255,255,0.08); }
+        .size-btn.active { background: var(--blue, #0A84FF); border-color: var(--blue, #0A84FF); color: #fff; }
+      </style>
+      <button id="behike-settings-toggle" aria-label="Settings">\u2699\uFE0F</button>
+      <div id="behike-settings-panel">
+        <div class="settings-title">Settings</div>
+        <div class="settings-section">
+          <div class="settings-label">Theme</div>
+          <div class="theme-grid">
+            ${Object.entries(themes).map(([key, t]) =>
+              `<div class="theme-dot" data-theme="${key}" data-name="${t.name}" style="background: ${t.black}; box-shadow: inset 0 0 0 4px ${t.accent};" title="${t.name}">${t.icon}</div>`
+            ).join('')}
+          </div>
+        </div>
+        <div class="settings-section" style="margin-top: 28px;">
+          <div class="settings-label">Font Size</div>
+          <div class="size-row">
+            ${Object.entries(fontSizes).map(([key, s]) =>
+              `<button class="size-btn" data-size="${key}">${s.label}</button>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(widget);
+
+    document.getElementById('behike-settings-toggle').addEventListener('click', () => {
+      document.getElementById('behike-settings-panel').classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('behike-settings-panel');
+      const toggle = document.getElementById('behike-settings-toggle');
+      if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) {
+        panel.classList.remove('open');
+      }
+    });
+
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyTheme(dot.dataset.theme);
+      });
+    });
+
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applyFontSize(btn.dataset.size);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    createWidget();
+    applyTheme(savedTheme);
+    applyFontSize(savedSize);
+  });
+})();
+
+// ── Language Switcher ──
+(function() {
+  const translations = {
+    en: {
+      subtitle: 'Builder. Engineer. Puerto Rico.',
+      navJournal: 'Journal', navProjects: 'Projects', navLab: 'Lab', navStore: 'Store',
+      buildLog: 'Build Log', projects: 'Projects', theLab: 'The Lab',
+      minecraft: 'Take a break. Play some Minecraft.',
+      mcSub: 'Built with JavaScript. No libraries. Just math.',
+      mcClick: 'Click to play. WASD to move. Mouse to look. Click to build/destroy.',
+      store: 'Products', storeAll: 'View All Products',
+      footer: 'Built from Puerto Rico with 3 computers and zero subscriptions.',
+      readMore: 'Read more', readLess: 'Read less', tryIt: 'Try It', view: 'View',
+      live: 'LIVE', built: 'BUILT', idea: 'IDEA',
+    },
+    es: {
+      subtitle: 'Builder. Ingeniero. Puerto Rico.',
+      navJournal: 'Bitacora', navProjects: 'Proyectos', navLab: 'Laboratorio', navStore: 'Tienda',
+      buildLog: 'Bitacora', projects: 'Proyectos', theLab: 'El Laboratorio',
+      minecraft: 'Toma un descanso. Juega Minecraft.',
+      mcSub: 'Hecho con JavaScript. Sin librerias. Solo matematicas.',
+      mcClick: 'Haz clic para jugar. WASD para moverte. Mouse para mirar. Clic para construir/destruir.',
+      store: 'Productos', storeAll: 'Ver Todos los Productos',
+      footer: 'Construido desde Puerto Rico con 3 computadoras y cero suscripciones.',
+      readMore: 'Leer mas', readLess: 'Leer menos', tryIt: 'Pruebalo', view: 'Ver',
+      live: 'ACTIVO', built: 'HECHO', idea: 'IDEA',
+    }
+  };
+
+  let currentLang = localStorage.getItem('behike-lang') || 'en';
+
+  function applyLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('behike-lang', lang);
+    const t = translations[lang];
+
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+
+    // Update lang toggle button
+    const btn = document.getElementById('lang-toggle');
+    if (btn) btn.textContent = lang === 'en' ? 'ES' : 'EN';
+
+    document.documentElement.lang = lang;
+  }
+
+  // Create language toggle button
+  function createLangToggle() {
+    const btn = document.createElement('button');
+    btn.id = 'lang-toggle';
+    btn.textContent = currentLang === 'en' ? 'ES' : 'EN';
+    btn.title = 'Switch language / Cambiar idioma';
+    btn.style.cssText = 'position:fixed;bottom:24px;left:80px;z-index:9999;width:48px;height:48px;border-radius:50%;background:rgba(245,245,247,0.1);border:1px solid rgba(245,245,247,0.15);color:#F5F5F7;font-size:14px;font-weight:700;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:transform 0.2s,background 0.2s;font-family:-apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0.05em;';
+    btn.addEventListener('mouseenter', () => btn.style.background = 'rgba(245,245,247,0.2)');
+    btn.addEventListener('mouseleave', () => btn.style.background = 'rgba(245,245,247,0.1)');
+    btn.addEventListener('click', () => applyLang(currentLang === 'en' ? 'es' : 'en'));
+    document.body.appendChild(btn);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add data-i18n attributes to key elements
+    const mappings = [
+      ['.hero-subtitle', 'subtitle'],
+      ['.section-title', null], // handled individually
+    ];
+
+    // Nav links
+    const navLinks = document.querySelectorAll('.nav-links a');
+    if (navLinks[0]) navLinks[0].setAttribute('data-i18n', 'navJournal');
+    if (navLinks[1]) navLinks[1].setAttribute('data-i18n', 'navProjects');
+    if (navLinks[2]) navLinks[2].setAttribute('data-i18n', 'navLab');
+    if (navLinks[3]) navLinks[3].setAttribute('data-i18n', 'navStore');
+
+    // Section titles
+    document.querySelectorAll('.section-title').forEach(el => {
+      const text = el.textContent.trim();
+      if (text === 'Build Log') el.setAttribute('data-i18n', 'buildLog');
+      if (text === 'Products') el.setAttribute('data-i18n', 'store');
+      if (text.includes('Minecraft')) el.setAttribute('data-i18n', 'minecraft');
+    });
+
+    // Section labels
+    document.querySelectorAll('.section-label').forEach(el => {
+      const text = el.textContent.trim();
+      if (text === 'Projects') el.setAttribute('data-i18n', 'projects');
+    });
+
+    // Glitch text (The Lab)
+    document.querySelectorAll('.glitch-text').forEach(el => {
+      if (el.textContent.trim() === 'The Lab') el.setAttribute('data-i18n', 'theLab');
+    });
+
+    // Footer
+    const footerP = document.querySelector('footer p');
+    if (footerP && footerP.textContent.includes('Puerto Rico')) footerP.setAttribute('data-i18n', 'footer');
+
+    // Hero subtitle
+    const heroSub = document.querySelector('.hero-subtitle');
+    if (heroSub) heroSub.setAttribute('data-i18n', 'subtitle');
+
+    createLangToggle();
+    applyLang(currentLang);
+  });
+})();
+</script>
+
+</body>
+</html>

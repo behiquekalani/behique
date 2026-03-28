@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Agent — Write Your First Ebook in a Weekend</title>
+  <meta name="description" content="A system of prompts, templates, and frameworks that turns your knowledge into a finished, publishable ebook. Even if you've never written one before." />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #000000;
+      --accent: #0A84FF;
+      --green: #30D158;
+      --text: #FFFFFF;
+      --text-secondary: #8E8E93;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --radius-card: 12px;
+      --radius-pill: 980px;
+      --max-width: 980px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      background: var(--green);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 32px;
+      letter-spacing: 0.3px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 .hl { color: var(--accent); }
+
+    .hero-sub {
+      font-size: clamp(17px, 2.2vw, 20px);
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* PROOF BAR */
+    .proof-bar {
+      padding: 28px 0;
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .proof-bar .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .proof-item { text-align: center; }
+
+    .proof-num {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: block;
+    }
+
+    .proof-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .proof-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--card-border);
+    }
+
+    /* SECTIONS */
+    .section { padding: 80px 0; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+    }
+
+    .problem-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 69, 58, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .problem-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* WHAT'S INSIDE */
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .inside-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .inside-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+
+    .inside-num {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .inside-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+      line-height: 1.35;
+    }
+
+    .inside-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* PROCESS */
+    .process-section {
+      padding: 80px 0;
+      background: rgba(255, 255, 255, 0.02);
+      border-top: 1px solid var(--card-border);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0;
+      margin-top: 48px;
+    }
+
+    .process-step {
+      padding: 28px 24px;
+      position: relative;
+    }
+
+    .process-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 40px; right: 0;
+      width: 1px; height: 50px;
+      background: var(--card-border);
+    }
+
+    .step-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .process-step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.35;
+      letter-spacing: -0.2px;
+    }
+
+    .process-step p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .process-duration {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      margin-top: 10px;
+    }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-card);
+      padding: 28px 24px;
+    }
+
+    .stars {
+      color: #FFD60A;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .testimonial-text {
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-style: italic;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .author-handle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* PRICING */
+    .pricing-card {
+      max-width: 480px;
+      margin: 48px auto 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+    }
+
+    .pricing-badge {
+      display: inline-block;
+      background: rgba(48, 209, 88, 0.12);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    .pricing-price {
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-price sup {
+      font-size: 24px;
+      font-weight: 600;
+      vertical-align: top;
+      margin-top: 10px;
+      display: inline-block;
+      letter-spacing: 0;
+    }
+
+    .pricing-note {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 15px;
+    }
+
+    .check {
+      color: var(--green);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .btn-pricing {
+      display: block;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 17px 36px;
+      border-radius: var(--radius-pill);
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-pricing:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* FAQ */
+    .faq-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .faq-list {
+      margin-top: 48px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 600;
+      text-align: left;
+      padding: 24px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-family: var(--font);
+      letter-spacing: -0.2px;
+      transition: color 0.2s ease;
+    }
+
+    .faq-question:hover { color: var(--accent); }
+
+    .faq-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+      color: var(--text-secondary);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 400px;
+      padding-bottom: 24px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 96px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(28px, 4.5vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .final-cta p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto 36px;
+      line-height: 1.55;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--card-border);
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-logo {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .footer-logo span { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--text-secondary);
+      width: 100%;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .proof-divider { display: none; }
+      .proof-bar .container { gap: 24px; }
+      .process-step:not(:last-child)::after { display: none; }
+      .process-step { border-bottom: 1px solid var(--card-border); }
+      footer .container { flex-direction: column; align-items: flex-start; }
+      .pricing-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="https://behike.shop" class="nav-logo">behike<span>.shop</span></a>
+      <a href="https://behikeai.gumroad.com/l/book-agent" class="nav-cta">Get the Book Agent</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="fade-in">
+        <div class="hero-badge">Powered by Claude AI</div>
+      </div>
+      <div class="fade-in">
+        <h1>Write Your First Ebook<br>in a <span class="hl">Weekend.</span> With AI.</h1>
+      </div>
+      <div class="fade-in">
+        <p class="hero-sub">The Book Agent is a system of prompts, templates, and frameworks that turns your knowledge into a finished, publishable ebook. Even if you have never written one before.</p>
+      </div>
+      <div class="fade-in">
+        <a href="https://behikeai.gumroad.com/l/book-agent" class="btn-primary">Get the Book Agent &mdash; $24.99</a>
+        <p class="hero-note">One-time payment. Instant download. No subscription.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF BAR -->
+  <div class="proof-bar">
+    <div class="container">
+      <div class="proof-item fade-in">
+        <span class="proof-num">40+</span>
+        <span class="proof-label">Prompts included</span>
+      </div>
+      <div class="proof-divider"></div>
+      <div class="proof-item fade-in">
+        <span class="proof-num">2 days</span>
+        <span class="proof-label">To a finished product</span>
+      </div>
+      <div class="proof-divider"></div>
+      <div class="proof-item fade-in">
+        <span class="proof-num">$24.99</span>
+        <span class="proof-label">One-time, no upsells</span>
+      </div>
+      <div class="proof-divider"></div>
+      <div class="proof-item fade-in">
+        <span class="proof-num">Your voice</span>
+        <span class="proof-label">Not generic AI copy</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">You know enough to write a book.<br>Something keeps stopping you.</h2>
+        <p class="section-sub">Every solopreneur has knowledge worth selling. Most never package it. Here is why.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#9632;</div>
+          <h3>You have the knowledge but blank page paralysis stops you every time</h3>
+          <p>You open a doc. You type two sentences. You close it and open Twitter instead. The knowledge is real but there is no structure to pull it out of you.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#9650;</div>
+          <h3>AI writes for you but it doesn't sound like you</h3>
+          <p>You've tried using ChatGPT or Claude. The output is technically correct and completely generic. It reads like every other AI ebook and your readers would notice immediately.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="problem-icon">&#9679;</div>
+          <h3>You've started 3 ebooks and finished zero</h3>
+          <p>You have a folder with half-finished drafts. Each one started with energy and died by chapter 2. The problem is not willpower. It is not having a system that carries you through.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section class="section" style="padding-top: 0;">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">What's Inside</div>
+        <h2 class="section-title">Five components.<br>One complete system.</h2>
+        <p class="section-sub">Not a prompt dump. A workflow where each piece feeds the next.</p>
+      </div>
+      <div class="inside-grid">
+        <div class="inside-card fade-in">
+          <div class="inside-num">01</div>
+          <h3>The Book Agent Prompt Stack</h3>
+          <p>40 prompts organized by phase: outline, draft, edit, and polish. Each prompt is engineered to give Claude enough context to produce a real chapter, not filler. Includes chain prompts that carry context forward across sessions.</p>
+        </div>
+        <div class="inside-card fade-in">
+          <div class="inside-num">02</div>
+          <h3>Voice Calibration Framework</h3>
+          <p>The system that makes AI write in your exact style. Run the calibration once before you start. Feed it samples of your writing, your vocabulary patterns, your sentence rhythm. Every subsequent prompt in the stack works from your voice model, not a default.</p>
+        </div>
+        <div class="inside-card fade-in">
+          <div class="inside-num">03</div>
+          <h3>The Weekend Writing Sprint Template</h3>
+          <p>A full hour-by-hour schedule across two days. You know exactly what you are doing at every block. No decisions to make, no rabbit holes to fall into. Designed for ADHD-friendly deep work windows.</p>
+        </div>
+        <div class="inside-card fade-in">
+          <div class="inside-num">04</div>
+          <h3>Cover Design Brief Template</h3>
+          <p>A structured brief to hand a designer or paste into Midjourney. Covers positioning, visual direction, color psychology, typography guidance, and the five elements of a cover that sells on a digital store.</p>
+        </div>
+        <div class="inside-card fade-in">
+          <div class="inside-num">05</div>
+          <h3>Publication Checklist</h3>
+          <p>Gumroad formatting guide, pricing framework, product description formula, thumbnail spec, and the exact page structure that converts browsers into buyers. Go from PDF to published in under two hours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="process-section">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">The Process</div>
+        <h2 class="section-title">48 hours. Start to listed.</h2>
+        <p class="section-sub">Not a rough draft in a Google Doc. A formatted, priced, published product. Here is the exact schedule.</p>
+      </div>
+      <div class="process-steps">
+        <div class="process-step fade-in">
+          <div class="step-tag"><span class="step-dot"></span>Day 1, Morning</div>
+          <h3>Calibrate your voice and outline your book</h3>
+          <p>Run the Voice Calibration Framework. Feed Claude your past writing. Use the Outline Prompt Stack to build a chapter structure you believe in before you write a single word.</p>
+          <span class="process-duration">2 hours</span>
+        </div>
+        <div class="process-step fade-in">
+          <div class="step-tag"><span class="step-dot"></span>Day 1, Afternoon</div>
+          <h3>Draft every chapter with the prompt stack</h3>
+          <p>Work chapter by chapter using the Draft Stack. Each prompt carries context from the previous output so the book stays coherent. You review, adjust tone, and move forward.</p>
+          <span class="process-duration">4 hours</span>
+        </div>
+        <div class="process-step fade-in">
+          <div class="step-tag"><span class="step-dot"></span>Day 2, Morning</div>
+          <h3>Edit, tighten, and polish with the revision prompts</h3>
+          <p>Twelve revision prompts for clarity, flow, transitions, and cutting. You cut what is weak and sharpen what is good. The book becomes tighter and more distinctly yours.</p>
+          <span class="process-duration">3 hours</span>
+        </div>
+        <div class="process-step fade-in">
+          <div class="step-tag"><span class="step-dot"></span>Day 2, Afternoon</div>
+          <h3>Format, cover, description, and list it</h3>
+          <p>Use the Publication Checklist. Format in Notion or Google Docs, export to PDF, run the cover brief, write the product description with the formula, and upload to Gumroad.</p>
+          <span class="process-duration">2 hours</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">From Builders Who Used It</div>
+        <h2 class="section-title">Real results from real solopreneurs.</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I had a half-finished ebook sitting in my Drive for four months. Used Book Agent on a Saturday and had a published product by Sunday night. The Voice Calibration step is the thing. Every chapter actually sounded like me, not a robot."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: rgba(10,132,255,0.15); color: var(--accent);">M</div>
+            <div>
+              <div class="author-name">Marcus T.</div>
+              <div class="author-handle">Freelance consultant, Austin TX</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I teach graphic design and always said I should write a pricing guide. Kept saying that for two years. Book Agent gave me a system and a deadline and I launched my first product in a weekend. Made my first $200 in three days."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: rgba(48,209,88,0.12); color: var(--green);">S</div>
+            <div>
+              <div class="author-name">Sofia R.</div>
+              <div class="author-handle">Designer and educator</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card fade-in">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The sprint template alone is worth the price. Most prompt packs give you prompts and no structure. This one has a real schedule. I blocked out the weekend, followed the timeline, and had a 7,000-word guide on Gumroad by Sunday at 8pm."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar" style="background: rgba(255,159,10,0.12); color: #FF9F0A;">J</div>
+            <div>
+              <div class="author-name">Jordan K.</div>
+              <div class="author-handle">Indie maker, fully remote</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" style="padding-bottom: 80px;">
+    <div class="container" style="text-align: center;">
+      <div class="fade-in">
+        <div class="section-label">Pricing</div>
+        <h2 class="section-title">Simple. One price. Yours forever.</h2>
+        <p class="section-sub" style="margin: 0 auto;">No subscription. No upsells. Download it once and use it for every ebook you ever write.</p>
+      </div>
+      <div class="pricing-card fade-in">
+        <div class="pricing-badge">One-Time Payment</div>
+        <div class="pricing-price"><sup>$</sup>24.99</div>
+        <p class="pricing-note">Everything below, instant download</p>
+        <ul class="pricing-features">
+          <li><span class="check">&#10003;</span> The Book Agent Prompt Stack (40+ prompts)</li>
+          <li><span class="check">&#10003;</span> Voice Calibration Framework</li>
+          <li><span class="check">&#10003;</span> Weekend Writing Sprint Template</li>
+          <li><span class="check">&#10003;</span> Cover Design Brief Template</li>
+          <li><span class="check">&#10003;</span> Gumroad Publication Checklist</li>
+          <li><span class="check">&#10003;</span> Works with Claude, ChatGPT, or any LLM</li>
+          <li><span class="check">&#10003;</span> Free updates when the prompt stack improves</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/book-agent" class="btn-pricing">Get the Book Agent &mdash; $24.99</a>
+        <p class="pricing-guarantee">Instant download. If it doesn't work for you, email us and we'll sort it out.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="fade-in">
+        <div class="section-label">FAQ</div>
+        <h2 class="section-title">Questions.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item fade-in">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Do I need a paid Claude or ChatGPT subscription to use this?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            No. The prompts are written to work with any LLM including the free tiers of Claude and ChatGPT. A paid subscription gives you longer context windows, which helps for longer chapters, but the system works without one. Most people complete the full sprint on a free plan.
+          </div>
+        </div>
+        <div class="faq-item fade-in">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What kind of ebook can I write with this?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            Any expertise-based ebook. How-to guides, frameworks, systems, tutorials, industry knowledge. The system is built around transferable knowledge so it works best when you have real experience in a topic. It is not built for fiction or narrative non-fiction.
+          </div>
+        </div>
+        <div class="faq-item fade-in">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Will my ebook actually sound like me and not like generic AI output?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            That is the main problem the Voice Calibration Framework solves. Before you write a single chapter you run a calibration sequence that feeds Claude your existing writing, vocabulary patterns, sentence rhythm, and point of view. Every prompt in the stack references that calibration. The output sounds like you because the AI is working from your voice model, not a default.
+          </div>
+        </div>
+        <div class="faq-item fade-in">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What if I don't finish in a weekend?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            The sprint template is a structure, not a rule. Most people who don't finish in a weekend finish in the following week because they have the system and the prompts. The value is not the two-day deadline. It is having a process that takes you from zero to published without stalling out halfway through. Take the time you need.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <div class="fade-in">
+        <h2>Your knowledge is worth packaging.<br>This weekend is a good time to start.</h2>
+        <p>You have something worth selling. The only thing between you and a live product is the system to extract it. That is what Book Agent is.</p>
+        <a href="https://behikeai.gumroad.com/l/book-agent" class="btn-primary">Get the Book Agent &mdash; $24.99</a>
+        <p class="hero-note" style="margin-top: 16px;">One-time payment. Works with any AI model. Instant download.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <a href="https://behike.shop" class="footer-logo">behike<span>.shop</span></a>
+      <div class="footer-links">
+        <a href="https://behike.shop">Store</a>
+        <a href="https://instagram.com/behikeai" target="_blank">@behikeai</a>
+        <a href="mailto:hello@behike.shop">Contact</a>
+      </div>
+      <p class="footer-copy">2026 Behike. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll fade-in
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Build Monitor</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;padding:24px;min-height:100vh}
+h1{font-size:28px;font-weight:600;margin-bottom:8px}
+.subtitle{color:#6e6e73;font-size:14px;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:32px}
+.card{background:#1c1c1e;border-radius:12px;padding:20px;border:1px solid #2c2c2e}
+.card.done{border-color:#34C759}
+.card.running{border-color:#0A84FF;animation:pulse 2s infinite}
+.card.waiting{border-color:#2c2c2e;opacity:0.5}
+.card.error{border-color:#FF453A}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(10,132,255,0)}50%{box-shadow:0 0 12px 2px rgba(10,132,255,0.3)}}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.card-title{font-size:15px;font-weight:600}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;letter-spacing:0.5px}
+.badge.done{background:#34C75920;color:#34C759}
+.badge.running{background:#0A84FF20;color:#0A84FF}
+.badge.waiting{background:#6e6e7320;color:#6e6e73}
+.badge.error{background:#FF453A20;color:#FF453A}
+.card-desc{font-size:13px;color:#8e8e93;line-height:1.5;margin-bottom:12px}
+.progress-bar{height:4px;background:#2c2c2e;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.5s ease}
+.progress-fill.done{background:#34C759;width:100%}
+.progress-fill.running{background:#0A84FF;animation:loading 1.5s infinite}
+@keyframes loading{0%{width:20%}50%{width:80%}100%{width:20%}}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.stat{background:#1c1c1e;border-radius:12px;padding:16px;text-align:center;border:1px solid #2c2c2e}
+.stat-number{font-size:32px;font-weight:700;color:#0A84FF}
+.stat-number.gold{color:#D4A843}
+.stat-number.green{color:#34C759}
+.stat-number.red{color:#FF453A}
+.stat-label{font-size:12px;color:#6e6e73;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.section-title{font-size:18px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.green{background:#34C759}
+.dot.blue{background:#0A84FF}
+.dot.gray{background:#6e6e73}
+.log{background:#1c1c1e;border-radius:12px;padding:20px;border:1px solid #2c2c2e;max-height:300px;overflow-y:auto;font-family:'SF Mono',monospace;font-size:12px;line-height:1.8;color:#8e8e93}
+.log-entry{border-bottom:1px solid #2c2c2e20;padding:4px 0}
+.log-time{color:#6e6e73}
+.log-done{color:#34C759}
+.log-run{color:#0A84FF}
+.timer{font-size:48px;font-weight:700;text-align:center;margin:16px 0;font-variant-numeric:tabular-nums}
+.timer-label{text-align:center;color:#6e6e73;font-size:13px}
+</style>
+</head>
+<body>
+
+<h1>Behike Build Monitor</h1>
+<p class="subtitle">Da Vinci Session -- 12 Hour Execution Plan</p>
+
+<div class="stats">
+<div class="stat"><div class="stat-number green" id="done-count">0</div><div class="stat-label">Completed</div></div>
+<div class="stat"><div class="stat-number" id="running-count">0</div><div class="stat-label">Running</div></div>
+<div class="stat"><div class="stat-number gold" id="total-agents">0</div><div class="stat-label">Total Agents</div></div>
+<div class="stat"><div class="stat-number red" id="revenue">$0</div><div class="stat-label">Revenue</div></div>
+</div>
+
+<div class="timer" id="elapsed">00:00:00</div>
+<div class="timer-label">Session elapsed</div>
+
+<div class="section-title" style="margin-top:32px"><span class="dot blue"></span> Current Wave (Hours 1-10)</div>
+<div class="grid" id="agents-grid"></div>
+
+<div class="section-title"><span class="dot green"></span> Completed This Session</div>
+<div class="grid" id="completed-grid"></div>
+
+<div class="section-title" style="margin-top:24px"><span class="dot gray"></span> Activity Log</div>
+<div class="log" id="log"></div>
+
+<script>
+const SESSION_START = new Date('2026-03-21T20:00:00-04:00');
+
+const agents = [
+  // Wave 1 (earlier today)
+  {id:1, name:'AI News Pipeline', desc:'18 RSS feeds, carousels, captions EN/ES, reel scripts', status:'done', hour:'Pre'},
+  {id:2, name:'Reddit Story Scraper', desc:'Auto-scrape stories into reel-pipeline JSON format', status:'done', hour:'Pre'},
+  {id:3, name:'Reddit Meme Scraper', desc:'Top memes with captions for Instagram', status:'done', hour:'Pre'},
+  {id:4, name:'YouTuber Outreach Bot', desc:'Find channels, scrape emails, generate pitches', status:'done', hour:'Pre'},
+  {id:5, name:'Transcription SaaS', desc:'Web app: paste URL, get transcript. Whisper + yt-dlp', status:'done', hour:'Pre'},
+  {id:6, name:'Book-to-Agent', desc:'Upload PDF, chat with it via local Ollama', status:'done', hour:'Pre'},
+  {id:7, name:'Content Extractor', desc:'368 transcripts scanned, 69 video ideas extracted', status:'done', hour:'Pre'},
+  {id:8, name:'Instagram Poster', desc:'Queue manager, calendar, auto-assign accounts', status:'done', hour:'Pre'},
+  {id:9, name:'BehiqueBot Phase 1', desc:'Multi-idea parser + smart keyword matcher', status:'done', hour:'Pre'},
+  {id:10, name:'BehiqueBot Phase 2', desc:'Calendar integration + Habitica API', status:'done', hour:'Pre'},
+  {id:11, name:'Google Trends v2', desc:'Anti-ban scraper with proxy rotation', status:'done', hour:'Pre'},
+  {id:12, name:'Overnight Orchestrator', desc:'Midnight cron pipeline + morning report', status:'done', hour:'Pre'},
+  {id:13, name:'Habitica Community Bot', desc:'Spanish bot, 8 commands, 4 automations', status:'done', hour:'Pre'},
+  {id:14, name:'Behike OS v1 Fixes', desc:'Font sizes, close buttons, security, i18n', status:'done', hour:'Pre'},
+  {id:15, name:'Ebook Series Pipeline', desc:'Roblox Guide + 3D Fashion Guide + builder tool', status:'done', hour:'Pre'},
+  {id:16, name:'Amazon FBA Guide', desc:'8 chapters, landing page, Spanish version', status:'done', hour:'Pre'},
+  {id:17, name:'eBay Dropshipping Guide', desc:'8 chapters, profit calculator, Spanish version', status:'done', hour:'Pre'},
+  {id:18, name:'Matrix Disk System', desc:'Knowledge compiler from transcripts, self-improving', status:'done', hour:'Pre'},
+  {id:19, name:'Free-Fall Pricing Widget', desc:'Animated price drops, buy-now lock, configurable', status:'done', hour:'Pre'},
+  {id:20, name:'Landing Page Rewrites', desc:'3 pages with unique structures per Voice Bible', status:'done', hour:'Pre'},
+  {id:21, name:'Missing Excel Products', desc:'Budget Template + Cash Flow Dashboard (were phantom)', status:'done', hour:'Pre'},
+  {id:22, name:'Grand Slam Offers', desc:'$5K value ladder + 3 premium landing pages', status:'done', hour:'Pre'},
+  {id:23, name:'Legal Pages', desc:'Terms, Privacy, Refund Policy, About page', status:'done', hour:'Pre'},
+  {id:24, name:'Security Audit', desc:'47 findings, 5 critical, PII scrubbed', status:'done', hour:'Pre'},
+  {id:25, name:'Legal/Copyright Audit', desc:'6 RED, 11 YELLOW issues identified and fixed', status:'done', hour:'Pre'},
+  {id:26, name:'Business Readiness Audit', desc:'Launch checklist, pricing review, competitor analysis', status:'done', hour:'Pre'},
+  {id:27, name:'Deep Audit', desc:'Every file scanned for forgotten ideas and skeletons', status:'done', hour:'Pre'},
+  {id:28, name:'Missed Ideas Scanner', desc:'28 ideas found across all session transcripts', status:'done', hour:'Pre'},
+  {id:29, name:'23 PDF Conversions', desc:'All products converted to downloadable PDFs', status:'done', hour:'Pre'},
+  {id:30, name:'Voice Bible', desc:'Brand DNA document, banned words, copy frameworks', status:'done', hour:'Pre'},
+  {id:31, name:'PII Name Scrub', desc:'All personal names replaced with Behike in products', status:'done', hour:'Pre'},
+  // Da Vinci Wave
+  {id:32, name:'Behike Finance', desc:'8-tab unified financial dashboard. Debt payoff, subscriptions, health score.', status:'done', hour:'1-2'},
+  {id:33, name:'Behike OS v2', desc:'96KB. 10 apps. Minecraft with terrain. Music studio. Particle screensaver. Terminal. Mobile.', status:'done', hour:'3-4'},
+  {id:34, name:'Behike Method Rewrite', desc:'15,020 words. 624 content blocks. ADHD chapter is 4K words alone. Real soul.', status:'done', hour:'5-6'},
+  {id:35, name:'AI Employee Guide Depth', desc:'Real benchmarks, Week 1 diary, troubleshooting, cost comparison. 499 content blocks.', status:'done', hour:'7-8'},
+  {id:36, name:'Self-Improving Loop', desc:'Voice Bible wired into all tools. Performance feedback. Matrix routing. Variety enforcer. 10 tests passing.', status:'done', hour:'9-10'},
+  {id:37, name:'Launch Prep', desc:'Gumroad listings ready to paste. 6 products. 30 minutes to go live.', status:'done', hour:'11-12'},
+  // Wave 3: Da Vinci upgrades
+  {id:38, name:'Behike Finance', desc:'8-tab unified financial app. Debt payoff. Health score.', status:'done', hour:'Da Vinci'},
+  {id:39, name:'Behike OS v2', desc:'96KB. 10 apps. Minecraft terrain. Screensaver. Mobile.', status:'done', hour:'Da Vinci'},
+  {id:40, name:'Behike Method Rewrite', desc:'15,020 words. Real soul. ADHD chapter 4K words.', status:'done', hour:'Da Vinci'},
+  {id:41, name:'AI Employee Guide Depth', desc:'499 blocks. Benchmarks. Week 1 diary. Troubleshooting.', status:'done', hour:'Da Vinci'},
+  {id:42, name:'Self-Improving Loop', desc:'Voice Bible + performance feedback + matrix routing.', status:'done', hour:'Da Vinci'},
+  // Wave 4: Expert upgrades
+  {id:43, name:'Ecommerce Expert', desc:'12,855 words. Supplier scripts. Act 60. 30-day plan.', status:'done', hour:'Expert'},
+  {id:44, name:'Claude Code Expert', desc:'14K words. 10 complete lessons. 55 prompt templates.', status:'done', hour:'Expert'},
+  {id:45, name:'Solopreneur Expert', desc:'13,205 words. 8 modules. Financial foundations.', status:'done', hour:'Expert'},
+  {id:46, name:'Wellness Expert', desc:'3,177 lines. Binaural beats. ADHD tools. Guided sessions.', status:'done', hour:'Expert'},
+  {id:47, name:'Electron App', desc:'Behike Wellness as real Mac desktop app.', status:'done', hour:'Expert'},
+  // Wave 5: Platform + funnel
+  {id:48, name:'Platform Architecture', desc:'10,337 word master blueprint. Revenue projections.', status:'done', hour:'Platform'},
+  {id:49, name:'Learning Hub', desc:'5 complete AI lessons. Progress tracking. Email capture.', status:'done', hour:'Platform'},
+  {id:50, name:'Email Sequences', desc:'15 emails. Welcome + post-purchase + re-engagement.', status:'done', hour:'Platform'},
+  {id:51, name:'Social Proof System', desc:'Beta reader pipeline + testimonial widget + case study.', status:'done', hour:'Platform'},
+  {id:52, name:'Email Capture System', desc:'FastAPI server + newsletter writer + sender + lead magnet.', status:'done', hour:'Platform'},
+  {id:53, name:'Pricing Research', desc:'Real Gumroad prices. DotCom Secrets funnel. Corrected pricing.', status:'done', hour:'Platform'},
+  {id:54, name:'Free Ebook Lead Magnet', desc:'7 AI Tools That Replaced My Team. $0 PWYW.', status:'done', hour:'Platform'},
+  {id:55, name:'Grand Slam Offers', desc:'$5K value ladder. 3 premium landing pages.', status:'done', hour:'Platform'},
+  // Wave 6: Visionary builder (CURRENT)
+  {id:56, name:'10 YouTube Scripts', desc:'Camera-ready. Word-for-word. With [CAMERA]/[SCREEN] cues.', status:'running', hour:'Visionary'},
+  {id:57, name:'Autonomous Work System', desc:'ceiba_autonomous.py + /wake + /sleep commands.', status:'running', hour:'Visionary'},
+  {id:58, name:'Founder Content', desc:'Origin story + manifesto + 30 tweets + LinkedIn + podcast pitches.', status:'running', hour:'Visionary'},
+  {id:59, name:'Mastery System', desc:'Robert Greene applied. Daily learning. New $14.99 product.', status:'running', hour:'Visionary'},
+];
+
+function render() {
+  const running = agents.filter(a => a.status === 'running');
+  const done = agents.filter(a => a.status === 'done');
+  const waiting = agents.filter(a => a.status === 'waiting');
+
+  document.getElementById('done-count').textContent = done.length;
+  document.getElementById('running-count').textContent = running.length;
+  document.getElementById('total-agents').textContent = agents.length;
+
+  // Running + waiting grid
+  const activeGrid = document.getElementById('agents-grid');
+  activeGrid.innerHTML = [...running, ...waiting].map(a => `
+    <div class="card ${a.status}">
+      <div class="card-header">
+        <span class="card-title">${a.name}</span>
+        <span class="badge ${a.status}">${a.status === 'running' ? 'BUILDING' : a.status === 'waiting' ? 'QUEUED' : a.status.toUpperCase()}</span>
+      </div>
+      <div class="card-desc">${a.desc}</div>
+      <div style="font-size:11px;color:#6e6e73;margin-bottom:8px">Hours ${a.hour}</div>
+      <div class="progress-bar"><div class="progress-fill ${a.status}"></div></div>
+    </div>
+  `).join('');
+
+  // Completed grid (show last 8)
+  const completedGrid = document.getElementById('completed-grid');
+  completedGrid.innerHTML = done.slice(-8).reverse().map(a => `
+    <div class="card done">
+      <div class="card-header">
+        <span class="card-title">${a.name}</span>
+        <span class="badge done">DONE</span>
+      </div>
+      <div class="card-desc">${a.desc}</div>
+      <div class="progress-bar"><div class="progress-fill done"></div></div>
+    </div>
+  `).join('');
+}
+
+function updateTimer() {
+  const now = new Date();
+  const diff = Math.floor((now - SESSION_START) / 1000);
+  const h = Math.floor(diff / 3600).toString().padStart(2, '0');
+  const m = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+  const s = (diff % 60).toString().padStart(2, '0');
+  document.getElementById('elapsed').textContent = `${h}:${m}:${s}`;
+}
+
+function addLog(msg, type='run') {
+  const log = document.getElementById('log');
+  const now = new Date().toLocaleTimeString();
+  log.innerHTML = `<div class="log-entry"><span class="log-time">${now}</span> <span class="log-${type}">${msg}</span></div>` + log.innerHTML;
+}
+
+// Initial logs
+const completedNames = agents.filter(a => a.status === 'done').map(a => a.name);
+completedNames.slice(-10).forEach(n => addLog(`${n} completed`, 'done'));
+agents.filter(a => a.status === 'running').forEach(a => addLog(`${a.name} building...`, 'run'));
+
+render();
+setInterval(updateTimer, 1000);
+updateTimer();
+
+// Auto-refresh page every 30 seconds to pick up manual status changes
+// To update: edit the agents array status from 'running' to 'done'
+setInterval(() => { render(); }, 30000);
+</script>
+</body>
+</html>

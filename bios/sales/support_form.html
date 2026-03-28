@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Behike Support</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{background:#111;border:1px solid #c9a84c33;border-radius:12px;padding:2.5rem;width:100%;max-width:460px}
+h1{color:#c9a84c;font-size:1.4rem;margin-bottom:.3rem}
+p.sub{color:#888;font-size:.85rem;margin-bottom:1.5rem}
+label{display:block;color:#aaa;font-size:.8rem;margin-bottom:.3rem;margin-top:1rem}
+input,textarea,select{width:100%;padding:.65rem;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#e0e0e0;font-size:.9rem}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#c9a84c}
+textarea{resize:vertical;min-height:100px}
+select option{background:#1a1a1a}
+button{margin-top:1.5rem;width:100%;padding:.75rem;background:#c9a84c;color:#0a0a0a;border:none;border-radius:6px;font-size:1rem;font-weight:600;cursor:pointer}
+button:hover{background:#d4b05c}
+button:disabled{opacity:.5;cursor:wait}
+.result{margin-top:1.2rem;padding:1rem;background:#1a2a1a;border:1px solid #2a4a2a;border-radius:8px;display:none}
+.result h3{color:#c9a84c;font-size:.95rem}
+.result p{font-size:.85rem;margin-top:.4rem;color:#aaa}
+.result .tid{font-family:monospace;color:#e0e0e0;font-size:1rem}
+.auto{margin-top:.6rem;padding:.6rem;background:#2a2a1a;border-radius:6px;font-size:.85rem;color:#c9a84c}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Contact Support</h1>
+  <p class="sub">We usually respond within 24 hours.</p>
+  <form id="f">
+    <label>Email *</label>
+    <input type="email" id="email" required placeholder="you@example.com">
+    <label>Subject *</label>
+    <input type="text" id="subject" required placeholder="What do you need help with?">
+    <label>Product</label>
+    <select id="product">
+      <option value="">General inquiry</option>
+      <option value="behike-os">Behike OS</option>
+      <option value="ai-playbook">AI Playbook</option>
+      <option value="prompt-vault">Prompt Vault</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Message *</label>
+    <textarea id="message" required placeholder="Describe your issue..."></textarea>
+    <button type="submit" id="btn">Submit Ticket</button>
+  </form>
+  <div class="result" id="res">
+    <h3>Ticket Created</h3>
+    <p>Your ticket ID: <span class="tid" id="tid"></span></p>
+    <p>We'll get back to you at <span id="remail"></span></p>
+    <div class="auto" id="autoreply" style="display:none"></div>
+  </div>
+</div>
+<script>
+const API = window.location.port === '' ? 'http://localhost:8105' : window.location.origin;
+document.getElementById('f').onsubmit = async(e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  try {
+    const r = await fetch(API + '/support/ticket', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value,
+        product: document.getElementById('product').value || null,
+      })
+    });
+    const d = await r.json();
+    document.getElementById('tid').textContent = d.ticket_id;
+    document.getElementById('remail').textContent = document.getElementById('email').value;
+    if (d.auto_reply) {
+      const ar = document.getElementById('autoreply');
+      ar.textContent = d.auto_reply; ar.style.display = 'block';
+    }
+    document.getElementById('res').style.display = 'block';
+    document.getElementById('f').style.display = 'none';
+  } catch(err) {
+    alert('Error submitting ticket. Please try again.');
+    btn.disabled = false; btn.textContent = 'Submit Ticket';
+  }
+};
+</script>
+</body>
+</html>

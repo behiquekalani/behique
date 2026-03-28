@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Content Machine Kit — Behike</title>
+  <meta name="description" content="The exact system for creating 30 days of content in 3 hours using AI. One input, six platforms, a full month scheduled.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0d0d0d;
+      --surface2: #141414;
+      --border: #222222;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --green: #30D158;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ---- NAV ---- */
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 20px;
+      transition: opacity 0.2s;
+    }
+
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ---- LAYOUT ---- */
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 96px 0;
+    }
+
+    /* ---- ANIMATE ON SCROLL ---- */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- HERO ---- */
+
+    .hero {
+      padding: 160px 0 100px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(17px, 2.5vw, 21px);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--green);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 12px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      font-size: 15px;
+      color: var(--muted);
+      padding: 16px 0;
+      transition: color 0.2s;
+    }
+
+    .btn-secondary:hover { color: var(--text); }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      margin-top: 52px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .meta-value {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .meta-label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meta-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
+    }
+
+    /* ---- SECTION LABELS ---- */
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.65;
+    }
+
+    /* ---- PROBLEM ---- */
+
+    .problem {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .problem-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .problem-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .problem-icon {
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 69, 58, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 11px;
+    }
+
+    .problem-text {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .problem-text strong {
+      color: var(--text);
+    }
+
+    .problem-callout {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    .callout-stat {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .callout-desc {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ---- SOLUTION ---- */
+
+    .solution-flow {
+      margin-top: 48px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      flex-direction: column;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .flow-node {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      flex: 1;
+      transition: border-color 0.2s;
+    }
+
+    .flow-node:hover { border-color: var(--accent); }
+
+    .flow-node-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .flow-node-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .flow-connector {
+      width: 2px;
+      background: linear-gradient(to bottom, var(--border), var(--accent));
+      margin: 0 auto;
+      height: 32px;
+    }
+
+    .flow-outputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .flow-output-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .flow-output-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .output-icon {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .output-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .output-count {
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    /* ---- WHAT'S INSIDE ---- */
+
+    .inside-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .inside-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .inside-card:hover { border-color: rgba(10, 132, 255, 0.4); }
+
+    .inside-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .inside-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .inside-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .inside-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(10, 132, 255, 0.1);
+      border-radius: 6px;
+      padding: 3px 10px;
+    }
+
+    /* ---- PROMPT PREVIEW ---- */
+
+    .prompt-preview {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .prompt-showcase {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .prompt-card {
+      background: #0a0a0a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .prompt-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .prompt-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-r { background: #FF453A; }
+    .dot-y { background: #FFD60A; }
+    .dot-g { background: #30D158; }
+
+    .prompt-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+
+    .prompt-body {
+      padding: 20px;
+      font-size: 13px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: #9db8d2;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .prompt-body .comment { color: #6e7e8b; }
+    .prompt-body .keyword { color: var(--accent); }
+    .prompt-body .value { color: var(--green); }
+
+    /* ---- PLATFORMS ---- */
+
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .platform-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .platform-card:hover {
+      border-color: rgba(10, 132, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .platform-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .platform-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .platform-formats {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .platform-count {
+      margin-top: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    /* ---- WHO THIS IS FOR ---- */
+
+    .for-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+    }
+
+    .for-group-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .for-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .for-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .for-check {
+      color: var(--green);
+      font-size: 14px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .for-x {
+      color: #FF453A;
+      font-size: 14px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ---- FAQ ---- */
+
+    .faq-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item:hover { border-color: rgba(10, 132, 255, 0.3); }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 24px 28px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      gap: 16px;
+    }
+
+    .faq-q-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .faq-icon {
+      font-size: 20px;
+      color: var(--muted);
+      transition: transform 0.3s, color 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+    }
+
+    .faq-answer-inner {
+      padding: 0 28px 24px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ---- FINAL CTA ---- */
+
+    .final-cta {
+      text-align: center;
+    }
+
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 64px 48px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .cta-price {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .cta-price-value {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .cta-price-note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .cta-box h2 {
+      font-size: clamp(24px, 3.5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+
+    .cta-box p {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    .btn-cta-large {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--green);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 12px;
+      transition: opacity 0.2s, transform 0.2s;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .btn-cta-large:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .cta-guarantee {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ---- FOOTER ---- */
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ---- RESPONSIVE ---- */
+
+    @media (max-width: 720px) {
+      .problem-grid,
+      .for-grid,
+      .inside-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-outputs,
+      .platforms-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero { padding: 120px 0 80px; }
+
+      .cta-box { padding: 40px 24px; }
+
+      .footer-inner { flex-direction: column; text-align: center; }
+
+      nav { padding: 0 20px; }
+
+      .meta-divider { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .flow-outputs,
+      .platforms-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <a href="https://behikeai.gumroad.com/l/ai-content-machine-kit" class="nav-cta" target="_blank" rel="noopener">
+      Get for $19.99
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge reveal">AI Content Machine Kit</div>
+      <h1 class="reveal">30 days of content.<br><span>3 hours of work.</span></h1>
+      <p class="hero-sub reveal">One idea. Six platforms. A full month scheduled before Monday. The exact AI workflow that makes it possible.</p>
+      <div class="hero-actions reveal">
+        <a href="https://behikeai.gumroad.com/l/ai-content-machine-kit" class="btn-primary" target="_blank" rel="noopener">
+          Get the Kit — $19.99
+        </a>
+        <a href="#inside" class="btn-secondary">See what's inside</a>
+      </div>
+      <div class="hero-meta reveal">
+        <div class="meta-item">
+          <span class="meta-value">20+</span>
+          <span class="meta-label">tested AI prompts</span>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <span class="meta-value">6</span>
+          <span class="meta-label">platforms covered</span>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <span class="meta-value">13x</span>
+          <span class="meta-label">content per idea</span>
+        </div>
+        <div class="meta-divider"></div>
+        <div class="meta-item">
+          <span class="meta-value">3 hrs</span>
+          <span class="meta-label">per month of content</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <div class="problem-grid">
+        <div class="reveal">
+          <p class="section-label">The problem</p>
+          <h2 class="section-title">Content is a full-time job if you do it wrong.</h2>
+          <ul class="problem-list">
+            <li>
+              <span class="problem-icon">x</span>
+              <span class="problem-text"><strong>You start from zero every time.</strong> Every post, every tweet, every caption is a separate creative decision. That is not sustainable.</span>
+            </li>
+            <li>
+              <span class="problem-icon">x</span>
+              <span class="problem-text"><strong>You run out of ideas mid-week.</strong> The blank screen is not a creativity problem. It is a system problem.</span>
+            </li>
+            <li>
+              <span class="problem-icon">x</span>
+              <span class="problem-text"><strong>You are on six platforms with nothing consistent.</strong> Sporadic posting signals to every algorithm that you are not worth distributing.</span>
+            </li>
+            <li>
+              <span class="problem-icon">x</span>
+              <span class="problem-text"><strong>You know AI can help but the prompts do not work.</strong> Generic prompts produce generic content. What you need is a tested sequence.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <div class="problem-callout">
+            <div class="callout-stat">4-6 hrs</div>
+            <div class="callout-desc">is how long most creators spend on content every single week. Most of it is spent deciding what to make, not making it.</div>
+          </div>
+          <div class="problem-callout" style="margin-top: 16px;">
+            <div class="callout-stat">1 of 10</div>
+            <div class="callout-desc">creators who start posting consistently are still doing it six months later. The ones who quit ran out of system, not ideas.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section>
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">The solution</p>
+        <h2 class="section-title">One idea. One Sunday. A full month scheduled.</h2>
+        <p class="section-body">The AI Content Machine treats content like a factory. One input enters. Multiple outputs leave. You do the thinking once. The machine handles the distribution.</p>
+      </div>
+
+      <div class="solution-flow reveal" style="margin-top: 48px; max-width: 520px;">
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-title">One core idea</div>
+            <div class="flow-node-desc">Pulled from your content bank. Developed in 30 minutes with a tested AI sequence.</div>
+          </div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-row">
+          <div class="flow-node">
+            <div class="flow-node-title">Anchor content</div>
+            <div class="flow-node-desc">Long-form piece, 1,500-2,000 words. This is the raw material everything else comes from.</div>
+          </div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-row">
+          <div class="flow-node" style="border-color: rgba(10,132,255,0.3);">
+            <div class="flow-node-title" style="color: var(--accent);">13+ pieces of content</div>
+            <div class="flow-node-desc">Platform-native adaptations. Not reposts. Actual rewrites for each format and audience.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow-outputs reveal" style="margin-top: 32px;">
+        <div class="flow-output-card">
+          <div class="output-icon">&#x1f4f7;</div>
+          <div class="output-name">Instagram</div>
+          <div class="output-count">3 carousels</div>
+        </div>
+        <div class="flow-output-card">
+          <div class="output-icon">&#x1f426;</div>
+          <div class="output-name">Twitter / X</div>
+          <div class="output-count">5 threads</div>
+        </div>
+        <div class="flow-output-card">
+          <div class="output-icon">&#x1f3b5;</div>
+          <div class="output-name">TikTok</div>
+          <div class="output-count">2 scripts</div>
+        </div>
+        <div class="flow-output-card">
+          <div class="output-icon">&#x1f4fa;</div>
+          <div class="output-name">YouTube</div>
+          <div class="output-count">1 full script</div>
+        </div>
+        <div class="flow-output-card">
+          <div class="output-icon">&#x1f4bc;</div>
+          <div class="output-name">LinkedIn</div>
+          <div class="output-count">1 post</div>
+        </div>
+        <div class="flow-output-card">
+          <div class="output-icon">&#x2709;&#xfe0f;</div>
+          <div class="output-name">Newsletter</div>
+          <div class="output-count">1 section</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="inside" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">What's inside</p>
+        <h2 class="section-title">Everything you need to run the machine.</h2>
+      </div>
+      <div class="inside-grid">
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 01</div>
+          <div class="inside-title">The Content Machine Concept</div>
+          <div class="inside-desc">The exact input-to-output model. How one idea becomes 13 pieces of content across six platforms, with a time budget breakdown for each phase.</div>
+          <div class="inside-tags">
+            <span class="tag">workflow</span>
+            <span class="tag">time breakdown</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 02</div>
+          <div class="inside-title">Your Content Core</div>
+          <div class="inside-desc">How to find your three core topics and three angles. How to build a content bank of 20+ ideas before you ever open a blank document.</div>
+          <div class="inside-tags">
+            <span class="tag">strategy</span>
+            <span class="tag">content bank</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 03</div>
+          <div class="inside-title">The AI Workflow</div>
+          <div class="inside-desc">7 prompt sequences in order. Anchor development, then platform adaptation for every channel. Copy-paste ready, with instructions for what to edit.</div>
+          <div class="inside-tags">
+            <span class="tag">prompts</span>
+            <span class="tag">Claude / ChatGPT</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 04</div>
+          <div class="inside-title">Platform Breakdown</div>
+          <div class="inside-desc">What actually works on each platform. Format priority, posting cadence, what performs vs. what wastes time. No generic advice.</div>
+          <div class="inside-tags">
+            <span class="tag">6 platforms</span>
+            <span class="tag">cadence</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 05</div>
+          <div class="inside-title">The Weekly Production Sprint</div>
+          <div class="inside-desc">A timed Sunday session. 9:00 to 11:00. What happens in each block, in what order, and what you ship by the end of it.</div>
+          <div class="inside-tags">
+            <span class="tag">Sunday sprint</span>
+            <span class="tag">scheduling</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 06</div>
+          <div class="inside-title">Repurposing Matrix</div>
+          <div class="inside-desc">A complete table mapping every content type to its derivatives. YouTube to Twitter to carousel to TikTok. The 1-to-25 content ratio broken down.</div>
+          <div class="inside-tags">
+            <span class="tag">matrix</span>
+            <span class="tag">repurposing</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 07</div>
+          <div class="inside-title">Prompt Library</div>
+          <div class="inside-desc">20 tested prompts. 4 for anchor content, 4 for Twitter threads, 4 for Instagram carousels, 4 for TikTok, 2 for newsletter, 2 for LinkedIn.</div>
+          <div class="inside-tags">
+            <span class="tag">20 prompts</span>
+            <span class="tag">all platforms</span>
+          </div>
+        </div>
+        <div class="inside-card reveal">
+          <div class="inside-number">Section 08-10</div>
+          <div class="inside-title">Stack, Metrics, and 90-Day Plan</div>
+          <div class="inside-desc">Which scheduling tools are worth it and which are not. The five metrics that actually tell you something. A week-by-week framework for the first 90 days.</div>
+          <div class="inside-tags">
+            <span class="tag">tools</span>
+            <span class="tag">metrics</span>
+            <span class="tag">90-day plan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMPT PREVIEW -->
+  <section class="prompt-preview">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Prompt library preview</p>
+        <h2 class="section-title">Prompts that actually produce usable content.</h2>
+        <p class="section-body">Every prompt in the library is sequenced, tested, and includes notes on what to edit. These are not starting points. They are working templates.</p>
+      </div>
+
+      <div class="prompt-showcase">
+        <div class="prompt-card reveal">
+          <div class="prompt-header">
+            <div class="prompt-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="prompt-label">THREAD-01 — Twitter teaching thread</span>
+          </div>
+          <div class="prompt-body"><span class="comment"># Paste your anchor content at the bottom before running</span>
+
+<span class="keyword">Hook:</span> <span class="value">[specific claim about topic]</span>
+
+Thread format:
+- Tweet 1 is the hook
+- Tweets 2-8 break down the concept step by step
+- Each tweet must be standalone-readable
+- End with a summary tweet and a question
+
+<span class="keyword">Topic:</span> <span class="value">[X]</span>
+Keep each tweet under 280 characters.
+
+<span class="comment">[PASTE ANCHOR CONTENT BELOW]</span></div>
+        </div>
+
+        <div class="prompt-card reveal">
+          <div class="prompt-header">
+            <div class="prompt-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="prompt-label">CAROUSEL-01 — Instagram how-to carousel</span>
+          </div>
+          <div class="prompt-body"><span class="keyword">Topic:</span> <span class="value">[X]</span>
+
+<span class="keyword">Slide 1:</span> "[Number] steps to [specific outcome]"
+<span class="keyword">Slides 2-N:</span> one step per slide, 2-3 sentences max
+<span class="keyword">Final slide:</span> what to do next + follow prompt
+
+Keep language simple.
+Every word earns its place.
+
+<span class="comment">[PASTE ANCHOR CONTENT BELOW]</span></div>
+        </div>
+
+        <div class="prompt-card reveal">
+          <div class="prompt-header">
+            <div class="prompt-dots">
+              <div class="dot dot-r"></div>
+              <div class="dot dot-y"></div>
+              <div class="dot dot-g"></div>
+            </div>
+            <span class="prompt-label">TIKTOK-01 — Tutorial format</span>
+          </div>
+          <div class="prompt-body"><span class="keyword">Hook (3 sec):</span> "Here is how I [achieved outcome] in [time]"
+<span class="keyword">Problem (10 sec):</span> what most people do wrong
+<span class="keyword">Tutorial (60 sec):</span> step-by-step, spoken naturally
+<span class="keyword">CTA (10 sec):</span> follow for [specific content promise]
+
+Write as spoken word. Conversational. No jargon.
+
+<span class="comment">[PASTE ANCHOR CONTENT BELOW]</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORMS -->
+  <section>
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Platform coverage</p>
+        <h2 class="section-title">Built for every platform you are already on.</h2>
+        <p class="section-body">Each platform chapter covers format priority, posting cadence, what the algorithm actually rewards, and what wastes your time.</p>
+      </div>
+      <div class="platforms-grid">
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x1f4f7;</div>
+          <div class="platform-name">Instagram</div>
+          <div class="platform-formats">Carousels, Reels, Stories. Carousel scripts with slide-by-slide copy. Optimized for saves.</div>
+          <div class="platform-count">3 carousel scripts per week</div>
+        </div>
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x1f426;</div>
+          <div class="platform-name">Twitter / X</div>
+          <div class="platform-formats">Long-form threads with hook frameworks. Single tweet templates. Daily posting cadence.</div>
+          <div class="platform-count">5 threads + single tweets</div>
+        </div>
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x1f3b5;</div>
+          <div class="platform-name">TikTok</div>
+          <div class="platform-formats">Spoken-word scripts in 4 formats. Tutorial, reaction, behind-the-scenes, quick tip.</div>
+          <div class="platform-count">2 scripts per anchor</div>
+        </div>
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x1f4fa;</div>
+          <div class="platform-name">YouTube</div>
+          <div class="platform-formats">Full video scripts with B-roll markers. Separate Shorts strategy. Title and hook frameworks.</div>
+          <div class="platform-count">Full 8-12 min script</div>
+        </div>
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x1f4bc;</div>
+          <div class="platform-name">LinkedIn</div>
+          <div class="platform-formats">Professional post format. Short paragraphs, strategic line breaks. Framework and lesson post templates.</div>
+          <div class="platform-count">1 post per anchor</div>
+        </div>
+        <div class="platform-card reveal">
+          <div class="platform-icon">&#x2709;&#xfe0f;</div>
+          <div class="platform-name">Newsletter</div>
+          <div class="platform-formats">The only platform you own. Deep-dive section and curated insight section templates included.</div>
+          <div class="platform-count">1 section per anchor</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO THIS IS FOR -->
+  <section class="for-section">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Who this is for</p>
+        <h2 class="section-title">Right for some. Wrong for others.</h2>
+      </div>
+      <div class="for-grid">
+        <div class="reveal">
+          <div class="for-group-title">
+            <span style="color: var(--green);">This is for you if</span>
+          </div>
+          <ul class="for-list">
+            <li>
+              <span class="for-check">+</span>
+              <span>You are a solopreneur, creator, or online business owner posting without a team</span>
+            </li>
+            <li>
+              <span class="for-check">+</span>
+              <span>You want to be present on multiple platforms without spending your entire week on content</span>
+            </li>
+            <li>
+              <span class="for-check">+</span>
+              <span>You have used AI for content before but the output feels generic</span>
+            </li>
+            <li>
+              <span class="for-check">+</span>
+              <span>You understand that consistency beats virality, and you want a system that makes consistency easy</span>
+            </li>
+            <li>
+              <span class="for-check">+</span>
+              <span>You are already creating content but want to get 10x the output from the same amount of thinking</span>
+            </li>
+          </ul>
+        </div>
+        <div class="reveal">
+          <div class="for-group-title">
+            <span style="color: #FF453A;">This is not for you if</span>
+          </div>
+          <ul class="for-list">
+            <li>
+              <span class="for-x">-</span>
+              <span>You are looking for a tool that creates content without your involvement</span>
+            </li>
+            <li>
+              <span class="for-x">-</span>
+              <span>You have no existing knowledge or perspective to build content around</span>
+            </li>
+            <li>
+              <span class="for-x">-</span>
+              <span>You expect follower growth without putting in the three hours this system requires</span>
+            </li>
+            <li>
+              <span class="for-x">-</span>
+              <span>You want shortcuts. This is a leverage system, not a skip button.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">FAQ</p>
+        <h2 class="section-title">Questions worth answering.</h2>
+      </div>
+      <div class="faq-list">
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span class="faq-q-text">Does this work with ChatGPT, Claude, or other AI tools?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Yes. Every prompt in the library is written to work with any major language model: ChatGPT (GPT-4 or later), Claude, Gemini, or any equivalent. The prompts are model-agnostic by design. The results will vary slightly by model, but the workflow structure works regardless of which tool you use.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span class="faq-q-text">I am not a writer. Will the AI handle all the writing?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">The AI handles the heavy lifting. Your job is to provide the input (your topic, your perspective, your examples) and do a light edit pass on the output. The review step takes 30 minutes and mostly involves replacing generic AI phrasing with specific details that only you would know. You do not need to be a writer. You need to have something worth saying.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span class="faq-q-text">How is this different from other content AI guides?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">Most AI content guides give you a list of prompts without context. This guide is a sequenced workflow where each prompt feeds the next. It also covers the parts other guides skip: what to do when the output is generic, how to build a content bank so you never start from zero, how to structure your Sunday sprint so you finish in under three hours, and how to track the metrics that actually matter.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span class="faq-q-text">How long will it take to see results?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">The 90-day plan in Section 10 gives you a realistic week-by-week framework. Most creators who post consistently for 90 days see measurable audience growth by month two. The machine helps you stay consistent, which is the variable most people fail on. Results depend on the quality of your ideas and how specific your content is, not on the system itself. The system removes friction. You still have to show up.</div>
+          </div>
+        </div>
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            <span class="faq-q-text">What do I get when I buy?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-inner">You get a PDF guide (4,000+ words) with 10 sections covering the full content machine workflow. This includes 20 tested prompts in a copy-paste-ready format, the repurposing matrix, the platform breakdown, the scheduling stack comparison, the metrics guide, and the 90-day plan. One purchase, instant download, no subscription.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <div class="cta-box reveal">
+        <p class="cta-price">One-time purchase</p>
+        <div class="cta-price-value">$19.99</div>
+        <p class="cta-price-note">Instant PDF download. No subscription.</p>
+        <h2>Start the machine this Sunday.</h2>
+        <p>The workflow, the prompts, the platform breakdown, the 90-day plan. Everything you need to create a full month of content in one session.</p>
+        <a href="https://behikeai.gumroad.com/l/ai-content-machine-kit" class="btn-cta-large" target="_blank" rel="noopener">
+          Get the AI Content Machine Kit
+        </a>
+        <p class="cta-guarantee">Instant access after purchase. Works with ChatGPT, Claude, or any major AI tool.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">Behike</span>
+      <div class="footer-links">
+        <a href="index.html">Store</a>
+        <a href="https://behikeai.gumroad.com" target="_blank" rel="noopener">Gumroad</a>
+      </div>
+      <span class="footer-copy">2026 Behike. Built in Puerto Rico.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    );
+    reveals.forEach((el) => observer.observe(el));
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach((el) => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // Nav CTA visibility boost
+    let lastScrollY = 0;
+    window.addEventListener('scroll', () => {
+      lastScrollY = window.scrollY;
+    }, { passive: true });
+  </script>
+
+</body>
+</html>

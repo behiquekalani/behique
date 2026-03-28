@@ -1,0 +1,66 @@
+<section class="logo-list section-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <p class="logo-list__heading">{{ section.settings.heading }}</p>
+    {%- endif -%}
+
+    <div class="logo-list__grid">
+      {%- for block in section.blocks -%}
+        <div class="logo-list__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 200 }}"
+              alt="{{ block.settings.image.alt | default: 'Partner logo' }}"
+              width="200"
+              height="auto"
+              loading="lazy"
+            >
+          {%- else -%}
+            {{ 'logo' | placeholder_svg_tag }}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Logo List",
+  "tag": "section",
+  "class": "section-logo-list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Trusted by leading brands"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Logo List",
+      "blocks": [
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" },
+        { "type": "logo" }
+      ]
+    }
+  ]
+}
+{% endschema %}

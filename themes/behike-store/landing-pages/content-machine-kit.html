@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Machine Kit — Behike</title>
+  <meta name="description" content="The complete content system for solopreneurs. Voice Bible, pipeline configs, script generator, caption templates, and automation workflows. Everything you need to publish 30 pieces a month.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --black: #000000;
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --red: #FF453A;
+      --light: #F5F5F7;
+      --gray: #86868B;
+      --surface: rgba(255,255,255,0.04);
+      --surface2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--black);
+      color: var(--light);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-logo { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+    .nav-back { font-size: 14px; color: var(--blue); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 120px 24px 80px;
+      max-width: 800px; margin: 0 auto; text-align: center;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      background: rgba(48,209,88,0.12); color: var(--green);
+      font-size: 13px; font-weight: 600;
+      padding: 4px 14px; border-radius: 980px;
+      margin-bottom: 20px; letter-spacing: 0.02em;
+    }
+
+    .hero h1 {
+      font-size: clamp(34px, 6vw, 56px);
+      font-weight: 700; letter-spacing: -0.04em;
+      line-height: 1.08; margin-bottom: 20px;
+    }
+
+    .hero h1 span { color: var(--green); }
+
+    .hero p {
+      font-size: 18px; color: var(--gray);
+      max-width: 560px; margin: 0 auto 36px; line-height: 1.6;
+    }
+
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--green); color: #000;
+      padding: 14px 36px; border-radius: 980px;
+      font-size: 16px; font-weight: 700;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.88; transform: scale(1.02); }
+
+    .btn-outline {
+      display: inline-block;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--light); padding: 14px 36px; border-radius: 980px;
+      font-size: 16px; font-weight: 600; transition: border-color 0.2s;
+    }
+
+    .btn-outline:hover { border-color: rgba(255,255,255,0.3); }
+
+    /* ── Sections ── */
+    .section { padding: 60px 24px; max-width: 980px; margin: 0 auto; }
+
+    .section-label {
+      font-size: 13px; font-weight: 600; color: var(--green);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 12px; text-align: center;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px); font-weight: 700;
+      letter-spacing: -0.03em; text-align: center; margin-bottom: 48px;
+    }
+
+    /* ── What's In the Kit ── */
+    .kit-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+
+    .kit-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+
+    .kit-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(48,209,88,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+
+    .kit-info {}
+    .kit-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .kit-desc { font-size: 14px; color: var(--gray); line-height: 1.5; }
+    .kit-value {
+      font-size: 12px; font-weight: 600; color: var(--green);
+      margin-top: 6px;
+    }
+
+    /* ── Value Stack ── */
+    .value-stack {
+      max-width: 560px; margin: 0 auto;
+    }
+
+    .value-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .value-row:last-of-type { border-bottom: none; }
+
+    .value-name { flex: 1; }
+    .value-price {
+      font-weight: 600; color: var(--gray);
+      text-decoration: line-through; margin-right: 16px;
+    }
+
+    .value-total {
+      display: flex; justify-content: space-between;
+      padding: 20px 0; margin-top: 16px;
+      border-top: 2px solid var(--border);
+      font-size: 18px; font-weight: 700;
+    }
+
+    .value-kit-price { color: var(--green); font-size: 24px; }
+
+    /* ── Testimonial style quote ── */
+    .quote-section {
+      padding: 60px 24px;
+      max-width: 700px; margin: 0 auto; text-align: center;
+    }
+
+    .quote-text {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 500; line-height: 1.5;
+      color: var(--light); margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .quote-attr { font-size: 14px; color: var(--gray); }
+
+    /* ── Who It's For ── */
+    .for-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+
+    .for-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; text-align: center;
+    }
+
+    .for-icon { font-size: 32px; margin-bottom: 12px; }
+    .for-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .for-desc { font-size: 14px; color: var(--gray); line-height: 1.5; }
+
+    /* ── FAQ ── */
+    .faq { padding: 60px 24px; max-width: 700px; margin: 0 auto; }
+
+    .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .faq-q { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+    .faq-a { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 80px 24px; max-width: 700px; margin: 0 auto; text-align: center;
+    }
+
+    .price-box {
+      background: var(--surface); border: 1px solid rgba(48,209,88,0.3);
+      border-radius: 20px; padding: 36px; margin-bottom: 32px;
+    }
+
+    .price-big { font-size: 56px; font-weight: 700; letter-spacing: -0.04em; }
+    .price-was { font-size: 18px; color: var(--gray); margin-bottom: 4px; }
+    .price-was span { text-decoration: line-through; }
+    .price-save { font-size: 14px; color: var(--green); font-weight: 600; margin-bottom: 20px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .kit-grid { grid-template-columns: 1fr; }
+      .for-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .for-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <a href="index.html" class="nav-back">All Products</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">Complete Bundle</div>
+    <h1>The system behind<br>30 pieces <span>a month.</span></h1>
+    <p>Voice Bible, script generator, caption templates, automation workflows, and platform configs. Everything a one-person content operation needs. No subscription required.</p>
+    <div class="hero-ctas">
+      <a href="https://behikeai.gumroad.com/l/content-machine-kit" class="btn-primary">Get the Kit $99.99</a>
+      <a href="#whats-inside" class="btn-outline">See What's Included</a>
+    </div>
+  </section>
+
+  <!-- What's Inside -->
+  <section class="section" id="whats-inside">
+    <div class="section-label">The Kit</div>
+    <h2 class="section-title">8 pieces. One system.</h2>
+
+    <div class="kit-grid">
+      <div class="kit-card">
+        <div class="kit-icon">📖</div>
+        <div class="kit-info">
+          <div class="kit-name">Voice Bible Template</div>
+          <div class="kit-desc">The exact template used to define Behike's writing voice. Banned words list, sentence structure rules, anti-patterns, tone guide. Filled in for you as an example. Blank version included for your own brand.</div>
+          <div class="kit-value">Value: $29</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">🤖</div>
+        <div class="kit-info">
+          <div class="kit-name">Ghost Writer CLI (Python)</div>
+          <div class="kit-desc">Command-line script generator that writes content in YOUR voice. Feed it a topic and it produces a Twitter thread, Instagram post, newsletter, or YouTube script. Checks output against your Voice Bible automatically.</div>
+          <div class="kit-value">Value: $49</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">📡</div>
+        <div class="kit-info">
+          <div class="kit-name">RSS + Reddit Source Config</div>
+          <div class="kit-desc">Pre-configured source list for AI, solopreneur, finance, and gaming niches. 18 RSS feeds and 12 subreddits. Add your own sources. System pulls trending topics automatically every morning.</div>
+          <div class="kit-value">Value: $19</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">📝</div>
+        <div class="kit-info">
+          <div class="kit-name">Caption Templates (5 Platforms)</div>
+          <div class="kit-desc">Fill-in-the-blank caption structures for Instagram, TikTok, YouTube Shorts, X/Twitter, and LinkedIn. Each platform formatted differently. Hook formulas, CTA variations, and hashtag sets included.</div>
+          <div class="kit-value">Value: $19</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">📅</div>
+        <div class="kit-info">
+          <div class="kit-name">21-Week Content Calendar Template</div>
+          <div class="kit-desc">The full content calendar used to plan 70+ posts across 5 platforms. Structured by content arc (product launch, educational, personal, case study). Tabs for each platform. Notion and Google Sheets versions.</div>
+          <div class="kit-value">Value: $14</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">⚙️</div>
+        <div class="kit-info">
+          <div class="kit-name">n8n Automation Workflows (3)</div>
+          <div class="kit-desc">Import-ready n8n workflows: (1) RSS to content draft, (2) Draft to review queue notification via Telegram, (3) Approved content to scheduling queue. Self-hostable. No monthly fees.</div>
+          <div class="kit-value">Value: $49</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">🗂</div>
+        <div class="kit-info">
+          <div class="kit-name">Content Repurposing System</div>
+          <div class="kit-desc">Turn one idea into 7 pieces of content. The exact workflow: long-form to newsletter to thread to 3 Instagram posts to TikTok script to YouTube Short. Step-by-step with examples for each transformation.</div>
+          <div class="kit-value">Value: $14</div>
+        </div>
+      </div>
+
+      <div class="kit-card">
+        <div class="kit-icon">📊</div>
+        <div class="kit-info">
+          <div class="kit-name">Setup Documentation + Walkthrough</div>
+          <div class="kit-desc">Full setup guide for every tool in the kit. Python environment setup, n8n import instructions, Voice Bible customization, calendar setup. Written for someone who has never used a CLI tool.</div>
+          <div class="kit-value">Value: included</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Value Stack -->
+  <section class="section" style="padding-top: 0">
+    <div class="section-label">The Math</div>
+    <h2 class="section-title">What you would pay separately.</h2>
+
+    <div class="value-stack">
+      <div class="value-row">
+        <span class="value-name">Voice Bible Template</span>
+        <span class="value-price">$29</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">Ghost Writer CLI</span>
+        <span class="value-price">$49</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">RSS + Reddit Source Config</span>
+        <span class="value-price">$19</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">Caption Templates (5 Platforms)</span>
+        <span class="value-price">$19</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">21-Week Content Calendar</span>
+        <span class="value-price">$14</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">3 n8n Automation Workflows</span>
+        <span class="value-price">$49</span>
+      </div>
+      <div class="value-row">
+        <span class="value-name">Content Repurposing System</span>
+        <span class="value-price">$14</span>
+      </div>
+      <div class="value-total">
+        <span>Total Value</span>
+        <span style="text-decoration:line-through;color:var(--gray)">$193</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:16px 0;background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:12px;padding:20px 24px;margin-top:8px;align-items:center">
+        <span style="font-size:17px;font-weight:600">Content Machine Kit</span>
+        <span class="value-kit-price">$99.99</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who It's For -->
+  <section class="section" style="padding-top: 0">
+    <div class="section-label">Who This Is For</div>
+    <h2 class="section-title">Built for one-person operations.</h2>
+    <div class="for-grid">
+      <div class="for-card">
+        <div class="for-icon">👤</div>
+        <div class="for-title">Solo Creators</div>
+        <div class="for-desc">You are making content but it takes too long and sounds inconsistent. This gives you a repeatable system so every post sounds like you.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">🏗</div>
+        <div class="for-title">Indie Hackers</div>
+        <div class="for-desc">You have a product but no content machine. This sets up the pipeline so content runs in the background while you build.</div>
+      </div>
+      <div class="for-card">
+        <div class="for-icon">🎓</div>
+        <div class="for-title">Student Builders</div>
+        <div class="for-desc">You want to build in public but do not know how to make content consistently. This removes the uncertainty about what to post and how.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="section-label">Questions</div>
+    <h2 class="section-title" style="text-align:left">Common Questions</h2>
+
+    <div class="faq-item">
+      <div class="faq-q">Do I need to know how to code?</div>
+      <div class="faq-a">The Ghost Writer CLI requires Python. If you can run a Python script from the terminal, you can use it. The Voice Bible, caption templates, and calendar are plain text files that work without any technical knowledge. The n8n workflows require a self-hosted n8n instance, which has a one-click setup guide included.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Is there a subscription fee?</div>
+      <div class="faq-a">No. One payment. Everything runs on your own hardware. The Ghost Writer CLI uses your own OpenAI API key (or runs locally with Ollama for $0/month). The n8n workflows are self-hosted. No recurring costs from Behike.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">Can I use this for any niche?</div>
+      <div class="faq-a">Yes. The Voice Bible is a template you fill in for your own brand voice. The RSS and Reddit sources are configurable for any niche. The caption templates work across all topics. Everything is built to be customized, not locked to one specific niche.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">How is this different from just using ChatGPT?</div>
+      <div class="faq-a">ChatGPT generates generic content. This system generates content that sounds like YOU, because it runs against your Voice Bible first. The Ghost Writer knows your banned words, your tone rules, your sentence structure preferences. The output reads like you wrote it, not like an AI.</div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q">What if I get stuck during setup?</div>
+      <div class="faq-a">Email support is included for 14 days post-purchase. Every component has a setup guide. If something does not work, send an email and you will get a response within 24 hours.</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="price-box">
+      <div class="price-was">Total value: <span>$193</span></div>
+      <div class="price-big">$99.99</div>
+      <div class="price-save">Save $93. One-time payment. No subscription.</div>
+      <a href="https://behikeai.gumroad.com/l/content-machine-kit" class="btn-primary" style="font-size:17px;padding:16px 48px">Get the Content Machine Kit</a>
+    </div>
+    <p style="font-size:13px;color:var(--gray)">Includes: Voice Bible, Ghost Writer CLI, RSS configs, caption templates, content calendar, 3 n8n workflows, repurposing system, setup docs. Digital download. Instant access.</p>
+  </section>
+
+  <!-- Cross-sell -->
+  <section class="section" style="padding-top: 0">
+    <div class="section-label">Goes Well With</div>
+    <h2 class="section-title">Pair it with the pipeline.</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <a href="reel-factory.html" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:block;transition:border-color 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="font-size:13px;font-weight:600;color:var(--amber);margin-bottom:8px">SERVICE</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px">Reel Factory</div>
+        <div style="font-size:13px;color:var(--gray)">Done-for-you content pipeline. $299/month.</div>
+      </a>
+      <a href="ai-agent-installer.html" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:block;transition:border-color 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:8px">SERVICE</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px">AI Agent Installer</div>
+        <div style="font-size:13px;color:var(--gray)">We install n8n and your automation stack. $497+.</div>
+      </a>
+      <a href="behike-method-v2.html" style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;display:block;transition:border-color 0.15s" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:8px">GUIDE</div>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px">Behike Method v2</div>
+        <div style="font-size:13px;color:var(--gray)">The AI business blueprint for solo builders. $19.99.</div>
+      </a>
+    </div>
+  </section>
+
+  <footer style="padding:32px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--gray)">
+    <span>2026 Behike. All rights reserved.</span>
+    <div style="display:flex;gap:20px">
+      <a href="index.html">Products</a>
+      <a href="bundles.html">Bundles</a>
+      <a href="ai-agent-installer.html">Services</a>
+    </div>
+  </footer>
+
+</body>
+</html>

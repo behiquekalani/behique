@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Bot for Business — Behike</title>
+  <meta name="description" content="Build an automated client communication system with Python and n8n in a weekend. Stop answering the same questions. Let the bot do it." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a244;
+      --surface: #111111;
+      --surface-2: #1C1C1E;
+      --border: #2C2C2E;
+      --code-bg: #0D1117;
+      --radius: 12px;
+      --max-width: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .nav-cta:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      margin-bottom: 28px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .hero-build-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 48px;
+    }
+
+    .hero-build-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .hero-build-item strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 0 0 0 rgba(48, 209, 88, 0);
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(48, 209, 88, 0.25);
+    }
+
+    .price-tag {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    .price-tag strong {
+      color: var(--text);
+      font-size: 17px;
+    }
+
+    /* Sections common */
+    section {
+      padding: 80px 0;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .section-intro {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.55;
+      margin-bottom: 48px;
+    }
+
+    /* Problem */
+    .problem {
+      border-top: 1px solid var(--border);
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .problem-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .problem-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Solution */
+    .solution {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .solution-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    @media (max-width: 700px) {
+      .solution-cols { grid-template-columns: 1fr; gap: 40px; }
+    }
+
+    .solution-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .solution-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 16px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .solution-list li.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .solution-list li .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(48, 209, 88, 0.15);
+      border: 1px solid rgba(48, 209, 88, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      font-size: 12px;
+    }
+
+    .stat-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .stat-item .number {
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--cta);
+      line-height: 1;
+    }
+
+    .stat-item .label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* What's inside */
+    .inside {
+      border-top: 1px solid var(--border);
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .module-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s, transform 0.45s, border-color 0.2s;
+    }
+
+    .module-card:hover {
+      border-color: rgba(10, 132, 255, 0.4);
+    }
+
+    .module-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .module-number {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .module-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .module-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .module-bullets {
+      margin-top: 14px;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .module-bullets li {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .module-bullets li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    /* Tech stack */
+    .tech {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .tech-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.4s, transform 0.4s, border-color 0.2s;
+    }
+
+    .tech-item.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .tech-item:hover {
+      border-color: var(--accent);
+    }
+
+    .tech-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .tech-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .tech-role {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Who this is for */
+    .for-who {
+      border-top: 1px solid var(--border);
+    }
+
+    .for-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .for-grid { grid-template-columns: 1fr; }
+    }
+
+    .for-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s, transform 0.45s;
+    }
+
+    .for-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .for-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .for-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Code preview */
+    .code-preview {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .code-window {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .code-window.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .code-topbar {
+      background: #161B22;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #FF5F57; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #28CA41; }
+
+    .code-filename {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    pre {
+      padding: 28px;
+      overflow-x: auto;
+      font-size: 13px;
+      line-height: 1.6;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    }
+
+    .kw { color: #FF7B72; }
+    .fn { color: #D2A8FF; }
+    .st { color: #A5D6FF; }
+    .cm { color: #8B949E; }
+    .nm { color: #79C0FF; }
+    .op { color: #E6EDF3; }
+
+    /* FAQ */
+    .faq {
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      max-width: 740px;
+    }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+
+    .faq-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .faq-q {
+      width: 100%;
+      background: var(--surface);
+      border: none;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 20px 24px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: background 0.2s;
+    }
+
+    .faq-q:hover { background: var(--surface-2); }
+
+    .faq-q svg {
+      flex-shrink: 0;
+      transition: transform 0.25s;
+      color: var(--text-muted);
+    }
+
+    .faq-item.open .faq-q svg { transform: rotate(180deg); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      background: var(--surface);
+      transition: max-height 0.35s ease;
+    }
+
+    .faq-item.open .faq-a { max-height: 400px; }
+
+    .faq-a-inner {
+      padding: 0 24px 20px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    /* Final CTA */
+    .final-cta {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .final-cta h2 {
+      max-width: 700px;
+      margin: 0 auto 16px;
+    }
+
+    .final-cta .sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .final-cta-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .price-display {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .price-display strong {
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      section { padding: 60px 0; }
+      .final-cta { padding: 72px 0; }
+      .hero-build-list { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="./index.html" class="logo">Beh<span>ike</span></a>
+    <a href="https://behikeai.gumroad.com/l/telegram-bot-business" class="nav-cta" target="_blank" rel="noopener">Get it for $29.99</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">New Release</div>
+    <h1>Stop Answering the Same Questions.<br><em>Let the Bot Do It.</em></h1>
+    <p class="hero-sub">Build an automated Telegram client communication system with Python and n8n in a weekend. No more missing messages. No more repeating yourself.</p>
+
+    <div class="hero-build-list">
+      <div class="hero-build-item"><strong>Auto-reply</strong> to FAQs</div>
+      <div class="hero-build-item"><strong>Capture leads</strong> automatically</div>
+      <div class="hero-build-item"><strong>Send order</strong> notifications</div>
+      <div class="hero-build-item"><strong>Book appointments</strong> without lifting a finger</div>
+      <div class="hero-build-item"><strong>Qualify leads</strong> before your calendar</div>
+      <div class="hero-build-item"><strong>Gate</strong> paid content</div>
+    </div>
+
+    <div class="hero-cta-group">
+      <a href="https://behikeai.gumroad.com/l/telegram-bot-business" class="btn-primary" target="_blank" rel="noopener">
+        Build Your Bot — $29.99
+      </a>
+      <span class="price-tag">One-time payment. Instant download. <strong>4,500-word guide + code templates.</strong></span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <div class="section-label">The Problem</div>
+    <h2>Manual client communication is costing you hours every week.</h2>
+    <p class="section-intro">Every minute you spend answering "what's my order status?" is a minute you're not building. This is the most fixable problem in a service business.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">📩</div>
+        <h3>Same questions, every day</h3>
+        <p>You answer "what's your refund policy?" seventeen times a week. It's in your FAQ. Nobody reads it. A bot would answer it instantly.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">⏳</div>
+        <h3>Leads go cold while you sleep</h3>
+        <p>Someone clicks your link at 11pm, messages you, and you respond at 9am. They booked someone else at midnight. A bot responds in seconds.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📧</div>
+        <h3>Email open rates are broken</h3>
+        <p>You send order confirmations via email. Clients still message asking for updates. Telegram messages are read. Email goes to Promotions.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📅</div>
+        <h3>No-shows kill your schedule</h3>
+        <p>Clients forget appointments. You lose the time slot. A bot sends a reminder 24 hours out and again 1 hour before. No-shows drop significantly.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🔍</div>
+        <h3>Unqualified calls waste your calendar</h3>
+        <p>You spend 30 minutes on a discovery call with someone who cannot afford your service. A bot qualifies them before they ever get your calendar link.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">📢</div>
+        <h3>No broadcast channel you own</h3>
+        <p>Your Instagram account can be suspended. Your email list can be throttled. A Telegram channel is yours. Telegram messages get 80-90% open rates.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution">
+  <div class="container">
+    <div class="section-label">The Solution</div>
+    <div class="solution-cols">
+      <div>
+        <h2>One bot, running 24/7, handles it all.</h2>
+        <p class="section-intro" style="margin-bottom: 32px;">You build it once in a weekend. It works every day without you touching it.</p>
+        <ul class="solution-list">
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Instant auto-replies to the 10 questions you answer every week</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Lead capture that stores names, emails, and budgets automatically</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Order confirmations and shipping notifications pushed to clients</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Appointment reminders at 24 hours and 1 hour before</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Lead scoring that filters buyers from tire-kickers</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Broadcast to your entire client base with one message</span>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <span>Stripe payment handling directly inside Telegram</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <div class="stat-block">
+          <div class="stat-item">
+            <div class="number">80-90%</div>
+            <div class="label">Telegram message open rate vs 20-25% for email</div>
+          </div>
+          <div class="stat-item">
+            <div class="number">$0</div>
+            <div class="label">Per-message fees. Telegram's Bot API is completely free.</div>
+          </div>
+          <div class="stat-item">
+            <div class="number">30 min</div>
+            <div class="label">To deploy your first working bot using the n8n no-code path</div>
+          </div>
+          <div class="stat-item">
+            <div class="number">5 min</div>
+            <div class="label">To get your bot token from BotFather and be ready to build</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section class="inside">
+  <div class="container">
+    <div class="section-label">What's Inside</div>
+    <h2>9 modules. Everything you need to go from zero to deployed.</h2>
+    <p class="section-intro">Not just theory. Every module ends with something you can build and ship.</p>
+
+    <div class="modules-grid">
+      <div class="module-card">
+        <div class="module-number">Module 01</div>
+        <h3>Why Telegram Over WhatsApp and Email</h3>
+        <p>The data on open rates, API costs, and platform risk. Why Telegram is the obvious choice for serious operators.</p>
+        <ul class="module-bullets">
+          <li>Open rate comparison (Telegram vs email vs SMS)</li>
+          <li>API cost breakdown (WhatsApp vs Telegram)</li>
+          <li>Platform dependency risk analysis</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 02</div>
+        <h3>What Your Bot Can Do</h3>
+        <p>Map of every automation capability to your specific business problem. Find your situation, go to the template.</p>
+        <ul class="module-bullets">
+          <li>Auto-replies and FAQ handling</li>
+          <li>Lead capture and storage</li>
+          <li>Order and appointment notifications</li>
+          <li>Broadcast updates to your entire list</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 03</div>
+        <h3>The No-Code Path</h3>
+        <p>n8n + Telegram in 30 minutes. No Python required. Build a working FAQ bot, lead capture system, and broadcast workflow.</p>
+        <ul class="module-bullets">
+          <li>Step-by-step n8n workflow setup</li>
+          <li>Telegram Trigger configuration</li>
+          <li>Google Sheets lead storage connection</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 04</div>
+        <h3>The Code Path</h3>
+        <p>Python python-telegram-bot library from scratch. Commands, conversation state, inline keyboards, webhooks, and push notifications.</p>
+        <ul class="module-bullets">
+          <li>Complete bot structure with working code</li>
+          <li>ConversationHandler for multi-step flows</li>
+          <li>Polling vs webhooks explained</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 05</div>
+        <h3>Five Business Templates</h3>
+        <p>Copy-paste templates for the five most common business use cases. Each includes full code and configuration.</p>
+        <ul class="module-bullets">
+          <li>E-commerce order notifications</li>
+          <li>Coaching lead qualification bot</li>
+          <li>Service booking and reminders</li>
+          <li>FAQ bot with human escalation</li>
+          <li>Scored lead qualifier with routing</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 06</div>
+        <h3>Connecting to Your Stack</h3>
+        <p>Wire your bot into Stripe, Google Sheets, Notion, and Airtable. Full code for each integration.</p>
+        <ul class="module-bullets">
+          <li>Stripe webhook payment confirmation</li>
+          <li>Google Sheets lead and subscriber storage</li>
+          <li>Notion database integration</li>
+          <li>Airtable connection</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 07</div>
+        <h3>Deployment and Hosting</h3>
+        <p>Get your bot running 24/7. Railway setup, VPS deployment, environment variables, and free options for testing.</p>
+        <ul class="module-bullets">
+          <li>Railway deployment walkthrough</li>
+          <li>VPS setup with PM2</li>
+          <li>Environment variable management</li>
+          <li>Free tier options compared</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 08</div>
+        <h3>Growing Your Telegram Audience</h3>
+        <p>Bot vs channel vs group. How to move followers from platforms you don't own onto Telegram. Content strategy that retains subscribers.</p>
+        <ul class="module-bullets">
+          <li>Channel vs group vs bot: when to use each</li>
+          <li>Funnel strategy from Instagram to Telegram</li>
+          <li>Content cadence that prevents unsubscribes</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-number">Module 09</div>
+        <h3>Monetization</h3>
+        <p>Paid channels, subscriber gating, and Telegram native payments. Turn your Telegram ecosystem into a revenue stream.</p>
+        <ul class="module-bullets">
+          <li>Bot-gated invite link system (full code)</li>
+          <li>Telegram Payments with Stripe</li>
+          <li>Recurring revenue via paid channel model</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="tech">
+  <div class="container">
+    <div class="section-label">Tech Stack</div>
+    <h2>Everything you're working with.</h2>
+    <p class="section-intro">No expensive tools. No SaaS subscriptions you don't need. Each piece does exactly one job.</p>
+
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="tech-icon">🤖</div>
+        <div class="tech-name">Telegram Bot API</div>
+        <div class="tech-role">Free, no per-message fees</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">🐍</div>
+        <div class="tech-name">Python</div>
+        <div class="tech-role">python-telegram-bot library</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">⚙️</div>
+        <div class="tech-name">n8n</div>
+        <div class="tech-role">No-code workflow automation</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">🚂</div>
+        <div class="tech-name">Railway</div>
+        <div class="tech-role">Bot hosting, $0-5/month</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">💳</div>
+        <div class="tech-name">Stripe</div>
+        <div class="tech-role">Payments + webhooks</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">📊</div>
+        <div class="tech-name">Google Sheets</div>
+        <div class="tech-role">Leads and subscriber storage</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">📝</div>
+        <div class="tech-name">Notion</div>
+        <div class="tech-role">CRM and database option</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">🗃️</div>
+        <div class="tech-name">Airtable</div>
+        <div class="tech-role">Alternative data storage</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO THIS IS FOR -->
+<section class="for-who">
+  <div class="container">
+    <div class="section-label">Who This Is For</div>
+    <h2>Built for operators, not developers.</h2>
+    <p class="section-intro">You don't need to be technical. The no-code path gets you a working bot in 30 minutes. The code path gives you full control.</p>
+
+    <div class="for-grid">
+      <div class="for-card">
+        <h3>Service Providers</h3>
+        <p>Consultants, coaches, freelancers, agencies. You spend too much time on client communication that a bot can handle. Appointment reminders, lead qualification, FAQ responses.</p>
+      </div>
+      <div class="for-card">
+        <h3>E-Commerce Operators</h3>
+        <p>Shopify and WooCommerce store owners. Order confirmations, shipping updates, delivery notifications. Stop answering support tickets for things that should be automated.</p>
+      </div>
+      <div class="for-card">
+        <h3>Content Creators and Educators</h3>
+        <p>Course creators, newsletter writers, community builders. Gate your paid content, broadcast to your audience, and qualify buyers before they hit your funnel.</p>
+      </div>
+      <div class="for-card">
+        <h3>Local Businesses</h3>
+        <p>Salons, gyms, clinics, restaurants. Appointment booking, reminders, FAQ handling. The same problems every local business has. One bot fixes all of them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE PREVIEW -->
+<section class="code-preview">
+  <div class="container">
+    <div class="section-label">Sample Code</div>
+    <h2>This is what you're working with.</h2>
+    <p class="section-intro">Real code, not pseudocode. Every snippet in the guide is copy-paste ready. This is from the lead qualifier template.</p>
+
+    <div class="code-window">
+      <div class="code-topbar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <span class="code-filename">bot.py — Lead Qualifier Template</span>
+      </div>
+      <pre><span class="kw">async def</span> <span class="fn">get_budget</span>(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    budget = update.message.text
+    context.user_data[<span class="st">"budget"</span>] = budget
+
+    <span class="cm"># Score the lead based on answers</span>
+    score = <span class="fn">calculate_score</span>(context.user_data)
+
+    <span class="kw">if</span> score >= <span class="nm">70</span>:
+        <span class="cm"># Strong fit — send calendar link immediately</span>
+        <span class="kw">await</span> update.message.<span class="fn">reply_text</span>(
+            <span class="st">"You're a strong fit. Book a call here: calendly.com/yourlink"</span>
+        )
+        <span class="kw">await</span> <span class="fn">send_notification</span>(YOUR_CHAT_ID, <span class="st">f"HOT LEAD (score: {score})"</span>)
+
+    <span class="kw">elif</span> score >= <span class="nm">40</span>:
+        <span class="cm"># Warm lead — manual follow-up</span>
+        <span class="kw">await</span> update.message.<span class="fn">reply_text</span>(
+            <span class="st">"We'll review your answers and reach out within 48 hours."</span>
+        )
+
+    <span class="kw">else</span>:
+        <span class="cm"># Not a fit — redirect to free resources</span>
+        <span class="kw">await</span> update.message.<span class="fn">reply_text</span>(
+            <span class="st">"Check out our free resources at behike.com/free."</span>
+        )
+
+    <span class="kw">return</span> ConversationHandler.END</pre>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2>Common questions.</h2>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q">
+          Do I need to know how to code?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">No. Module 3 covers the complete no-code path using n8n. You connect nodes on a visual canvas. No Python required. The n8n path gets you a working FAQ bot, lead capture system, and broadcast workflow in about 30 minutes. The code path is there if you want more control.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          What does it cost to run the bot after I buy the guide?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Telegram's Bot API is completely free. No per-message fees at any volume. Hosting on Railway runs about $1-2/month for a simple polling bot, and Railway's free tier covers that. n8n's cloud free tier handles up to 2,500 executions per month. For most starting businesses, the ongoing cost is $0-5/month total.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          I'm not technical at all. Can I still build this?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Yes, if you follow the n8n path. Getting your bot token from BotFather takes 5 minutes. Setting up the n8n trigger and responses takes another 25. The guide walks through every step with screenshots and exact node configurations. If you can drag and drop, you can build this bot.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          What if my clients don't use Telegram?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Module 8 covers audience building: how to move people from Instagram, LinkedIn, and your website onto Telegram. The guide explains the opt-in strategies that work. That said, if you have an existing audience on another platform and they are not moving, this may not be the right time. The bot is most effective when you are starting fresh or have a list you can migrate.</div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q">
+          Is there a refund policy?
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-a">
+          <div class="faq-a-inner">Gumroad handles payment processing and offers a 30-day refund window. If you buy the guide, follow the instructions, and cannot get a bot working, reach out. We want you to have a working bot, not your $29.99.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <div class="section-label">Get Started</div>
+    <h2>Your clients are messaging you right now. Let the bot answer.</h2>
+    <p class="sub">One weekend. One bot. The same questions stop landing in your inbox.</p>
+
+    <div class="final-cta-group">
+      <a href="https://behikeai.gumroad.com/l/telegram-bot-business" class="btn-primary" target="_blank" rel="noopener">
+        Download the Guide — $29.99
+      </a>
+      <div class="price-display">One-time payment. <strong>$29.99.</strong> Instant access.</div>
+      <div class="guarantee">4,500-word guide with working Python code, n8n workflow templates, and all five business templates.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>Behike &copy; 2026. Built for operators. <a href="./index.html">All products</a></p>
+  </div>
+</footer>
+
+<script>
+  // IntersectionObserver scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, entry.target.dataset.delay || 0);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  // Stagger children of grids
+  document.querySelectorAll('.problem-card, .module-card, .tech-item, .for-card').forEach((el, i) => {
+    el.dataset.delay = (i % 4) * 80;
+    observer.observe(el);
+  });
+
+  document.querySelectorAll('.solution-list li').forEach((el, i) => {
+    el.dataset.delay = i * 60;
+    observer.observe(el);
+  });
+
+  document.querySelectorAll('.code-window, .faq-item').forEach((el, i) => {
+    el.dataset.delay = i * 70;
+    observer.observe(el);
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+
+      // Close all
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+
+      // Toggle current
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>

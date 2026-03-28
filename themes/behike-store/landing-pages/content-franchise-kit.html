@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Franchise Kit — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --surface: #111111;
+      --surface-2: #1A1A1A;
+      --border: #2A2A2A;
+      --radius: 12px;
+      --max-width: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 20px;
+      border-radius: var(--radius);
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); text-decoration: none; }
+
+    .hero {
+      padding: 100px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      max-width: 720px;
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 19px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .price-tag {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin-bottom: 52px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.2s;
+    }
+
+    .card.visible { opacity: 1; transform: translateY(0); }
+    .card:hover { border-color: var(--accent); }
+
+    .card-number {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .formats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .format-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.2s;
+    }
+
+    .format-item.visible { opacity: 1; transform: translateY(0); }
+    .format-item:hover { border-color: var(--accent); }
+
+    .format-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -1px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .format-item h4 { font-size: 14px; font-weight: 600; }
+
+    .format-item p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    .inside-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .inside-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .inside-item.visible { opacity: 1; transform: translateY(0); }
+
+    .inside-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+
+    .inside-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      margin-bottom: 4px;
+    }
+
+    .inside-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .personas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .persona-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .persona-card.visible { opacity: 1; transform: translateY(0); }
+
+    .persona-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .persona-card h4 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .persona-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .testimonial {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .testimonial.visible { opacity: 1; transform: translateY(0); }
+
+    .testimonial-quote {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .testimonial-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .pricing-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px;
+      max-width: 580px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .pricing-box.visible { opacity: 1; transform: translateY(0); }
+
+    .pricing-product {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .pricing-description {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 36px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+    }
+
+    .pricing-features li:last-child { border-bottom: none; }
+
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px;
+      border-radius: var(--radius);
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .pricing-cta:hover {
+      background: var(--cta-hover);
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .pricing-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(30px, 5vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 18px;
+    }
+
+    .final-cta p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+
+    .final-cta .btn-primary { font-size: 17px; padding: 16px 40px; }
+
+    .final-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 70px 0 60px; }
+      .section { padding: 60px 0; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .formats-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-box { padding: 32px 24px; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">Behi<span>ke</span></div>
+      <a href="https://behikeai.gumroad.com/l/content-franchise-kit" class="nav-cta" target="_blank" rel="noopener">
+        Get it for $27.99
+      </a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-label">Content Repurposing System</div>
+      <h1>One piece of content. Nine places it lives.</h1>
+      <p class="hero-sub">
+        The complete system for turning one long-form piece into nine distribution formats. Stop starting from scratch. Start multiplying what you already made.
+      </p>
+      <div class="hero-actions">
+        <a href="https://behikeai.gumroad.com/l/content-franchise-kit" class="btn-primary" target="_blank" rel="noopener">
+          Download Now
+        </a>
+        <div>
+          <div class="price-tag">$27.99</div>
+          <div class="price-note">One-time. Instant access.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2 class="section-title">You are creating more than you are distributing</h2>
+      <p class="section-sub">Most creators treat every platform as a separate content job. That math does not work when you are building alone.</p>
+
+      <div class="cards-grid">
+        <div class="card fade-in">
+          <div class="card-number">01</div>
+          <h3>You create once and it disappears</h3>
+          <p>A YouTube video gets posted. A newsletter gets sent. A podcast episode goes live. Each one exists in one place and then fades. The same idea never reaches the audiences on the other eight platforms.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">02</div>
+          <h3>Repurposing feels like starting over</h3>
+          <p>You know you should repurpose. But sitting down to write a LinkedIn post from a 20-minute video takes as long as writing something new. Without a system, repurposing is just more work.</p>
+        </div>
+        <div class="card fade-in">
+          <div class="card-number">03</div>
+          <h3>Your best ideas only reach one audience</h3>
+          <p>Your sharpest insight from last month reached the people who follow you on one platform. The same idea, reformatted for nine formats, reaches nine different audiences.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">The 9 formats</div>
+      <h2 class="section-title">One source. Nine outputs.</h2>
+      <p class="section-sub">Start with a YouTube video, newsletter, or podcast. The system turns it into all nine of these.</p>
+
+      <div class="formats-grid">
+        <div class="format-item fade-in">
+          <div class="format-number">01</div>
+          <h4>Twitter Thread</h4>
+          <p>The core argument in connected tweets</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">02</div>
+          <h4>LinkedIn Post</h4>
+          <p>Professional framing with first-line hook</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">03</div>
+          <h4>Instagram Carousel</h4>
+          <p>Visual slide-by-slide breakdown</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">04</div>
+          <h4>TikTok Script</h4>
+          <p>60-second spoken format with hook structure</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">05</div>
+          <h4>YouTube Short</h4>
+          <p>Vertical cut from the long-form original</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">06</div>
+          <h4>Email Newsletter</h4>
+          <p>Deeper version for the inbox</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">07</div>
+          <h4>SEO Blog Post</h4>
+          <p>Long-form written version for search</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">08</div>
+          <h4>Pinterest Pin</h4>
+          <p>Visual summary for evergreen discovery</p>
+        </div>
+        <div class="format-item fade-in">
+          <div class="format-number">09</div>
+          <h4>Quote Graphic</h4>
+          <p>The single sharpest line from the piece</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">What's inside</div>
+      <h2 class="section-title">The complete repurposing toolkit</h2>
+      <p class="section-sub">Four components that take you from one piece of content to a fully distributed content operation.</p>
+
+      <div class="inside-grid">
+        <div class="inside-item fade-in">
+          <div class="inside-num">01</div>
+          <div>
+            <h4>The 9-Format Repurposing System</h4>
+            <p>The full framework for extracting the right elements from any long-form piece and translating them into each of the nine formats. Logic, not just templates.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">02</div>
+          <div>
+            <h4>Format Templates for Each Platform</h4>
+            <p>Nine fill-in-the-structure templates. Each one is built around the native content style of the platform it targets, not a generic repurposing clipboard.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">03</div>
+          <div>
+            <h4>Scheduling Strategy</h4>
+            <p>When to post each format after the original goes live. The sequencing that maximizes reach without flooding your audience with the same idea in one day.</p>
+          </div>
+        </div>
+        <div class="inside-item fade-in">
+          <div class="inside-num">04</div>
+          <div>
+            <h4>30-Day Repurposing Calendar</h4>
+            <p>A complete 30-day schedule showing how one long-form piece per week generates a full month of content across all nine platforms.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Who this is for</div>
+      <h2 class="section-title">Built for creators who make something worth spreading</h2>
+      <p class="section-sub">If you are building long-form content and not distributing it at scale, this system closes that gap.</p>
+
+      <div class="personas-grid">
+        <div class="persona-card fade-in">
+          <div class="persona-icon">01</div>
+          <h4>The YouTube Creator Who Wants More Reach</h4>
+          <p>You spend hours making a video that reaches your YouTube audience only. The Kit shows you how to extract nine more pieces from what you already made, without shooting nine more videos.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">02</div>
+          <h4>The Newsletter Writer Building an Audience</h4>
+          <p>You write 800 words every week and it reaches your email list. The same 800 words contains a Twitter thread, a LinkedIn post, a TikTok script, and more. The Kit shows you how to pull them out.</p>
+        </div>
+        <div class="persona-card fade-in">
+          <div class="persona-icon">03</div>
+          <h4>The Solopreneur Who Cannot Post Everywhere Separately</h4>
+          <p>You do not have a content team. You cannot create fresh content for nine platforms every week. This system multiplies your existing output instead of demanding more time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">From buyers</div>
+      <h2 class="section-title">What changed once the system was running</h2>
+      <p class="section-sub">The most consistent outcome is that people stopped feeling behind on content.</p>
+
+      <div class="testimonials-grid">
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"I used to make one video a week and call it done. Now I make one video and it becomes my entire week of content across five platforms. Same work, nine outputs."</p>
+          <div class="testimonial-author">Andre V.</div>
+          <div class="testimonial-role">Business creator, YouTube + LinkedIn</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"The 30-day calendar is the most useful part. I loaded in four videos and had a full month of content scheduled in two hours. That never happened before."</p>
+          <div class="testimonial-author">Sofia M.</div>
+          <div class="testimonial-role">Newsletter writer and content creator</div>
+        </div>
+        <div class="testimonial fade-in">
+          <p class="testimonial-quote">"The templates are built for how each platform actually works, not generic repurposing advice. The LinkedIn template looks nothing like the Twitter template. That specificity is what makes it work."</p>
+          <div class="testimonial-author">Darius O.</div>
+          <div class="testimonial-role">Solopreneur, digital products</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">One price. The full system.</h2>
+      <p class="section-sub">No platform subscription. No recurring fee. Everything you need to run the system indefinitely, in one download.</p>
+
+      <div class="pricing-box fade-in">
+        <div class="pricing-product">Content Franchise Kit</div>
+        <div class="pricing-price">$27.99</div>
+        <div class="pricing-description">Instant download. Use it this week.</div>
+        <ul class="pricing-features">
+          <li>The 9-format repurposing system and framework</li>
+          <li>Platform template: Twitter threads</li>
+          <li>Platform template: LinkedIn posts</li>
+          <li>Platform template: Instagram carousels</li>
+          <li>Platform template: TikTok scripts</li>
+          <li>Platform template: YouTube Shorts</li>
+          <li>Platform template: email newsletters</li>
+          <li>Platform template: SEO blog posts</li>
+          <li>Platform templates: Pinterest pins and quote graphics</li>
+          <li>Platform scheduling strategy</li>
+          <li>30-day repurposing calendar</li>
+          <li>Digital PDF download via Gumroad</li>
+        </ul>
+        <a href="https://behikeai.gumroad.com/l/content-franchise-kit" class="pricing-cta" target="_blank" rel="noopener">
+          Get the Content Franchise Kit for $27.99
+        </a>
+        <p class="pricing-guarantee">One-time payment. Instant access. Refundable via Gumroad if it does not deliver.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="container">
+      <h2>You already have the content. Now distribute it properly.</h2>
+      <p>Nine formats, one system, 30 days of content from four pieces of long-form work. The Content Franchise Kit handles the rest.</p>
+      <a href="https://behikeai.gumroad.com/l/content-franchise-kit" class="btn-primary" target="_blank" rel="noopener">
+        Download the Kit for $27.99
+      </a>
+      <p class="final-note">Instant PDF download via Gumroad. One-time payment.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        &copy; 2026 Behike.
+        <a href="index.html">All Products</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = entry.target.dataset.delay || 0;
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach((el, i) => {
+      el.dataset.delay = (i % 4) * 80;
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

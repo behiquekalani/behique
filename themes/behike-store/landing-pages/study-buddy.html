@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Buddy — Behike</title>
+  <style>
+    :root {
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --red: #FF453A;
+      --bg: #000000;
+      --surface: #111111;
+      --surface2: #1C1C1E;
+      --text: #FFFFFF;
+      --text-dim: #8E8E93;
+      --border: #2C2C2E;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    #header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--border);
+      transition: opacity 0.3s;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand p {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 1px;
+    }
+
+    #xp-zone {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #level-badge {
+      background: var(--purple);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    #xp-bar-wrap {
+      width: 120px;
+    }
+
+    #xp-label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    #xp-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #xp-bar-fill {
+      height: 100%;
+      background: var(--purple);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    /* LAYOUT */
+    #app {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      min-height: calc(100vh - 61px);
+    }
+
+    /* LEFT PANEL */
+    #left-panel {
+      padding: 24px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Subject */
+    .section-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    #subject-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    #subject-input:focus {
+      border-color: var(--blue);
+    }
+
+    /* Timer */
+    #timer-section {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    #mode-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: var(--blue);
+      transition: color 0.3s;
+    }
+
+    #timer-display {
+      font-size: 120px;
+      font-weight: 700;
+      letter-spacing: -4px;
+      line-height: 1;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      transition: color 0.3s;
+    }
+
+    #pomodoro-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .pom-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+    .pom-dot.done { background: var(--blue); }
+    .pom-dot.active { background: var(--amber); }
+
+    #timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); }
+    .btn-green { background: var(--green); color: #000; }
+    .btn-amber { background: var(--amber); color: #000; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-purple { background: var(--purple); color: #fff; }
+
+    /* Current task */
+    #current-task-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    #current-task-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    #current-task-text {
+      font-size: 16px;
+      font-weight: 500;
+      min-height: 24px;
+    }
+
+    #done-task-btn {
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* Notes */
+    #session-notes {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      outline: none;
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color 0.2s;
+    }
+    #session-notes:focus { border-color: var(--blue); }
+
+    #notes-saved {
+      font-size: 11px;
+      color: var(--green);
+      margin-top: 4px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* Distractions */
+    #distraction-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    #distraction-box h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+
+    #distraction-btn { width: 100%; }
+
+    #distraction-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .distraction-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .distraction-row input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      outline: none;
+    }
+    .distraction-row input:focus { border-color: var(--amber); }
+
+    #distraction-count {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0 4px;
+      transition: color 0.2s;
+    }
+    .remove-btn:hover { color: var(--red); }
+
+    /* RIGHT PANEL */
+    #right-panel {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      overflow-y: auto;
+    }
+
+    .panel-section h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    #task-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #task-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #task-input:focus { border-color: var(--blue); }
+
+    #task-list, #completed-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    #task-list li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #task-list li:first-child { border-color: var(--blue); }
+
+    .task-num {
+      font-size: 11px;
+      color: var(--text-dim);
+      min-width: 14px;
+    }
+    .task-text { flex: 1; }
+
+    #completed-list li {
+      background: var(--surface);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      color: var(--green);
+    }
+
+    /* History */
+    #history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .history-date { font-size: 11px; color: var(--text-dim); margin-bottom: 3px; }
+    .history-subject { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+    .history-stats { display: flex; gap: 12px; }
+    .history-stat { font-size: 11px; color: var(--text-dim); }
+    .history-stat span { color: var(--text); font-weight: 600; }
+
+    /* FOCUS MODE */
+    body.focus-mode #header { opacity: 0.08; pointer-events: none; }
+    body.focus-mode #left-panel > *:not(#timer-section) { opacity: 0.08; pointer-events: none; }
+    body.focus-mode #right-panel { opacity: 0.08; pointer-events: none; }
+    body.focus-mode #timer-section { opacity: 1 !important; pointer-events: auto !important; }
+
+    /* BREAK MODE colors */
+    body.break-mode #timer-display { color: var(--green); }
+    body.break-mode #mode-label { color: var(--green); }
+
+    /* SESSION END OVERLAY */
+    #end-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    #end-overlay.visible { display: flex; }
+
+    #end-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+    #end-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    #end-subject { font-size: 14px; color: var(--text-dim); margin-bottom: 4px; }
+
+    #end-xp {
+      font-size: 56px;
+      font-weight: 700;
+      color: var(--purple);
+      margin: 16px 0;
+      line-height: 1;
+    }
+
+    .end-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0 24px;
+    }
+    .end-stat-cell {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 12px 8px;
+    }
+    .end-stat-value { font-size: 26px; font-weight: 700; }
+    .end-stat-label { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+    /* XP pop */
+    @keyframes xpFloat {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-70px) scale(1.3); opacity: 0; }
+    }
+    .xp-popup {
+      position: fixed;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--purple);
+      pointer-events: none;
+      z-index: 200;
+      animation: xpFloat 1s ease forwards;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      #app { grid-template-columns: 1fr; }
+      #left-panel { border-right: none; border-bottom: 1px solid var(--border); }
+      #timer-display { font-size: 82px; letter-spacing: -2px; }
+      #xp-bar-wrap { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <div class="brand">
+    <h1>Study Buddy</h1>
+    <p>Para cerebros con ADHD</p>
+  </div>
+  <div id="xp-zone">
+    <div id="level-badge">Nivel 1</div>
+    <div id="xp-bar-wrap">
+      <div id="xp-label">0 / 100 XP</div>
+      <div id="xp-bar-bg">
+        <div id="xp-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- APP GRID -->
+<div id="app">
+
+  <!-- LEFT -->
+  <div id="left-panel">
+
+    <!-- Subject -->
+    <div>
+      <label class="section-label" for="subject-input">Estudiando</label>
+      <input type="text" id="subject-input" placeholder="ej. Calculo II, Historia del Caribe..." autocomplete="off">
+    </div>
+
+    <!-- Timer -->
+    <div id="timer-section">
+      <div id="mode-label">ENFOQUE</div>
+      <div id="timer-display">25:00</div>
+      <div id="pomodoro-dots">
+        <div class="pom-dot active" id="dot-0"></div>
+        <div class="pom-dot" id="dot-1"></div>
+        <div class="pom-dot" id="dot-2"></div>
+        <div class="pom-dot" id="dot-3"></div>
+      </div>
+      <div id="timer-controls">
+        <button class="btn btn-primary" id="start-btn">Comenzar</button>
+        <button class="btn btn-secondary" id="pause-btn" style="display:none">Pausar</button>
+        <button class="btn btn-secondary" id="reset-btn">Reset</button>
+        <button class="btn btn-purple" id="focus-btn">Modo Focus</button>
+        <button class="btn btn-red" id="end-btn">Fin de sesion</button>
+      </div>
+    </div>
+
+    <!-- Current task -->
+    <div id="current-task-box">
+      <div id="current-task-title">Tarea actual</div>
+      <div id="current-task-text" style="color:var(--text-dim);font-style:italic;font-size:14px">Agrega tareas en el panel derecho.</div>
+      <button class="btn btn-green" id="done-task-btn" style="display:none;margin-top:12px" id="done-task-btn">Completada</button>
+    </div>
+
+    <!-- Distractions -->
+    <div id="distraction-box">
+      <h3>Registro de distracciones</h3>
+      <button class="btn btn-amber" id="distraction-btn">Me distrae...</button>
+      <div id="distraction-list"></div>
+      <div id="distraction-count"></div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <label class="section-label" for="session-notes">Notas de sesion</label>
+      <textarea id="session-notes" placeholder="Escribe lo que aprendiste, dudas, ideas..."></textarea>
+      <div id="notes-saved">Guardado</div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div id="right-panel">
+
+    <!-- Task queue -->
+    <div class="panel-section">
+      <h2>Cola de tareas</h2>
+      <div id="task-input-row">
+        <input type="text" id="task-input" placeholder="Nueva tarea..." autocomplete="off">
+        <button class="btn btn-primary" id="add-task-btn">+</button>
+      </div>
+      <ul id="task-list"></ul>
+    </div>
+
+    <!-- Completed -->
+    <div class="panel-section">
+      <h2>Completadas</h2>
+      <ul id="completed-list"></ul>
+    </div>
+
+    <!-- History -->
+    <div class="panel-section">
+      <h2>Historial (7 dias)</h2>
+      <div id="history-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SESSION END OVERLAY -->
+<div id="end-overlay">
+  <div id="end-card">
+    <h2>Sesion completada</h2>
+    <div id="end-subject"></div>
+    <div id="end-xp">+0 XP</div>
+    <div class="end-stats-grid">
+      <div class="end-stat-cell">
+        <div class="end-stat-value" id="end-pomodoros">0</div>
+        <div class="end-stat-label">Pomodoros</div>
+      </div>
+      <div class="end-stat-cell">
+        <div class="end-stat-value" id="end-tasks">0</div>
+        <div class="end-stat-label">Tareas</div>
+      </div>
+      <div class="end-stat-cell">
+        <div class="end-stat-value" id="end-distractions">0</div>
+        <div class="end-stat-label">Distracciones</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" id="new-session-btn">Nueva sesion</button>
+  </div>
+</div>
+
+<script>
+// ================================================
+// CONSTANTS
+// ================================================
+const FOCUS_SECS = 25 * 60;
+const SHORT_BREAK_SECS = 5 * 60;
+const LONG_BREAK_SECS = 15 * 60;
+const XP_POMODORO = 25;
+const XP_TASK = 10;
+const XP_PER_LEVEL = 100;
+
+// ================================================
+// STATE
+// ================================================
+let timerInterval = null;
+let timeLeft = FOCUS_SECS;
+let isRunning = false;
+let isFocusBlock = true;
+let cycleCount = 0;       // pomodoros done in current cycle (0-3)
+let sessionPomodoros = 0;
+let sessionTasks = 0;
+let sessionXP = 0;
+let focusModeOn = false;
+
+let taskQueue = [];
+let doneTasks = [];
+let distractionInputs = [];
+
+let audioCtx = null;
+
+// Persisted
+let xpTotal = parseInt(localStorage.getItem('sb_xp') || '0');
+let currentLevel = Math.floor(xpTotal / XP_PER_LEVEL) + 1;
+let sessionHistory = JSON.parse(localStorage.getItem('sb_history') || '[]');
+
+// ================================================
+// AUDIO
+// ================================================
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function beep(freq, dur, type) {
+  try {
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function playAlarm() {
+  beep(880, 0.3);
+  setTimeout(() => beep(1108, 0.3), 350);
+  setTimeout(() => beep(1320, 0.6), 700);
+}
+
+function playXP() {
+  beep(660, 0.12, 'square');
+  setTimeout(() => beep(880, 0.18, 'square'), 130);
+}
+
+function playLevelUp() {
+  [440, 554, 660, 880].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'square'), i * 120));
+}
+
+// ================================================
+// TIMER
+// ================================================
+function fmt(secs) {
+  const m = String(Math.floor(secs / 60)).padStart(2, '0');
+  const s = String(secs % 60).padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function tick() {
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    onBlockEnd();
+    return;
+  }
+  timeLeft--;
+  document.getElementById('timer-display').textContent = fmt(timeLeft);
+}
+
+function startTimer() {
+  if (isRunning) return;
+  isRunning = true;
+  timerInterval = setInterval(tick, 1000);
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('pause-btn').style.display = '';
+}
+
+function pauseTimer() {
+  if (!isRunning) return;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+  document.getElementById('start-btn').style.display = '';
+  document.getElementById('start-btn').textContent = 'Reanudar';
+  document.getElementById('pause-btn').style.display = 'none';
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  isRunning = false;
+  isFocusBlock = true;
+  timeLeft = FOCUS_SECS;
+  document.getElementById('start-btn').style.display = '';
+  document.getElementById('start-btn').textContent = 'Comenzar';
+  document.getElementById('pause-btn').style.display = 'none';
+  setTimerMode('focus');
+  renderDots();
+}
+
+function onBlockEnd() {
+  playAlarm();
+  document.getElementById('start-btn').style.display = '';
+  document.getElementById('start-btn').textContent = 'Comenzar';
+  document.getElementById('pause-btn').style.display = 'none';
+
+  if (isFocusBlock) {
+    // Focus block done
+    cycleCount++;
+    sessionPomodoros++;
+    sessionXP += XP_POMODORO;
+    addXP(XP_POMODORO);
+    showXpPop(`+${XP_POMODORO} XP`);
+
+    if (cycleCount >= 4) {
+      cycleCount = 0;
+      timeLeft = LONG_BREAK_SECS;
+      setTimerMode('long-break');
+    } else {
+      timeLeft = SHORT_BREAK_SECS;
+      setTimerMode('short-break');
+    }
+    isFocusBlock = false;
+  } else {
+    // Break done
+    isFocusBlock = true;
+    timeLeft = FOCUS_SECS;
+    setTimerMode('focus');
+  }
+  renderDots();
+  document.getElementById('timer-display').textContent = fmt(timeLeft);
+}
+
+function setTimerMode(mode) {
+  const label = document.getElementById('mode-label');
+  const disp = document.getElementById('timer-display');
+  if (mode === 'focus') {
+    label.textContent = 'ENFOQUE';
+    label.style.color = 'var(--blue)';
+    disp.style.color = 'var(--text)';
+    document.body.classList.remove('break-mode');
+  } else if (mode === 'short-break') {
+    label.textContent = 'DESCANSO';
+    label.style.color = 'var(--green)';
+    disp.style.color = 'var(--green)';
+    document.body.classList.add('break-mode');
+  } else if (mode === 'long-break') {
+    label.textContent = 'DESCANSO LARGO';
+    label.style.color = 'var(--green)';
+    disp.style.color = 'var(--green)';
+    document.body.classList.add('break-mode');
+  }
+}
+
+function renderDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (i < cycleCount) {
+      dot.className = 'pom-dot done';
+    } else if (i === cycleCount && isFocusBlock) {
+      dot.className = 'pom-dot active';
+    } else {
+      dot.className = 'pom-dot';
+    }
+  }
+}
+
+// ================================================
+// FOCUS MODE
+// ================================================
+function toggleFocusMode() {
+  focusModeOn = !focusModeOn;
+  document.body.classList.toggle('focus-mode', focusModeOn);
+  const btn = document.getElementById('focus-btn');
+  if (focusModeOn) {
+    btn.textContent = 'Salir Focus';
+    btn.className = 'btn btn-secondary';
+  } else {
+    btn.textContent = 'Modo Focus';
+    btn.className = 'btn btn-purple';
+  }
+}
+
+// ================================================
+// TASKS
+// ================================================
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = '';
+  taskQueue.forEach((t, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="task-num">${i + 1}</span>
+      <span class="task-text">${esc(t)}</span>
+      <button class="remove-btn" data-idx="${i}" title="Eliminar">x</button>`;
+    li.querySelector('.remove-btn').addEventListener('click', function() {
+      removeTask(parseInt(this.dataset.idx));
+    });
+    list.appendChild(li);
+  });
+  updateCurrentTask();
+}
+
+function updateCurrentTask() {
+  const box = document.getElementById('current-task-text');
+  const doneBtn = document.getElementById('done-task-btn');
+  if (taskQueue.length > 0) {
+    box.innerHTML = '<strong>' + esc(taskQueue[0]) + '</strong>';
+    box.style.cssText = 'font-size:16px;font-weight:500;';
+    doneBtn.style.display = '';
+  } else {
+    box.textContent = 'Agrega tareas en el panel derecho.';
+    box.style.cssText = 'color:var(--text-dim);font-style:italic;font-size:14px;';
+    doneBtn.style.display = 'none';
+  }
+}
+
+function addTask() {
+  const inp = document.getElementById('task-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  taskQueue.push(val);
+  inp.value = '';
+  renderTasks();
+}
+
+function removeTask(idx) {
+  taskQueue.splice(idx, 1);
+  renderTasks();
+}
+
+function completeTask() {
+  if (taskQueue.length === 0) return;
+  const t = taskQueue.shift();
+  doneTasks.push(t);
+  sessionTasks++;
+  sessionXP += XP_TASK;
+  addXP(XP_TASK);
+  showXpPop(`+${XP_TASK} XP`);
+  playXP();
+  renderTasks();
+  renderDone();
+}
+
+function renderDone() {
+  const list = document.getElementById('completed-list');
+  list.innerHTML = '';
+  doneTasks.forEach(t => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span style="color:var(--green);margin-right:6px">+</span>${esc(t)}`;
+    list.appendChild(li);
+  });
+}
+
+// ================================================
+// XP SYSTEM
+// ================================================
+function addXP(amount) {
+  xpTotal += amount;
+  localStorage.setItem('sb_xp', xpTotal);
+  const newLevel = Math.floor(xpTotal / XP_PER_LEVEL) + 1;
+  if (newLevel > currentLevel) {
+    currentLevel = newLevel;
+    localStorage.setItem('sb_level', currentLevel);
+    onLevelUp();
+  }
+  updateXPDisplay();
+}
+
+function updateXPDisplay() {
+  const inLevel = xpTotal % XP_PER_LEVEL;
+  const pct = (inLevel / XP_PER_LEVEL) * 100;
+  document.getElementById('level-badge').textContent = 'Nivel ' + currentLevel;
+  document.getElementById('xp-label').textContent = inLevel + ' / ' + XP_PER_LEVEL + ' XP';
+  document.getElementById('xp-bar-fill').style.width = pct + '%';
+}
+
+function onLevelUp() {
+  playLevelUp();
+  const badge = document.getElementById('level-badge');
+  badge.style.background = 'var(--amber)';
+  badge.style.transform = 'scale(1.25)';
+  setTimeout(() => {
+    badge.style.background = 'var(--purple)';
+    badge.style.transform = 'scale(1)';
+  }, 700);
+}
+
+function showXpPop(text) {
+  const badge = document.getElementById('level-badge');
+  const rect = badge.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'xp-popup';
+  el.textContent = text;
+  el.style.left = rect.left + 'px';
+  el.style.top = rect.top + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+// ================================================
+// DISTRACTIONS
+// ================================================
+function addDistraction() {
+  const row = document.createElement('div');
+  row.className = 'distraction-row';
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.placeholder = 'Que me distrae...';
+
+  const rm = document.createElement('button');
+  rm.className = 'remove-btn';
+  rm.textContent = 'x';
+  rm.addEventListener('click', () => {
+    distractionInputs = distractionInputs.filter(x => x !== inp);
+    row.remove();
+    updateDistractionCount();
+  });
+
+  row.appendChild(inp);
+  row.appendChild(rm);
+  document.getElementById('distraction-list').appendChild(row);
+  distractionInputs.push(inp);
+  inp.focus();
+  updateDistractionCount();
+}
+
+function updateDistractionCount() {
+  const n = distractionInputs.length;
+  const el = document.getElementById('distraction-count');
+  el.textContent = n > 0 ? n + ' distraccion' + (n !== 1 ? 'es' : '') + ' registrada' + (n !== 1 ? 's' : '') : '';
+}
+
+// ================================================
+// NOTES
+// ================================================
+let notesTimer = null;
+function saveNotes() {
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(() => {
+    localStorage.setItem('sb_notes', document.getElementById('session-notes').value);
+    const ind = document.getElementById('notes-saved');
+    ind.style.opacity = '1';
+    setTimeout(() => ind.style.opacity = '0', 1500);
+  }, 600);
+}
+
+// ================================================
+// HISTORY
+// ================================================
+function saveSessionToHistory() {
+  const subject = document.getElementById('subject-input').value.trim() || 'Sesion de estudio';
+  const entry = {
+    date: new Date().toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }),
+    subject,
+    pomodoros: sessionPomodoros,
+    tasks: sessionTasks,
+    xp: sessionXP
+  };
+  sessionHistory.unshift(entry);
+  if (sessionHistory.length > 7) sessionHistory = sessionHistory.slice(0, 7);
+  localStorage.setItem('sb_history', JSON.stringify(sessionHistory));
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-list');
+  if (sessionHistory.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-dim)">Ninguna sesion todavia.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  sessionHistory.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+      <div class="history-date">${s.date}</div>
+      <div class="history-subject">${esc(s.subject)}</div>
+      <div class="history-stats">
+        <div class="history-stat">Pomodoros <span>${s.pomodoros}</span></div>
+        <div class="history-stat">Tareas <span>${s.tasks}</span></div>
+        <div class="history-stat">XP <span>+${s.xp}</span></div>
+      </div>`;
+    container.appendChild(item);
+  });
+}
+
+// ================================================
+// SESSION END
+// ================================================
+function endSession() {
+  pauseTimer();
+  saveSessionToHistory();
+  document.getElementById('end-subject').textContent = document.getElementById('subject-input').value.trim() || 'Sesion de estudio';
+  document.getElementById('end-xp').textContent = '+' + sessionXP + ' XP';
+  document.getElementById('end-pomodoros').textContent = sessionPomodoros;
+  document.getElementById('end-tasks').textContent = sessionTasks;
+  document.getElementById('end-distractions').textContent = distractionInputs.length;
+  document.getElementById('end-overlay').classList.add('visible');
+}
+
+function newSession() {
+  document.getElementById('end-overlay').classList.remove('visible');
+  sessionPomodoros = 0;
+  sessionTasks = 0;
+  sessionXP = 0;
+  cycleCount = 0;
+  taskQueue = [];
+  doneTasks = [];
+  distractionInputs = [];
+  document.getElementById('distraction-list').innerHTML = '';
+  updateDistractionCount();
+  renderTasks();
+  renderDone();
+  renderHistory();
+  resetTimer();
+  if (focusModeOn) toggleFocusMode();
+}
+
+// ================================================
+// UTILS
+// ================================================
+function esc(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str));
+  return d.innerHTML;
+}
+
+// ================================================
+// INIT
+// ================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Timer buttons
+  document.getElementById('start-btn').addEventListener('click', startTimer);
+  document.getElementById('pause-btn').addEventListener('click', pauseTimer);
+  document.getElementById('reset-btn').addEventListener('click', resetTimer);
+  document.getElementById('focus-btn').addEventListener('click', toggleFocusMode);
+  document.getElementById('end-btn').addEventListener('click', endSession);
+
+  // Task buttons
+  document.getElementById('add-task-btn').addEventListener('click', addTask);
+  document.getElementById('task-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTask();
+  });
+
+  // Done task
+  document.getElementById('done-task-btn').addEventListener('click', completeTask);
+
+  // Distraction
+  document.getElementById('distraction-btn').addEventListener('click', addDistraction);
+
+  // Notes
+  document.getElementById('session-notes').addEventListener('input', saveNotes);
+
+  // New session
+  document.getElementById('new-session-btn').addEventListener('click', newSession);
+
+  // Load persisted notes
+  const saved = localStorage.getItem('sb_notes');
+  if (saved) document.getElementById('session-notes').value = saved;
+
+  // Init display
+  currentLevel = Math.floor(xpTotal / XP_PER_LEVEL) + 1;
+  updateXPDisplay();
+  renderHistory();
+  renderDots();
+  document.getElementById('timer-display').textContent = fmt(timeLeft);
+});
+</script>
+</body>
+</html>

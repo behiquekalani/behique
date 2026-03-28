@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Creator's Newsletter Bible — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+    .fade-in { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1a1a1a;
+      position: sticky; top: 0; background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px); z-index: 100;
+    }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-size: 15px; font-weight: 600; color: #F5F5F7; text-decoration: none; letter-spacing: 0.02em; }
+    .nav-cta {
+      background: #30D158; color: #000; padding: 9px 20px;
+      border-radius: 980px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero-badge {
+      display: inline-block; background: #0A84FF22; color: #0A84FF;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 980px;
+      border: 1px solid #0A84FF44; margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px); font-weight: 700;
+      letter-spacing: -0.025em; line-height: 1.08;
+      margin-bottom: 24px; max-width: 800px; margin-left: auto; margin-right: auto;
+    }
+    .hero h1 span { color: #0A84FF; }
+    .hero-subtitle {
+      font-size: 20px; color: #86868B; max-width: 580px;
+      margin: 0 auto 40px; line-height: 1.5;
+    }
+    .hero-price { font-size: 15px; color: #86868B; margin-bottom: 16px; }
+    .hero-price strong { color: #F5F5F7; font-size: 32px; font-weight: 700; }
+    .cta-primary {
+      display: inline-block; background: #30D158; color: #000;
+      padding: 16px 40px; border-radius: 980px; font-size: 17px;
+      font-weight: 600; text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .cta-primary:hover { opacity: 0.88; transform: scale(1.02); }
+    .hero-note { font-size: 13px; color: #48484A; margin-top: 14px; }
+
+    /* PROBLEM */
+    .section { padding: 96px 0; }
+    .section-label {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #0A84FF; margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 24px;
+    }
+    .section p { color: #86868B; font-size: 18px; line-height: 1.65; margin-bottom: 18px; max-width: 660px; }
+    .section p strong { color: #F5F5F7; }
+
+    /* STATS */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; margin: 64px 0;
+    }
+    .stat-card {
+      background: #0a0a0a; padding: 40px 32px; text-align: center;
+    }
+    .stat-card:first-child { border-radius: 16px 0 0 16px; }
+    .stat-card:last-child { border-radius: 0 16px 16px 0; }
+    .stat-number { font-size: 48px; font-weight: 700; color: #0A84FF; letter-spacing: -0.03em; }
+    .stat-label { font-size: 14px; color: #86868B; margin-top: 8px; }
+
+    /* WHAT YOU GET */
+    .toc-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2px; margin-top: 48px;
+    }
+    .toc-item {
+      background: #0a0a0a; padding: 28px 32px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .toc-item:nth-child(1) { border-radius: 16px 0 0 0; }
+    .toc-item:nth-child(2) { border-radius: 0 16px 0 0; }
+    .toc-item:nth-last-child(2) { border-radius: 0 0 0 16px; }
+    .toc-item:last-child { border-radius: 0 0 16px 0; }
+    .toc-num {
+      font-size: 13px; font-weight: 700; color: #0A84FF;
+      min-width: 28px; padding-top: 2px;
+    }
+    .toc-text h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .toc-text p { font-size: 14px; color: #86868B; line-height: 1.5; }
+
+    /* QUOTE */
+    .quote-section {
+      padding: 80px 0; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+    }
+    blockquote {
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: 500;
+      letter-spacing: -0.01em; line-height: 1.3;
+      max-width: 780px; margin: 0 auto; text-align: center;
+      color: #F5F5F7;
+    }
+    blockquote span { color: #0A84FF; }
+
+    /* PLATFORMS */
+    .platform-list { margin-top: 48px; display: flex; flex-direction: column; gap: 2px; }
+    .platform-item {
+      background: #0a0a0a; padding: 28px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .platform-item:first-child { border-radius: 16px 16px 0 0; }
+    .platform-item:last-child { border-radius: 0 0 16px 16px; }
+    .platform-name { font-weight: 600; font-size: 16px; }
+    .platform-tag {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 5px 12px;
+      border-radius: 980px; border: 1px solid;
+    }
+    .tag-monetize { color: #30D158; border-color: #30D15844; background: #30D15811; }
+    .tag-automation { color: #0A84FF; border-color: #0A84FF44; background: #0A84FF11; }
+    .tag-publication { color: #FF9F0A; border-color: #FF9F0A44; background: #FF9F0A11; }
+    .tag-control { color: #BF5AF2; border-color: #BF5AF244; background: #BF5AF211; }
+    .platform-desc { font-size: 14px; color: #86868B; max-width: 420px; }
+
+    /* MONETIZATION */
+    .mono-timeline { margin-top: 48px; display: flex; flex-direction: column; gap: 2px; }
+    .mono-stage {
+      background: #0a0a0a; padding: 28px 32px;
+      display: grid; grid-template-columns: 120px 1fr; gap: 24px; align-items: start;
+    }
+    .mono-stage:first-child { border-radius: 16px 16px 0 0; }
+    .mono-stage:last-child { border-radius: 0 0 16px 16px; }
+    .mono-phase {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #30D158; padding-top: 2px;
+    }
+    .mono-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .mono-body p { font-size: 14px; color: #86868B; line-height: 1.5; }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 100px 0; text-align: center;
+      background: linear-gradient(180deg, #000 0%, #030a05 100%);
+    }
+    .cta-section h2 {
+      font-size: clamp(30px, 4.5vw, 52px); font-weight: 700;
+      letter-spacing: -0.02em; margin-bottom: 20px;
+    }
+    .cta-section p { font-size: 18px; color: #86868B; max-width: 520px; margin: 0 auto 40px; }
+    .price-display { margin-bottom: 32px; }
+    .price-display .amount {
+      font-size: 56px; font-weight: 700; color: #F5F5F7; letter-spacing: -0.03em;
+    }
+    .price-display .currency { font-size: 28px; color: #86868B; vertical-align: super; }
+    .guarantee { font-size: 13px; color: #48484A; margin-top: 16px; }
+
+    /* FOOTER */
+    footer { padding: 40px 0; border-top: 1px solid #1a1a1a; text-align: center; }
+    footer p { font-size: 13px; color: #48484A; }
+    footer a { color: #86868B; text-decoration: none; }
+
+    @media (max-width: 700px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-card { border-radius: 0; }
+      .stat-card:first-child { border-radius: 16px 16px 0 0; }
+      .stat-card:last-child { border-radius: 0 0 16px 16px; }
+      .toc-grid { grid-template-columns: 1fr; }
+      .toc-item { border-radius: 0; }
+      .toc-item:first-child { border-radius: 16px 16px 0 0; }
+      .toc-item:last-child { border-radius: 0 0 16px 16px; }
+      .mono-stage { grid-template-columns: 1fr; gap: 8px; }
+      .platform-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="https://behike.gumroad.com" class="nav-cta">Get it now — $23.99</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="fade-in">
+      <div class="hero-badge">Digital Product</div>
+      <h1>The Creator's<br><span>Newsletter Bible</span></h1>
+      <p class="hero-subtitle">Your social media following belongs to the platform. This is how you build an audience you actually own.</p>
+      <p class="hero-price"><strong>$23.99</strong> &nbsp; one-time, instant download</p>
+      <a href="https://behike.gumroad.com" class="cta-primary">Get the Newsletter Bible</a>
+      <p class="hero-note">PDF. Read anywhere. No subscription.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">The real problem</p>
+      <h2>You are building on rented land</h2>
+      <p>Every follower you have on Instagram, TikTok, or YouTube <strong>belongs to the platform.</strong> The algorithm decides who sees your work. The platform decides whether your account exists tomorrow. You have no contract, no guarantee, no recourse.</p>
+      <p>The newsletter fixes this. An email list is an asset you own. The subscriber agreed to hear from you. You can reach them directly, without an algorithm in the way, for as long as they stay subscribed.</p>
+      <p>The creators who figured this out early are the ones with durable businesses. What they have in common is a list.</p>
+    </div>
+
+    <div class="stats-grid fade-in">
+      <div class="stat-card">
+        <div class="stat-number">2-5%</div>
+        <div class="stat-label">Social media reach per post (even at 50K followers)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">40%</div>
+        <div class="stat-label">Typical open rate on a well-run newsletter</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">10x</div>
+        <div class="stat-label">Email conversion rate vs. social media for paid offers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-section">
+  <div class="container">
+    <blockquote class="fade-in">
+      "A newsletter with 5,000 subscribers at 40% open rate <span>reaches more people</span> than an Instagram account with 50,000 followers, and every one of them chose to be there."
+    </blockquote>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">What's inside</p>
+      <h2>Nine chapters. Zero fluff.</h2>
+      <p>A complete operating manual for newsletter creators, from platform selection to building a $3/subscriber/month media business.</p>
+    </div>
+
+    <div class="toc-grid fade-in">
+      <div class="toc-item">
+        <div class="toc-num">01</div>
+        <div class="toc-text">
+          <h3>The Economics of Email vs. Social</h3>
+          <p>Why reach, conversion rates, and data ownership make email the most valuable channel in your stack.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">02</div>
+        <div class="toc-text">
+          <h3>Platform Comparison</h3>
+          <p>Beehiiv, ConvertKit, Substack, and Ghost. Honest breakdown with a clear decision framework for your situation.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">03</div>
+        <div class="toc-text">
+          <h3>Positioning and Niche Selection</h3>
+          <p>How to define a newsletter concept that is specific enough to matter but large enough to build on.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">04</div>
+        <div class="toc-text">
+          <h3>The First 100 Subscribers System</h3>
+          <p>Personal invites, social cross-promotion, lead magnets, and referral loops. The tactics that actually work.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">05</div>
+        <div class="toc-text">
+          <h3>Content Structure and Cadence</h3>
+          <p>A proven issue structure, how to find your voice, and the cadence that sustains long-term consistency.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">06</div>
+        <div class="toc-text">
+          <h3>Subject Line and Open Rate Mastery</h3>
+          <p>Five subject line frameworks that consistently perform, plus the preview text optimization most creators miss.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">07</div>
+        <div class="toc-text">
+          <h3>Monetization Sequencing</h3>
+          <p>Six stages from first offer to paid subscription tiers, with timing guidance for each transition.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">08</div>
+        <div class="toc-text">
+          <h3>List Hygiene and Deliverability</h3>
+          <p>Technical setup, sunset campaigns, and the engagement-first habits that protect your inbox placement.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="border-top: 1px solid #1a1a1a;">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">Platform guide</p>
+      <h2>The right platform for your situation</h2>
+      <p>Not a ranking. A decision framework. Each platform wins in a specific scenario.</p>
+    </div>
+
+    <div class="platform-list fade-in">
+      <div class="platform-item">
+        <div>
+          <div class="platform-name">Beehiiv</div>
+          <div class="platform-desc" style="margin-top:6px;">Best for creators who want built-in ad monetization, referral growth, and a creator-first interface.</div>
+        </div>
+        <span class="platform-tag tag-monetize">Best for monetization</span>
+      </div>
+      <div class="platform-item">
+        <div>
+          <div class="platform-name">ConvertKit (Kit)</div>
+          <div class="platform-desc" style="margin-top:6px;">Best for creators who sell digital products and need sophisticated behavioral automation sequences.</div>
+        </div>
+        <span class="platform-tag tag-automation">Best for automation</span>
+      </div>
+      <div class="platform-item">
+        <div>
+          <div class="platform-name">Substack</div>
+          <div class="platform-desc" style="margin-top:6px;">Best for writers and thinkers who want a paid publication with built-in audience discovery.</div>
+        </div>
+        <span class="platform-tag tag-publication">Best for publications</span>
+      </div>
+      <div class="platform-item">
+        <div>
+          <div class="platform-name">Ghost</div>
+          <div class="platform-desc" style="margin-top:6px;">Best for technical creators who want full control, zero revenue share, and a website-plus-newsletter architecture.</div>
+        </div>
+        <span class="platform-tag tag-control">Best for control</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="border-top: 1px solid #1a1a1a;">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">Monetization roadmap</p>
+      <h2>Six stages to a sustainable newsletter business</h2>
+      <p>The sequence matters. Monetizing too early destroys trust. Waiting too long sets a free-forever expectation. Here is the timing that works.</p>
+    </div>
+
+    <div class="mono-timeline fade-in">
+      <div class="mono-stage">
+        <div class="mono-phase">Issues 1-8</div>
+        <div class="mono-body">
+          <h3>Credibility Building</h3>
+          <p>Deliver value. Keep every promise in your welcome email. Mention your work organically, never push hard. Build the track record.</p>
+        </div>
+      </div>
+      <div class="mono-stage">
+        <div class="mono-phase">Issues 9-16</div>
+        <div class="mono-body">
+          <h3>First Offer</h3>
+          <p>A low-barrier entry product ($15-$47). The goal is not maximum revenue. It is identifying who in your audience is a buyer.</p>
+        </div>
+      </div>
+      <div class="mono-stage">
+        <div class="mono-phase">500+ Subscribers</div>
+        <div class="mono-body">
+          <h3>Sponsored Ads</h3>
+          <p>Approach sponsors whose products are already advertising in your niche. $10-$50 CPM depending on audience specificity.</p>
+        </div>
+      </div>
+      <div class="mono-stage">
+        <div class="mono-phase">Ongoing</div>
+        <div class="mono-body">
+          <h3>Digital Products</h3>
+          <p>The products that sell best deepen the core newsletter topic. Launch no more than once every 6-8 weeks. Maintain a 10:1 value-to-pitch ratio.</p>
+        </div>
+      </div>
+      <div class="mono-stage">
+        <div class="mono-phase">Established list</div>
+        <div class="mono-body">
+          <h3>Paid Subscription Tier</h3>
+          <p>$8-$15/month for access and depth. Free tier gets the ideas. Paid tier gets the systems. Never remove value from free to create urgency.</p>
+        </div>
+      </div>
+      <div class="mono-stage">
+        <div class="mono-phase">5,000+ Subscribers</div>
+        <div class="mono-body">
+          <h3>Quarterly Sponsorships</h3>
+          <p>Formal monthly or quarterly flat-rate sponsorships. Have a media kit. Know your metrics. Be selective. You are a media property now.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="fade-in">
+      <h2>The list is the business</h2>
+      <p>Build it correctly once. Every product, service, and partnership you launch for the next decade performs better because of it.</p>
+      <div class="price-display">
+        <span class="currency">$</span>
+        <span class="amount">23.99</span>
+      </div>
+      <a href="https://behike.gumroad.com" class="cta-primary">Get The Creator's Newsletter Bible</a>
+      <p class="guarantee">PDF. Instant download. One-time payment.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="/">Behike</a>.
+      Built for creators who build to own, not rent.
+    </p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CUSTOMIZE: Change the description to match your product -->
+    <meta name="description" content="[Your Product Name] - [Your tagline here]">
+    <!-- CUSTOMIZE: Change the page title -->
+    <title>[Your Product Name] | [Your Brand]</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ============================================
+           COLOR VARIABLES - Edit these to change the
+           entire color scheme of your landing page.
+           ============================================ */
+        :root {
+            --black: #000000;        /* Background color */
+            --blue: #0A84FF;         /* Accent color (buttons, links, highlights) */
+            --light: #F5F5F7;        /* Main text color */
+            --secondary-bg: #1D1D1F; /* Card and section backgrounds */
+            --gray: #86868B;         /* Muted text (subtitles, descriptions) */
+            --font: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.8s ease-out both;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* Scroll-triggered animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .nav-logo {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-cta {
+            background: var(--blue);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover {
+            opacity: 0.85;
+        }
+
+        /* ============================================
+           SECTIONS (global)
+           ============================================ */
+        section {
+            padding: 120px 24px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--blue);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        /* ============================================
+           HERO
+           ============================================ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border: 1px solid rgba(10, 132, 255, 0.3);
+            border-radius: 980px;
+            font-size: 13px;
+            color: var(--blue);
+            margin-bottom: 32px;
+            letter-spacing: 0.02em;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            max-width: 800px;
+        }
+
+        .hero h1 span {
+            color: var(--blue);
+        }
+
+        .hero-tagline {
+            font-size: clamp(16px, 2.5vw, 21px);
+            color: var(--gray);
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.5;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .hero-cta:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+
+        .hero-price {
+            margin-top: 16px;
+            color: var(--gray);
+            font-size: 15px;
+        }
+
+        /* ============================================
+           PROBLEM SECTION
+           ============================================ */
+        .problem {
+            text-align: center;
+            background: var(--secondary-bg);
+            max-width: 100%;
+            padding: 120px 24px;
+        }
+
+        .problem-inner {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .problem h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .problem h2 span {
+            color: var(--blue);
+        }
+
+        .problem p {
+            font-size: 19px;
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .problem .solution {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--blue);
+            line-height: 1.5;
+            margin-top: 32px;
+        }
+
+        /* ============================================
+           FEATURES
+           ============================================ */
+        .features {
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 64px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            text-align: left;
+        }
+
+        .feature-card {
+            padding: 32px;
+            background: var(--secondary-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(245, 245, 247, 0.06);
+            transition: border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(245, 245, 247, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           SOCIAL PROOF / STATS
+           ============================================ */
+        .stats {
+            text-align: center;
+            background: var(--secondary-bg);
+            max-width: 100%;
+            padding: 120px 24px;
+        }
+
+        .stats h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 64px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            padding: 40px 24px;
+            background: var(--black);
+            border-radius: 16px;
+            border: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            color: var(--blue);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 15px;
+            color: var(--gray);
+        }
+
+        /* ============================================
+           PRICING
+           ============================================ */
+        .pricing {
+            text-align: center;
+            background: var(--secondary-bg);
+            max-width: 100%;
+            padding: 120px 24px;
+        }
+
+        .pricing h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .pricing-subtitle {
+            color: var(--gray);
+            font-size: 19px;
+            margin-bottom: 48px;
+        }
+
+        .pricing-card {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--black);
+            border: 1px solid rgba(245, 245, 247, 0.1);
+            border-radius: 20px;
+            padding: 48px 40px;
+        }
+
+        .pricing-amount {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            margin-bottom: 8px;
+        }
+
+        .pricing-one-time {
+            color: var(--gray);
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(245, 245, 247, 0.06);
+            font-size: 15px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--blue);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .pricing-cta {
+            display: inline-block;
+            background: var(--blue);
+            color: #fff;
+            padding: 16px 48px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+
+        .pricing-cta:hover {
+            opacity: 0.85;
+        }
+
+        /* ============================================
+           FAQ
+           ============================================ */
+        .faq {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 120px 24px;
+        }
+
+        .faq h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid rgba(245, 245, 247, 0.08);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-family: var(--font);
+            font-size: 17px;
+            font-weight: 500;
+            padding: 24px 0;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: "+";
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--gray);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            padding-bottom: 24px;
+        }
+
+        .faq-answer p {
+            font-size: 15px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            text-align: center;
+            padding: 48px 24px;
+            border-top: 1px solid rgba(245, 245, 247, 0.06);
+        }
+
+        .footer-links {
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 14px;
+            margin: 0 16px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-copy {
+            color: var(--gray);
+            font-size: 13px;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            section {
+                padding: 80px 20px;
+            }
+
+            .problem, .stats, .pricing {
+                padding: 80px 20px;
+            }
+
+            .faq {
+                padding: 80px 20px;
+            }
+
+            .pricing-card {
+                padding: 36px 24px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         NAVIGATION
+         CUSTOMIZE: Change [Your Brand] to your brand name
+         CUSTOMIZE: Change [PAYMENT_LINK] to your checkout URL
+         ============================================ -->
+    <nav>
+        <div class="nav-logo">[Your Brand]</div>
+        <a href="[PAYMENT_LINK]" class="nav-cta">Get It Now</a>
+    </nav>
+
+    <!-- ============================================
+         HERO SECTION
+         CUSTOMIZE: Change the badge text, title, tagline, and price
+         ============================================ -->
+    <section class="hero">
+        <!-- CUSTOMIZE: Change this badge text to a short label for your product -->
+        <div class="hero-badge fade-up">[Price] - Available Now</div>
+
+        <!-- CUSTOMIZE: Change the title. Wrap the key word in <span> for accent color -->
+        <h1 class="fade-up delay-1">[Your Product <span>Name</span>]</h1>
+
+        <!-- CUSTOMIZE: Change this to a one-line description of your product -->
+        <p class="hero-tagline fade-up delay-2">[Your tagline here. One or two sentences that explain what this product does and why someone should buy it.]</p>
+
+        <!-- CUSTOMIZE: Change [PAYMENT_LINK] to your Gumroad, Stripe, or PayPal URL -->
+        <a href="[PAYMENT_LINK]" class="hero-cta fade-up delay-3">Get Instant Access</a>
+
+        <!-- CUSTOMIZE: Change the price -->
+        <p class="hero-price fade-up delay-4">One-time payment. Instant download.</p>
+    </section>
+
+    <!-- ============================================
+         PROBLEM SECTION
+         CUSTOMIZE: Describe the pain point your product solves.
+         Use the Problem > Agitate > Solve framework.
+         ============================================ -->
+    <section class="problem">
+        <div class="problem-inner reveal">
+            <!-- CUSTOMIZE: Describe the core problem. Wrap the key phrase in <span> for accent color -->
+            <h2>[Describe your customer's <span>problem</span>]</h2>
+
+            <!-- CUSTOMIZE: Explain why this problem matters. Make it personal. -->
+            <p>[Explain why this problem matters. What does it cost them in time, money, or frustration? Paint the picture of life before your product.]</p>
+
+            <!-- CUSTOMIZE: One sentence on how your product solves it -->
+            <p class="solution">[How your product solves it. One clear sentence.]</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FEATURES SECTION
+         CUSTOMIZE: Replace each feature card with your own.
+         Add or remove cards as needed. Keep the same structure.
+         ============================================ -->
+    <section class="features reveal">
+        <div class="section-label">What's Inside</div>
+        <h2>Everything You Get</h2>
+
+        <div class="features-grid">
+            <!-- CUSTOMIZE: Feature 1 - Change the icon, title, and description -->
+            <div class="feature-card">
+                <div class="feature-icon">01</div>
+                <h3>[Feature Title 1]</h3>
+                <p>[Feature description 1. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+
+            <!-- CUSTOMIZE: Feature 2 -->
+            <div class="feature-card">
+                <div class="feature-icon">02</div>
+                <h3>[Feature Title 2]</h3>
+                <p>[Feature description 2. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+
+            <!-- CUSTOMIZE: Feature 3 -->
+            <div class="feature-card">
+                <div class="feature-icon">03</div>
+                <h3>[Feature Title 3]</h3>
+                <p>[Feature description 3. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+
+            <!-- CUSTOMIZE: Feature 4 -->
+            <div class="feature-card">
+                <div class="feature-icon">04</div>
+                <h3>[Feature Title 4]</h3>
+                <p>[Feature description 4. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+
+            <!-- CUSTOMIZE: Feature 5 -->
+            <div class="feature-card">
+                <div class="feature-icon">05</div>
+                <h3>[Feature Title 5]</h3>
+                <p>[Feature description 5. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+
+            <!-- CUSTOMIZE: Feature 6 -->
+            <div class="feature-card">
+                <div class="feature-icon">06</div>
+                <h3>[Feature Title 6]</h3>
+                <p>[Feature description 6. One or two sentences explaining what this feature does and why it matters.]</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         SOCIAL PROOF / STATS SECTION
+         CUSTOMIZE: Replace with your own numbers.
+         If you don't have stats yet, delete this entire section.
+         ============================================ -->
+    <section class="stats">
+        <h2 class="reveal">By the Numbers</h2>
+        <div class="stats-grid">
+            <!-- CUSTOMIZE: Replace each stat with your own metrics -->
+            <div class="stat-card reveal">
+                <div class="stat-number">[100+]</div>
+                <div class="stat-label">[Stat description 1]</div>
+            </div>
+            <div class="stat-card reveal">
+                <div class="stat-number">[50+]</div>
+                <div class="stat-label">[Stat description 2]</div>
+            </div>
+            <div class="stat-card reveal">
+                <div class="stat-number">[4.9]</div>
+                <div class="stat-label">[Stat description 3]</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PRICING SECTION
+         CUSTOMIZE: Change the headline, price, and included items
+         ============================================ -->
+    <section class="pricing">
+        <div class="reveal">
+            <!-- CUSTOMIZE: Change the pricing headline -->
+            <h2>[Pricing headline]</h2>
+            <!-- CUSTOMIZE: Change the subtitle -->
+            <p class="pricing-subtitle">[Pricing subtitle. e.g. One payment. Lifetime access.]</p>
+
+            <div class="pricing-card">
+                <!-- CUSTOMIZE: Change the price -->
+                <div class="pricing-amount">[Price]</div>
+                <div class="pricing-one-time">One-time payment</div>
+
+                <!-- CUSTOMIZE: List what's included. Add or remove <li> items as needed -->
+                <ul class="pricing-features">
+                    <li>[What's included item 1]</li>
+                    <li>[What's included item 2]</li>
+                    <li>[What's included item 3]</li>
+                    <li>[What's included item 4]</li>
+                    <li>[What's included item 5]</li>
+                </ul>
+
+                <!-- CUSTOMIZE: Change [PAYMENT_LINK] to your checkout URL -->
+                <a href="[PAYMENT_LINK]" class="pricing-cta">Get Instant Access</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FAQ SECTION
+         CUSTOMIZE: Replace each question and answer.
+         Add or remove faq-item blocks as needed.
+         ============================================ -->
+    <section class="faq">
+        <h2 class="reveal">Frequently Asked Questions</h2>
+
+        <!-- CUSTOMIZE: FAQ 1 -->
+        <div class="faq-item reveal">
+            <button class="faq-question">[FAQ Question 1]</button>
+            <div class="faq-answer">
+                <p>[FAQ Answer 1]</p>
+            </div>
+        </div>
+
+        <!-- CUSTOMIZE: FAQ 2 -->
+        <div class="faq-item reveal">
+            <button class="faq-question">[FAQ Question 2]</button>
+            <div class="faq-answer">
+                <p>[FAQ Answer 2]</p>
+            </div>
+        </div>
+
+        <!-- CUSTOMIZE: FAQ 3 -->
+        <div class="faq-item reveal">
+            <button class="faq-question">[FAQ Question 3]</button>
+            <div class="faq-answer">
+                <p>[FAQ Answer 3]</p>
+            </div>
+        </div>
+
+        <!-- CUSTOMIZE: FAQ 4 -->
+        <div class="faq-item reveal">
+            <button class="faq-question">[FAQ Question 4]</button>
+            <div class="faq-answer">
+                <p>[FAQ Answer 4]</p>
+            </div>
+        </div>
+
+        <!-- CUSTOMIZE: FAQ 5 -->
+        <div class="faq-item reveal">
+            <button class="faq-question">[FAQ Question 5]</button>
+            <div class="faq-answer">
+                <p>[FAQ Answer 5]</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         CUSTOMIZE: Change the email and brand name
+         ============================================ -->
+    <footer>
+        <div class="footer-links">
+            <!-- CUSTOMIZE: Change the email address -->
+            <a href="mailto:[your-email@example.com]">Contact</a>
+        </div>
+        <!-- CUSTOMIZE: Change the brand/name -->
+        <p class="footer-copy">&copy; 2026 [Your Brand or Name]. All rights reserved.</p>
+    </footer>
+
+    <!-- FAQ toggle script -->
+    <script>
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const item = btn.parentElement;
+                const isActive = item.classList.contains('active');
+                // Close all
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+                // Open clicked (if it wasn't already open)
+                if (!isActive) item.classList.add('active');
+            });
+        });
+
+        // Scroll reveal animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+
+    <!-- CUSTOMIZE: Remove this line if you don't want the theme/font-size switcher -->
+    <script src="settings-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket Dashboard - Behike</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--surface:#111;--border:#1e1e1e;--text:#e8e8e8;--muted:#666;--accent:#0066ff;--up:#00c853;--down:#ff4444;--gold:#c9a84c;--contested:#ff9800}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Mono','Fira Code',monospace;background:var(--bg);color:var(--text);min-height:100vh}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:1.2em;font-weight:600;letter-spacing:-0.5px}
+.header h1 span{color:var(--accent)}
+.header-right{display:flex;gap:12px;align-items:center}
+.header-right .status{font-size:.75em;color:var(--up);display:flex;align-items:center;gap:4px}
+.header-right .status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--up);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-sm{padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.8em;cursor:pointer;font-family:inherit}
+.btn-sm:hover{background:#0052cc}
+.btn-sm.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+.main{display:grid;grid-template-columns:1fr 320px;gap:0;min-height:calc(100vh - 56px)}
+@media(max-width:900px){.main{grid-template-columns:1fr}}
+
+/* Market list */
+.market-list{padding:16px;overflow-y:auto;max-height:calc(100vh - 56px)}
+.section-title{font-size:.75em;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin:16px 0 8px;padding:0 4px}
+.market-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.market-card:hover{border-color:var(--accent);transform:translateX(2px)}
+.market-card.hot{border-left:3px solid var(--up)}
+.market-card.contested{border-left:3px solid var(--contested)}
+.market-card.dropping{border-left:3px solid var(--down)}
+
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.mc-question{font-size:.9em;line-height:1.3;flex:1}
+.mc-price{font-size:1.1em;font-weight:700;white-space:nowrap}
+.mc-price.high{color:var(--up)}
+.mc-price.low{color:var(--down)}
+.mc-price.mid{color:var(--contested)}
+
+.mc-bottom{display:flex;justify-content:space-between;margin-top:8px;font-size:.7em;color:var(--muted)}
+.mc-tag{padding:2px 8px;border-radius:10px;font-size:.65em;text-transform:uppercase;letter-spacing:.5px}
+.mc-tag.hot{background:rgba(0,200,83,.1);color:var(--up)}
+.mc-tag.contested{background:rgba(255,152,0,.1);color:var(--contested)}
+.mc-tag.new{background:rgba(0,102,255,.1);color:var(--accent)}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-left:1px solid var(--border);padding:16px;overflow-y:auto;max-height:calc(100vh - 56px)}
+@media(max-width:900px){.sidebar{border-left:none;border-top:1px solid var(--border)}}
+
+.sidebar h3{font-size:.8em;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.85em}
+.stat-row .label{color:var(--muted)}
+.stat-row .value{font-weight:600}
+
+.watchlist{margin-top:20px}
+.wl-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.85em}
+.wl-item .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:8px}
+.wl-item .dot.active{background:var(--up)}
+.wl-add{display:flex;gap:6px;margin-top:10px}
+.wl-add input{flex:1;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8em;font-family:inherit}
+
+.alert-log{margin-top:20px}
+.alert-item{padding:8px;background:var(--bg);border-radius:6px;margin-bottom:6px;font-size:.75em;line-height:1.3}
+.alert-item .time{color:var(--muted)}
+.alert-item.move-up{border-left:2px solid var(--up)}
+.alert-item.move-down{border-left:2px solid var(--down)}
+.alert-item.new-hot{border-left:2px solid var(--gold)}
+
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9em}
+
+/* Filters */
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-btn{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.75em;cursor:pointer;font-family:inherit;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(0,102,255,.05)}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Poly<span>Market</span> Dashboard</h1>
+  <div class="header-right">
+    <span class="status">Live</span>
+    <span style="font-size:.75em;color:var(--muted)" id="lastUpdate">Loading...</span>
+    <button class="btn-sm" onclick="fetchMarkets()">Refresh</button>
+    <button class="btn-sm outline" onclick="toggleAutoRefresh()">Auto: OFF</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="market-list">
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('hot',this)">Hot</button>
+      <button class="filter-btn" onclick="setFilter('contested',this)">Contested</button>
+      <button class="filter-btn" onclick="setFilter('crypto',this)">Crypto</button>
+      <button class="filter-btn" onclick="setFilter('politics',this)">Politics</button>
+      <button class="filter-btn" onclick="setFilter('sports',this)">Sports</button>
+    </div>
+    <div id="marketList"><div class="empty">Loading markets from Polymarket API...</div></div>
+  </div>
+
+  <div class="sidebar">
+    <h3>Overview</h3>
+    <div id="overviewStats">
+      <div class="stat-row"><span class="label">Markets tracked</span><span class="value" id="statTotal">0</span></div>
+      <div class="stat-row"><span class="label">Contested (40-60%)</span><span class="value" id="statContested">0</span></div>
+      <div class="stat-row"><span class="label">High volume</span><span class="value" id="statHot">0</span></div>
+      <div class="stat-row"><span class="label">Avg YES price</span><span class="value" id="statAvg">0%</span></div>
+    </div>
+
+    <div class="watchlist">
+      <h3>Watchlist</h3>
+      <div id="watchlistItems"></div>
+      <div class="wl-add">
+        <input type="text" id="wlInput" placeholder="Add keyword..." onkeydown="if(event.key==='Enter')addWatchlist()">
+        <button class="btn-sm" onclick="addWatchlist()">+</button>
+      </div>
+    </div>
+
+    <div class="alert-log">
+      <h3>Recent Alerts</h3>
+      <div id="alertLog"><div class="alert-item"><span class="time">No alerts yet</span></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://gamma-api.polymarket.com';
+let markets = [];
+let filter = 'all';
+let autoRefresh = false;
+let autoInterval = null;
+let watchlist = JSON.parse(localStorage.getItem('pm_watchlist') || '["bitcoin","trump","fed","ai","election"]');
+let alertLog = JSON.parse(localStorage.getItem('pm_alerts') || '[]');
+let prevPrices = JSON.parse(localStorage.getItem('pm_prices') || '{}');
+
+async function fetchMarkets() {
+  try {
+    const resp = await fetch(`${API}/markets?limit=100&active=true&closed=false&order=volume24hr&ascending=false`);
+    markets = await resp.json();
+    checkAlerts();
+    renderMarkets();
+    renderStats();
+    renderWatchlist();
+    renderAlerts();
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('marketList').innerHTML = `<div class="empty">API error: ${e.message}. Check your connection.</div>`;
+  }
+}
+
+function parsePrice(m) {
+  try {
+    const p = typeof m.outcomePrices === 'string' ? JSON.parse(m.outcomePrices) : m.outcomePrices;
+    return p && p.length >= 2 ? [parseFloat(p[0]), parseFloat(p[1])] : [null, null];
+  } catch { return [null, null]; }
+}
+
+function checkAlerts() {
+  markets.forEach(m => {
+    const [yes] = parsePrice(m);
+    if (yes === null) return;
+    const id = m.id;
+    if (prevPrices[id]) {
+      const change = yes - prevPrices[id];
+      if (Math.abs(change) >= 0.05) {
+        const dir = change > 0 ? 'up' : 'down';
+        alertLog.unshift({
+          type: `move-${dir}`,
+          text: `${change > 0 ? '📈' : '📉'} ${m.question?.substring(0, 50)}: ${(prevPrices[id]*100).toFixed(1)}% -> ${(yes*100).toFixed(1)}%`,
+          time: new Date().toLocaleTimeString()
+        });
+      }
+    }
+    prevPrices[id] = yes;
+  });
+  alertLog = alertLog.slice(0, 20);
+  localStorage.setItem('pm_prices', JSON.stringify(prevPrices));
+  localStorage.setItem('pm_alerts', JSON.stringify(alertLog));
+}
+
+function categorize(q) {
+  const ql = (q || '').toLowerCase();
+  if (/bitcoin|btc|eth|crypto|token|defi|solana/i.test(ql)) return 'crypto';
+  if (/trump|biden|election|congress|senate|president|democrat|republican/i.test(ql)) return 'politics';
+  if (/win|game|match|score|nba|nfl|premier|champions|la liga|serie a|fc |vs\./i.test(ql)) return 'sports';
+  return 'other';
+}
+
+function renderMarkets() {
+  const list = document.getElementById('marketList');
+  let filtered = markets.filter(m => {
+    const [yes] = parsePrice(m);
+    if (yes === null) return false;
+    if (filter === 'all') return true;
+    if (filter === 'hot') return parseFloat(m.volume24hr || 0) > 500000;
+    if (filter === 'contested') return yes >= 0.35 && yes <= 0.65;
+    return categorize(m.question) === filter;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty">No markets match this filter.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.slice(0, 50).map(m => {
+    const [yes] = parsePrice(m);
+    const vol = parseFloat(m.volume24hr || 0);
+    const isHot = vol > 500000;
+    const isContested = yes >= 0.35 && yes <= 0.65;
+    const cat = categorize(m.question);
+
+    let cls = '';
+    if (isHot) cls = 'hot';
+    else if (isContested) cls = 'contested';
+
+    let priceClass = yes >= 0.7 ? 'high' : yes <= 0.3 ? 'low' : 'mid';
+    let tags = '';
+    if (isHot) tags += '<span class="mc-tag hot">HOT</span> ';
+    if (isContested) tags += '<span class="mc-tag contested">50/50</span> ';
+
+    return `<div class="market-card ${cls}" onclick="window.open('https://polymarket.com/event/${m.slug}','_blank')">
+      <div class="mc-top">
+        <div class="mc-question">${(m.question || '').substring(0, 80)}</div>
+        <div class="mc-price ${priceClass}">${(yes * 100).toFixed(1)}%</div>
+      </div>
+      <div class="mc-bottom">
+        <div>${tags}<span style="color:var(--muted)">${cat}</span></div>
+        <div>Vol: $${vol >= 1000000 ? (vol/1000000).toFixed(1)+'M' : vol >= 1000 ? (vol/1000).toFixed(0)+'K' : vol.toFixed(0)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderStats() {
+  let total = 0, contested = 0, hot = 0, sumYes = 0;
+  markets.forEach(m => {
+    const [yes] = parsePrice(m);
+    if (yes === null) return;
+    total++;
+    sumYes += yes;
+    if (yes >= 0.35 && yes <= 0.65) contested++;
+    if (parseFloat(m.volume24hr || 0) > 500000) hot++;
+  });
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statContested').textContent = contested;
+  document.getElementById('statHot').textContent = hot;
+  document.getElementById('statAvg').textContent = total > 0 ? (sumYes / total * 100).toFixed(1) + '%' : '0%';
+}
+
+function renderWatchlist() {
+  const el = document.getElementById('watchlistItems');
+  el.innerHTML = watchlist.map(kw => {
+    const match = markets.some(m => (m.question || '').toLowerCase().includes(kw.toLowerCase()));
+    return `<div class="wl-item"><div style="display:flex;align-items:center"><span class="dot ${match ? 'active' : ''}"></span>${kw}</div><span style="cursor:pointer;color:var(--muted)" onclick="removeWatchlist('${kw}')">x</span></div>`;
+  }).join('');
+}
+
+function addWatchlist() {
+  const input = document.getElementById('wlInput');
+  const kw = input.value.trim();
+  if (kw && !watchlist.includes(kw.toLowerCase())) {
+    watchlist.push(kw.toLowerCase());
+    localStorage.setItem('pm_watchlist', JSON.stringify(watchlist));
+    input.value = '';
+    renderWatchlist();
+  }
+}
+
+function removeWatchlist(kw) {
+  watchlist = watchlist.filter(w => w !== kw);
+  localStorage.setItem('pm_watchlist', JSON.stringify(watchlist));
+  renderWatchlist();
+}
+
+function renderAlerts() {
+  const el = document.getElementById('alertLog');
+  if (alertLog.length === 0) {
+    el.innerHTML = '<div class="alert-item"><span class="time">No alerts yet. Refresh to start tracking.</span></div>';
+    return;
+  }
+  el.innerHTML = alertLog.slice(0, 10).map(a =>
+    `<div class="alert-item ${a.type}"><span class="time">${a.time}</span> ${a.text}</div>`
+  ).join('');
+}
+
+function setFilter(f, btn) {
+  filter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMarkets();
+}
+
+function toggleAutoRefresh() {
+  autoRefresh = !autoRefresh;
+  const btn = document.querySelector('.btn-sm.outline');
+  if (autoRefresh) {
+    btn.textContent = 'Auto: ON';
+    btn.style.borderColor = 'var(--up)';
+    btn.style.color = 'var(--up)';
+    autoInterval = setInterval(fetchMarkets, 60000);
+  } else {
+    btn.textContent = 'Auto: OFF';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    clearInterval(autoInterval);
+  }
+}
+
+fetchMarkets();
+</script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's AI Tools Implementation Guide — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #F5F5F7;
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 14px;
+      color: #888;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: #F5F5F7;
+      max-width: 820px;
+      margin: 0 auto 24px;
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: #888;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .price-block {
+      margin-bottom: 36px;
+    }
+    .price-main {
+      font-size: 56px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -0.02em;
+    }
+    .price-meta {
+      font-size: 14px;
+      color: #555;
+      margin-top: 4px;
+    }
+    .cta-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 52px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .cta-primary:hover { opacity: 0.88; }
+    .hero-reassurance {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #444;
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: #1a1a1a;
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 80px 0;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 700px;
+    }
+    .section p {
+      font-size: 18px;
+      color: #999;
+      max-width: 660px;
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+    .section p strong {
+      color: #F5F5F7;
+      font-weight: 600;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      padding: 64px 0;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 48px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -0.03em;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #555;
+      margin-top: 4px;
+    }
+
+    /* GET GRID */
+    .get-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .get-card {
+      background: #0d0d0d;
+      border: 1px solid #1f1f1f;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .get-card-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+    .get-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #F5F5F7;
+    }
+    .get-card p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* CHAPTERS */
+    .chapters-section {
+      padding: 80px 0;
+      background: #050505;
+    }
+    .chapters-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .chapter-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid #111;
+    }
+    .chapter-row:last-child { border-bottom: none; }
+    .chapter-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0A84FF;
+      letter-spacing: 0.08em;
+      min-width: 60px;
+      padding-top: 3px;
+    }
+    .chapter-info h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .chapter-info p {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* TIME SAVINGS */
+    .savings-block {
+      margin-top: 48px;
+      background: #0d0d0d;
+      border: 1px solid #1f1f1f;
+      border-radius: 20px;
+      padding: 40px;
+    }
+    .savings-block h3 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #F5F5F7;
+    }
+    .savings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 15px;
+    }
+    .savings-row:last-child { border-bottom: none; }
+    .savings-task { color: #888; }
+    .savings-time { color: #30D158; font-weight: 600; }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .final-cta h2 {
+      font-size: clamp(30px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: #888;
+      max-width: 520px;
+      margin: 0 auto 48px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid #111;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr; gap: 32px; }
+      .hero { padding: 64px 0 56px; }
+      .savings-block { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="brand" href="../index.html">Behike</a>
+      <span class="nav-price">PDF Guide &mdash; $22.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-label">Solopreneur's AI Tools Implementation Guide</p>
+      <h1>Do the Work of Three People. Stay the One Person You Are.</h1>
+      <p class="hero-sub">A concrete implementation system for solopreneurs who want AI to do real work in their business, not just sit in a browser tab they opened once.</p>
+      <div class="price-block">
+        <div class="price-main">$22.99</div>
+        <div class="price-meta">One-time payment. PDF guide. ~40 pages.</div>
+      </div>
+      <a class="cta-primary" href="#">Get Instant Access</a>
+      <p class="hero-reassurance">Instant PDF download. No subscription.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEM -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">The Problem</p>
+      <h2>You have the tools. You are not using them.</h2>
+      <p>Most solopreneurs using AI tools are not using them. They are collecting them. ChatGPT, Claude, Notion AI, six browser tabs, zero systems. They experiment for a few hours, get mediocre output, and go back to doing everything manually.</p>
+      <p>The tools are not the problem. The problem is there is no implementation model. <strong>No one shows you how a person running a real one-person business reorganizes their workflow to make AI do actual work.</strong></p>
+      <p>This guide is that model. Not a feature review. Not a list of prompts. A complete operating system for running your business with AI embedded into every function.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STATS -->
+  <section class="section">
+    <div class="container">
+      <div class="stats-row">
+        <div>
+          <div class="stat-val">5-10h</div>
+          <div class="stat-label">Hours recaptured per week from the five core automations</div>
+        </div>
+        <div>
+          <div class="stat-val">7</div>
+          <div class="stat-label">Chapters covering every function of a solopreneur business</div>
+        </div>
+        <div>
+          <div class="stat-val">30</div>
+          <div class="stat-label">Day implementation plan, one step per week</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What You Get</p>
+      <h2>A complete AI operating system for one-person businesses.</h2>
+      <div class="get-grid">
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>AI Stack Architecture</h3>
+          <p>The exact tools to use for each function of your business, with no redundancy and no waste. The full stack costs $40 to $100 per month.</p>
+        </div>
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>Prompt Library System</h3>
+          <p>How to build a prompt library of 30 to 50 reusable templates that cover the majority of your writing tasks. Built once, used forever.</p>
+        </div>
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>Daily Operating Rhythm</h3>
+          <p>A mapped daily schedule that shows exactly when and how AI fits into your workday without adding cognitive overhead.</p>
+        </div>
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>5 Core Automations</h3>
+          <p>The five workflows that pay for your entire AI stack within the first month. Inquiry to proposal, content repurposing, feedback processing, and more.</p>
+        </div>
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>Client Delivery Framework</h3>
+          <p>How to use AI in your service delivery to free up 3 to 6 hours per client per month without reducing quality or exposing your process.</p>
+        </div>
+        <div class="get-card">
+          <div class="get-card-icon">&#9679;</div>
+          <h3>Quality Audit System</h3>
+          <p>A review protocol and monthly audit process that keeps AI output quality high and catches the places where AI will quietly make you look bad.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIME SAVINGS -->
+  <section class="section">
+    <div class="container">
+      <p class="section-label">What Gets Faster</p>
+      <h2>Specific tasks. Specific time saved.</h2>
+      <div class="savings-block">
+        <h3>Weekly time recaptured with full implementation</h3>
+        <div class="savings-row">
+          <span class="savings-task">Client proposals and reports</span>
+          <span class="savings-time">3 to 5 hrs saved per engagement</span>
+        </div>
+        <div class="savings-row">
+          <span class="savings-task">Content creation (600-word piece)</span>
+          <span class="savings-time">40 to 60% time reduction</span>
+        </div>
+        <div class="savings-row">
+          <span class="savings-task">Research and information gathering</span>
+          <span class="savings-time">80% time reduction</span>
+        </div>
+        <div class="savings-row">
+          <span class="savings-task">Routine client communication</span>
+          <span class="savings-time">20 to 40 min/day</span>
+        </div>
+        <div class="savings-row">
+          <span class="savings-task">Weekly business review</span>
+          <span class="savings-time">30 min/week</span>
+        </div>
+        <div class="savings-row">
+          <span class="savings-task">Inquiry-to-proposal pipeline</span>
+          <span class="savings-time">45 to 90 min per inquiry</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CHAPTERS -->
+  <section class="chapters-section">
+    <div class="container">
+      <p class="section-label">Inside the Guide</p>
+      <h2>Seven chapters. Every function of your business covered.</h2>
+      <div class="chapters-list">
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 01</div>
+          <div class="chapter-info">
+            <h3>The AI Implementation Framework</h3>
+            <p>Audit, assign, and anchor. The three-stage model for mapping AI tools to your actual workflow instead of experimenting randomly.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 02</div>
+          <div class="chapter-info">
+            <h3>Your AI Stack, Built for a One-Person Business</h3>
+            <p>The six categories you need, the tools that fill each one, and the total monthly cost. No redundancy, no waste.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 03</div>
+          <div class="chapter-info">
+            <h3>Prompt Engineering Without the Complexity</h3>
+            <p>The four-element prompt formula (role, task, constraints, format), how to build a prompt library, and the few-shot technique for voice matching.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 04</div>
+          <div class="chapter-info">
+            <h3>AI-Powered Daily Operations</h3>
+            <p>A mapped day showing exactly how AI integrates into morning planning, content creation, client communication, research, and end-of-day capture.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 05</div>
+          <div class="chapter-info">
+            <h3>AI for Client Delivery and Service</h3>
+            <p>How consultants, coaches, freelancers, and creatives use AI in service delivery without reducing quality or exposing their process to clients.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 06</div>
+          <div class="chapter-info">
+            <h3>Automating Repetitive Business Tasks</h3>
+            <p>The five automations that pay for your AI stack in the first month, built with Zapier or Make, no code required.</p>
+          </div>
+        </div>
+        <div class="chapter-row">
+          <div class="chapter-num">Ch. 07</div>
+          <div class="chapter-info">
+            <h3>Measuring Results and Refining the System</h3>
+            <p>The metrics that matter, the monthly audit process, and how to avoid skill atrophy and quality drift over time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2>Build the operating system. Then stop thinking about it.</h2>
+      <p>One-time payment. Immediate PDF download. Implementation you can start this week.</p>
+      <div class="price-block">
+        <div class="price-main">$22.99</div>
+        <div class="price-meta">PDF Guide, ~40 pages</div>
+      </div>
+      <a class="cta-primary" href="#">Get Instant Access</a>
+      <p class="hero-reassurance" style="margin-top:16px;">Instant download after purchase.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike Digital Products &mdash; Built for builders.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

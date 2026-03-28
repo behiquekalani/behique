@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Lumina - Your Screen, Working With Your Body</title>
+<meta name="description" content="Circadian light, ambient sound, ADHD focus mode, breathing exercises, sleep coaching. One app. $9.99 once.">
+<meta name="robots" content="noai, noimageai">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#060810;--surface:#0c0e16;--card:#12141e;--border:#1c2030;
+  --text:#d0d4e0;--dim:#5a6280;--muted:#3a4060;
+  --warm:#ff9944;--cool:#4488ff;--accent:#6c8cff;
+  --inhale:#4488ff;--hold:#8855cc;--exhale:#44cc88;--rest:#ffbb44;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+
+/* Layout */
+.app{display:grid;grid-template-columns:1fr 320px;grid-template-rows:48px 1fr 56px;height:100vh;height:100dvh}
+
+/* Top bar */
+.topbar{grid-column:1/-1;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.topbar .logo{font-size:15px;font-weight:600;letter-spacing:0.08em;color:var(--text)}
+.topbar .logo span{color:var(--accent)}
+.topbar .clock{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:0.05em}
+.topbar .pro-badge{font-size:9px;background:rgba(108,140,255,0.15);color:var(--accent);padding:3px 10px;border-radius:12px;letter-spacing:0.1em;font-weight:600}
+
+/* Main area */
+.main{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+canvas#particles{position:absolute;inset:0;width:100%;height:100%}
+
+/* Breathing circle */
+.breath{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:20px}
+.ring{width:180px;height:180px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;transition:all 1.2s ease-in-out;position:relative}
+.ring::before{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(108,140,255,0.1);transition:all 1.2s}
+.ring::after{content:'';position:absolute;inset:-20px;border-radius:50%;border:1px solid rgba(108,140,255,0.05);transition:all 1.2s}
+.ring.inhale{width:240px;height:240px;border-color:var(--inhale);box-shadow:0 0 60px rgba(68,136,255,0.1)}
+.ring.hold-in{border-color:var(--hold);box-shadow:0 0 40px rgba(136,85,204,0.1)}
+.ring.exhale{width:140px;height:140px;border-color:var(--exhale);box-shadow:0 0 40px rgba(68,204,136,0.08)}
+.ring.hold-out{border-color:var(--rest);box-shadow:0 0 30px rgba(255,187,68,0.08)}
+.b-timer{font-size:44px;font-weight:200;color:var(--accent);transition:color 1s}
+.b-label{font-size:14px;font-weight:300;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);transition:color 1s}
+.b-hint{font-size:12px;color:var(--muted);letter-spacing:0.05em}
+
+/* Sidebar */
+.sidebar{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.sb-section{padding:16px 20px;border-bottom:1px solid var(--border)}
+.sb-section h3{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--dim);font-weight:600;margin-bottom:12px}
+
+/* Tabs in sidebar */
+.sb-tabs{display:flex;border-bottom:1px solid var(--border)}
+.sb-tab{flex:1;padding:10px;text-align:center;font-size:10px;letter-spacing:0.1em;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.sb-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.sb-pane{display:none}
+.sb-pane.active{display:block}
+
+/* Pattern buttons */
+.pat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pat{padding:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;text-align:center;cursor:pointer;transition:all .2s;font-family:var(--font)}
+.pat:hover{border-color:var(--accent)}
+.pat.active{border-color:var(--accent);background:rgba(108,140,255,0.08)}
+.pat .p-name{font-weight:500;margin-bottom:1px}
+.pat .p-timing{font-size:9px;color:var(--dim)}
+
+/* Sound rows */
+.snd-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.snd-row label{font-size:11px;color:var(--text);flex:1}
+.snd-slider{-webkit-appearance:none;width:80px;height:3px;background:var(--border);border-radius:2px;outline:none}
+.snd-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--accent);cursor:pointer}
+.snd-toggle{width:28px;height:16px;background:var(--border);border-radius:8px;position:relative;cursor:pointer;transition:background .2s}
+.snd-toggle.on{background:var(--accent)}
+.snd-toggle::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:#fff;border-radius:50%;transition:transform .2s}
+.snd-toggle.on::after{transform:translateX(12px)}
+
+/* Circadian bar */
+.circ-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#1a1040,#ff8844,#ffffcc,#ff8844,#1a1040);margin-bottom:6px;position:relative}
+.circ-dot{position:absolute;top:-5px;width:16px;height:16px;border:2px solid var(--accent);border-radius:50%;background:var(--bg);transform:translateX(-50%)}
+.circ-label{font-size:11px;color:var(--dim);text-align:center}
+
+/* Focus timer */
+.focus-time{font-size:32px;font-weight:200;text-align:center;font-variant-numeric:tabular-nums;margin-bottom:8px}
+.focus-btns{display:flex;gap:6px;justify-content:center}
+.focus-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text);font-size:10px;cursor:pointer;font-family:var(--font)}
+.focus-btn:hover{border-color:var(--accent)}
+.focus-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+/* Sleep coach */
+.sleep-info{background:var(--card);border-radius:8px;padding:12px;margin-bottom:8px}
+.sleep-info .s-label{font-size:10px;color:var(--dim);letter-spacing:0.1em;margin-bottom:4px}
+.sleep-info .s-value{font-size:18px;font-weight:300}
+
+/* Presets */
+.preset-row{display:flex;gap:4px;flex-wrap:wrap}
+.preset{padding:5px 10px;border:1px solid var(--border);border-radius:14px;font-size:10px;color:var(--dim);cursor:pointer;background:transparent;font-family:var(--font);transition:all .2s}
+.preset:hover{border-color:var(--accent);color:var(--accent)}
+.preset.active{background:rgba(108,140,255,0.1);border-color:var(--accent);color:var(--accent)}
+
+/* Stats */
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mini-stat{background:var(--card);border-radius:8px;padding:10px;text-align:center}
+.mini-stat .val{font-size:18px;font-weight:300;color:var(--accent)}
+.mini-stat .lbl{font-size:9px;color:var(--dim);margin-top:2px}
+
+/* Bottom bar */
+.bottombar{grid-column:1/-1;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:20px;padding:0 20px}
+.play-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.play-btn:hover{background:rgba(108,140,255,0.1)}
+.mode-info{font-size:11px;color:var(--dim);letter-spacing:0.05em}
+.session-time{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;margin-left:auto}
+
+/* Circadian overlay */
+#circ-overlay{position:fixed;inset:0;pointer-events:none;z-index:50;transition:background 2s;mix-blend-mode:multiply}
+
+/* Pro lock overlay */
+.pro-lock{position:relative}
+.pro-lock::after{content:'PRO';position:absolute;top:4px;right:4px;font-size:7px;background:rgba(108,140,255,0.2);color:var(--accent);padding:1px 6px;border-radius:8px;letter-spacing:0.1em;font-weight:700}
+
+/* Responsive */
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;grid-template-rows:48px 1fr auto 56px}
+  .sidebar{max-height:40vh;border-left:none;border-top:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="logo"><span>L</span>UMINA</div>
+    <div class="clock" id="clock"></div>
+    <div class="pro-badge">PRO</div>
+  </div>
+
+  <!-- Main area -->
+  <div class="main">
+    <canvas id="particles"></canvas>
+    <div class="breath">
+      <div class="ring" id="ring">
+        <div style="text-align:center">
+          <div class="b-timer" id="b-timer">4</div>
+          <div class="b-label" id="b-label">INHALE</div>
+        </div>
+      </div>
+      <div class="b-hint" id="b-hint">Press play to begin</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sb-tabs">
+      <div class="sb-tab active" data-pane="breathe">Breathe</div>
+      <div class="sb-tab" data-pane="sound">Sound</div>
+      <div class="sb-tab" data-pane="light">Light</div>
+      <div class="sb-tab" data-pane="focus">Focus</div>
+      <div class="sb-tab" data-pane="sleep">Sleep</div>
+    </div>
+
+    <!-- Breathe pane -->
+    <div class="sb-pane active" id="pane-breathe">
+      <div class="sb-section">
+        <h3>Pattern</h3>
+        <div class="pat-grid" id="patterns">
+          <div class="pat active" data-pat="box"><div class="p-name">Box</div><div class="p-timing">4-4-4-4</div></div>
+          <div class="pat" data-pat="relax"><div class="p-name">4-7-8</div><div class="p-timing">Sleep</div></div>
+          <div class="pat" data-pat="energy"><div class="p-name">Energy</div><div class="p-timing">2-1-4-0</div></div>
+          <div class="pat" data-pat="calm"><div class="p-name">Calm</div><div class="p-timing">6-0-6-0</div></div>
+          <div class="pat" data-pat="wim"><div class="p-name">Wim Hof</div><div class="p-timing">Fast-Hold</div></div>
+          <div class="pat" data-pat="custom"><div class="p-name">Custom</div><div class="p-timing">Set yours</div></div>
+        </div>
+      </div>
+      <div class="sb-section">
+        <h3>Presets</h3>
+        <div class="preset-row">
+          <button class="preset active" data-preset="focus">Deep Focus</button>
+          <button class="preset" data-preset="sleep">Sleep</button>
+          <button class="preset" data-preset="energy">Energy</button>
+          <button class="preset" data-preset="calm">Anxiety</button>
+          <button class="preset" data-preset="create">Create</button>
+        </div>
+      </div>
+      <div class="sb-section">
+        <h3>Today</h3>
+        <div class="stat-row">
+          <div class="mini-stat"><div class="val" id="s-breaths">0</div><div class="lbl">Breaths</div></div>
+          <div class="mini-stat"><div class="val" id="s-minutes">0</div><div class="lbl">Minutes</div></div>
+          <div class="mini-stat"><div class="val" id="s-sessions">0</div><div class="lbl">Sessions</div></div>
+          <div class="mini-stat"><div class="val" id="s-streak">0</div><div class="lbl">Streak</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sound pane -->
+    <div class="sb-pane" id="pane-sound">
+      <div class="sb-section">
+        <h3>Ambient Layers</h3>
+        <div class="snd-row"><label>Rain</label><input type="range" class="snd-slider" data-snd="rain" min="0" max="100" value="40"><div class="snd-toggle on" data-snd="rain"></div></div>
+        <div class="snd-row"><label>Ocean</label><input type="range" class="snd-slider" data-snd="ocean" min="0" max="100" value="0"><div class="snd-toggle" data-snd="ocean"></div></div>
+        <div class="snd-row"><label>Forest</label><input type="range" class="snd-slider" data-snd="forest" min="0" max="100" value="0"><div class="snd-toggle" data-snd="forest"></div></div>
+        <div class="snd-row"><label>Fireplace</label><input type="range" class="snd-slider" data-snd="fire" min="0" max="100" value="0"><div class="snd-toggle" data-snd="fire"></div></div>
+        <div class="snd-row"><label>Cafe</label><input type="range" class="snd-slider" data-snd="cafe" min="0" max="100" value="0"><div class="snd-toggle" data-snd="cafe"></div></div>
+        <div class="snd-row"><label>White Noise</label><input type="range" class="snd-slider" data-snd="white" min="0" max="100" value="0"><div class="snd-toggle" data-snd="white"></div></div>
+        <div class="snd-row"><label>Binaural 40Hz</label><input type="range" class="snd-slider" data-snd="binaural" min="0" max="100" value="0"><div class="snd-toggle" data-snd="binaural"></div></div>
+      </div>
+      <div class="sb-section">
+        <h3>Master Volume</h3>
+        <input type="range" class="snd-slider" id="master-vol" min="0" max="100" value="50" style="width:100%">
+      </div>
+    </div>
+
+    <!-- Light pane -->
+    <div class="sb-pane" id="pane-light">
+      <div class="sb-section">
+        <h3>Circadian Filter</h3>
+        <div class="circ-track"><div class="circ-dot" id="circ-dot" style="left:50%"></div></div>
+        <div class="circ-label" id="circ-label">Neutral</div>
+        <input type="range" class="snd-slider" id="circ-slider" min="0" max="100" value="50" style="width:100%;margin-top:12px">
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--dim);cursor:pointer">
+          <input type="checkbox" id="circ-auto" checked> Auto (follows time of day)
+        </label>
+      </div>
+      <div class="sb-section">
+        <h3>Screen Dimming</h3>
+        <div class="snd-row"><label>Brightness</label><input type="range" class="snd-slider" id="brightness" min="20" max="100" value="100" style="width:120px"></div>
+      </div>
+    </div>
+
+    <!-- Focus pane -->
+    <div class="sb-pane" id="pane-focus">
+      <div class="sb-section">
+        <h3>ADHD Focus Mode</h3>
+        <div class="focus-time" id="focus-time">25:00</div>
+        <div class="focus-btns">
+          <button class="focus-btn" data-min="15">15m</button>
+          <button class="focus-btn active" data-min="25">25m</button>
+          <button class="focus-btn" data-min="45">45m</button>
+          <button class="focus-btn" data-min="60">60m</button>
+          <button class="focus-btn" data-min="90">90m</button>
+        </div>
+      </div>
+      <div class="sb-section">
+        <h3>Session Log</h3>
+        <div id="session-log" style="font-size:11px;color:var(--dim);max-height:120px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- Sleep pane -->
+    <div class="sb-pane" id="pane-sleep">
+      <div class="sb-section">
+        <h3>Sleep Coach</h3>
+        <div class="sleep-info"><div class="s-label">OPTIMAL BEDTIME</div><div class="s-value" id="bedtime">10:30 PM</div></div>
+        <div class="sleep-info"><div class="s-label">WAKE TIME</div><div class="s-value" id="waketime">6:30 AM</div></div>
+        <div class="sleep-info"><div class="s-label">WIND-DOWN STARTS</div><div class="s-value" id="winddown">9:30 PM</div></div>
+      </div>
+      <div class="sb-section">
+        <h3>Set Wake Time</h3>
+        <input type="time" id="wake-input" value="06:30" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-family:var(--font);width:100%">
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottombar">
+    <button class="play-btn" id="play-btn" title="Play/Pause">&#9654;</button>
+    <div class="mode-info" id="mode-info">Ready</div>
+    <div class="session-time" id="session-time">00:00</div>
+  </div>
+</div>
+
+<!-- Circadian overlay -->
+<div id="circ-overlay"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* === CLOCK === */
+function updateClock(){
+  var now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+}
+updateClock();setInterval(updateClock,1000);
+
+/* === TABS === */
+document.querySelectorAll('.sb-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.sb-tab').forEach(function(t){t.classList.remove('active')});
+    document.querySelectorAll('.sb-pane').forEach(function(p){p.classList.remove('active')});
+    tab.classList.add('active');
+    document.getElementById('pane-'+tab.dataset.pane).classList.add('active');
+  });
+});
+
+/* === AUDIO === */
+var audioCtx=null,sounds={},masterGain=null;
+function initAudio(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain();masterGain.gain.value=0.5;masterGain.connect(audioCtx.destination);
+  sounds.rain=makeNoise('brown',0.4);
+  sounds.ocean=makeFiltered(200,0);
+  sounds.forest=makeNoise('pink',0);
+  sounds.fire=makeFiltered(120,0);
+  sounds.cafe=makeNoise('pink',0);
+  sounds.white=makeNoise('white',0);
+  sounds.binaural=makeBinaural(200,240,0);
+}
+function makeNoise(type,vol){
+  var N=audioCtx.sampleRate*2,buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate),d=buf.getChannelData(0),b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+  for(var i=0;i<N;i++){var w=Math.random()*2-1;if(type==='pink'){b0=.99886*b0+w*.0555;b1=.99332*b1+w*.0751;b2=.969*b2+w*.1539;b3=.8665*b3+w*.3105;b4=.55*b4+w*.5330;b5=-.7616*b5-w*.0169;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11;b6=w*.1159}else if(type==='brown'){d[i]=(b0+(0.02*w))/1.02;b0=d[i];d[i]*=3.5}else{d[i]=w}}
+  var s=audioCtx.createBufferSource();s.buffer=buf;s.loop=true;var g=audioCtx.createGain();g.gain.value=vol;s.connect(g);g.connect(masterGain);s.start();return{gain:g};
+}
+function makeFiltered(freq,vol){
+  var N=audioCtx.sampleRate*2,buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<N;i++)d[i]=Math.random()*2-1;
+  var s=audioCtx.createBufferSource();s.buffer=buf;s.loop=true;var f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=freq;var g=audioCtx.createGain();g.gain.value=vol;s.connect(f);f.connect(g);g.connect(masterGain);s.start();return{gain:g};
+}
+function makeBinaural(fL,fR,vol){
+  var oL=audioCtx.createOscillator(),oR=audioCtx.createOscillator(),m=audioCtx.createChannelMerger(2),g=audioCtx.createGain();g.gain.value=vol;
+  oL.frequency.value=fL;oR.frequency.value=fR;oL.type='sine';oR.type='sine';
+  var gL=audioCtx.createGain(),gR=audioCtx.createGain();gL.gain.value=0.3;gR.gain.value=0.3;
+  oL.connect(gL);oR.connect(gR);gL.connect(m,0,0);gR.connect(m,0,1);m.connect(g);g.connect(masterGain);oL.start();oR.start();return{gain:g};
+}
+
+/* Sound controls */
+document.querySelectorAll('.snd-toggle').forEach(function(t){
+  t.addEventListener('click',function(){
+    t.classList.toggle('on');var snd=t.dataset.snd;
+    var slider=document.querySelector('.snd-slider[data-snd="'+snd+'"]');
+    if(sounds[snd]&&audioCtx)sounds[snd].gain.gain.setTargetAtTime(t.classList.contains('on')?slider.value/100*0.5:0,audioCtx.currentTime,0.3);
+  });
+});
+document.querySelectorAll('.snd-slider[data-snd]').forEach(function(s){
+  s.addEventListener('input',function(){var snd=s.dataset.snd;var t=document.querySelector('.snd-toggle[data-snd="'+snd+'"]');
+    if(sounds[snd]&&audioCtx&&t&&t.classList.contains('on'))sounds[snd].gain.gain.setTargetAtTime(s.value/100*0.5,audioCtx.currentTime,0.1);
+  });
+});
+document.getElementById('master-vol').addEventListener('input',function(){if(masterGain)masterGain.gain.setTargetAtTime(this.value/100,audioCtx.currentTime,0.1);});
+
+/* === BREATHING === */
+var PATS={box:{i:4,hi:4,e:4,ho:4},relax:{i:4,hi:7,e:8,ho:0},energy:{i:2,hi:1,e:4,ho:0},calm:{i:6,hi:0,e:6,ho:0},wim:{i:1,hi:0,e:1,ho:0},custom:{i:4,hi:4,e:4,ho:4}};
+var curPat='box',phase='inhale',phaseTime=0,running=false,sessionStart=null,breaths=0;
+var ring=document.getElementById('ring'),bTimer=document.getElementById('b-timer'),bLabel=document.getElementById('b-label'),bHint=document.getElementById('b-hint');
+var COLORS={inhale:'#4488ff','hold-in':'#8855cc',exhale:'#44cc88','hold-out':'#ffbb44'};
+var LABELS={inhale:'INHALE','hold-in':'HOLD',exhale:'EXHALE','hold-out':'REST'};
+
+function getTime(){var p=PATS[curPat];switch(phase){case'inhale':return p.i;case'hold-in':return p.hi;case'exhale':return p.e;case'hold-out':return p.ho;default:return 4}}
+function nextPhase(){var p=PATS[curPat];switch(phase){case'inhale':phase=p.hi>0?'hold-in':'exhale';break;case'hold-in':phase='exhale';break;case'exhale':phase=p.ho>0?'hold-out':'inhale';breaths++;break;case'hold-out':phase='inhale';break}phaseTime=getTime();updateUI()}
+function updateUI(){ring.className='ring '+phase;bLabel.textContent=LABELS[phase];bLabel.style.color=COLORS[phase];bTimer.textContent=phaseTime;bTimer.style.color=COLORS[phase];document.getElementById('s-breaths').textContent=breaths}
+
+var breathInt=null;
+function startBreath(){if(running)return;initAudio();running=true;sessionStart=sessionStart||Date.now();phase='inhale';phaseTime=PATS[curPat].i;updateUI();bHint.textContent='';document.getElementById('play-btn').innerHTML='&#10074;&#10074;';document.getElementById('mode-info').textContent='Breathing';
+  breathInt=setInterval(function(){phaseTime--;if(phaseTime<=0)nextPhase();else bTimer.textContent=phaseTime},1000)}
+function stopBreath(){running=false;clearInterval(breathInt);document.getElementById('play-btn').innerHTML='&#9654;';document.getElementById('mode-info').textContent='Paused';bHint.textContent='Press play to continue'}
+
+document.getElementById('play-btn').addEventListener('click',function(){running?stopBreath():startBreath()});
+document.getElementById('patterns').addEventListener('click',function(e){var b=e.target.closest('.pat');if(!b)return;document.querySelectorAll('.pat').forEach(function(p){p.classList.remove('active')});b.classList.add('active');curPat=b.dataset.pat;if(running){stopBreath();startBreath()}});
+
+/* Presets */
+document.querySelectorAll('.preset').forEach(function(p){p.addEventListener('click',function(){
+  document.querySelectorAll('.preset').forEach(function(b){b.classList.remove('active')});p.classList.add('active');
+  var pr=p.dataset.preset;
+  switch(pr){case'focus':setPat('box');setSnd({rain:40,binaural:30});break;case'sleep':setPat('relax');setSnd({rain:60,ocean:30});break;case'energy':setPat('energy');setSnd({forest:20,binaural:50});break;case'calm':setPat('calm');setSnd({rain:30,ocean:40,fire:20});break;case'create':setPat('box');setSnd({cafe:40,rain:20});break}
+})});
+function setPat(n){curPat=n;document.querySelectorAll('.pat').forEach(function(b){b.classList.toggle('active',b.dataset.pat===n)})}
+function setSnd(levels){Object.keys(levels).forEach(function(snd){var sl=document.querySelector('.snd-slider[data-snd="'+snd+'"]'),tg=document.querySelector('.snd-toggle[data-snd="'+snd+'"]');if(sl)sl.value=levels[snd];if(tg){levels[snd]>0?tg.classList.add('on'):tg.classList.remove('on')}if(sounds[snd]&&audioCtx)sounds[snd].gain.gain.setTargetAtTime(levels[snd]/100*0.5,audioCtx.currentTime,0.3)})}
+
+/* === CIRCADIAN === */
+var circOverlay=document.getElementById('circ-overlay'),circSlider=document.getElementById('circ-slider'),circDot=document.getElementById('circ-dot'),circLbl=document.getElementById('circ-label'),circAuto=document.getElementById('circ-auto');
+function updateCirc(v){circDot.style.left=v+'%';if(v<25){circOverlay.style.background='rgba(10,5,30,'+(0.3-v/100)+')';circLbl.textContent='Night (warm, dim)'}else if(v<50){circOverlay.style.background='rgba(255,136,68,0.08)';circLbl.textContent='Morning (warm)'}else if(v<75){circOverlay.style.background='transparent';circLbl.textContent='Daylight (neutral)'}else{circOverlay.style.background='rgba(100,140,255,'+(v-75)/100*0.15+')';circLbl.textContent='Cool (alert)'}}
+function autoCirc(){if(!circAuto.checked)return;var h=new Date().getHours(),v;if(h<6)v=10;else if(h<9)v=30;else if(h<17)v=60;else if(h<20)v=40;else v=15;circSlider.value=v;updateCirc(v)}
+circSlider.addEventListener('input',function(){circAuto.checked=false;updateCirc(parseInt(circSlider.value))});
+autoCirc();setInterval(autoCirc,60000);
+
+/* Brightness */
+document.getElementById('brightness').addEventListener('input',function(){document.body.style.filter='brightness('+this.value/100+')'});
+
+/* === FOCUS TIMER === */
+var focusMin=25,focusSec=0,focusRunning=false,focusInt=null;
+document.querySelectorAll('.focus-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.focus-btn').forEach(function(x){x.classList.remove('active')});b.classList.add('active');focusMin=parseInt(b.dataset.min);focusSec=focusMin*60;document.getElementById('focus-time').textContent=fmtTime(focusSec);clearInterval(focusInt);focusRunning=false})});
+function fmtTime(s){var m=Math.floor(s/60),sec=s%60;return(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec}
+function startFocus(){if(focusRunning)return;focusRunning=true;focusSec=focusMin*60;focusInt=setInterval(function(){focusSec--;document.getElementById('focus-time').textContent=fmtTime(focusSec);if(focusSec<=0){clearInterval(focusInt);focusRunning=false;if(audioCtx){var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=528;o.type='sine';g.gain.value=0.1;o.start();g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+2);o.stop(audioCtx.currentTime+2)}var log=document.getElementById('session-log');log.innerHTML='<div>'+new Date().toLocaleTimeString()+' - '+focusMin+'min complete</div>'+log.innerHTML}},1000)}
+
+/* === SLEEP COACH === */
+document.getElementById('wake-input').addEventListener('change',function(){
+  var parts=this.value.split(':'),wH=parseInt(parts[0]),wM=parseInt(parts[1]);
+  var bedH=(wH-8+24)%24,windH=(bedH-1+24)%24;
+  document.getElementById('waketime').textContent=fmt12(wH,wM);
+  document.getElementById('bedtime').textContent=fmt12(bedH,wM);
+  document.getElementById('winddown').textContent=fmt12(windH,wM);
+});
+function fmt12(h,m){var ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+(m<10?'0':'')+m+' '+ap}
+
+/* === SESSION CLOCK === */
+setInterval(function(){if(!sessionStart)return;var e=Math.floor((Date.now()-sessionStart)/1000),m=Math.floor(e/60),s=e%60;document.getElementById('session-time').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;document.getElementById('s-minutes').textContent=m},1000);
+
+/* === PARTICLES === */
+var cvs=document.getElementById('particles'),ctx=cvs.getContext('2d'),pts=[];
+function resize(){cvs.width=cvs.offsetWidth;cvs.height=cvs.offsetHeight}
+resize();window.addEventListener('resize',resize);
+for(var i=0;i<60;i++)pts.push({x:Math.random()*cvs.width,y:Math.random()*cvs.height,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,sz:Math.random()*1.5+0.5,op:Math.random()*0.2+0.03});
+function drawPts(){ctx.clearRect(0,0,cvs.width,cvs.height);var c=COLORS[phase]||'#4488ff';pts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=cvs.width;if(p.x>cvs.width)p.x=0;if(p.y<0)p.y=cvs.height;if(p.y>cvs.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fillStyle=c;ctx.globalAlpha=p.op;ctx.fill()});ctx.globalAlpha=0.02;ctx.strokeStyle=c;ctx.lineWidth=0.5;for(var a=0;a<pts.length;a++)for(var b=a+1;b<pts.length;b++){var dx=pts[a].x-pts[b].x,dy=pts[a].y-pts[b].y;if(dx*dx+dy*dy<12000){ctx.beginPath();ctx.moveTo(pts[a].x,pts[a].y);ctx.lineTo(pts[b].x,pts[b].y);ctx.stroke()}}ctx.globalAlpha=1;requestAnimationFrame(drawPts)}
+drawPts();
+
+/* Start focus when breathing starts */
+var origStart=startBreath;startBreath=function(){origStart();startFocus()};
+
+/* Persistence */
+try{var saved=JSON.parse(localStorage.getItem('lumina-stats')||'{}'),today=new Date().toISOString().slice(0,10);if(saved.date===today){breaths=saved.breaths||0;document.getElementById('s-breaths').textContent=breaths;document.getElementById('s-minutes').textContent=saved.minutes||0}document.getElementById('s-streak').textContent=localStorage.getItem('lumina-streak')||'0'}catch(e){}
+setInterval(function(){try{var today=new Date().toISOString().slice(0,10);localStorage.setItem('lumina-stats',JSON.stringify({date:today,breaths:breaths,minutes:sessionStart?Math.floor((Date.now()-sessionStart)/60000):0}));var streak=parseInt(localStorage.getItem('lumina-streak')||'0'),last=localStorage.getItem('lumina-last');if(last!==today&&sessionStart){var yday=new Date(Date.now()-86400000).toISOString().slice(0,10);streak=last===yday?streak+1:1;localStorage.setItem('lumina-streak',streak);localStorage.setItem('lumina-last',today)}document.getElementById('s-streak').textContent=streak}catch(e){}},10000);
+
+})();
+</script>
+</body>
+</html>

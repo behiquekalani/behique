@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Ceiba Guild — Comunidad de Hábitos en Español</title>
+  <style>
+    :root {
+      --bg: #000;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: rgba(255,255,255,0.08);
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --text: #fff;
+      --gray: #888;
+      --gray2: #555;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 52px;
+    }
+    .nav-logo { font-size: 17px; font-weight: 700; text-decoration: none; color: var(--text); }
+    .nav-logo span { color: var(--green); }
+    .nav-cta {
+      background: var(--green); color: #000;
+      padding: 8px 18px; border-radius: 980px;
+      font-size: 13px; font-weight: 700; text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; }
+
+    .hero {
+      text-align: center;
+      padding: 80px 24px 60px;
+      max-width: 760px; margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(48,209,88,0.1);
+      border: 1px solid rgba(48,209,88,0.3);
+      border-radius: 980px;
+      padding: 6px 16px;
+      font-size: 13px; font-weight: 600; color: var(--green);
+      margin-bottom: 24px;
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    h1 {
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 700; letter-spacing: -1.5px; line-height: 1.08;
+      margin-bottom: 20px;
+    }
+    h1 span { color: var(--green); }
+    .hero-sub {
+      font-size: 18px; color: var(--gray);
+      line-height: 1.6; max-width: 560px;
+      margin: 0 auto 36px;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green); color: #000;
+      padding: 14px 32px; border-radius: 980px;
+      font-size: 16px; font-weight: 700;
+      text-decoration: none; border: none; cursor: pointer;
+    }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+      padding: 14px 32px; border-radius: 980px;
+      font-size: 16px; font-weight: 600;
+      text-decoration: none; cursor: pointer;
+    }
+    .hero-sub-note { font-size: 13px; color: var(--gray2); margin-top: 16px; }
+
+    /* STATS */
+    .stats-row {
+      display: flex; justify-content: center;
+      gap: 0; flex-wrap: wrap;
+      max-width: 640px; margin: 0 auto 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .stat-item {
+      flex: 1; min-width: 140px;
+      padding: 24px 20px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 28px; font-weight: 700; color: var(--green); }
+    .stat-label { font-size: 12px; color: var(--gray); margin-top: 4px; }
+
+    /* PILLARS */
+    .section { max-width: 980px; margin: 0 auto; padding: 80px 24px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      color: var(--green); text-transform: uppercase;
+      text-align: center; margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 700;
+      letter-spacing: -1px; text-align: center; margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center; color: var(--gray); font-size: 16px;
+      max-width: 560px; margin: 0 auto 48px; line-height: 1.6;
+    }
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px;
+      transition: border-color 0.15s;
+    }
+    .pillar-card:hover { border-color: rgba(48,209,88,0.3); }
+    .pillar-icon { font-size: 28px; margin-bottom: 12px; }
+    .pillar-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .pillar-card p { font-size: 14px; color: var(--gray); line-height: 1.5; }
+
+    /* HABITICA SECTION */
+    .habitica-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: center;
+    }
+    .habitica-info h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; }
+    .habitica-info p { font-size: 15px; color: var(--gray); line-height: 1.6; margin-bottom: 20px; }
+    .habitica-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .habitica-list li { font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+    .habitica-list li::before { content: '▶'; color: var(--green); font-size: 10px; margin-top: 3px; }
+    .habitica-visual {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .hv-header {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--gray);
+    }
+    .hv-avatar {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .hv-name { font-weight: 600; color: var(--text); }
+    .hv-level { font-size: 12px; color: var(--green); }
+    .hv-stat-row { display: flex; gap: 12px; }
+    .hv-stat {
+      flex: 1; background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px;
+      text-align: center;
+    }
+    .hv-stat .val { font-size: 20px; font-weight: 700; }
+    .hv-stat .lbl { font-size: 11px; color: var(--gray); margin-top: 2px; }
+    .hv-stat .val.xp { color: var(--amber); }
+    .hv-stat .val.streak { color: var(--purple); }
+    .hv-stat .val.gold { color: #FFD60A; }
+    .hv-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--gray); }
+    .hv-bar { background: var(--bg); border-radius: 980px; height: 6px; margin-top: 4px; overflow: hidden; }
+    .hv-bar-fill { height: 100%; border-radius: 980px; }
+    .hv-habits { display: flex; flex-direction: column; gap: 6px; }
+    .hv-habit {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; font-size: 13px;
+    }
+    .hv-habit-check { color: var(--green); font-weight: 700; font-size: 16px; }
+    .hv-habit-pending { color: var(--gray2); }
+
+    /* HOW TO JOIN */
+    .join-steps { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 48px; }
+    .join-step {
+      text-align: center; padding: 28px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .join-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(48,209,88,0.15);
+      border: 1px solid rgba(48,209,88,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--green);
+      margin: 0 auto 16px;
+    }
+    .join-step h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+    .join-step p { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+    /* PRICING */
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 48px; max-width: 600px; margin-left: auto; margin-right: auto; }
+    .pricing-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px 24px;
+      display: flex; flex-direction: column;
+    }
+    .pricing-card.featured {
+      border-color: var(--green);
+      background: rgba(48,209,88,0.04);
+    }
+    .pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+    .pricing-price { font-size: 40px; font-weight: 700; letter-spacing: -1px; margin-bottom: 4px; }
+    .pricing-price span { font-size: 16px; font-weight: 400; color: var(--gray); }
+    .pricing-desc { font-size: 14px; color: var(--gray); margin-bottom: 20px; line-height: 1.5; }
+    .pricing-features { list-style: none; flex: 1; margin-bottom: 24px; display: flex; flex-direction: column; gap: 9px; }
+    .pricing-features li { font-size: 13px; display: flex; gap: 8px; }
+    .pricing-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
+    .pricing-features li.no::before { content: '—'; color: var(--gray2); }
+    .pricing-btn {
+      display: block; text-align: center;
+      background: var(--green); color: #000;
+      padding: 14px; border-radius: 980px;
+      font-size: 15px; font-weight: 700; text-decoration: none;
+    }
+    .pricing-card:not(.featured) .pricing-btn {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+    }
+
+    /* MANIFESTO */
+    .manifesto {
+      max-width: 640px; margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 40px;
+    }
+    .manifesto h3 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+    .manifesto p { font-size: 15px; color: var(--gray); line-height: 1.7; margin-bottom: 16px; }
+
+    .cta-section {
+      text-align: center; padding: 80px 24px;
+      background: radial-gradient(ellipse at 50% 50%, rgba(48,209,88,0.07) 0%, transparent 60%);
+    }
+    .cta-section h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -1px; margin-bottom: 16px; }
+    .cta-section p { font-size: 16px; color: var(--gray); margin-bottom: 32px; }
+
+    footer {
+      border-top: 1px solid var(--border); padding: 32px 24px;
+      text-align: center; font-size: 13px; color: var(--gray2);
+    }
+    footer a { color: var(--gray); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      .habitica-section { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">La Ceiba<span>.</span></a>
+  <div class="nav-links">
+    <a href="index.html">Tienda</a>
+  </div>
+  <a href="#pricing" class="nav-cta">Unirse gratis</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Comunidad Activa
+  </div>
+  <h1>La primera comunidad<br>de <span>hábitos en español</span><br>que funciona.</h1>
+  <p class="hero-sub">Habitica gamificado. Accountability real. Un bot de Telegram que te conoce. Contenido de AI en tu idioma. Todo lo que los grupos de habla inglesa tienen, pero para ti.</p>
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">Unirse gratis</a>
+    <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+  </div>
+  <p class="hero-sub-note">Gratis para siempre. Premium $4.99/mes.</p>
+</section>
+
+<!-- STATS -->
+<div style="max-width: 640px; margin: 0 auto 80px; padding: 0 24px;">
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">127</div>
+      <div class="stat-label">Miembros fundadores</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">94%</div>
+      <div class="stat-label">Retención semanal</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.8x</div>
+      <div class="stat-label">Más hábitos completados</div>
+    </div>
+  </div>
+</div>
+
+<!-- PILLARS -->
+<section class="section" style="padding-top: 0;">
+  <div class="section-label">Qué es La Ceiba</div>
+  <h2 class="section-title">Un sistema completo, en español.</h2>
+  <p class="section-sub">No es otro grupo de WhatsApp. Es una infraestructura de crecimiento diseñada para hispanohablantes que quieren resultados.</p>
+  <div class="pillars-grid">
+    <div class="pillar-card">
+      <div class="pillar-icon">🎮</div>
+      <h3>Habitica Guild</h3>
+      <p>Una guild oficial de Habitica donde tus hábitos reales se convierten en puntos de experiencia. Quests colectivos. Leaderboards semanales. El grupo avanza junto.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🤖</div>
+      <h3>Bot de Accountability</h3>
+      <p>Un bot de Telegram basado en el framework de un psicólogo real. Te hace check-in diario, registra tus hábitos, detecta cuando estás evitando algo, y no te deja pasar.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">📚</div>
+      <h3>Base de conocimiento</h3>
+      <p>26 lecciones de productividad y AI en español. El mismo contenido que se vende en inglés por $50+, gratis para miembros de la guild.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🫂</div>
+      <h3>Check-ins grupales</h3>
+      <p>Sesiones semanales de accountability donde cada miembro reporta sus avances. No se trata de juzgar. Se trata de que alguien te vea cumplir.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🧘</div>
+      <h3>Herramientas de bienestar</h3>
+      <p>Meditación guiada, temporizadores Pomodoro, y música de enfoque integrados. El bienestar no es separado de la productividad. Es el prerequisito.</p>
+    </div>
+    <div class="pillar-card">
+      <div class="pillar-icon">🏆</div>
+      <h3>Retos mensuales</h3>
+      <p>Un reto nuevo cada mes con premios reales (productos de la tienda Behike). El mejor hábito del mes gana. La competencia amistosa funciona.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HABITICA SECTION -->
+<section class="section" style="padding-top: 0;">
+  <div class="habitica-section">
+    <div class="habitica-info">
+      <h2>Tus hábitos valen XP real.</h2>
+      <p>Habitica convierte tus rutinas en un juego de rol. Cada hábito completado te da puntos de experiencia, oro, y equipamiento para tu personaje. La guild La Ceiba avanza junta en quests épicas que solo se completan si todos participan.</p>
+      <ul class="habitica-list">
+        <li>Sincronización automática entre el bot de Telegram y Habitica</li>
+        <li>Quests colectivos que requieren participación del grupo</li>
+        <li>Leaderboard semanal con los mejores rachas</li>
+        <li>Premios en productos Behike para los ganadores del mes</li>
+      </ul>
+    </div>
+    <div class="habitica-visual">
+      <div class="hv-header">
+        <div class="hv-avatar">🌱</div>
+        <div>
+          <div class="hv-name">Kalani_PR</div>
+          <div class="hv-level">Nivel 14 Guerrero</div>
+        </div>
+      </div>
+      <div class="hv-stat-row">
+        <div class="hv-stat">
+          <div class="val xp">2,480</div>
+          <div class="lbl">XP Total</div>
+        </div>
+        <div class="hv-stat">
+          <div class="val streak">21</div>
+          <div class="lbl">Racha</div>
+        </div>
+        <div class="hv-stat">
+          <div class="val gold">345</div>
+          <div class="lbl">Oro</div>
+        </div>
+      </div>
+      <div>
+        <div class="hv-bar-label"><span>HP</span><span>87/100</span></div>
+        <div class="hv-bar"><div class="hv-bar-fill" style="width:87%; background:var(--red);"></div></div>
+      </div>
+      <div>
+        <div class="hv-bar-label"><span>Quest: El Bosque de los Hábitos</span><span>62%</span></div>
+        <div class="hv-bar"><div class="hv-bar-fill" style="width:62%; background:var(--green);"></div></div>
+      </div>
+      <div class="hv-habits">
+        <div class="hv-habit">
+          <span>Ejercicio 30 min</span>
+          <span class="hv-habit-check">✓ +25 XP</span>
+        </div>
+        <div class="hv-habit">
+          <span>No redes antes del mediodía</span>
+          <span class="hv-habit-check">✓ +20 XP</span>
+        </div>
+        <div class="hv-habit">
+          <span>Leer 20 páginas</span>
+          <span class="hv-habit-pending">— pendiente</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO JOIN -->
+<section class="section" id="como-funciona" style="padding-top: 0;">
+  <div class="section-label">Cómo unirse</div>
+  <h2 class="section-title">Cuatro pasos. Cinco minutos.</h2>
+  <div class="join-steps">
+    <div class="join-step">
+      <div class="join-num">1</div>
+      <h3>Crea cuenta Habitica</h3>
+      <p>Es gratis. Toma 2 minutos. Elige tu clase (Guerrero recomendado para empezar).</p>
+    </div>
+    <div class="join-step">
+      <div class="join-num">2</div>
+      <h3>Únete a la guild</h3>
+      <p>Busca "La Ceiba Guild" en Habitica o usa el enlace de invitación que llega al registrarte.</p>
+    </div>
+    <div class="join-step">
+      <div class="join-num">3</div>
+      <h3>Conéctate al bot</h3>
+      <p>Un mensaje a @LaCeibaBot en Telegram activa tu cuenta y sincroniza con Habitica.</p>
+    </div>
+    <div class="join-step">
+      <div class="join-num">4</div>
+      <h3>Pon el primer hábito</h3>
+      <p>Un hábito. No diez. El sistema te guía para agregar más cuando el primero sea consistente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="section" style="padding-top: 0;">
+  <div class="manifesto">
+    <h3>Por qué esto existe.</h3>
+    <p>Hay miles de comunidades de productividad en inglés. Hay cero en español que sean serias.</p>
+    <p>Los grupos de WhatsApp se mueren en tres semanas porque no hay estructura. Los Discord de habla hispana son caóticos. Las apps de hábitos como Habitica tienen comunidades masivas, pero están en inglés y nadie está construyendo en español.</p>
+    <p>El mercado hispanohablante tiene 650 millones de personas. El espacio de educación sobre AI y productividad en español está casi vacío.</p>
+    <p>La Ceiba existe para llenar ese espacio. Con infraestructura real. Con un bot que usa el framework de un psicólogo. Con contenido original. Con una comunidad que avanza junta.</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="padding-top: 0;">
+  <div class="section-label">Membresía</div>
+  <h2 class="section-title">Gratis para siempre, o más si quieres más.</h2>
+  <p class="section-sub">El plan gratuito te da acceso real a la comunidad. Premium es para quienes quieren las herramientas avanzadas.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="pricing-tier">Miembro</div>
+      <div class="pricing-price">$0</div>
+      <div class="pricing-desc">Acceso completo a la guild y el check-in básico.</div>
+      <ul class="pricing-features">
+        <li>Habitica Guild access</li>
+        <li>Telegram group</li>
+        <li>Check-in semanal del bot</li>
+        <li>26 lecciones gratis</li>
+        <li class="no">Bot de accountability diario</li>
+        <li class="no">Analytics de hábitos</li>
+        <li class="no">Prioridad en check-ins grupales</li>
+      </ul>
+      <a href="#" class="pricing-btn">Unirse gratis</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-tier">Premium</div>
+      <div class="pricing-price">$4.99<span>/mes</span></div>
+      <div class="pricing-desc">El bot completo, analytics, y voto en la dirección de la comunidad.</div>
+      <ul class="pricing-features">
+        <li>Todo lo de Miembro</li>
+        <li>Bot diario con análisis profundo</li>
+        <li>Dashboard de analytics de hábitos</li>
+        <li>Participación en retos con premio</li>
+        <li>Voto en decisiones de la guild</li>
+        <li>Acceso anticipado a productos</li>
+        <li>Soporte prioritario</li>
+      </ul>
+      <a href="#" class="pricing-btn">Ir Premium</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>La Ceiba te espera.</h2>
+  <p>127 personas ya están construyendo hábitos en serio. El grupo crece. Los quests no se detienen.</p>
+  <a href="#pricing" class="btn-primary">Unirse gratis ahora</a>
+</section>
+
+<footer>
+  <a href="index.html">Behike Store</a> &nbsp;·&nbsp;
+  <a href="ai-tutor.html">AI Tutor</a> &nbsp;·&nbsp;
+  <a href="study-buddy.html">Study Buddy</a> &nbsp;·&nbsp;
+  <a href="solopreneur-os-live.html">Solopreneur OS</a>
+  <p style="margin-top: 12px;">Construido en Puerto Rico. Sin VC. Sin vigilancia.</p>
+</footer>
+
+</body>
+</html>

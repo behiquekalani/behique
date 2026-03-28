@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike A/B Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 2rem; }
+  h1 { color: #00e5c7; font-size: 1.6rem; margin-bottom: 0.3rem; }
+  .subtitle { color: #666; font-size: 0.85rem; margin-bottom: 2rem; }
+  .stats-bar { display: flex; gap: 2rem; margin-bottom: 2rem; }
+  .stat { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 1rem 1.5rem; }
+  .stat-val { color: #00e5c7; font-size: 1.4rem; font-weight: 700; }
+  .stat-label { color: #888; font-size: 0.75rem; text-transform: uppercase; margin-top: 0.2rem; }
+  .test-card { background: #111; border: 1px solid #222; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .test-name { color: #00e5c7; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+  .variant-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem; }
+  .variant-label { width: 30px; font-weight: 700; font-size: 0.9rem; }
+  .variant-label.a { color: #00e5c7; }
+  .variant-label.b { color: #ff6b00; }
+  .bar-bg { flex: 1; background: #1a1a1a; border-radius: 4px; height: 28px; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; display: flex; align-items: center; padding-left: 10px; font-size: 0.8rem; font-weight: 600; min-width: 40px; }
+  .bar-fill.a { background: linear-gradient(90deg, #00e5c7, #00b89c); color: #000; }
+  .bar-fill.b { background: linear-gradient(90deg, #ff6b00, #cc5500); color: #000; }
+  .variant-stats { font-size: 0.8rem; color: #999; width: 180px; text-align: right; }
+  .sig-badge { display: inline-block; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-top: 0.5rem; }
+  .sig-green { background: #00e5c720; color: #00e5c7; border: 1px solid #00e5c740; }
+  .sig-yellow { background: #f5a62320; color: #f5a623; border: 1px solid #f5a62340; }
+  .sig-gray { background: #44444420; color: #888; border: 1px solid #44444440; }
+  .winner { margin-left: 0.5rem; font-size: 0.75rem; color: #00e5c7; }
+  .confidence-line { margin-top: 0.8rem; font-size: 0.8rem; color: #888; }
+  .empty { text-align: center; color: #555; padding: 3rem; font-size: 1rem; }
+  .refresh-btn { position: fixed; bottom: 2rem; right: 2rem; background: #00e5c7; color: #000; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+  .refresh-btn:hover { background: #00ffdd; }
+</style>
+</head>
+<body>
+<h1>A/B Testing Dashboard</h1>
+<p class="subtitle">Behike Sales Pages</p>
+
+<div class="stats-bar" id="statsBar"></div>
+<div id="tests"></div>
+<button class="refresh-btn" onclick="loadData()">Refresh</button>
+
+<script>
+const API = window.location.origin;
+
+async function loadData() {
+  try {
+    const res = await fetch(`${API}/ab/results`);
+    const data = await res.json();
+    renderStats(data);
+    renderTests(data.tests);
+  } catch (e) {
+    document.getElementById('tests').innerHTML = '<div class="empty">Cannot connect to A/B server</div>';
+  }
+}
+
+function renderStats(data) {
+  const el = document.getElementById('statsBar');
+  const testCount = Object.keys(data.tests).length;
+  el.innerHTML = `
+    <div class="stat"><div class="stat-val">${testCount}</div><div class="stat-label">Active Tests</div></div>
+    <div class="stat"><div class="stat-val">${data.total_visitors}</div><div class="stat-label">Total Visitors</div></div>
+    <div class="stat"><div class="stat-val">${data.total_conversions}</div><div class="stat-label">Conversions</div></div>
+  `;
+}
+
+function renderTests(tests) {
+  const el = document.getElementById('tests');
+  const keys = Object.keys(tests);
+  if (keys.length === 0) {
+    el.innerHTML = '<div class="empty">No test data yet. Add ab_snippet.js to a sales page to start.</div>';
+    return;
+  }
+  el.innerHTML = keys.map(name => {
+    const t = tests[name];
+    const maxRate = Math.max(t.A.rate, t.B.rate, 1);
+    const sigClass = t.significance === 'significant' ? 'sig-green' : t.significance === 'trending' ? 'sig-yellow' : 'sig-gray';
+    const sigText = t.significance === 'significant' ? '95%+ Significant' : t.significance === 'trending' ? '80%+ Trending' : 'Not enough data';
+    const winnerText = t.winner ? `<span class="winner">Winner: ${t.winner}</span>` : '';
+    return `
+      <div class="test-card">
+        <div class="test-name">${name} ${winnerText}</div>
+        <div class="variant-row">
+          <span class="variant-label a">A</span>
+          <div class="bar-bg"><div class="bar-fill a" style="width:${(t.A.rate / maxRate) * 100}%">${t.A.rate}%</div></div>
+          <span class="variant-stats">${t.A.conversions}/${t.A.views} visitors</span>
+        </div>
+        <div class="variant-row">
+          <span class="variant-label b">B</span>
+          <div class="bar-bg"><div class="bar-fill b" style="width:${(t.B.rate / maxRate) * 100}%">${t.B.rate}%</div></div>
+          <span class="variant-stats">${t.B.conversions}/${t.B.views} visitors</span>
+        </div>
+        <span class="sig-badge ${sigClass}">${sigText}</span>
+        <div class="confidence-line">Confidence: ${t.confidence}% | p-value: ${t.p_value}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+loadData();
+setInterval(loadData, 15000);
+</script>
+</body>
+</html>

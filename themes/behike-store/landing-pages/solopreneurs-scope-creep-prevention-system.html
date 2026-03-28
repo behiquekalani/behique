@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Solopreneur's Scope Creep Prevention System — Behike</title>
+  <meta name="description" content="A complete system for delivering exactly what was agreed and stopping the slow drain of work that was never yours to do." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --muted: #86868B;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --max: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .nav-price {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 700px;
+      margin-bottom: 24px;
+    }
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--cta);
+      color: #000;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 12px;
+      transition: opacity 0.15s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .hero-cta:hover { opacity: 0.88; text-decoration: none; }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .thesis-text {
+      font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+      line-height: 1.75;
+      max-width: 720px;
+      color: var(--text);
+    }
+    .thesis-text strong {
+      color: var(--accent);
+    }
+
+    /* PROBLEM STRIP */
+    .problem-strip {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--border);
+      background: #050505;
+    }
+    .problem-strip .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 32px;
+    }
+    .problem-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .problem-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .problem-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHAT YOU GET */
+    .what-you-get {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+      line-height: 1.2;
+    }
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+    }
+    .item-number {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .item-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .item-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* SECTION PREVIEWS */
+    .previews {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .preview-item {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 0;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .preview-item:first-child { border-top: 1px solid var(--border); }
+    .preview-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding-top: 4px;
+    }
+    .preview-content h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .preview-content p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    /* SCRIPTS PREVIEW */
+    .scripts-preview {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .script-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .script-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .script-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .script-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* PULL QUOTE */
+    .pull-quote {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .pull-quote blockquote {
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      font-weight: 500;
+      line-height: 1.5;
+      max-width: 700px;
+      margin: 0 auto;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .pull-quote cite {
+      display: block;
+      margin-top: 24px;
+      font-size: 0.82rem;
+      font-style: normal;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .bottom-cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+    .bottom-cta p {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--cta);
+      color: #000;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 14px;
+      transition: opacity 0.15s ease;
+      cursor: pointer;
+      border: none;
+    }
+    .cta-button:hover { opacity: 0.88; text-decoration: none; }
+    .cta-note {
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+    footer .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-brand {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 64px 0 56px; }
+      .items-grid { grid-template-columns: 1fr; }
+      .preview-item { grid-template-columns: 1fr; gap: 8px; }
+      .preview-num { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <span class="nav-brand">Behike</span>
+      <span class="nav-price">Digital Product — $16.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-tag">Solopreneur's System</span>
+      <h1>The Scope Creep Prevention System</h1>
+      <p class="hero-subtitle">A complete system for delivering exactly what was agreed and stopping the slow drain of work that was never yours to do.</p>
+      <a href="#buy" class="hero-cta">Get the System — $16.99</a>
+      <p class="hero-meta">PDF download. 2,500+ words. Templates and scripts included.</p>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="container">
+      <p class="thesis-text">
+        Scope creep is a documentation and process failure before it is a client behavior problem. The client who keeps adding requests is operating in an environment where adding requests was never explicitly made costly. <strong>You created that environment</strong> by accepting the first addition without addressing it. This system fixes the environment, not the client.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROBLEM STRIP -->
+  <section class="problem-strip">
+    <div class="container">
+      <div class="problem-item">
+        <div class="problem-dot"></div>
+        <p class="problem-text">Projects that end two months late and twice as large as the original scope</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-dot"></div>
+        <p class="problem-text">Post-delivery requests framed as part of the original agreement</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-dot"></div>
+        <p class="problem-text">The "that's not included" conversation that feels too uncomfortable to have</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-dot"></div>
+        <p class="problem-text">Good clients who drift into bad patterns because the process didn't prevent it</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="what-you-get">
+    <div class="container">
+      <p class="section-label">What's inside</p>
+      <h2 class="section-title">Nine sections. The full system.</h2>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-number">01</div>
+          <div class="item-title">Why scope creep happens</div>
+          <div class="item-desc">The real cause is process, not client behavior. Understanding this is the first step.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">02</div>
+          <div class="item-title">The discovery call question</div>
+          <div class="item-desc">One question that surfaces 80% of hidden assumptions before a proposal is written.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">03</div>
+          <div class="item-title">Proposal language that draws hard lines</div>
+          <div class="item-desc">How to write inclusions and exclusions so the scope is unambiguous before signing.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">04</div>
+          <div class="item-title">The project brief template</div>
+          <div class="item-desc">Every component. Signed before work starts. Creates the document you reference in every scope conversation.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">05</div>
+          <div class="item-title">Change request workflow</div>
+          <div class="item-desc">Four steps: capture, classify, price, approve. Never work outside scope without written approval.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">06</div>
+          <div class="item-title">Mid-project check-in structure</div>
+          <div class="item-desc">A 25% and 60% check-in format that catches drift before it becomes renegotiation.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">07</div>
+          <div class="item-title">Scripts for hard scope conversations</div>
+          <div class="item-desc">Four word-for-word scripts. First request. Pushback. Escalation. Post-delivery.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">08</div>
+          <div class="item-title">Project close process</div>
+          <div class="item-desc">Formal delivery, written acceptance, transition note. How to close a project so it stays closed.</div>
+        </div>
+        <div class="item-card">
+          <div class="item-number">09</div>
+          <div class="item-title">Building a reputation for reliability</div>
+          <div class="item-desc">The long-term case for scope clarity. Why the best clients pay more for predictability.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section class="previews">
+    <div class="container">
+      <p class="section-label">Section previews</p>
+      <h2 class="section-title">How it reads inside</h2>
+      <div class="preview-list">
+        <div class="preview-item">
+          <span class="preview-num">02</span>
+          <div class="preview-content">
+            <h3>The Discovery Call Question</h3>
+            <p>The question that surfaces hidden assumptions: "When this project is complete and you consider it a success, what does it include and what doesn't it include?" The second part is what most solopreneurs skip. It is the most important thing to establish before you write a proposal.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">03</span>
+          <div class="preview-content">
+            <h3>Proposal Language</h3>
+            <p>Every proposal should include a section called "Not included in this scope." List three to five things specifically not included. Clients who see "copywriting not included" will tell you immediately if they expected copywriting. That conversation is infinitely easier to have before signing than after.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">05</span>
+          <div class="preview-content">
+            <h3>Change Request Workflow</h3>
+            <p>When a client requests something outside the original scope, do not respond to the request directly. Respond to the recognition that a request has been made. "Let me capture this and get back to you with what it would take to include it." This pause communicates that additions go through a process.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">08</span>
+          <div class="preview-content">
+            <h3>Project Close Process</h3>
+            <p>Every project should have a formal delivery moment, not a gradual trailing off. Written acceptance is the moment the project officially ends. Without it, the project end date is ambiguous, and ambiguity creates room for post-delivery requests to be framed as project deliverables.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCRIPTS PREVIEW -->
+  <section class="scripts-preview">
+    <div class="container">
+      <p class="section-label">Scripts included</p>
+      <h2 class="section-title">Four conversations, fully scripted</h2>
+      <div class="script-cards">
+        <div class="script-card">
+          <div class="script-label">Script 1 — First time a client requests something outside scope</div>
+          <p>References the document, not your memory. Offers a clear next step. Sets a specific time. Does not say "no." Says "here is the process."</p>
+        </div>
+        <div class="script-card">
+          <div class="script-label">Script 2 — Client pushes back on a change request</div>
+          <p>Invites both parties to look at the project brief together. The document against the document, not your memory against theirs.</p>
+        </div>
+        <div class="script-card">
+          <div class="script-label">Script 3 — Client escalates</div>
+          <p>Offers a specific option while maintaining the documentation requirement. You are not refusing. You are redirecting toward a path that keeps both parties clear.</p>
+        </div>
+        <div class="script-card">
+          <div class="script-label">Script 4 — Post-delivery when a client requests additional work</div>
+          <p>Short. Warm. Clear. The project is closed. New work is new scope. Opens the door to a new proposal without friction.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULL QUOTE -->
+  <section class="pull-quote">
+    <div class="container">
+      <blockquote>
+        "The more clearly you define what you will deliver, the more consistently you can deliver it, and the more your reputation for reliability compounds."
+      </blockquote>
+      <cite>From Chapter 9</cite>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta" id="buy">
+    <div class="container">
+      <h2>Get the full system</h2>
+      <p>2,500+ words. Discovery questions, proposal templates, brief structure, change request workflow, four scripts, and a close process. PDF, immediate download.</p>
+      <a href="https://behike.gumroad.com/l/solopreneurs-scope-creep-prevention-system" class="cta-button">Buy Now — $16.99</a>
+      <p class="cta-note">One-time purchase. Instant PDF download. No subscription.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <span class="footer-brand">Behike</span>
+      <span class="footer-copy">2026 Behike Digital Products</span>
+    </div>
+  </footer>
+
+</body>
+</html>

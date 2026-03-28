@@ -1,0 +1,29 @@
+<div class="promo-popup-overlay" id="promoPopup">
+  <div class="promo-popup">
+    <button class="promo-popup__close" onclick="document.getElementById('promoPopup').classList.remove('active')" aria-label="Close">&times;</button>
+    {%- if settings.promo_popup_heading != blank -%}
+      <h2 style="margin: 0 0 1.2rem;">{{ settings.promo_popup_heading }}</h2>
+    {%- endif -%}
+    {%- if settings.promo_popup_text != blank -%}
+      <div style="margin-bottom: 2rem;">{{ settings.promo_popup_text }}</div>
+    {%- endif -%}
+    {% form "customer", class: "newsletter__form" %}
+      <input type="email" name="contact[email]" class="newsletter__input" placeholder="Enter your email" required>
+      <button type="submit" class="button">Subscribe</button>
+    {% endform %}
+  </div>
+</div>
+<script>
+  (function() {
+    var delay = {{ settings.promo_popup_delay | default: 5 }} * 1000;
+    var dismissed = sessionStorage.getItem("promoPopupDismissed");
+    if (!dismissed) {
+      setTimeout(function() {
+        document.getElementById("promoPopup").classList.add("active");
+      }, delay);
+    }
+    document.querySelector(".promo-popup__close").addEventListener("click", function() {
+      sessionStorage.setItem("promoPopupDismissed", "true");
+    });
+  })();
+</script>

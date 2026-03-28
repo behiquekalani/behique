@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Bundle - Behike</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0a;--text:#F5F5F7;--dim:#86868B;--cyan:#00E5CC;--cyan-dim:rgba(0,229,204,.12);--surface:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);--glass:rgba(255,255,255,.06);--radius:14px}
+body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}
+
+/* Layout */
+.page{display:grid;grid-template-columns:1fr 340px;gap:32px;max-width:1280px;margin:0 auto;padding:24px;min-height:100vh}
+header{grid-column:1/-1;text-align:center;padding:40px 0 16px}
+header h1{font-size:clamp(28px,5vw,48px);font-weight:700;letter-spacing:-.03em}
+header h1 span{color:var(--cyan)}
+header p{color:var(--dim);font-size:17px;margin-top:8px}
+
+/* Tabs */
+.tabs{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding-bottom:8px}
+.tab{padding:8px 20px;border-radius:980px;border:1px solid var(--border);background:transparent;color:var(--dim);font-size:14px;cursor:pointer;transition:all .2s}
+.tab:hover{border-color:var(--cyan);color:var(--text)}
+.tab.active{background:var(--cyan);color:#000;border-color:var(--cyan);font-weight:600}
+
+/* Discount banner */
+.discount-tiers{grid-column:1/-1;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding-bottom:8px}
+.tier{padding:6px 16px;border-radius:8px;font-size:13px;background:var(--surface);border:1px solid var(--border);color:var(--dim)}
+.tier.active{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan);font-weight:600}
+
+/* Product grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;align-content:start}
+.card{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .25s;position:relative;backdrop-filter:blur(12px)}
+.card:hover{border-color:rgba(0,229,204,.3);transform:translateY(-2px)}
+.card.selected{border-color:var(--cyan);background:var(--cyan-dim)}
+.card.selected::after{content:'\2713';position:absolute;top:12px;right:12px;width:24px;height:24px;background:var(--cyan);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.badge{display:inline-block;padding:3px 10px;border-radius:980px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px}
+.badge-blueprint{background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44}
+.badge-guide{background:#0ea5e922;color:#67e8f9;border:1px solid #0ea5e944}
+.badge-kit{background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b44}
+.badge-template{background:#10b98122;color:#6ee7b7;border:1px solid #10b98144}
+.badge-free{background:#6b728022;color:#a1a1aa;border:1px solid #6b728044}
+.card h3{font-size:15px;font-weight:600;margin-bottom:6px;line-height:1.3}
+.card .desc{font-size:13px;color:var(--dim);margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .price{font-size:18px;font-weight:700;color:var(--cyan)}
+.card .price.free-tag{color:var(--dim)}
+
+/* Sidebar */
+.sidebar{position:sticky;top:24px;height:fit-content;background:var(--glass);border:1px solid var(--border);border-radius:var(--radius);padding:24px;backdrop-filter:blur(16px)}
+.sidebar h2{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sidebar h2 .count{background:var(--cyan);color:#000;font-size:12px;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.selected-list{list-style:none;max-height:280px;overflow-y:auto;margin-bottom:20px}
+.selected-list li{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px}
+.selected-list li .remove{color:var(--dim);cursor:pointer;font-size:18px;line-height:1;padding:0 4px}
+.selected-list li .remove:hover{color:#ff4d4f}
+.empty-state{color:var(--dim);font-size:14px;text-align:center;padding:32px 0}
+.price-block{border-top:1px solid var(--border);padding-top:16px;margin-top:4px}
+.price-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px}
+.price-row.dim{color:var(--dim)}
+.price-row.savings{color:var(--cyan);font-weight:600}
+.price-row.total{font-size:20px;font-weight:700;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:var(--radius);background:var(--cyan);color:#000;font-size:16px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;text-align:center}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.bundle-code{font-size:12px;color:var(--dim);text-align:center;margin-top:10px;font-family:monospace}
+
+/* Footer */
+footer{grid-column:1/-1;text-align:center;padding:48px 0 24px;color:var(--dim);font-size:13px;border-top:1px solid var(--border)}
+
+/* Mobile */
+@media(max-width:768px){
+  .page{grid-template-columns:1fr;padding:16px}
+  .sidebar{position:fixed;bottom:0;left:0;right:0;z-index:100;border-radius:var(--radius) var(--radius) 0 0;max-height:60vh;overflow-y:auto;transform:translateY(calc(100% - 64px));transition:transform .3s ease}
+  .sidebar.open{transform:translateY(0)}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px;cursor:pointer;margin:-24px -24px 16px;padding:16px;border-bottom:1px solid var(--border);font-weight:600}
+  .sidebar-toggle::after{content:'\25B2';font-size:10px;transition:transform .3s}
+  .sidebar.open .sidebar-toggle::after{transform:rotate(180deg)}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  footer{padding-bottom:80px}
+}
+@media(min-width:769px){.sidebar-toggle{display:none}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Build Your <span>Bundle</span></h1>
+    <p>Pick what you need. The more you grab, the more you save.</p>
+  </header>
+
+  <div class="discount-tiers">
+    <div class="tier" data-min="3">3+ items = 15% off</div>
+    <div class="tier" data-min="5">5+ items = 25% off</div>
+    <div class="tier" data-min="8">8+ items = 35% off</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-cat="all">All</button>
+    <button class="tab" data-cat="blueprint">Blueprints</button>
+    <button class="tab" data-cat="guide">Guides</button>
+    <button class="tab" data-cat="kit">Kits</button>
+    <button class="tab" data-cat="template">Templates</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-toggle" id="sidebarToggle">Your Bundle <span class="count" id="mobileCount">0</span></div>
+    <h2>Your Bundle <span class="count" id="count">0</span></h2>
+    <ul class="selected-list" id="selectedList"><li class="empty-state">Select products to start building</li></ul>
+    <div class="price-block" id="priceBlock" style="display:none">
+      <div class="price-row dim"><span>Subtotal</span><span id="subtotal">$0</span></div>
+      <div class="price-row savings" id="savingsRow" style="display:none"><span id="discountLabel">Discount (0%)</span><span id="savings">-$0</span></div>
+      <div class="price-row total"><span>Total</span><span id="total">$0</span></div>
+    </div>
+    <button class="btn" id="bundleBtn" disabled>Select 3+ to unlock discount</button>
+    <div class="bundle-code" id="bundleCode"></div>
+  </aside>
+
+  <footer>behike.co</footer>
+</div>
+
+<script>
+const PRODUCTS_URL = 'products.json';
+let products = [];
+let selected = new Set(JSON.parse(localStorage.getItem('behike_bundle') || '[]'));
+
+async function init() {
+  try {
+    const res = await fetch(PRODUCTS_URL);
+    products = (await res.json()).filter(p => p.price > 0);
+  } catch {
+    products = [];
+  }
+  renderGrid('all');
+  updateSidebar();
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    renderGrid(t.dataset.cat);
+  }));
+  document.getElementById('sidebarToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+  document.getElementById('bundleBtn').addEventListener('click', generateBundle);
+}
+
+function renderGrid(cat) {
+  const grid = document.getElementById('grid');
+  const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+  grid.innerHTML = filtered.map(p => `
+    <div class="card ${selected.has(p.id) ? 'selected' : ''}" data-id="${p.id}">
+      <span class="badge badge-${p.category}">${p.category}</span>
+      <h3>${p.title}</h3>
+      <p class="desc">${p.description}</p>
+      <div class="price">$${p.price}</div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => toggleProduct(c.dataset.id)));
+}
+
+function toggleProduct(id) {
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  localStorage.setItem('behike_bundle', JSON.stringify([...selected]));
+  document.querySelectorAll(`.card[data-id="${id}"]`).forEach(c => c.classList.toggle('selected'));
+  const check = document.querySelector(`.card[data-id="${id}"]`);
+  if (check) check.classList.toggle('selected', selected.has(id));
+  // Re-render to fix check marks
+  const activeCat = document.querySelector('.tab.active').dataset.cat;
+  renderGrid(activeCat);
+  updateSidebar();
+}
+
+function getDiscount(count) {
+  if (count >= 8) return 0.35;
+  if (count >= 5) return 0.25;
+  if (count >= 3) return 0.15;
+  return 0;
+}
+
+function updateSidebar() {
+  const items = products.filter(p => selected.has(p.id));
+  const count = items.length;
+  const subtotal = items.reduce((s, p) => s + p.price, 0);
+  const discount = getDiscount(count);
+  const savingsAmt = Math.round(subtotal * discount * 100) / 100;
+  const total = subtotal - savingsAmt;
+
+  document.getElementById('count').textContent = count;
+  document.getElementById('mobileCount').textContent = count;
+
+  const list = document.getElementById('selectedList');
+  if (count === 0) {
+    list.innerHTML = '<li class="empty-state">Select products to start building</li>';
+  } else {
+    list.innerHTML = items.map(p => `<li><span>${p.title}</span><span class="remove" data-id="${p.id}">&times;</span></li>`).join('');
+    list.querySelectorAll('.remove').forEach(r => r.addEventListener('click', e => { e.stopPropagation(); toggleProduct(r.dataset.id); }));
+  }
+
+  const priceBlock = document.getElementById('priceBlock');
+  const savingsRow = document.getElementById('savingsRow');
+  priceBlock.style.display = count > 0 ? 'block' : 'none';
+  document.getElementById('subtotal').textContent = '$' + subtotal;
+  savingsRow.style.display = discount > 0 ? 'flex' : 'none';
+  document.getElementById('discountLabel').textContent = `Discount (${Math.round(discount * 100)}%)`;
+  document.getElementById('savings').textContent = '-$' + savingsAmt.toFixed(2);
+  document.getElementById('total').textContent = '$' + total.toFixed(2);
+
+  // Tier highlights
+  document.querySelectorAll('.tier').forEach(t => {
+    const min = parseInt(t.dataset.min);
+    t.classList.toggle('active', count >= min && getDiscount(count) === getDiscount(min));
+  });
+  // Simpler: highlight the active tier only
+  document.querySelectorAll('.tier').forEach(t => t.classList.remove('active'));
+  if (count >= 8) document.querySelector('[data-min="8"]').classList.add('active');
+  else if (count >= 5) document.querySelector('[data-min="5"]').classList.add('active');
+  else if (count >= 3) document.querySelector('[data-min="3"]').classList.add('active');
+
+  const btn = document.getElementById('bundleBtn');
+  if (count >= 3) {
+    btn.disabled = false;
+    btn.textContent = `Get This Bundle - $${total.toFixed(2)}`;
+  } else {
+    btn.disabled = true;
+    btn.textContent = count === 0 ? 'Select 3+ to unlock discount' : `Add ${3 - count} more for 15% off`;
+  }
+  document.getElementById('bundleCode').textContent = '';
+}
+
+function generateBundle() {
+  const items = products.filter(p => selected.has(p.id));
+  if (items.length < 3) return;
+  const code = 'BHK-' + Date.now().toString(36).toUpperCase() + '-' + items.length;
+  const ids = items.map(p => p.id).join(',');
+  document.getElementById('bundleCode').textContent = 'Bundle: ' + code;
+  // In production, this would link to a Gumroad checkout with the bundle
+  const gumroadBase = 'https://behike.gumroad.com/l/custom-bundle';
+  const url = `${gumroadBase}?bundle=${encodeURIComponent(code)}&items=${encodeURIComponent(ids)}`;
+  window.open(url, '_blank');
+}
+
+init();
+</script>
+</body>
+</html>

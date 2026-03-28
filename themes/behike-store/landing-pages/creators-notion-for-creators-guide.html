@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notion for Creators — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: #86868B;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #0A84FF;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      color: #F5F5F7;
+      max-width: 820px;
+      margin: 0 auto 24px;
+    }
+    .hero h1 span {
+      color: #0A84FF;
+    }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: #86868B;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      font-weight: 400;
+      letter-spacing: -0.2px;
+    }
+    .cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      letter-spacing: -0.3px;
+      transition: opacity 0.2s ease;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .price-tag {
+      font-size: 22px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -0.5px;
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 0;
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+    }
+    .thesis p {
+      font-size: clamp(20px, 2.8vw, 28px);
+      font-weight: 400;
+      color: #F5F5F7;
+      letter-spacing: -0.5px;
+      line-height: 1.45;
+      max-width: 760px;
+    }
+    .thesis p + p {
+      margin-top: 28px;
+      color: #86868B;
+      font-size: clamp(16px, 2vw, 20px);
+    }
+
+    /* WHAT YOU GET */
+    .what-you-get {
+      padding: 80px 0;
+      background: #0A0A0A;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #0A84FF;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: #F5F5F7;
+      margin-bottom: 56px;
+      max-width: 560px;
+    }
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+    }
+    .what-item {
+      background: #111111;
+      padding: 32px;
+    }
+    .what-item:first-child { border-radius: 16px 0 0 0; }
+    .what-item:nth-child(3) { border-radius: 0 16px 0 0; }
+    .what-item:nth-last-child(2) { border-radius: 0 0 0 16px; }
+    .what-item:last-child { border-radius: 0 0 16px 0; }
+    .what-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0A84FF;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .what-item h3 {
+      font-size: 19px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .what-item p {
+      font-size: 15px;
+      color: #86868B;
+      line-height: 1.55;
+    }
+
+    /* PREVIEWS */
+    .previews {
+      padding: 80px 0;
+    }
+    .preview-block {
+      border-left: 2px solid #0A84FF;
+      padding: 24px 32px;
+      margin-bottom: 32px;
+      background: rgba(10, 132, 255, 0.04);
+      border-radius: 0 12px 12px 0;
+    }
+    .preview-block h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .preview-block p {
+      font-size: 16px;
+      color: #86868B;
+      line-height: 1.6;
+    }
+
+    /* PROOF */
+    .proof-strip {
+      padding: 60px 0;
+      background: #0A0A0A;
+      text-align: center;
+    }
+    .proof-strip p {
+      font-size: 15px;
+      color: #48484A;
+      letter-spacing: 0.3px;
+    }
+    .proof-stats {
+      display: flex;
+      justify-content: center;
+      gap: 64px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 700;
+      color: #F5F5F7;
+      letter-spacing: -1px;
+      display: block;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #86868B;
+      margin-top: 4px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+    .final-cta h2 {
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      color: #F5F5F7;
+      margin-bottom: 16px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: #86868B;
+      margin-bottom: 40px;
+    }
+    .guarantee {
+      margin-top: 24px;
+      font-size: 14px;
+      color: #48484A;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #48484A;
+    }
+    footer a {
+      color: #0A84FF;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .what-item:first-child, .what-item:nth-child(3),
+      .what-item:nth-last-child(2), .what-item:last-child {
+        border-radius: 0;
+      }
+      .what-grid { gap: 1px; }
+      .proof-stats { gap: 32px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">Behike</a>
+      <span class="nav-price">$17.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-tag">Digital Guide</span>
+      <h1>The Notion workspace that <span>stays alive</span></h1>
+      <p class="hero-sub">Five databases. One weekly review. A creator OS built for how you actually work, not how you wish you worked.</p>
+      <div class="cta-group">
+        <a href="#buy" class="btn-primary">Get the Guide</a>
+        <span class="price-tag">$17.99</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="container">
+      <p>Most Notion setups fail the same way. You build something impressive, miss a few updates during a busy week, feel guilty, avoid the workspace, and start over. The cycle kills the system before it builds any real value.</p>
+      <p>The fix is not finding a better template. It is building fewer things and using them consistently. This guide is built around that principle, not productivity theater.</p>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- WHAT YOU GET -->
+  <section class="what-you-get">
+    <div class="container">
+      <p class="section-label">What is Inside</p>
+      <h2 class="section-title">Nine sections. Zero fluff.</h2>
+      <div class="what-grid">
+        <div class="what-item">
+          <p class="what-num">01</p>
+          <h3>Why Workspaces Die</h3>
+          <p>The exact failure pattern most creators repeat, and the design principle that breaks it.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">02</p>
+          <h3>The Five Core Databases</h3>
+          <p>Content Library, Idea Inbox, Pipeline, Projects, Revenue Tracker. Nothing else required.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">03</p>
+          <h3>Content Calendar Setup</h3>
+          <p>Built from your Pipeline database. Weekly targets over fixed daily schedules. Survives chaos.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">04</p>
+          <h3>Idea Capture System</h3>
+          <p>Zero-friction capture, weekly triage, and a three-sentence brief that starts any piece.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">05</p>
+          <h3>Solo Project Management</h3>
+          <p>Milestone checklists inside project pages. No separate task database. No PM overhead.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">06</p>
+          <h3>Repurposing Tracker</h3>
+          <p>A filtered view that shows every published piece you have not yet repurposed. Automatic backlog.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">07</p>
+          <h3>Client Management</h3>
+          <p>For service-based creators: deliverables, brand deal terms, and communication logs in one place.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">08</p>
+          <h3>Revenue Tracking</h3>
+          <p>A simple log that builds pattern recognition over time. Not accounting. Strategic clarity.</p>
+        </div>
+        <div class="what-item">
+          <p class="what-num">09</p>
+          <h3>Weekly Review Template</h3>
+          <p>A six-step, 25-minute review that keeps the entire system alive. One session per week.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section class="previews">
+    <div class="container">
+      <p class="section-label">Inside the Guide</p>
+      <h2 class="section-title">What the guide actually says</h2>
+
+      <div class="preview-block">
+        <h3>On the content calendar</h3>
+        <p>"A calendar that shows you missed Tuesday, Wednesday, and Thursday is a guilt machine, not a productivity tool. Build your calendar from the Pipeline database. Use a weekly target, not a fixed daily schedule. The weekly target survives a chaotic Tuesday. The fixed schedule does not."</p>
+      </div>
+
+      <div class="preview-block">
+        <h3>On keeping the system minimal</h3>
+        <p>"Every time you feel the urge to add something to the system, ask: what decision does this help me make, and how often do I need to make that decision? If the answer is unclear or infrequent, do not add it."</p>
+      </div>
+
+      <div class="preview-block">
+        <h3>On idea triage</h3>
+        <p>"The triage session should take fifteen minutes. If it is taking longer, you are over-thinking ideas instead of committing to them. Not every idea deserves development. The triage is where you practice saying no."</p>
+      </div>
+
+      <div class="preview-block">
+        <h3>On revenue tracking</h3>
+        <p>"Once a month, spend five minutes asking three questions: Which source generated the most? Which type of revenue is growing? Which source surprised you? Write the answers as a dated note. Over a year, these notes become an honest record of how your business actually developed."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF STRIP -->
+  <section class="proof-strip">
+    <div class="container">
+      <p>A Behike Digital Product</p>
+      <div class="proof-stats">
+        <div class="stat">
+          <span class="stat-num">~2,500</span>
+          <span class="stat-label">Words of actionable content</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">9</span>
+          <span class="stat-label">Sections covered</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">5</span>
+          <span class="stat-label">Core databases defined</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">PDF</span>
+          <span class="stat-label">Instant download</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta" id="buy">
+    <div class="container">
+      <h2>Build the workspace you actually use.</h2>
+      <p>One-time purchase. Instant PDF download. No subscription.</p>
+      <div class="cta-group">
+        <a href="#" class="btn-primary">Get the Guide for $17.99</a>
+      </div>
+      <p class="guarantee">Instant access. PDF format. Works on any device.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike Digital Products &nbsp;|&nbsp; <a href="https://behike.com">behike.com</a> &nbsp;|&nbsp; Built by Kalani Andre Gomez Padin</p>
+    </div>
+  </footer>
+
+</body>
+</html>

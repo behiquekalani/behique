@@ -1,0 +1,30 @@
+
+# BIOS Conviction Engine - every hour
+# BIOS Daily Briefing - 7 AM AST
+# BIOS Daily Report - 6 AM AST
+# BIOS Daily Sales Digest - 9 PM AST
+# BIOS Fleet Sync - hourly
+# BIOS Health Check - every 4 hours, alert on failures
+# BIOS Intelligence Pipeline - every 6 hours
+# BIOS News Scraper - every 2 hours
+# BIOS PR Intelligence - every 2 hours
+# BIOS Social Scraper - every 30 min
+# Competitor Analysis - Mondays at 8 AM
+# Content Publishing Daemon - every hour at :15
+# Market Research - Wednesdays at 8 AM
+# Weekly Newsletter - Sundays at 6 PM
+*/30 * * * * cd /Users/kalani/behique && /usr/bin/python3 bios/ingestion/social_scraper.py --run >> bios/logs/social.log 2>&1
+0 * * * * cd /Users/kalani/behique && /usr/bin/python3 bios/intelligence/conviction_engine.py --run >> bios/logs/conviction.log 2>&1
+0 */2 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/ingestion/news_scraper.py --run >> bios/logs/news.log 2>&1
+0 */4 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/health_check.py --alert >> bios/logs/health.log 2>&1
+0 */6 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/run_all.py --pipeline >> bios/logs/cron.log 2>&1
+0 18 * * 0 cd /Users/kalani/behique && /usr/bin/python3 bios/publisher/weekly_newsletter.py >> bios/logs/newsletter.log 2>&1
+0 21 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/sales/daily_digest.py >> bios/logs/sales_digest.log 2>&1
+0 3 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/fleet/backup.py >> bios/logs/backup.log 2>&1
+0 6 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/scheduler/daily_report.py >> bios/logs/daily.log 2>&1
+0 7 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/scheduler/daily_briefing.py >> bios/logs/briefing.log 2>&1
+0 8 * * 1 cd /Users/kalani/behique && /usr/bin/python3 bios/intelligence/competitor_tracker.py --full >> bios/logs/competitor.log 2>&1
+0 8 * * 3 cd /Users/kalani/behique && /usr/bin/python3 bios/intelligence/market_research.py --full >> bios/logs/market.log 2>&1
+15 * * * * cd /Users/kalani/behique/bios/publisher && /usr/bin/python3 publish_daemon.py >> /Users/kalani/behique/bios/publisher/logs/daemon-cron.log 2>&1
+15 */2 * * * cd /Users/kalani/behique && /usr/bin/python3 bios/ingestion/pr_scraper.py --run >> bios/logs/pr.log 2>&1
+30 * * * * cd /Users/kalani/behique && /usr/bin/python3 bios/fleet/sync_results.py >> bios/logs/sync.log 2>&1

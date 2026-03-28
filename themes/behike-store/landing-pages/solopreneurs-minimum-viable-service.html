@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Solopreneur's Minimum Viable Service — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a348;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 780px;
+      margin-bottom: 28px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+    .cta-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-cta:hover { background: var(--cta-hover); }
+    .price-note {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .price-note strong {
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      padding: 40px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .stat {
+      background: var(--surface);
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      max-width: 680px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    /* WHAT YOU GET */
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-top: 40px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .what-item {
+      background: var(--surface);
+      padding: 32px;
+    }
+    .what-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .what-item h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .what-item p {
+      font-size: 15px;
+      margin: 0;
+    }
+
+    /* 3-QUESTION HIGHLIGHT */
+    .question-trio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 40px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .question-card {
+      background: var(--surface);
+      padding: 32px;
+    }
+    .question-num {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: block;
+    }
+    .question-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .question-card p {
+      font-size: 15px;
+      margin: 0;
+    }
+
+    /* SECTION PREVIEWS */
+    .preview-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .preview-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .preview-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      padding-top: 3px;
+      letter-spacing: 0.05em;
+    }
+    .preview-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .preview-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* PULL QUOTE */
+    .pull-quote {
+      background: var(--surface-2);
+      border-left: 3px solid var(--accent);
+      padding: 32px 40px;
+      border-radius: 0 12px 12px 0;
+      margin: 40px 0;
+    }
+    .pull-quote p {
+      font-size: 22px;
+      line-height: 1.45;
+      color: var(--text);
+      max-width: none;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 64px 48px;
+      text-align: center;
+      margin: 80px 0;
+    }
+    .cta-section h2 {
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+    .cta-section p {
+      max-width: 480px;
+      margin: 0 auto 40px;
+      color: var(--text-muted);
+    }
+    .cta-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .cta-format {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      display: block;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: none;
+      margin: 0;
+    }
+
+    @media (max-width: 720px) {
+      .question-trio { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .what-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .preview-item { grid-template-columns: 1fr; }
+      .preview-num { padding-top: 0; }
+      .cta-section { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-brand" href="#">Behike</a>
+      <span class="nav-price">Digital Guide — $17.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <span class="hero-label">Solopreneur Strategy</span>
+      <h1>Stop designing. Start <em>delivering.</em> Your first service client is closer than your next revision.</h1>
+      <p class="hero-sub">A complete framework for designing, pricing, and selling your minimum viable service before you have a portfolio, a website, or a finished brand.</p>
+      <div class="cta-group">
+        <a href="#buy" class="btn-cta">Get the guide — $17.99</a>
+        <span class="price-note">PDF + instant download</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-number">9</span>
+          <span class="stat-label">complete sections</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">90</span>
+          <span class="stat-label">days to a real business</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">3</span>
+          <span class="stat-label">questions that validate any offer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THESIS -->
+  <section>
+    <div class="container">
+      <p class="section-label">The Core Argument</p>
+      <h2>Building infrastructure before you have clients is productive procrastination.</h2>
+      <div class="pull-quote">
+        <p>The solopreneur who waits for everything to be ready before selling will wait a long time. The one who builds the minimum viable service, sells it, delivers it, and iterates will have a real business inside of 90 days.</p>
+      </div>
+      <p>Most solopreneurs fail before they start because they are trying to build a finished product when what they need is a working draft. They design service packages, write intake forms, and build onboarding sequences before they have a single client. By the time they launch, they have burned their motivation on infrastructure that no client has ever tested.</p>
+      <p>The minimum viable service is the alternative. The smallest, most specific offer you can deliver well right now, to one specific person, in exchange for real money. This guide shows you how to build it, sell it, and evolve it into a signature offer.</p>
+    </div>
+  </section>
+
+  <!-- 3 QUESTIONS -->
+  <section>
+    <div class="container">
+      <p class="section-label">The Offer Test</p>
+      <h2>Three questions that validate any service offer before you pitch it.</h2>
+      <p>If your offer fails any of these, it is not ready to sell. The questions are simple. Getting clear answers is the actual work.</p>
+      <div class="question-trio">
+        <div class="question-card">
+          <span class="question-num">Question 01</span>
+          <h3>What is the specific problem?</h3>
+          <p>Not a category. A named problem a specific person experiences. Could they hear it and immediately know whether it applies to them?</p>
+        </div>
+        <div class="question-card">
+          <span class="question-num">Question 02</span>
+          <h3>Who is the specific person?</h3>
+          <p>Not a demographic. A specific role, situation, or context. You should be able to picture them clearly enough to write a pitch directly to them.</p>
+        </div>
+        <div class="question-card">
+          <span class="question-num">Question 03</span>
+          <h3>What is the specific outcome?</h3>
+          <p>Not the process. The result. What does done look like for the client? Can they evaluate whether they want that before buying?</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section>
+    <div class="container">
+      <p class="section-label">What You Get</p>
+      <h2>Nine sections. From blank page to first client.</h2>
+      <div class="what-grid">
+        <div class="what-item">
+          <span class="what-icon">&#9881;</span>
+          <h3>The MVS Framework</h3>
+          <p>What minimum viable means in a service context. The three properties every MVS must have to be sellable and deliverable.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128178;</span>
+          <h3>Pricing Without Guessing</h3>
+          <p>Why underpricing is a structural problem, not a strategy. A practical framework for pricing based on outcome value, not hours.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128101;</span>
+          <h3>First Client Without a Portfolio</h3>
+          <p>The warm market first principle. The proof of thinking approach. How to get a yes before you have case studies to show.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128260;</span>
+          <h3>The Feedback Loop</h3>
+          <p>Three questions to ask after every delivery. How to collect the raw material that tells you what to build next.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128203;</span>
+          <h3>Simple Delivery Process</h3>
+          <p>A five-stage delivery framework that works before you have systems. No tools required. Just clarity at every handoff.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128200;</span>
+          <h3>From MVS to Signature Offer</h3>
+          <p>The three-stage evolution path. When to expand the service versus when to productize. How the signature offer is discovered, not designed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section>
+    <div class="container">
+      <p class="section-label">Section Previews</p>
+      <h2>What you will read, section by section.</h2>
+      <div class="preview-list">
+        <div class="preview-item">
+          <span class="preview-num">01</span>
+          <div>
+            <div class="preview-title">The Problem with Over-Engineered Packages</div>
+            <p class="preview-desc">Why building infrastructure before clients is productive procrastination. The psychological mechanism that keeps solopreneurs designing instead of selling.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">02</span>
+          <div>
+            <div class="preview-title">What Minimum Viable Means in a Service Business</div>
+            <p class="preview-desc">The three properties every MVS must have. Why MVS is not about low quality. How it differs from a beta or a discount.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">03</span>
+          <div>
+            <div class="preview-title">The 3-Question Offer Test</div>
+            <p class="preview-desc">Specific problem, specific person, specific outcome. How to test each one. What failure looks like for each question.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">04</span>
+          <div>
+            <div class="preview-title">Pricing Your Minimum Viable Service</div>
+            <p class="preview-desc">Why underpricing attracts the wrong clients. Why aspirational pricing before you can deliver destroys trust. The practical pricing framework based on outcome value.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">05</span>
+          <div>
+            <div class="preview-title">A Simple Delivery Process for Your First Three Clients</div>
+            <p class="preview-desc">Five stages: kickoff, work delivery, first draft, revision, completion and handoff. What each stage requires and why clarity at each one reduces friction.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">06</span>
+          <div>
+            <div class="preview-title">Getting Your First MVS Client Without a Portfolio</div>
+            <p class="preview-desc">The warm market first principle. The proof of thinking approach. How to write the message that surfaces clients from your existing network.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">07</span>
+          <div>
+            <div class="preview-title">The Feedback Loop After Every Delivery</div>
+            <p class="preview-desc">Three questions: what they valued most, what created friction, what they would have paid more for. How to use patterns from five to ten deliveries as your product roadmap.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">08</span>
+          <div>
+            <div class="preview-title">When to Expand vs. When to Productize</div>
+            <p class="preview-desc">The signals that tell you the service is ready to scale versus the signals that tell you it is time to systematize. Why productizing prematurely is a form of avoidance.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">09</span>
+          <div>
+            <div class="preview-title">From MVS to Signature Offer</div>
+            <p class="preview-desc">The three stages: MVS, refined offer, signature offer. What distinguishes each stage. Why the signature offer is discovered through evidence, not designed from imagination.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO THIS IS FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2>Solopreneurs who have the skill but not the first client yet.</h2>
+      <p>This guide is for anyone who knows they can deliver real value as a service provider but is stuck in the design phase. It is for the freelancer who has been polishing a service page that nobody has bought from. The consultant who has been waiting to launch until the website looks right. The coach who has been avoiding the pitch because the offer does not feel complete yet.</p>
+      <p>The minimum viable service framework is not a shortcut. It is a reorientation. The work does not start when everything is ready. It starts when you deliver something real to a real person and learn from it.</p>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <div class="container" id="buy">
+    <div class="cta-section">
+      <p class="section-label">Get the Guide</p>
+      <h2>The Solopreneur's Minimum Viable Service</h2>
+      <p>A complete framework for designing, pricing, and selling your first service offer before you have a portfolio or a finished brand.</p>
+      <span class="cta-price">$17.99</span>
+      <span class="cta-format">PDF download. 9 sections. ~2,500 words.</span>
+      <div>
+        <a href="#" class="btn-cta">Buy now — $17.99</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>Behike Digital Products &mdash; behike.com</p>
+    </div>
+  </footer>
+
+</body>
+</html>

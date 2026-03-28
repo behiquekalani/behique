@@ -1,0 +1,2099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ADHD Finance</title>
+<style>
+/* ============ RESET & BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  /* Calm theme (default) */
+  --bg: #FDF6EC;
+  --bg2: #F5EDE0;
+  --card: #FFFFFF;
+  --text: #2D2D2D;
+  --text2: #6B6B6B;
+  --accent: #0D9488;
+  --accent2: #0F766E;
+  --warning: #F59E0B;
+  --danger: #FF6B6B;
+  --danger2: #EF4444;
+  --success: #10B981;
+  --shadow: rgba(0,0,0,0.06);
+  --jar-bg: rgba(13,148,136,0.08);
+  --nav-bg: #FFFFFF;
+  --input-bg: #F5EDE0;
+  --bubble-user: #0D9488;
+  --bubble-text: #FFFFFF;
+  --bubble-sys: #F0F0F0;
+  --bubble-sys-text: #2D2D2D;
+  --overlay: rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] {
+  --bg: #0F172A;
+  --bg2: #1E293B;
+  --card: #1E293B;
+  --text: #E2E8F0;
+  --text2: #94A3B8;
+  --accent: #22D3EE;
+  --accent2: #06B6D4;
+  --shadow: rgba(0,0,0,0.3);
+  --jar-bg: rgba(34,211,238,0.08);
+  --nav-bg: #1E293B;
+  --input-bg: #334155;
+  --bubble-user: #22D3EE;
+  --bubble-text: #0F172A;
+  --bubble-sys: #334155;
+  --bubble-sys-text: #E2E8F0;
+  --overlay: rgba(0,0,0,0.6);
+}
+
+[data-theme="minimal"] {
+  --bg: #FFFFFF;
+  --bg2: #F5F5F5;
+  --card: #FFFFFF;
+  --text: #111111;
+  --text2: #777777;
+  --accent: #111111;
+  --accent2: #333333;
+  --shadow: rgba(0,0,0,0.08);
+  --jar-bg: rgba(0,0,0,0.04);
+  --nav-bg: #FFFFFF;
+  --input-bg: #F5F5F5;
+  --bubble-user: #111111;
+  --bubble-text: #FFFFFF;
+  --bubble-sys: #F0F0F0;
+  --bubble-sys-text: #111111;
+  --overlay: rgba(0,0,0,0.4);
+}
+
+html { font-size: 18px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 420px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============ TYPOGRAPHY ============ */
+h1 { font-size: 1.5rem; font-weight: 700; }
+h2 { font-size: 1.2rem; font-weight: 600; }
+h3 { font-size: 1rem; font-weight: 600; }
+p { line-height: 1.5; }
+
+/* ============ UTILITIES ============ */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: transform 0.15s ease;
+}
+.card:active { transform: scale(0.98); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(0.95); }
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+.btn-primary:hover { background: var(--accent2); }
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.btn-full { width: 100%; }
+.btn-lg { padding: 18px 32px; font-size: 1.1rem; min-height: 56px; }
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop 0.3s ease; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+.shake { animation: shake 0.4s ease; }
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  top: 0;
+  z-index: 9999;
+  pointer-events: none;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,107,0); }
+  50% { box-shadow: 0 0 20px 4px rgba(255,107,107,0.4); }
+}
+
+/* ============ HEADER ============ */
+.header {
+  padding: 20px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header h1 {
+  font-size: 1.3rem;
+  letter-spacing: -0.5px;
+}
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.streak-badge {
+  background: var(--accent);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+.settings-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============ BUDGET SUMMARY BAR ============ */
+.budget-bar {
+  margin: 0 20px 8px;
+  padding: 14px 20px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: 0 2px 12px var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.budget-bar .amount {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  transition: color 0.3s ease;
+}
+.budget-bar .label {
+  font-size: 0.75rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+.budget-status {
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.status-green { background: rgba(16,185,129,0.15); color: #059669; }
+.status-yellow { background: rgba(245,158,11,0.15); color: #D97706; }
+.status-red { background: rgba(255,107,107,0.15); color: #DC2626; }
+
+/* ============ NAV TABS ============ */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  background: var(--nav-bg);
+  border-top: 1px solid var(--shadow);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+  box-shadow: 0 -4px 20px var(--shadow);
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  color: var(--text2);
+  font-size: 0.65rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item .icon { font-size: 1.4rem; }
+
+/* ============ SCREENS ============ */
+.screen {
+  display: none;
+  padding: 12px 20px 100px;
+}
+.screen.active { display: block; }
+
+/* ============ SPEND SCREEN ============ */
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.category-grid .cat-btn:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+.cat-btn {
+  padding: 20px;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  background: var(--card);
+  box-shadow: 0 2px 8px var(--shadow);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-height: 80px;
+}
+.cat-btn .cat-icon { font-size: 1.6rem; }
+.cat-btn .cat-spent {
+  font-size: 0.7rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+.cat-btn.selected {
+  border-color: var(--accent);
+  background: var(--jar-bg);
+}
+.cat-btn:active { transform: scale(0.95); }
+
+/* Numpad */
+.numpad {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.num-btn {
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: var(--card);
+  box-shadow: 0 1px 4px var(--shadow);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s;
+  color: var(--text);
+}
+.num-btn:active {
+  transform: scale(0.93);
+  background: var(--bg2);
+}
+.num-btn.action {
+  background: var(--accent);
+  color: white;
+}
+.num-btn.action:active { background: var(--accent2); }
+.num-btn.del {
+  background: var(--danger);
+  color: white;
+}
+
+.amount-display {
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 800;
+  padding: 20px;
+  letter-spacing: -1px;
+  color: var(--text);
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.amount-display .dollar { color: var(--text2); font-weight: 400; }
+
+/* ============ JARS SCREEN ============ */
+.jars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.jar-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px var(--shadow);
+  transition: all 0.3s ease;
+}
+.jar-row.overflow {
+  animation: pulse-glow 1.5s infinite;
+}
+.jar-visual {
+  width: 50px;
+  height: 100px;
+  border: 3px solid var(--text2);
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--jar-bg);
+}
+.jar-visual::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -2px; right: -2px;
+  height: 8px;
+  background: var(--text2);
+  border-radius: 4px 4px 0 0;
+  transform: translateY(-100%);
+}
+.jar-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--accent);
+  transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 0 0 9px 9px;
+}
+.jar-liquid.warn { background: var(--warning); }
+.jar-liquid.over { background: var(--danger); }
+.jar-budget-line {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  height: 2px;
+  background: var(--danger);
+  opacity: 0.6;
+  z-index: 2;
+}
+.jar-info {
+  flex: 1;
+}
+.jar-info .jar-name {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+.jar-info .jar-amounts {
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+.jar-info .jar-pct {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+/* ============ IMPULSE SCREEN ============ */
+.impulse-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.impulse-input-area input {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border: 2px solid var(--bg2);
+  background: var(--input-bg);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.impulse-input-area input:focus {
+  border-color: var(--accent);
+}
+
+.cooldown-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px var(--shadow);
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.cooldown-card .item-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.cooldown-card .item-price {
+  color: var(--text2);
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+.cooldown-timer {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--warning);
+  margin: 12px 0;
+  font-variant-numeric: tabular-nums;
+}
+.cooldown-card .timer-label {
+  font-size: 0.75rem;
+  color: var(--text2);
+}
+.cooldown-card.ready {
+  border: 2px solid var(--success);
+}
+.cooldown-card.ready .cooldown-timer {
+  color: var(--success);
+}
+.cooldown-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.cooldown-actions .btn { flex: 1; padding: 12px; }
+
+.impulse-stats {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 12px var(--shadow);
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  text-align: center;
+}
+.impulse-stats .stat-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+.impulse-stats .stat-label {
+  font-size: 0.7rem;
+  color: var(--text2);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ============ QUICK LOG SCREEN ============ */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 80px;
+  min-height: 50vh;
+}
+.chat-bubble {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  position: relative;
+  animation: fadeIn 0.2s ease;
+}
+.chat-bubble.user {
+  align-self: flex-end;
+  background: var(--bubble-user);
+  color: var(--bubble-text);
+  border-bottom-right-radius: 4px;
+}
+.chat-bubble.system {
+  align-self: flex-start;
+  background: var(--bubble-sys);
+  color: var(--bubble-sys-text);
+  border-bottom-left-radius: 4px;
+}
+.chat-bubble .bubble-time {
+  font-size: 0.6rem;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+.chat-bubble .delete-bubble {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  border: none;
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.chat-bubble:hover .delete-bubble,
+.chat-bubble:active .delete-bubble {
+  display: flex;
+}
+
+.chat-input-bar {
+  position: fixed;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  padding: 8px 16px;
+  background: var(--nav-bg);
+  display: flex;
+  gap: 8px;
+  z-index: 99;
+  border-top: 1px solid var(--shadow);
+}
+.chat-input-bar input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 99px;
+  border: 2px solid var(--bg2);
+  background: var(--input-bg);
+  font-size: 0.95rem;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+}
+.chat-input-bar input:focus {
+  border-color: var(--accent);
+}
+.chat-input-bar button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ============ SNAPSHOT SCREEN ============ */
+.snapshot-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.snapshot-header .month-name {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.snapshot-header .month-range {
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+.grade-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin: 16px auto;
+  color: white;
+}
+.grade-A { background: var(--success); }
+.grade-B { background: #0D9488; }
+.grade-C { background: var(--warning); }
+.grade-D { background: #F97316; }
+.grade-F { background: var(--danger); }
+
+.snapshot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.snapshot-stat {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.snapshot-stat .s-val {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.snapshot-stat .s-label {
+  font-size: 0.7rem;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+.snapshot-jars {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.snapshot-jar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 1px 6px var(--shadow);
+}
+.snapshot-jar-row .sj-icon { font-size: 1.2rem; }
+.snapshot-jar-row .sj-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
+.snapshot-jar-row .sj-bar {
+  width: 60px;
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.snapshot-jar-row .sj-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+.snapshot-jar-row .sj-pct {
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: 40px;
+  text-align: right;
+}
+
+.history-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 1px 4px var(--shadow);
+  cursor: pointer;
+}
+.history-item:active { transform: scale(0.98); }
+
+/* ============ SETTINGS OVERLAY ============ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 200;
+  align-items: flex-end;
+  justify-content: center;
+}
+.overlay.open { display: flex; }
+.overlay-panel {
+  background: var(--bg);
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.overlay-panel h2 {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.overlay-panel .close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+}
+.setting-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text2);
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.setting-group input[type="number"] {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--bg2);
+  background: var(--input-bg);
+  font-size: 1rem;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+}
+.setting-group input[type="number"]:focus {
+  border-color: var(--accent);
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--bg2);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-row span { font-weight: 500; }
+.toggle {
+  width: 52px;
+  height: 30px;
+  border-radius: 99px;
+  border: none;
+  background: var(--bg2);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle.on::after { transform: translateX(22px); }
+
+.theme-picker {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.theme-option {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 3px solid var(--bg2);
+  background: var(--card);
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.theme-option.active { border-color: var(--accent); }
+
+.split-suggest {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.split-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--bg2);
+  background: var(--card);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.split-btn:active { border-color: var(--accent); }
+
+/* ============ ONBOARDING ============ */
+.onboarding {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+.onboarding.hidden { display: none; }
+.onboarding h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+.onboarding p {
+  color: var(--text2);
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+}
+.onboarding input {
+  width: 100%;
+  max-width: 300px;
+  padding: 18px 24px;
+  border-radius: 16px;
+  border: 2px solid var(--bg2);
+  background: var(--input-bg);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  margin-bottom: 16px;
+}
+.onboarding input:focus { border-color: var(--accent); }
+.onboarding .sub-text {
+  font-size: 0.75rem;
+  color: var(--text2);
+  margin-top: 12px;
+}
+
+/* ============ RESPONSIVENESS ============ */
+@media (max-width: 420px) {
+  body { max-width: 100%; }
+  .nav { max-width: 100%; }
+  .chat-input-bar { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== ONBOARDING ===== -->
+<div class="onboarding" id="onboarding">
+  <h1>ADHD Finance</h1>
+  <p>Budgeting that works with your brain, not against it.</p>
+  <label style="font-size:0.8rem;color:var(--text2);font-weight:600;margin-bottom:6px;display:block;">MONTHLY INCOME</label>
+  <input type="number" id="onboard-income" placeholder="3000" inputmode="decimal">
+  <div class="sub-text">You can change this anytime in settings.</div>
+  <br>
+  <button class="btn btn-primary btn-lg btn-full" onclick="completeOnboarding()" style="max-width:300px;">Start tracking</button>
+  <div class="sub-text" style="margin-top:24px;font-size:0.65rem;opacity:0.5;">&copy; 2026 Behike</div>
+</div>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <h1>ADHD Finance</h1>
+  <div class="header-right">
+    <div class="streak-badge" onclick="showTab('snapshot')" id="streak-display">0 days</div>
+    <button class="settings-btn" onclick="openSettings()">&#9881;</button>
+  </div>
+</div>
+
+<!-- ===== BUDGET BAR ===== -->
+<div class="budget-bar" id="budget-bar">
+  <div>
+    <div class="label">Remaining this month</div>
+    <div class="amount" id="remaining-amount">$0</div>
+  </div>
+  <div class="budget-status status-green" id="budget-status">On track</div>
+</div>
+
+<!-- ===== SPEND SCREEN ===== -->
+<div class="screen active" id="screen-spend">
+  <div class="amount-display" id="spend-display">
+    <span class="dollar">$</span>0
+  </div>
+
+  <div class="category-grid">
+    <button class="cat-btn" data-cat="needs" onclick="selectCat(this)">
+      <span class="cat-icon">&#127968;</span>
+      <span>Needs</span>
+      <span class="cat-spent" id="cat-spent-needs">$0</span>
+    </button>
+    <button class="cat-btn" data-cat="food" onclick="selectCat(this)">
+      <span class="cat-icon">&#127828;</span>
+      <span>Food</span>
+      <span class="cat-spent" id="cat-spent-food">$0</span>
+    </button>
+    <button class="cat-btn" data-cat="fun" onclick="selectCat(this)">
+      <span class="cat-icon">&#127918;</span>
+      <span>Fun</span>
+      <span class="cat-spent" id="cat-spent-fun">$0</span>
+    </button>
+    <button class="cat-btn" data-cat="savings" onclick="selectCat(this)">
+      <span class="cat-icon">&#128176;</span>
+      <span>Savings</span>
+      <span class="cat-spent" id="cat-spent-savings">$0</span>
+    </button>
+    <button class="cat-btn" data-cat="other" onclick="selectCat(this)">
+      <span class="cat-icon">&#128230;</span>
+      <span>Other</span>
+      <span class="cat-spent" id="cat-spent-other">$0</span>
+    </button>
+  </div>
+
+  <div class="numpad">
+    <button class="num-btn" onclick="numInput('1')">1</button>
+    <button class="num-btn" onclick="numInput('2')">2</button>
+    <button class="num-btn" onclick="numInput('3')">3</button>
+    <button class="num-btn" onclick="numInput('4')">4</button>
+    <button class="num-btn" onclick="numInput('5')">5</button>
+    <button class="num-btn" onclick="numInput('6')">6</button>
+    <button class="num-btn" onclick="numInput('7')">7</button>
+    <button class="num-btn" onclick="numInput('8')">8</button>
+    <button class="num-btn" onclick="numInput('9')">9</button>
+    <button class="num-btn" onclick="numInput('.')">.</button>
+    <button class="num-btn" onclick="numInput('0')">0</button>
+    <button class="num-btn del" onclick="numDelete()">&#9003;</button>
+  </div>
+  <button class="btn btn-primary btn-full btn-lg" style="margin-top:12px" onclick="addExpense()" id="add-expense-btn">Add expense</button>
+</div>
+
+<!-- ===== JARS SCREEN ===== -->
+<div class="screen" id="screen-jars">
+  <h2 style="margin-bottom:16px">Budget Jars</h2>
+  <div class="jars-container" id="jars-container"></div>
+</div>
+
+<!-- ===== IMPULSE SCREEN ===== -->
+<div class="screen" id="screen-impulse">
+  <h2 style="margin-bottom:16px">Impulse Cooldown</h2>
+  <div class="impulse-input-area">
+    <input type="text" id="impulse-item" placeholder="What do you want to buy?">
+    <input type="number" id="impulse-price" placeholder="Price" inputmode="decimal">
+    <button class="btn btn-primary btn-full btn-lg" onclick="addImpulse()">Start 24h cooldown</button>
+  </div>
+  <div id="impulse-list"></div>
+  <div class="impulse-stats" id="impulse-stats" style="display:none">
+    <div>
+      <div class="stat-val" id="impulse-avoided">0</div>
+      <div class="stat-label">Impulse buys avoided</div>
+    </div>
+    <div>
+      <div class="stat-val" id="impulse-saved">$0</div>
+      <div class="stat-label">Money saved by waiting</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUICK LOG SCREEN ===== -->
+<div class="screen" id="screen-log">
+  <h2 style="margin-bottom:12px">Quick Log</h2>
+  <p style="font-size:0.8rem;color:var(--text2);margin-bottom:16px">Type like "$25 food" or "$15 uber"</p>
+  <div class="chat-container" id="chat-container"></div>
+</div>
+<div class="chat-input-bar" id="chat-input-bar" style="display:none">
+  <input type="text" id="chat-input" placeholder='$25 food' enterkeyhint="send">
+  <button onclick="sendChat()">&#9652;</button>
+</div>
+
+<!-- ===== SNAPSHOT SCREEN ===== -->
+<div class="screen" id="screen-snapshot">
+  <div class="snapshot-header">
+    <div class="month-name" id="snap-month">March 2026</div>
+    <div class="month-range" id="snap-range"></div>
+  </div>
+  <div id="snap-grade-area"></div>
+  <div class="snapshot-grid" id="snap-grid"></div>
+  <div class="snapshot-jars" id="snap-jars"></div>
+  <button class="btn btn-ghost btn-full" style="margin-top:20px" onclick="saveSnapshot()">Save this snapshot</button>
+  <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="exportCSV()">Export CSV</button>
+  <h3 style="margin-top:28px;margin-bottom:12px">Past months</h3>
+  <div class="history-list" id="history-list"></div>
+</div>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+  <button class="nav-item active" data-tab="spend" onclick="showTab('spend')">
+    <span class="icon">&#128178;</span>
+    Spend
+  </button>
+  <button class="nav-item" data-tab="jars" onclick="showTab('jars')">
+    <span class="icon">&#127863;</span>
+    Jars
+  </button>
+  <button class="nav-item" data-tab="impulse" onclick="showTab('impulse')">
+    <span class="icon">&#9200;</span>
+    Impulse
+  </button>
+  <button class="nav-item" data-tab="log" onclick="showTab('log')">
+    <span class="icon">&#9997;</span>
+    Log
+  </button>
+  <button class="nav-item" data-tab="snapshot" onclick="showTab('snapshot')">
+    <span class="icon">&#128202;</span>
+    Month
+  </button>
+</nav>
+
+<!-- ===== SETTINGS OVERLAY ===== -->
+<div class="overlay" id="settings-overlay" onclick="closeSettingsOutside(event)">
+  <div class="overlay-panel" onclick="event.stopPropagation()">
+    <h2>Settings <button class="close-btn" onclick="closeSettings()">&times;</button></h2>
+
+    <div class="setting-group">
+      <label>Monthly Income</label>
+      <input type="number" id="set-income" inputmode="decimal" onchange="updateIncome(this.value)">
+    </div>
+
+    <div class="setting-group">
+      <label>Budget per Category</label>
+      <div class="split-suggest">
+        <button class="split-btn" onclick="applySplit(50,30,20)">50/30/20</button>
+        <button class="split-btn" onclick="applySplit(60,20,20)">60/20/20</button>
+        <button class="split-btn" onclick="applySplit(40,30,30)">40/30/30</button>
+      </div>
+    </div>
+
+    <div class="setting-group" id="budget-inputs"></div>
+
+    <div class="setting-group">
+      <label>Preferences</label>
+      <div class="toggle-row">
+        <span>Sound effects</span>
+        <button class="toggle on" id="toggle-sound" onclick="toggleSetting(this,'sound')"></button>
+      </div>
+      <div class="toggle-row">
+        <span>Impulse cooldown</span>
+        <button class="toggle on" id="toggle-impulse" onclick="toggleSetting(this,'impulse')"></button>
+      </div>
+    </div>
+
+    <div class="setting-group">
+      <label>Theme</label>
+      <div class="theme-picker">
+        <button class="theme-option active" data-theme-val="calm" onclick="setTheme('calm')">Calm</button>
+        <button class="theme-option" data-theme-val="dark" onclick="setTheme('dark')">Dark</button>
+        <button class="theme-option" data-theme-val="minimal" onclick="setTheme('minimal')">Minimal</button>
+      </div>
+    </div>
+
+    <button class="btn btn-ghost btn-full" onclick="exportCSV()">Export data as CSV</button>
+    <div style="text-align:center;margin-top:24px;font-size:0.65rem;color:var(--text2);">&copy; 2026 Behike</div>
+  </div>
+</div>
+
+<script>
+// ============ STATE ============
+const CATS = ['needs','food','fun','savings','other'];
+const CAT_ICONS = {needs:'&#127968;',food:'&#127828;',fun:'&#127918;',savings:'&#128176;',other:'&#128230;'};
+const CAT_NAMES = {needs:'Needs',food:'Food',fun:'Fun',savings:'Savings',other:'Other'};
+
+let state = loadState();
+
+function defaultState() {
+  const now = new Date();
+  return {
+    income: 0,
+    budgets: {needs:0,food:0,fun:0,savings:0,other:0},
+    expenses: [],
+    impulses: [],
+    impulseHistory: {avoided:0,savedTotal:0},
+    streak: {current:0,longest:0,lastDate:null},
+    settings: {sound:true,impulse:true,theme:'calm'},
+    currentMonth: now.getMonth() + '-' + now.getFullYear(),
+    snapshots: [],
+    onboarded: false,
+    chatLog: []
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('adhd-finance');
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    // Month rollover check
+    const now = new Date();
+    const cm = now.getMonth() + '-' + now.getFullYear();
+    if (s.currentMonth !== cm) {
+      // Auto-save last month snapshot before rolling
+      autoSaveSnapshot(s);
+      s.expenses = [];
+      s.impulses = [];
+      s.chatLog = [];
+      s.currentMonth = cm;
+    }
+    return {...defaultState(), ...s};
+  } catch(e) {
+    return defaultState();
+  }
+}
+
+function save() {
+  localStorage.setItem('adhd-finance', JSON.stringify(state));
+}
+
+function autoSaveSnapshot(s) {
+  const snap = buildSnapshot(s);
+  if (!s.snapshots) s.snapshots = [];
+  s.snapshots.unshift(snap);
+  if (s.snapshots.length > 24) s.snapshots.pop();
+}
+
+// ============ ONBOARDING ============
+function checkOnboarding() {
+  if (!state.onboarded) {
+    document.getElementById('onboarding').classList.remove('hidden');
+  } else {
+    document.getElementById('onboarding').classList.add('hidden');
+  }
+}
+
+function completeOnboarding() {
+  const val = parseFloat(document.getElementById('onboard-income').value);
+  if (!val || val <= 0) {
+    document.getElementById('onboard-income').style.borderColor = 'var(--danger)';
+    shakeEl(document.getElementById('onboard-income'));
+    return;
+  }
+  state.income = val;
+  state.onboarded = true;
+  // Default 50/30/20 split
+  applySplitValues(50, 30, 20);
+  save();
+  document.getElementById('onboarding').classList.add('hidden');
+  playSound('success');
+  renderAll();
+}
+
+// ============ SOUND ============
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function playSound(type) {
+  if (!state.settings.sound) return;
+  if (!audioCtx) audioCtx = new AudioCtx();
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  gain.gain.value = 0.08;
+
+  if (type === 'tap') {
+    osc.frequency.value = 800;
+    osc.type = 'sine';
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+  } else if (type === 'success') {
+    osc.frequency.value = 523;
+    osc.type = 'sine';
+    gain.gain.value = 0.1;
+    setTimeout(() => {
+      const o2 = audioCtx.createOscillator();
+      const g2 = audioCtx.createGain();
+      o2.connect(g2); g2.connect(audioCtx.destination);
+      o2.frequency.value = 659; o2.type = 'sine';
+      g2.gain.value = 0.1;
+      g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      o2.start(); o2.stop(audioCtx.currentTime + 0.2);
+    }, 100);
+    setTimeout(() => {
+      const o3 = audioCtx.createOscillator();
+      const g3 = audioCtx.createGain();
+      o3.connect(g3); g3.connect(audioCtx.destination);
+      o3.frequency.value = 784; o3.type = 'sine';
+      g3.gain.value = 0.1;
+      g3.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      o3.start(); o3.stop(audioCtx.currentTime + 0.3);
+    }, 200);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+  } else if (type === 'warning') {
+    osc.frequency.value = 300;
+    osc.type = 'triangle';
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+  } else if (type === 'delete') {
+    osc.frequency.value = 400;
+    osc.type = 'sawtooth';
+    gain.gain.value = 0.04;
+    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+  }
+}
+
+// ============ NAVIGATION ============
+function showTab(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.querySelector(`.nav-item[data-tab="${tab}"]`).classList.add('active');
+
+  const chatBar = document.getElementById('chat-input-bar');
+  chatBar.style.display = tab === 'log' ? 'flex' : 'none';
+
+  if (tab === 'jars') renderJars();
+  if (tab === 'snapshot') renderSnapshot();
+  if (tab === 'impulse') renderImpulses();
+  if (tab === 'log') {
+    renderChatLog();
+    setTimeout(() => {
+      const c = document.getElementById('chat-container');
+      c.scrollTop = c.scrollHeight;
+    }, 50);
+  }
+  playSound('tap');
+}
+
+// ============ SPEND TAB ============
+let currentAmount = '';
+let selectedCat = null;
+
+function numInput(val) {
+  if (val === '.' && currentAmount.includes('.')) return;
+  if (currentAmount.includes('.') && currentAmount.split('.')[1].length >= 2) return;
+  if (currentAmount.length >= 8) return;
+  currentAmount += val;
+  updateAmountDisplay();
+  playSound('tap');
+}
+
+function numDelete() {
+  currentAmount = currentAmount.slice(0, -1);
+  updateAmountDisplay();
+  playSound('tap');
+}
+
+function updateAmountDisplay() {
+  const display = document.getElementById('spend-display');
+  const val = currentAmount || '0';
+  display.innerHTML = `<span class="dollar">$</span>${val}`;
+}
+
+function selectCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = el.dataset.cat;
+  playSound('tap');
+}
+
+function addExpense() {
+  const amount = parseFloat(currentAmount);
+  if (!amount || amount <= 0) {
+    shakeEl(document.getElementById('spend-display'));
+    return;
+  }
+  if (!selectedCat) {
+    document.querySelectorAll('.cat-btn').forEach(b => shakeEl(b));
+    return;
+  }
+  state.expenses.push({
+    id: Date.now(),
+    amount: amount,
+    category: selectedCat,
+    date: new Date().toISOString(),
+    source: 'numpad'
+  });
+
+  // Check if this pushes over budget
+  const catTotal = getCatTotal(selectedCat);
+  const catBudget = state.budgets[selectedCat];
+  if (catBudget > 0 && catTotal > catBudget) {
+    playSound('warning');
+  } else {
+    playSound('success');
+  }
+
+  // Update streak
+  updateStreak();
+
+  currentAmount = '';
+  selectedCat = null;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  updateAmountDisplay();
+  save();
+  renderBudgetBar();
+  renderCatSpent();
+
+  // Visual feedback
+  const btn = document.getElementById('add-expense-btn');
+  btn.textContent = 'Added!';
+  btn.classList.add('pop');
+  setTimeout(() => {
+    btn.textContent = 'Add expense';
+    btn.classList.remove('pop');
+  }, 800);
+}
+
+function getCatTotal(cat) {
+  return state.expenses
+    .filter(e => e.category === cat)
+    .reduce((sum, e) => sum + e.amount, 0);
+}
+
+function getTotalSpent() {
+  return state.expenses.reduce((sum, e) => sum + e.amount, 0);
+}
+
+function renderCatSpent() {
+  CATS.forEach(cat => {
+    const el = document.getElementById('cat-spent-' + cat);
+    if (el) el.textContent = '$' + getCatTotal(cat).toFixed(2);
+  });
+}
+
+function renderBudgetBar() {
+  const totalBudget = state.income;
+  const totalSpent = getTotalSpent();
+  const remaining = totalBudget - totalSpent;
+  const pct = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+
+  const amountEl = document.getElementById('remaining-amount');
+  const statusEl = document.getElementById('budget-status');
+
+  amountEl.textContent = '$' + Math.max(0, remaining).toFixed(2);
+
+  if (pct < 70) {
+    amountEl.style.color = 'var(--success)';
+    statusEl.className = 'budget-status status-green';
+    statusEl.textContent = 'On track';
+  } else if (pct < 95) {
+    amountEl.style.color = 'var(--warning)';
+    statusEl.className = 'budget-status status-yellow';
+    statusEl.textContent = 'Watch it';
+  } else {
+    amountEl.style.color = 'var(--danger)';
+    statusEl.className = 'budget-status status-red';
+    statusEl.textContent = pct >= 100 ? 'Over budget' : 'Almost out';
+  }
+}
+
+// ============ JARS ============
+function renderJars() {
+  const container = document.getElementById('jars-container');
+  container.innerHTML = '';
+
+  CATS.forEach(cat => {
+    const spent = getCatTotal(cat);
+    const budget = state.budgets[cat] || 0;
+    const pct = budget > 0 ? Math.min((spent / budget) * 100, 150) : 0;
+    const isOver = spent > budget && budget > 0;
+    const isWarn = pct >= 80 && pct < 100;
+
+    const liquidClass = isOver ? 'over' : isWarn ? 'warn' : '';
+    const fillH = Math.min(pct, 100);
+    const budgetLinePos = budget > 0 ? 100 - Math.min(100, 100) : -10;
+
+    const row = document.createElement('div');
+    row.className = 'jar-row fade-in' + (isOver ? ' overflow shake' : '');
+    row.innerHTML = `
+      <div class="jar-visual">
+        <div class="jar-liquid ${liquidClass}" style="height:${fillH}%"></div>
+        ${budget > 0 ? `<div class="jar-budget-line" style="bottom:100%;top:0"></div>` : ''}
+      </div>
+      <div class="jar-info">
+        <div class="jar-name">${CAT_ICONS[cat]} ${CAT_NAMES[cat]}</div>
+        <div class="jar-amounts">$${spent.toFixed(2)} of $${budget.toFixed(2)}</div>
+        <div class="jar-pct" style="color:${isOver ? 'var(--danger)' : isWarn ? 'var(--warning)' : 'var(--accent)'}">${pct.toFixed(0)}%</div>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+
+  // Check if all under budget for confetti
+  const allUnder = CATS.every(cat => {
+    const budget = state.budgets[cat];
+    return budget <= 0 || getCatTotal(cat) <= budget;
+  });
+  // Confetti only on month end (last 2 days)
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  if (allUnder && getTotalSpent() > 0 && now.getDate() >= lastDay - 1) {
+    launchConfetti();
+  }
+}
+
+// ============ IMPULSE COOLDOWN ============
+function addImpulse() {
+  if (!state.settings.impulse) return;
+  const item = document.getElementById('impulse-item').value.trim();
+  const price = parseFloat(document.getElementById('impulse-price').value);
+  if (!item || !price || price <= 0) {
+    if (!item) shakeEl(document.getElementById('impulse-item'));
+    if (!price) shakeEl(document.getElementById('impulse-price'));
+    return;
+  }
+
+  state.impulses.push({
+    id: Date.now(),
+    item: item,
+    price: price,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 24*60*60*1000).toISOString(),
+    resolved: false,
+    bought: false
+  });
+
+  document.getElementById('impulse-item').value = '';
+  document.getElementById('impulse-price').value = '';
+  save();
+  renderImpulses();
+  playSound('success');
+}
+
+function renderImpulses() {
+  const list = document.getElementById('impulse-list');
+  list.innerHTML = '';
+  const now = new Date();
+
+  // Show active impulses
+  state.impulses.filter(i => !i.resolved).forEach(imp => {
+    const expires = new Date(imp.expiresAt);
+    const isReady = now >= expires;
+    const remaining = Math.max(0, expires - now);
+
+    const card = document.createElement('div');
+    card.className = 'cooldown-card fade-in' + (isReady ? ' ready' : '');
+    card.innerHTML = `
+      <div class="item-name">${escHtml(imp.item)}</div>
+      <div class="item-price">$${imp.price.toFixed(2)}</div>
+      <div class="cooldown-timer" id="timer-${imp.id}">${isReady ? 'Ready!' : formatMs(remaining)}</div>
+      <div class="timer-label">${isReady ? 'Still want it?' : 'Cooling down...'}</div>
+      ${isReady ? `
+        <div class="cooldown-actions">
+          <button class="btn btn-primary" onclick="resolveImpulse(${imp.id}, false)">Nah, skip it</button>
+          <button class="btn btn-danger" onclick="resolveImpulse(${imp.id}, true)">Buy it</button>
+        </div>
+      ` : `
+        <div class="cooldown-actions">
+          <button class="btn btn-ghost" onclick="cancelImpulse(${imp.id})" style="font-size:0.8rem">Cancel</button>
+        </div>
+      `}
+    `;
+    list.appendChild(card);
+  });
+
+  // Stats
+  const stats = document.getElementById('impulse-stats');
+  const avoided = state.impulseHistory.avoided;
+  const savedTotal = state.impulseHistory.savedTotal;
+  if (avoided > 0 || savedTotal > 0) {
+    stats.style.display = 'grid';
+    document.getElementById('impulse-avoided').textContent = avoided;
+    document.getElementById('impulse-saved').textContent = '$' + savedTotal.toFixed(2);
+  }
+
+  // Start timers
+  startImpulseTimers();
+}
+
+let impulseTimerInterval;
+function startImpulseTimers() {
+  if (impulseTimerInterval) clearInterval(impulseTimerInterval);
+  impulseTimerInterval = setInterval(() => {
+    const now = new Date();
+    let needsRerender = false;
+    state.impulses.filter(i => !i.resolved).forEach(imp => {
+      const expires = new Date(imp.expiresAt);
+      const remaining = Math.max(0, expires - now);
+      const el = document.getElementById('timer-' + imp.id);
+      if (el) {
+        if (remaining <= 0 && el.textContent !== 'Ready!') {
+          needsRerender = true;
+        } else if (remaining > 0) {
+          el.textContent = formatMs(remaining);
+        }
+      }
+    });
+    if (needsRerender) renderImpulses();
+  }, 1000);
+}
+
+function resolveImpulse(id, bought) {
+  const imp = state.impulses.find(i => i.id === id);
+  if (!imp) return;
+  imp.resolved = true;
+  imp.bought = bought;
+  if (!bought) {
+    state.impulseHistory.avoided++;
+    state.impulseHistory.savedTotal += imp.price;
+    playSound('success');
+    launchConfetti();
+  } else {
+    // Add as expense under "fun"
+    state.expenses.push({
+      id: Date.now(),
+      amount: imp.price,
+      category: 'fun',
+      date: new Date().toISOString(),
+      source: 'impulse',
+      note: imp.item
+    });
+    playSound('warning');
+  }
+  save();
+  renderImpulses();
+  renderBudgetBar();
+  renderCatSpent();
+}
+
+function cancelImpulse(id) {
+  const imp = state.impulses.find(i => i.id === id);
+  if (!imp) return;
+  imp.resolved = true;
+  imp.bought = false;
+  state.impulseHistory.avoided++;
+  state.impulseHistory.savedTotal += imp.price;
+  save();
+  renderImpulses();
+  playSound('success');
+}
+
+function formatMs(ms) {
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${h}h ${String(m).padStart(2,'0')}m ${String(s).padStart(2,'0')}s`;
+}
+
+// ============ QUICK LOG (Chat) ============
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  // Parse the input
+  const parsed = parseQuickLog(text);
+
+  // Add user bubble
+  state.chatLog.push({
+    type: 'user',
+    text: text,
+    time: new Date().toISOString()
+  });
+
+  if (parsed) {
+    // Add as expense
+    state.expenses.push({
+      id: Date.now(),
+      amount: parsed.amount,
+      category: parsed.category,
+      date: new Date().toISOString(),
+      source: 'quicklog',
+      note: parsed.note
+    });
+    save();
+    renderBudgetBar();
+    renderCatSpent();
+
+    state.chatLog.push({
+      type: 'system',
+      text: `Got it. $${parsed.amount.toFixed(2)} added to ${CAT_NAMES[parsed.category]}.`,
+      time: new Date().toISOString()
+    });
+    playSound('success');
+  } else {
+    state.chatLog.push({
+      type: 'system',
+      text: 'Hmm, try something like "$25 food" or "$50 groceries".',
+      time: new Date().toISOString()
+    });
+    playSound('warning');
+  }
+
+  save();
+  renderChatLog();
+  updateStreak();
+
+  setTimeout(() => {
+    const c = document.getElementById('chat-container');
+    c.scrollTop = c.scrollHeight;
+  }, 50);
+}
+
+function parseQuickLog(text) {
+  // Match patterns: "$25 food", "25 groceries", "$50.99 uber", "rent 200"
+  const match = text.match(/\$?\s*(\d+\.?\d*)\s+(.+)/i) || text.match(/(.+?)\s+\$?\s*(\d+\.?\d*)/i);
+  if (!match) {
+    // Try just a number with $
+    const numOnly = text.match(/\$\s*(\d+\.?\d*)/);
+    if (numOnly) return { amount: parseFloat(numOnly[1]), category: 'other', note: '' };
+    return null;
+  }
+
+  let amount, desc;
+  if (!isNaN(parseFloat(match[1]))) {
+    amount = parseFloat(match[1]);
+    desc = match[2].toLowerCase().trim();
+  } else {
+    amount = parseFloat(match[2]);
+    desc = match[1].toLowerCase().trim();
+  }
+
+  if (!amount || amount <= 0) return null;
+
+  // Map description to category
+  const catMap = {
+    needs: ['rent','electricity','electric','water','gas','insurance','phone','internet','wifi','bills','bill','mortgage','car','medicine','doctor','hospital','pharmacy','health'],
+    food: ['food','groceries','grocery','lunch','dinner','breakfast','coffee','restaurant','uber eats','ubereats','doordash','grubhub','snack','snacks','eat','eating','takeout','pizza','burger','taco'],
+    fun: ['fun','entertainment','games','game','movie','movies','netflix','spotify','subscription','bar','drinks','drink','party','concert','clothes','shopping','shoes','amazon','gift'],
+    savings: ['savings','save','invest','investment','emergency','401k','crypto','stocks','stock'],
+    other: ['other','misc','uber','lyft','taxi','parking','toll','fee','fees','atm','cash','tip']
+  };
+
+  let category = 'other';
+  for (const [cat, keywords] of Object.entries(catMap)) {
+    if (keywords.some(kw => desc.includes(kw))) {
+      category = cat;
+      break;
+    }
+  }
+
+  return { amount, category, note: desc };
+}
+
+function renderChatLog() {
+  const container = document.getElementById('chat-container');
+  container.innerHTML = '';
+
+  state.chatLog.forEach((msg, idx) => {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + msg.type;
+    const time = new Date(msg.time);
+    const timeStr = time.toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});
+    bubble.innerHTML = `
+      ${msg.text}
+      <div class="bubble-time">${timeStr}</div>
+      ${msg.type === 'user' ? `<button class="delete-bubble" onclick="deleteChatEntry(${idx})">&times;</button>` : ''}
+    `;
+    container.appendChild(bubble);
+  });
+
+  if (state.chatLog.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text2);padding:40px 20px;font-size:0.9rem;">No entries yet. Type something like "$25 food" to start.</div>';
+  }
+}
+
+function deleteChatEntry(idx) {
+  // Find the corresponding expense if this was a user entry
+  const msg = state.chatLog[idx];
+  if (msg && msg.type === 'user') {
+    // Try to find and remove the expense logged around the same time
+    const msgTime = new Date(msg.time).getTime();
+    const expIdx = state.expenses.findIndex(e =>
+      e.source === 'quicklog' && Math.abs(new Date(e.date).getTime() - msgTime) < 5000
+    );
+    if (expIdx >= 0) state.expenses.splice(expIdx, 1);
+    // Remove user bubble and the system response after it
+    state.chatLog.splice(idx, idx + 1 < state.chatLog.length && state.chatLog[idx+1].type === 'system' ? 2 : 1);
+  }
+  save();
+  renderChatLog();
+  renderBudgetBar();
+  renderCatSpent();
+  playSound('delete');
+}
+
+// Chat enter key
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendChat();
+});
+
+// ============ STREAK ============
+function updateStreak() {
+  const today = new Date().toISOString().split('T')[0];
+  const totalBudget = state.income;
+  const totalSpent = getTotalSpent();
+  const underBudget = totalSpent <= totalBudget;
+
+  if (!state.streak.lastDate) {
+    state.streak.lastDate = today;
+    state.streak.current = underBudget ? 1 : 0;
+  } else if (state.streak.lastDate !== today) {
+    if (underBudget) {
+      // Check if it's consecutive
+      const last = new Date(state.streak.lastDate);
+      const now = new Date(today);
+      const diffDays = Math.floor((now - last) / 86400000);
+      if (diffDays === 1) {
+        state.streak.current++;
+      } else {
+        state.streak.current = 1;
+      }
+    } else {
+      state.streak.current = 0;
+    }
+    state.streak.lastDate = today;
+  }
+
+  if (state.streak.current > state.streak.longest) {
+    state.streak.longest = state.streak.current;
+  }
+
+  save();
+  renderStreak();
+}
+
+function renderStreak() {
+  const el = document.getElementById('streak-display');
+  const d = state.streak.current;
+  let flame = '';
+  if (d >= 30) flame = '&#128293;&#128293;&#128293;';
+  else if (d >= 7) flame = '&#128293;&#128293;';
+  else if (d >= 1) flame = '&#128293;';
+  el.innerHTML = `${flame} ${d} day${d !== 1 ? 's' : ''}`;
+}
+
+// ============ SNAPSHOT ============
+function buildSnapshot(s) {
+  const total = (s.expenses || []).reduce((sum, e) => sum + e.amount, 0);
+  const catTotals = {};
+  CATS.forEach(cat => {
+    catTotals[cat] = (s.expenses || []).filter(e => e.category === cat).reduce((sum, e) => sum + e.amount, 0);
+  });
+
+  const totalBudget = s.income || 0;
+  const pct = totalBudget > 0 ? (total / totalBudget) * 100 : 100;
+
+  let grade;
+  if (pct <= 70) grade = 'A';
+  else if (pct <= 85) grade = 'B';
+  else if (pct <= 100) grade = 'C';
+  else if (pct <= 120) grade = 'D';
+  else grade = 'F';
+
+  return {
+    month: s.currentMonth,
+    income: s.income,
+    totalSpent: total,
+    catTotals,
+    budgets: {...s.budgets},
+    grade,
+    streak: {...(s.streak || {current:0,longest:0})},
+    impulseAvoided: (s.impulseHistory || {}).avoided || 0,
+    impulseSaved: (s.impulseHistory || {}).savedTotal || 0,
+    savedAt: new Date().toISOString()
+  };
+}
+
+function renderSnapshot() {
+  const snap = buildSnapshot(state);
+  const now = new Date();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  document.getElementById('snap-month').textContent = monthNames[now.getMonth()] + ' ' + now.getFullYear();
+  document.getElementById('snap-range').textContent = `${now.getMonth()+1}/1 - ${now.getMonth()+1}/${new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()}`;
+
+  // Grade
+  const gradeArea = document.getElementById('snap-grade-area');
+  gradeArea.innerHTML = `<div class="grade-circle grade-${snap.grade}">${snap.grade}</div>`;
+
+  // Stats grid
+  const grid = document.getElementById('snap-grid');
+  grid.innerHTML = `
+    <div class="snapshot-stat"><div class="s-val" style="color:var(--accent)">$${snap.income.toFixed(0)}</div><div class="s-label">Income</div></div>
+    <div class="snapshot-stat"><div class="s-val" style="color:${snap.totalSpent > snap.income ? 'var(--danger)' : 'var(--success)'}">$${snap.totalSpent.toFixed(2)}</div><div class="s-label">Total spent</div></div>
+    <div class="snapshot-stat"><div class="s-val">${snap.impulseAvoided}</div><div class="s-label">Impulse buys avoided</div></div>
+    <div class="snapshot-stat"><div class="s-val" style="color:var(--success)">$${snap.impulseSaved.toFixed(2)}</div><div class="s-label">Saved by waiting</div></div>
+    <div class="snapshot-stat"><div class="s-val">${snap.streak.current}</div><div class="s-label">Current streak</div></div>
+    <div class="snapshot-stat"><div class="s-val">${snap.streak.longest}</div><div class="s-label">Longest streak</div></div>
+  `;
+
+  // Jars breakdown
+  const jarsEl = document.getElementById('snap-jars');
+  jarsEl.innerHTML = '';
+  CATS.forEach(cat => {
+    const spent = snap.catTotals[cat] || 0;
+    const budget = snap.budgets[cat] || 0;
+    const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
+    const color = spent > budget && budget > 0 ? 'var(--danger)' : pct > 80 ? 'var(--warning)' : 'var(--accent)';
+    const row = document.createElement('div');
+    row.className = 'snapshot-jar-row';
+    row.innerHTML = `
+      <span class="sj-icon">${CAT_ICONS[cat]}</span>
+      <span class="sj-name">${CAT_NAMES[cat]}</span>
+      <div class="sj-bar"><div class="sj-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="sj-pct" style="color:${color}">${pct.toFixed(0)}%</span>
+    `;
+    jarsEl.appendChild(row);
+  });
+
+  // History
+  renderHistory();
+}
+
+function saveSnapshot() {
+  const snap = buildSnapshot(state);
+  // Check if this month already saved
+  const existing = state.snapshots.findIndex(s => s.month === snap.month);
+  if (existing >= 0) state.snapshots[existing] = snap;
+  else state.snapshots.unshift(snap);
+  if (state.snapshots.length > 24) state.snapshots.pop();
+  save();
+  renderHistory();
+  playSound('success');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  if (!state.snapshots || state.snapshots.length === 0) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:0.85rem;text-align:center;padding:16px">No saved snapshots yet.</div>';
+    return;
+  }
+  state.snapshots.forEach(snap => {
+    const [m, y] = snap.month.split('-');
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `
+      <div>
+        <strong>${monthNames[parseInt(m)]} ${y}</strong>
+        <div style="font-size:0.75rem;color:var(--text2)">$${snap.totalSpent.toFixed(2)} spent</div>
+      </div>
+      <div class="grade-circle" style="width:40px;height:40px;font-size:1rem;background:${
+        snap.grade === 'A' ? 'var(--success)' :
+        snap.grade === 'B' ? '#0D9488' :
+        snap.grade === 'C' ? 'var(--warning)' :
+        snap.grade === 'D' ? '#F97316' : 'var(--danger)'
+      }">${snap.grade}</div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+// ============ SETTINGS ============
+function openSettings() {
+  document.getElementById('settings-overlay').classList.add('open');
+  document.getElementById('set-income').value = state.income;
+  renderBudgetInputs();
+  renderSettingsToggles();
+  renderThemePicker();
+  playSound('tap');
+}
+
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+  renderAll();
+}
+
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settings-overlay')) closeSettings();
+}
+
+function renderBudgetInputs() {
+  const container = document.getElementById('budget-inputs');
+  container.innerHTML = '';
+  CATS.forEach(cat => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '10px';
+    div.innerHTML = `
+      <label style="display:block;font-size:0.75rem;color:var(--text2);margin-bottom:4px;font-weight:600">${CAT_NAMES[cat]}</label>
+      <input type="number" value="${state.budgets[cat] || 0}" inputmode="decimal" style="width:100%;padding:12px;border-radius:10px;border:2px solid var(--bg2);background:var(--input-bg);font-size:0.95rem;color:var(--text);outline:none;font-family:inherit" onchange="updateBudget('${cat}',this.value)">
+    `;
+    container.appendChild(div);
+  });
+}
+
+function updateIncome(val) {
+  state.income = parseFloat(val) || 0;
+  save();
+}
+
+function updateBudget(cat, val) {
+  state.budgets[cat] = parseFloat(val) || 0;
+  save();
+}
+
+function applySplit(needs, wants, save_pct) {
+  applySplitValues(needs, wants, save_pct);
+  save();
+  renderBudgetInputs();
+}
+
+function applySplitValues(needsPct, wantsPct, savePct) {
+  const inc = state.income;
+  // Needs = needsPct, Food = half of wants, Fun = half of wants, Savings = savePct, Other = 0
+  state.budgets.needs = Math.round(inc * needsPct / 100);
+  state.budgets.food = Math.round(inc * wantsPct / 200);
+  state.budgets.fun = Math.round(inc * wantsPct / 200);
+  state.budgets.savings = Math.round(inc * savePct / 100);
+  state.budgets.other = 0;
+}
+
+function toggleSetting(el, key) {
+  el.classList.toggle('on');
+  state.settings[key] = el.classList.contains('on');
+  save();
+}
+
+function renderSettingsToggles() {
+  document.getElementById('toggle-sound').className = 'toggle' + (state.settings.sound ? ' on' : '');
+  document.getElementById('toggle-impulse').className = 'toggle' + (state.settings.impulse ? ' on' : '');
+}
+
+function setTheme(theme) {
+  const themeMap = {calm:'',dark:'dark',minimal:'minimal'};
+  if (theme === 'calm') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', themeMap[theme]);
+
+  state.settings.theme = theme;
+  save();
+  document.querySelectorAll('.theme-option').forEach(t => {
+    t.classList.toggle('active', t.dataset.themeVal === theme);
+  });
+}
+
+function renderThemePicker() {
+  document.querySelectorAll('.theme-option').forEach(t => {
+    t.classList.toggle('active', t.dataset.themeVal === state.settings.theme);
+  });
+}
+
+// ============ CSV EXPORT ============
+function exportCSV() {
+  let csv = 'Date,Amount,Category,Note,Source\n';
+  state.expenses.forEach(e => {
+    const date = new Date(e.date).toLocaleDateString();
+    csv += `${date},${e.amount},${e.category},"${(e.note || '').replace(/"/g,'""')}",${e.source}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `adhd-finance-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  playSound('success');
+}
+
+// ============ EFFECTS ============
+function shakeEl(el) {
+  el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 400);
+}
+
+function launchConfetti() {
+  const colors = ['#0D9488','#FF6B6B','#F59E0B','#10B981','#8B5CF6','#EC4899'];
+  for (let i = 0; i < 40; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (Math.random() * 8 + 6) + 'px';
+    piece.style.height = (Math.random() * 8 + 6) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.5) + 's';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ============ INIT ============
+function renderAll() {
+  renderBudgetBar();
+  renderCatSpent();
+  renderStreak();
+}
+
+function init() {
+  // Apply saved theme
+  if (state.settings.theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  else if (state.settings.theme === 'minimal') document.documentElement.setAttribute('data-theme', 'minimal');
+
+  checkOnboarding();
+  if (state.onboarded) renderAll();
+
+  // Milestone check
+  const d = state.streak.current;
+  if ([7,14,30,60,90].includes(d)) {
+    setTimeout(() => {
+      launchConfetti();
+      playSound('success');
+    }, 500);
+  }
+}
+
+init();
+</script>
+</body>
+</html>

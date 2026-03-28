@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Writer Kit — Behike</title>
+  <meta name="description" content="A complete voice cloning system for content creators. Train AI on your existing writing. Generate drafts that sound like you. Publish 10x more without 10x more work.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --bg: #000000;
+      --surface: #0a0a0a;
+      --surface2: #111111;
+      --border: #2a2a2a;
+      --text: #f5f5f5;
+      --muted: #888888;
+      --blue: #0A84FF;
+      --green: #30D158;
+      --amber: #FF9F0A;
+      --purple: #BF5AF2;
+      --red: #FF453A;
+      --accent: #0A84FF;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(245, 245, 247, 0.07);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .nav-cta {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .nav-cta:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 148px 24px 96px;
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 132, 255, 0.08);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 980px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 32px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 5.5vw, 62px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      padding: 14px 32px;
+      border-radius: 980px;
+      font-size: 16px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(245, 245, 247, 0.3);
+      color: var(--text);
+    }
+
+    .hero-meta {
+      margin-top: 28px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Shared section */
+    .section {
+      padding: 80px 24px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    /* Problem cards */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      padding: 36px 32px;
+    }
+
+    .problem-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 69, 58, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .problem-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .problem-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Kit components */
+    .kit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .kit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .kit-card:hover {
+      border-color: rgba(245, 245, 247, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .kit-num {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .kit-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .kit-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Process steps */
+    .process-section {
+      padding: 0 24px 80px;
+    }
+
+    .process-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 64px;
+    }
+
+    .process-header {
+      max-width: 600px;
+      margin-bottom: 52px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* Who it is for */
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .profile-card:hover {
+      border-color: rgba(245, 245, 247, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .profile-tag {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.08);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      border-radius: 980px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .profile-title {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+
+    .profile-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Before/after */
+    .beforeafter-section {
+      padding: 0 24px 80px;
+    }
+
+    .beforeafter-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr 56px 1fr;
+      gap: 0;
+      align-items: start;
+      margin-top: 48px;
+    }
+
+    .ba-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .ba-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+
+    .ba-label.generic {
+      color: var(--muted);
+    }
+
+    .ba-label.voice {
+      color: var(--green);
+    }
+
+    .ba-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      font-style: italic;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .ba-card.after-card .ba-content {
+      color: var(--text);
+      border-color: rgba(48, 209, 88, 0.2);
+      background: rgba(48, 209, 88, 0.04);
+    }
+
+    .ba-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .ba-note.positive {
+      color: var(--green);
+    }
+
+    .ba-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px;
+    }
+
+    .ba-arrow svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Value stack */
+    .value-section {
+      padding: 0 24px 80px;
+    }
+
+    .value-inner {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .value-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+    }
+
+    .value-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .value-table tr:last-of-type {
+      border-bottom: none;
+    }
+
+    .value-table td {
+      padding: 16px 0;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .value-table td:last-child {
+      text-align: right;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .value-table .total-row td {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      padding-top: 24px;
+    }
+
+    .value-table .price-row td {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent);
+      padding-top: 8px;
+    }
+
+    .value-divider {
+      border: none;
+      border-top: 2px solid var(--border);
+      margin: 0;
+    }
+
+    /* FAQ */
+    .faq-section {
+      padding: 0 24px 80px;
+    }
+
+    .faq-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .faq-list {
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 24px 28px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+      transition: background 0.2s;
+    }
+
+    .faq-question:hover {
+      background: var(--surface);
+    }
+
+    .faq-chevron {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.2s;
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 0 28px 24px;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* CTA */
+    .cta-section {
+      padding: 80px 24px;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-price {
+      font-size: clamp(48px, 8vw, 72px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .cta-format {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 16px 48px;
+      border-radius: 980px;
+      font-size: 17px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .cta-btn:hover {
+      opacity: 0.88;
+      transform: scale(1.02);
+    }
+
+    .cta-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Cross-sell */
+    .crosssell-section {
+      padding: 0 24px 80px;
+    }
+
+    .crosssell-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .crosssell-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .crosssell-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .crosssell-card:hover {
+      border-color: rgba(245, 245, 247, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .crosssell-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .crosssell-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+      flex-grow: 1;
+      margin-bottom: 20px;
+    }
+
+    .crosssell-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .crosssell-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .crosssell-btn {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.1);
+      color: var(--accent);
+      padding: 8px 18px;
+      border-radius: 980px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .crosssell-btn:hover {
+      background: rgba(10, 132, 255, 0.2);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      nav {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding: 120px 20px 72px;
+      }
+
+      .hero h1 {
+        font-size: 36px;
+      }
+
+      .hero-sub {
+        font-size: 16px;
+      }
+
+      .problem-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kit-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .process-inner {
+        padding: 36px 24px;
+      }
+
+      .steps-grid {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .profiles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ba-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .ba-arrow {
+        padding-top: 0;
+        transform: rotate(90deg);
+      }
+
+      .crosssell-grid {
+        grid-template-columns: 1fr;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        padding: 32px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <div class="nav-links">
+      <a href="index.html">Products</a>
+      <a href="index.html#bundles">Bundles</a>
+      <a href="index.html#about">About</a>
+    </div>
+    <a href="https://behikeai.gumroad.com/l/ghost-writer-kit" class="nav-cta">Get the Kit &mdash; $99</a>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      Available Now
+    </div>
+    <h1>Scale your content without<br><span>losing your voice.</span></h1>
+    <p class="hero-sub">The Ghost Writer Kit is a complete voice cloning system. Train an AI on your existing content. Generate drafts that sound like you. Publish 10x more without 10x more work.</p>
+    <div class="hero-actions">
+      <a href="https://behikeai.gumroad.com/l/ghost-writer-kit" class="btn-primary">Get Ghost Writer Kit &mdash; $99</a>
+      <a href="#whats-inside" class="btn-secondary">See what's inside</a>
+    </div>
+    <div class="hero-meta">
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Voice Bible template
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Python script included
+      </span>
+      <span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Instant download
+      </span>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- The problem -->
+  <section class="section reveal">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">Three reasons content doesn't scale.</h2>
+    <p class="section-sub">Most creators hit one of these walls. The kit is built to solve all three.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">&#128053;</div>
+        <div class="problem-title">Most AI content sounds like AI content</div>
+        <p class="problem-desc">Open ChatGPT. Type a prompt. Get output that reads like every other post written with that same prompt. Polished. Generic. Forgettable. The problem is not the tool. The problem is that the AI has nothing to work with. No voice. No rules. No personality.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">&#128176;</div>
+        <div class="problem-title">Hiring ghostwriters costs $500 to $5,000 per month</div>
+        <p class="problem-desc">A real ghostwriter who captures your voice takes weeks to calibrate. Even then, you spend hours reviewing drafts that miss the mark. For most creators building solo, that cost and that overhead do not make sense.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">&#9203;</div>
+        <div class="problem-title">Writing everything yourself doesn't scale</div>
+        <p class="problem-desc">If you have ideas worth sharing, you already know this. Three hours per post is not sustainable alongside everything else you are building. But publishing less means growing slower. The kit removes the bottleneck without removing you from the work.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- What's inside -->
+  <section class="section reveal" id="whats-inside">
+    <div class="section-label">What's Inside</div>
+    <h2 class="section-title">Six components. One complete system.</h2>
+    <p class="section-sub">Each piece builds on the last. Together they go from blank page to publishable draft without losing the voice that makes your content yours.</p>
+
+    <div class="kit-grid">
+      <div class="kit-card">
+        <div class="kit-num">01</div>
+        <div class="kit-title">Voice Bible Template</div>
+        <p class="kit-desc">A structured document for capturing your writing style. Six sections: who you are, banned words, sentence structure rules, off-limits topics, reference examples, and recurring framings. Fill it once. Use it every time you generate content.</p>
+      </div>
+      <div class="kit-card">
+        <div class="kit-num">02</div>
+        <div class="kit-title">Training Prompt Library</div>
+        <p class="kit-desc">50 prompts designed to extract voice patterns from your existing writing. Not generic content prompts. Diagnostic prompts that surface how you structure arguments, what you avoid, and how you open and close a piece.</p>
+      </div>
+      <div class="kit-card">
+        <div class="kit-num">03</div>
+        <div class="kit-title">Content Batch System</div>
+        <p class="kit-desc">A workflow for producing 30 posts in one afternoon. The batch system uses your Voice Bible as input and runs through a sequence of briefs across formats: threads, captions, newsletter sections, and scripts.</p>
+      </div>
+      <div class="kit-card">
+        <div class="kit-num">04</div>
+        <div class="kit-title">Platform Adaptation Guide</div>
+        <p class="kit-desc">Same voice, different format. Covers Twitter/X, Instagram, LinkedIn, and newsletter. Each platform has different length constraints, different audience expectations, and different failure modes. The guide maps your voice to each one.</p>
+      </div>
+      <div class="kit-card">
+        <div class="kit-num">05</div>
+        <div class="kit-title">Quality Control Checklist</div>
+        <p class="kit-desc">A three-step review process: voice scan, fact check, personality check. The checklist tells you when to edit a draft line by line and when to scrap it and regenerate. Most review sessions under 10 minutes.</p>
+      </div>
+      <div class="kit-card">
+        <div class="kit-num">06</div>
+        <div class="kit-title">Maintenance Protocol</div>
+        <p class="kit-desc">Your Voice Bible is a living document. The protocol covers how to update it as your voice evolves: when to add new reference examples, when to expand the banned list, and how to handle style drift over time.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- The process -->
+  <div class="process-section reveal">
+    <div class="process-inner">
+      <div class="process-header">
+        <div class="section-label">The Process</div>
+        <h2 class="section-title">How the voice training works.</h2>
+        <p class="section-sub" style="margin-bottom: 0;">Four steps. The first three are setup. After that, you run step four every time you need content.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-title">Audit your best content</div>
+          <p class="step-desc">Pull 20 posts that felt most authentic when you wrote them. Not your most viral. Not your most polished. The ones that sounded the most like you. These become your reference corpus.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-title">Extract your patterns</div>
+          <p class="step-desc">Use the Voice Bible template to document your sentence structure, banned words, recurring framings, and off-limits topics. The training prompts help you surface patterns you did not know you had.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-title">Build your prompts</div>
+          <p class="step-desc">Configure the training prompt library for your style. This is a one-time setup. The prompts embed your Voice Bible into every generation request so the AI works from your rules, not its defaults.</p>
+        </div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-title">Test and calibrate</div>
+          <p class="step-desc">Generate 5 test posts. Compare each one against your reference corpus. Read them aloud. Mark every sentence that does not sound like you. Tighten the Voice Bible based on what you find. Repeat until the output passes the voice scan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Who it's for -->
+  <section class="section reveal">
+    <div class="section-label">Who It's For</div>
+    <h2 class="section-title">Three types of creators who need this.</h2>
+    <p class="section-sub">The kit requires existing content to train on. If you have never published anything, start there first.</p>
+
+    <div class="profiles-grid">
+      <div class="profile-card">
+        <div class="profile-tag">Creator</div>
+        <div class="profile-title">Posting 3x per week, want to post 10x</div>
+        <p class="profile-desc">You already have a voice and a workflow. The problem is that writing everything yourself is the ceiling. The kit lets you stay in creative direction while the system handles first drafts.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-tag">Founder</div>
+        <div class="profile-title">Needs content, can't afford a ghostwriter</div>
+        <p class="profile-desc">You have expertise and a perspective worth sharing. You do not have time to write three posts a week. The kit gives you the output of a ghostwriter at a fraction of the cost, without handing over your voice to someone else.</p>
+      </div>
+      <div class="profile-card">
+        <div class="profile-tag">Solopreneur</div>
+        <div class="profile-title">Distinct voice, wants to preserve it while scaling</div>
+        <p class="profile-desc">Your audience follows you for how you say things, not just what you say. The Voice Bible system is designed specifically to preserve that. It documents what makes your writing yours and keeps the AI anchored to it.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Before / after -->
+  <div class="beforeafter-section reveal">
+    <div class="beforeafter-inner">
+      <div class="section-label">What It Produces</div>
+      <h2 class="section-title">Generic AI output vs. voice-trained output.</h2>
+
+      <div class="ba-grid">
+        <div class="ba-card">
+          <div class="ba-label generic">Without the kit</div>
+          <div class="ba-content">
+            "In today's fast-paced digital landscape, leveraging AI tools is becoming increasingly important for content creators who want to unlock their full potential and streamline their content creation process. By harnessing the power of artificial intelligence, you can transform your content strategy and achieve game-changing results."
+          </div>
+          <p class="ba-note">Generic. Could have been written by anyone who typed the same prompt.</p>
+        </div>
+
+        <div class="ba-arrow">
+          <svg viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>
+
+        <div class="ba-card after-card">
+          <div class="ba-label voice">With your Voice Bible</div>
+          <div class="ba-content">
+            "Most people use AI for content by typing a topic and pasting whatever comes out. The result reads like everyone else who typed the same thing. The fix is not a better prompt. It is a system that gives the AI your actual rules before it writes a single word."
+          </div>
+          <p class="ba-note positive">Specific framing. Direct structure. No banned words. Sounds like the person who wrote the Voice Bible.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Value stack -->
+  <div class="value-section reveal">
+    <div class="value-inner">
+      <div class="section-label">What You Are Getting</div>
+      <h2 class="section-title">Everything in one kit.</h2>
+
+      <table class="value-table">
+        <tbody>
+          <tr>
+            <td>Voice Bible Template</td>
+            <td>$29.99</td>
+          </tr>
+          <tr>
+            <td>Training Prompt Library (50 prompts)</td>
+            <td>$29.99</td>
+          </tr>
+          <tr>
+            <td>Content Batch System</td>
+            <td>$19.99</td>
+          </tr>
+          <tr>
+            <td>Platform Adaptation Guide</td>
+            <td>$19.99</td>
+          </tr>
+          <tr>
+            <td>Quality Control Checklist + Maintenance Protocol</td>
+            <td>free</td>
+          </tr>
+        </tbody>
+        <tbody>
+          <tr><td colspan="2"><hr class="value-divider"></td></tr>
+          <tr class="total-row">
+            <td>Total value</td>
+            <td>$99.96</td>
+          </tr>
+          <tr class="price-row">
+            <td>Your price</td>
+            <td>$99</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FAQ -->
+  <div class="faq-section reveal">
+    <div class="faq-inner">
+      <div class="section-label">Questions</div>
+      <h2 class="section-title">What people ask before buying.</h2>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What AI tools does this work with?
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">The Voice Bible and prompt library work with any AI writing tool that accepts a system prompt or context input. That includes ChatGPT, Claude, Gemini, and most others. The included Python script (ghost_writer.py) uses the Anthropic API by default and can be configured to use other providers. You do not need to know how to code to use the script.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Do I need to give the AI access to my accounts?
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">No. The system works with text you paste in manually. You write briefs, the AI generates drafts, you review and publish. Nothing connects to your social accounts. Nothing posts automatically. You stay in control of what goes out.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Will my audience notice the content is AI-assisted?
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">A well-trained Voice Bible produces output that passes the read-aloud test. If a sentence does not sound like you when spoken, you catch it in the quality control step and fix it before publishing. The goal is not to trick anyone. It is to remove the blank page problem while keeping the voice your audience recognizes.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How long does the initial setup take?
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">Most people finish the Voice Bible in two to three hours. That includes the content audit, filling in all six sections, and running the first calibration test. After setup, generating a draft takes under 10 minutes. The batch system lets you produce 30 posts in a single afternoon once everything is configured.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What if my voice changes over time?
+            <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="faq-answer">The maintenance protocol covers this. Your Voice Bible is a living document. You add new reference examples when you write something that sounds especially like your current voice. You expand the banned list when you notice AI defaulting to language you have moved away from. The guide recommends a quarterly review. Most updates take less than 30 minutes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- CTA -->
+  <section class="cta-section reveal">
+    <div class="section-label" style="text-align: center;">Get the Kit</div>
+    <div class="cta-price">$99</div>
+    <div class="cta-format">Voice Bible template, prompt library, batch system, platform guide, and Python script. Instant download.</div>
+    <a href="https://behikeai.gumroad.com/l/ghost-writer-kit" class="cta-btn">Buy Now</a>
+    <p class="cta-note">Instant download. No account required.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- Cross-sell -->
+  <div class="crosssell-section reveal">
+    <div class="crosssell-inner">
+      <div class="section-label">More from Behike</div>
+      <h2 class="section-title">Related products</h2>
+
+      <div class="crosssell-grid">
+        <a href="mastery-for-builders.html" class="crosssell-card">
+          <div class="crosssell-title">Behike Method v2</div>
+          <p class="crosssell-desc">The full methodology behind building a one-person content business. Deliberate practice, AI as a feedback loop, and a 30-day sprint protocol built for ADHD builders who are done with slow feedback loops.</p>
+          <div class="crosssell-footer">
+            <span class="crosssell-price">$14.99</span>
+            <span class="crosssell-btn">View</span>
+          </div>
+        </a>
+        <a href="public-build-system.html" class="crosssell-card">
+          <div class="crosssell-title">Public Build System</div>
+          <p class="crosssell-desc">A framework for building in public without burning out. How to document your process, share the right things at the right time, and turn your builder journey into an audience that buys what you ship.</p>
+          <div class="crosssell-footer">
+            <span class="crosssell-price">$24.99</span>
+            <span class="crosssell-btn">View</span>
+          </div>
+        </a>
+        <a href="content-waterfall.html" class="crosssell-card">
+          <div class="crosssell-title">Content Waterfall</div>
+          <p class="crosssell-desc">One core piece becomes six. The system for repurposing long-form content across Twitter/X, Instagram, LinkedIn, and newsletters without writing each one from scratch.</p>
+          <div class="crosssell-footer">
+            <span class="crosssell-price">$19.99</span>
+            <span class="crosssell-btn">View</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span class="footer-copy">© 2026 Behike. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="index.html">Products</a>
+      <a href="https://behikeai.gumroad.com" target="_blank" rel="noopener">Gumroad</a>
+      <a href="mailto:hello@behikeai.com">Contact</a>
+    </div>
+  </footer>
+
+  <script>
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

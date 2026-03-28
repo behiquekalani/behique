@@ -1,0 +1,159 @@
+{
+  "name": "Invoice Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "b2c3d4e5-0001-4000-8000-000000000001",
+      "name": "Schedule Trigger - 1st of Month",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "readAllRows",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "ActiveClients",
+          "mode": "name"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "condition": "eq",
+              "lookupColumn": "Status",
+              "lookupValue": "Active"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2c3d4e5-0002-4000-8000-000000000002",
+      "name": "Google Sheets - Get Active Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate invoice for each active client\nconst items = $input.all();\nconst invoices = [];\n\nfor (const item of items) {\n  const client = item.json;\n  const monthlyRate = parseFloat(client.MonthlyRate || 0);\n  const hoursWorked = parseFloat(client.HoursThisMonth || 0);\n  const hourlyRate = parseFloat(client.HourlyRate || 0);\n  \n  // Calculate total: flat rate + any overage hours\n  const baseAmount = monthlyRate > 0 ? monthlyRate : (hoursWorked * hourlyRate);\n  const tax = baseAmount * 0.115; // 11.5% PR sales tax if applicable\n  const total = baseAmount + (client.TaxExempt === 'true' ? 0 : tax);\n  \n  const invoiceNumber = `INV-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${client.ClientID}`;\n  \n  invoices.push({\n    json: {\n      ...client,\n      invoiceNumber,\n      baseAmount: baseAmount.toFixed(2),\n      taxAmount: (client.TaxExempt === 'true' ? 0 : tax).toFixed(2),\n      totalAmount: total.toFixed(2),\n      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],\n      invoiceMonth: new Date().toLocaleString('default', { month: 'long', year: 'numeric' })\n    }\n  });\n}\n\nreturn invoices;"
+      },
+      "id": "b2c3d4e5-0003-4000-8000-000000000003",
+      "name": "Code - Calculate Invoice",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "billing@behike.shop",
+        "toEmail": "={{ $json.Email }}",
+        "subject": "Invoice {{ $json.invoiceNumber }} — {{ $json.invoiceMonth }}",
+        "emailType": "html",
+        "message": "<h2>Invoice from Behike</h2><p>Hi {{ $json.Name }},</p><p>Please find your invoice for {{ $json.invoiceMonth }} below.</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th>Description</th><th>Amount</th></tr><tr><td>{{ $json.Service }} — {{ $json.invoiceMonth }}</td><td>${{ $json.baseAmount }}</td></tr><tr><td>Tax</td><td>${{ $json.taxAmount }}</td></tr><tr><th>Total Due</th><th>${{ $json.totalAmount }}</th></tr></table><br><p><strong>Invoice Number:</strong> {{ $json.invoiceNumber }}<br><strong>Due Date:</strong> {{ $json.dueDate }}</p><p>Payment can be sent via PayPal or bank transfer. Reply to this email with any questions.</p><br><p>— Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "b2c3d4e5-0004-4000-8000-000000000004",
+      "name": "Gmail - Send Invoice",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "application": "YOUR_AIRTABLE_BASE_ID_HERE",
+        "table": "Invoices",
+        "options": {},
+        "fields": {
+          "fieldMappingsUi": {
+            "fieldMappings": [
+              { "fieldId": "InvoiceNumber", "fieldValue": "={{ $json.invoiceNumber }}" },
+              { "fieldId": "ClientName", "fieldValue": "={{ $json.Name }}" },
+              { "fieldId": "ClientEmail", "fieldValue": "={{ $json.Email }}" },
+              { "fieldId": "Amount", "fieldValue": "={{ $json.totalAmount }}" },
+              { "fieldId": "SentDate", "fieldValue": "={{ $now.toISO() }}" },
+              { "fieldId": "DueDate", "fieldValue": "={{ $json.dueDate }}" },
+              { "fieldId": "Status", "fieldValue": "Sent" }
+            ]
+          }
+        }
+      },
+      "id": "b2c3d4e5-0005-4000-8000-000000000005",
+      "name": "Airtable - Log Invoice Sent",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "name": "YOUR_AIRTABLE_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - 1st of Month": {
+      "main": [
+        [
+          { "node": "Google Sheets - Get Active Clients", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets - Get Active Clients": {
+      "main": [
+        [
+          { "node": "Code - Calculate Invoice", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Code - Calculate Invoice": {
+      "main": [
+        [
+          { "node": "Gmail - Send Invoice", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Send Invoice": {
+      "main": [
+        [
+          { "node": "Airtable - Log Invoice Sent", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "billing", "invoices"]
+}

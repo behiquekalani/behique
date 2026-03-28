@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Reel Factory System — Behike</title>
+  <meta name="description" content="Batch-produce 30 Reels a month without burnout. A repeatable factory system for solo creators who want to stop grinding and start shipping.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --muted: #86868B;
+      --border: #1D1D1F;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    nav { padding: 20px 0; border-bottom: 1px solid var(--border); }
+    nav .container { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-size: 15px; font-weight: 600; color: var(--text); text-decoration: none; }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 9px 20px;
+      border-radius: 980px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--cta); }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .price { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; }
+    .price-note { font-size: 14px; color: var(--muted); text-align: left; line-height: 1.4; }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      padding: 16px 40px;
+      border-radius: 980px;
+      font-size: 17px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-meta { margin-top: 20px; font-size: 14px; color: var(--muted); }
+
+    section { padding: 80px 0; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .lead {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .problem-card {
+      background: #0A0A0A;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-card .icon { font-size: 28px; margin-bottom: 16px; }
+    .problem-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+    .problem-card p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+
+    /* STAT BAR */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .stat-item {
+      background: #0A0A0A;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .stat-num { font-size: 36px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    /* CHAPTERS */
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .chapter-card {
+      background: #0A0A0A;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .chapter-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .chapter-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .chapter-card p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+    .for-section { background: #080808; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .for-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .for-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .for-item::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cta);
+      flex-shrink: 0;
+    }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .testimonial-card {
+      background: #0A0A0A;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .stars { color: #FFD60A; font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+    .testimonial-card blockquote {
+      font-size: 16px;
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+      color: #D1D1D6;
+    }
+    .testimonial-author { font-size: 14px; font-weight: 600; }
+    .testimonial-role { font-size: 13px; color: var(--muted); }
+
+    .pricing-box {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #0A0A0A;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+    }
+    .pricing-box .big-price { font-size: 72px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 8px; }
+    .pricing-box .big-price sup { font-size: 32px; vertical-align: top; margin-top: 16px; }
+    .pricing-includes { list-style: none; margin: 28px 0 32px; text-align: left; }
+    .pricing-includes li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pricing-includes li::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cta);
+      flex-shrink: 0;
+    }
+    .guarantee { margin-top: 20px; font-size: 13px; color: var(--muted); }
+
+    .final-cta { text-align: center; padding: 100px 0; }
+    .final-cta h2 { margin-bottom: 16px; }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    .divider { height: 1px; background: var(--border); }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-logo" href="/">Behike</a>
+      <a class="nav-cta" href="https://behike.gumroad.com/l/reel-factory-system" target="_blank" rel="noopener">Get it for $19.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-label fade-up">Content System</span>
+      <h1 class="fade-up">30 Reels a month.<br><span>Not a grind. A factory.</span></h1>
+      <p class="hero-sub fade-up">The batch production system for solo creators. Design, film, edit, and schedule everything in one focused session. Then stop thinking about content for three weeks.</p>
+      <div class="price-block fade-up">
+        <div class="price">$19.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <a class="btn-primary fade-up" href="https://behike.gumroad.com/l/reel-factory-system" target="_blank" rel="noopener">Build the Factory</a>
+      <p class="hero-meta fade-up">8 chapters. 30 done-for-you hooks. Weekly batch checklist included.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- STATS -->
+  <section>
+    <div class="container">
+      <div class="stat-bar fade-up">
+        <div class="stat-item">
+          <div class="stat-num">30</div>
+          <div class="stat-label">Reels per month</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">10-15</div>
+          <div class="stat-label">Total hours of work</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5</div>
+          <div class="stat-label">Platforms per Reel</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">60%</div>
+          <div class="stat-label">Less editing time with AI</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section style="padding-top:0;">
+    <div class="container">
+      <p class="section-label fade-up">The Problem</p>
+      <h2 class="fade-up">Daily content is a hamster wheel.<br>This is a factory.</h2>
+      <p class="lead fade-up">Most creators wake up with no plan, scramble to think of something, post something mediocre, and burn out within three weeks. The problem is the model, not the motivation.</p>
+      <div class="problem-grid">
+        <div class="problem-card fade-up">
+          <div class="icon">&#128260;</div>
+          <h3>Decision fatigue every day</h3>
+          <p>What to post, how to say it, what angle to take. That cognitive load compounds until you start posting for the sake of posting. Quality drops. Results drop.</p>
+        </div>
+        <div class="problem-card fade-up">
+          <div class="icon">&#128293;</div>
+          <h3>Burnout disguised as hustle</h3>
+          <p>When content is a daily obligation with no system behind it, you are always "on." There is no off switch, no recovery, no creative energy left for the work that actually grows your account.</p>
+        </div>
+        <div class="problem-card fade-up">
+          <div class="icon">&#9889;</div>
+          <h3>Producing for one platform at a time</h3>
+          <p>You spend two hours on a Reel that posts once and disappears. The same content could have been live on five platforms. That is four missed distributions for every video you make.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up">What's Inside</p>
+      <h2 class="fade-up">8 chapters. Every layer of the system.</h2>
+      <p class="lead fade-up">From the factory mindset through analytics, with a 5-template library, AI production workflow, repurposing machine, and scheduling stack built in.</p>
+      <div class="chapter-grid">
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 1</div>
+          <h3>The Factory Mindset</h3>
+          <p>The four-stage batch model: ideation, scripting, production, editing. Why daily creation fails and how scheduled batches fix it.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 2</div>
+          <h3>Your 5-Template Library</h3>
+          <p>Insight Drop, Step-by-Step Walkthrough, Myth Bust, Before-and-After Story, Resource Drop. The five formats that consistently produce results.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 3</div>
+          <h3>The Script Formula</h3>
+          <p>Hook, body, CTA in under 90 seconds. Write your hook last. Respect the promise. One CTA, one action, zero filler.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 4</div>
+          <h3>Filming Without a Studio</h3>
+          <p>Complete phone studio setup under $100. Tripod, ring light, lav mic, background. Filming efficiency rules that protect batch momentum.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 5</div>
+          <h3>AI-Assisted Production</h3>
+          <p>CapCut auto-captions and AI cut. ElevenLabs for voiceover. Descript for long-to-short clip extraction. AI scripting prompts you can use immediately.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 6</div>
+          <h3>The Repurposing Machine</h3>
+          <p>One Reel becomes five pieces of content. Instagram, TikTok, YouTube Shorts, Twitter/X, LinkedIn. Platform-specific caption workflow included.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 7</div>
+          <h3>Scheduling Without Burnout</h3>
+          <p>Buffer and Later setup. Batch scheduling once per week. Best posting times. How to confine creative demand to scheduled windows.</p>
+        </div>
+        <div class="chapter-card fade-up">
+          <div class="chapter-num">Chapter 8</div>
+          <h3>Analytics: 3 Metrics Only</h3>
+          <p>Average watch percentage, saves, profile visits. What each one tells you, what to do when they are low, and what to ignore entirely.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WHO IT'S FOR -->
+  <section class="for-section">
+    <div class="container">
+      <p class="section-label fade-up">Who It's For</p>
+      <h2 class="fade-up">Solo creators who need a system,<br>not more motivation.</h2>
+      <p class="lead fade-up">If you are already creating but feel like you are always behind, this system removes the daily decision weight and turns content into a scheduled output.</p>
+      <div class="for-list">
+        <div class="for-item fade-up">Solo creators on Instagram or TikTok</div>
+        <div class="for-item fade-up">Solopreneurs building audience</div>
+        <div class="for-item fade-up">Coaches and consultants</div>
+        <div class="for-item fade-up">Digital product sellers</div>
+        <div class="for-item fade-up">People who have tried posting daily and burned out</div>
+        <div class="for-item fade-up">Creators who want to scale output without a team</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TESTIMONIALS -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up">Social Proof</p>
+      <h2 class="fade-up">What people are saying.</h2>
+      <div class="testimonial-grid" style="margin-top:40px;">
+        <div class="testimonial-card fade-up">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"I went from posting twice a week with no consistency to 28 Reels in the last month. The batch workflow is the difference. I film on Wednesday mornings and do not think about content again until the following Sunday."</blockquote>
+          <div class="testimonial-author">Jordan S.</div>
+          <div class="testimonial-role">Fitness coach, 14K followers</div>
+        </div>
+        <div class="testimonial-card fade-up">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"The repurposing chapter alone changed my workflow. I was only posting to Instagram. Now every Reel goes to four platforms. Same work, four times the reach."</blockquote>
+          <div class="testimonial-author">Casey N.</div>
+          <div class="testimonial-role">Brand strategist and content creator</div>
+        </div>
+        <div class="testimonial-card fade-up">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <blockquote>"The 5-template library gave me a framework I had been missing for two years. I stopped trying to be creative every day and started executing a rotation. Watch time went up 40% in 30 days."</blockquote>
+          <div class="testimonial-author">Simone A.</div>
+          <div class="testimonial-role">Personal finance creator</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PRICING -->
+  <section>
+    <div class="container">
+      <p class="section-label fade-up" style="text-align:center;">Pricing</p>
+      <h2 class="fade-up" style="text-align:center;">One price. The complete system.</h2>
+      <div class="pricing-box fade-up" style="margin-top:48px;">
+        <div class="big-price"><sup>$</sup>19.99</div>
+        <p style="color:var(--muted);font-size:15px;">One-time. No subscription.</p>
+        <ul class="pricing-includes">
+          <li>8-chapter factory system guide</li>
+          <li>5-template Reel library</li>
+          <li>90-second script formula</li>
+          <li>AI production workflow</li>
+          <li>One Reel to five platforms repurposing guide</li>
+          <li>30 done-for-you hook templates</li>
+          <li>Weekly batch production checklist</li>
+          <li>Instant PDF download</li>
+        </ul>
+        <a class="btn-primary" style="width:100%;display:block;text-align:center;" href="https://behike.gumroad.com/l/reel-factory-system" target="_blank" rel="noopener">Get the Reel Factory System</a>
+        <p class="guarantee">30-day money-back guarantee. If the system does not improve your output, full refund.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <p class="section-label fade-up">Build the Factory</p>
+      <h2 class="fade-up">Stop producing one Reel at a time.<br>Build a system that runs.</h2>
+      <p class="fade-up">30 Reels a month is not 30 days of work. It is 10 focused hours, properly batched, with a system that removes daily decision-making from the equation.</p>
+      <a class="btn-primary fade-up" href="https://behike.gumroad.com/l/reel-factory-system" target="_blank" rel="noopener">Download for $19.99</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 Behike. All rights reserved. &nbsp;|&nbsp; <a href="/privacy.html">Privacy</a> &nbsp;|&nbsp; <a href="/refund.html">Refund Policy</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

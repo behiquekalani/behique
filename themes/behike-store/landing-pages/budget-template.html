@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="A simple budget tool that works. Try it right now, no signup. Track income, expenses, and what's left. By Behike.">
+    <title>Budget Template | Behike</title>
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #FFF8F0;
+            --dark: #1A1A1A;
+            --orange: #FF6B35;
+            --orange-soft: rgba(255, 107, 53, 0.08);
+            --orange-border: rgba(255, 107, 53, 0.2);
+            --muted: #6B6B6B;
+            --light-border: #E8E0D8;
+            --input-bg: #FFF3E8;
+            --positive: #2D8A4E;
+            --negative: #C44536;
+            --font: 'Georgia', 'Times New Roman', serif;
+            --sans: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--cream);
+            color: var(--dark);
+            font-family: var(--sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Top bar, simple */
+        .topbar {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .topbar-logo {
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--dark);
+            letter-spacing: -0.01em;
+        }
+
+        .topbar-link {
+            font-size: 13px;
+            color: var(--muted);
+            text-decoration: none;
+        }
+
+        /* Demo section, top of page */
+        .demo {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 40px 24px 20px;
+        }
+
+        .demo-intro {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .demo-intro h1 {
+            font-family: var(--font);
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 400;
+            line-height: 1.3;
+            color: var(--dark);
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .demo-intro p {
+            font-size: 15px;
+            color: var(--muted);
+        }
+
+        /* Budget tool */
+        .budget-tool {
+            background: #fff;
+            border: 1px solid var(--light-border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .budget-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .budget-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .budget-row input[type="text"] {
+            flex: 2;
+            padding: 10px 12px;
+            border: 1px solid var(--light-border);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: var(--sans);
+            background: var(--input-bg);
+            color: var(--dark);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .budget-row input[type="text"]:focus {
+            border-color: var(--orange);
+        }
+
+        .budget-row input[type="number"] {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--light-border);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: var(--sans);
+            background: var(--input-bg);
+            color: var(--dark);
+            text-align: right;
+            outline: none;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        .budget-row input[type="number"]::-webkit-inner-spin-button,
+        .budget-row input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        .budget-row input[type="number"]:focus {
+            border-color: var(--orange);
+        }
+
+        .budget-row .remove-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            line-height: 1;
+            border-radius: 4px;
+            transition: color 0.2s;
+        }
+
+        .budget-row .remove-btn:hover {
+            color: var(--negative);
+        }
+
+        .add-row-btn {
+            background: none;
+            border: 1px dashed var(--light-border);
+            color: var(--muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: border-color 0.2s, color 0.2s;
+            font-family: var(--sans);
+        }
+
+        .add-row-btn:hover {
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .budget-divider {
+            height: 1px;
+            background: var(--light-border);
+            margin: 28px 0;
+        }
+
+        /* Summary bar */
+        .budget-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 0;
+            border-top: 2px solid var(--dark);
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 600;
+            font-family: var(--sans);
+        }
+
+        .summary-value.income { color: var(--positive); }
+        .summary-value.expenses { color: var(--negative); }
+        .summary-value.remaining { color: var(--dark); }
+        .summary-value.remaining.positive { color: var(--positive); }
+        .summary-value.remaining.negative { color: var(--negative); }
+
+        /* Sell section */
+        .sell {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .sell-card {
+            background: #fff;
+            border: 1px solid var(--light-border);
+            border-radius: 12px;
+            padding: 40px 32px;
+            text-align: center;
+        }
+
+        .sell-card h2 {
+            font-family: var(--font);
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .sell-card p {
+            font-size: 15px;
+            color: var(--muted);
+            max-width: 440px;
+            margin: 0 auto 12px;
+        }
+
+        .sell-features {
+            list-style: none;
+            margin: 28px 0;
+            text-align: left;
+            max-width: 360px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sell-features li {
+            padding: 8px 0;
+            font-size: 15px;
+            color: var(--dark);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sell-features li::before {
+            content: "+";
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .sell-price {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 24px 0 8px;
+        }
+
+        .sell-format {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+        }
+
+        .sell-button {
+            display: inline-block;
+            background: var(--orange);
+            color: #fff;
+            padding: 13px 36px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+            font-family: var(--sans);
+        }
+
+        .sell-button:hover { opacity: 0.85; }
+
+        .sell-note {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 14px;
+        }
+
+        /* Who it's for */
+        .who {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        .who-card {
+            background: var(--orange-soft);
+            border: 1px solid var(--orange-border);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .who-card h3 {
+            font-family: var(--font);
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 16px;
+        }
+
+        .who-card p {
+            font-size: 15px;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        .who-card p:last-child { margin-bottom: 0; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--light-border);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 500px) {
+            .budget-tool { padding: 20px 16px; }
+            .budget-summary { flex-direction: column; gap: 16px; }
+            .sell-card { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <span class="topbar-logo">behike</span>
+        <a href="#full" class="topbar-link">Get the full version</a>
+    </div>
+
+    <!-- DEMO FIRST: The tool is the pitch -->
+    <section class="demo">
+        <div class="demo-intro">
+            <h1>Try it. Right now.</h1>
+            <p>Type your income and expenses. See what's left. No signup, no download.</p>
+        </div>
+
+        <div class="budget-tool">
+            <div class="budget-section-title">Income</div>
+            <div id="income-rows">
+                <div class="budget-row">
+                    <input type="text" placeholder="Source (e.g. Salary)" value="Main job">
+                    <input type="number" placeholder="0.00" value="2400" class="income-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+                <div class="budget-row">
+                    <input type="text" placeholder="Source" value="Side hustle">
+                    <input type="number" placeholder="0.00" value="350" class="income-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+            </div>
+            <button class="add-row-btn" onclick="addRow('income')">+ Add income source</button>
+
+            <div class="budget-divider"></div>
+
+            <div class="budget-section-title">Expenses</div>
+            <div id="expense-rows">
+                <div class="budget-row">
+                    <input type="text" placeholder="Expense (e.g. Rent)" value="Rent">
+                    <input type="number" placeholder="0.00" value="800" class="expense-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+                <div class="budget-row">
+                    <input type="text" placeholder="Expense" value="Food">
+                    <input type="number" placeholder="0.00" value="400" class="expense-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+                <div class="budget-row">
+                    <input type="text" placeholder="Expense" value="Subscriptions">
+                    <input type="number" placeholder="0.00" value="65" class="expense-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+                <div class="budget-row">
+                    <input type="text" placeholder="Expense" value="Transport">
+                    <input type="number" placeholder="0.00" value="120" class="expense-input">
+                    <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+                </div>
+            </div>
+            <button class="add-row-btn" onclick="addRow('expense')">+ Add expense</button>
+
+            <div class="budget-divider"></div>
+
+            <div class="budget-summary">
+                <div class="summary-item">
+                    <div class="summary-label">Total Income</div>
+                    <div class="summary-value income" id="total-income">$2,750</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Expenses</div>
+                    <div class="summary-value expenses" id="total-expenses">$1,385</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Remaining</div>
+                    <div class="summary-value remaining positive" id="total-remaining">$1,365</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Soft sell -->
+    <section class="sell" id="full">
+        <div class="sell-card">
+            <h2>Like it? The full version does more.</h2>
+            <p>The demo above is one month. The full template tracks 12 months, calculates trends, and actually tells you where your money goes.</p>
+
+            <ul class="sell-features">
+                <li>12-month tracking with monthly comparison</li>
+                <li>Savings goals with progress bars</li>
+                <li>Category breakdown (see where it leaks)</li>
+                <li>CSV export for tax season or your accountant</li>
+                <li>Works in Google Sheets or Excel</li>
+                <li>No formulas to fix. It just works.</li>
+            </ul>
+
+            <div class="sell-price">$4.99</div>
+            <div class="sell-format">Google Sheets template. Instant access.</div>
+            <a href="https://behikeai.gumroad.com/l/budget-template" class="sell-button">Get the full template</a>
+            <div class="sell-note">One-time purchase. Keep it forever.</div>
+        </div>
+    </section>
+
+    <!-- Who it's for -->
+    <section class="who">
+        <div class="who-card">
+            <h3>I built this for people like me.</h3>
+            <p>Students, freelancers, side-hustlers. People who know they should budget but hate the apps that feel like homework.</p>
+            <p>This is a spreadsheet. You open it, type numbers, and it tells you the truth about your money. That's it.</p>
+            <p>No AI analysis. No spending predictions. No gamification. Just math and honesty.</p>
+        </div>
+    </section>
+
+    <!-- Cross-sell -->
+    <section style="padding: 80px 24px; max-width: 900px; margin: 0 auto;">
+        <p style="text-align:center; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#8e8e93; margin-bottom:12px;">Pair it with</p>
+        <h2 style="text-align:center; font-size:28px; font-weight:700; letter-spacing:-0.03em; color:#e8e8e8; margin-bottom:48px;">Complete your financial stack</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;">
+            <a href="cash-flow-dashboard.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF6B35'" onmouseout="this.style.borderColor='#2a2a2a'">
+                <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Dashboard</p>
+                <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Cash Flow Dashboard</p>
+                <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">8-tab financial command center. Income, expenses, forecast, savings rate. All automated.</p>
+                <p style="font-size:15px; font-weight:600; color:#FF6B35;">$14.99</p>
+            </a>
+            <a href="solopreneur-os.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF6B35'" onmouseout="this.style.borderColor='#2a2a2a'">
+                <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Workbook</p>
+                <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Solopreneur OS</p>
+                <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">5-module business workbook. Includes the monetization map and financial runway calculator.</p>
+                <p style="font-size:15px; font-weight:600; color:#FF6B35;">$12.99</p>
+            </a>
+            <a href="ecommerce-playbook.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF6B35'" onmouseout="this.style.borderColor='#2a2a2a'">
+                <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Playbook</p>
+                <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Ecommerce Playbook</p>
+                <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">Once your budget is set, this is the income side. 10-chapter dropshipping system.</p>
+                <p style="font-size:15px; font-weight:600; color:#FF6B35;">$14.99</p>
+            </a>
+        </div>
+    </section>
+
+    <footer>&copy; 2026 Behike</footer>
+
+    <script>
+        function calculate() {
+            let income = 0;
+            let expenses = 0;
+
+            document.querySelectorAll('.income-input').forEach(input => {
+                income += parseFloat(input.value) || 0;
+            });
+
+            document.querySelectorAll('.expense-input').forEach(input => {
+                expenses += parseFloat(input.value) || 0;
+            });
+
+            const remaining = income - expenses;
+
+            document.getElementById('total-income').textContent = '$' + income.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('total-expenses').textContent = '$' + expenses.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+
+            const remainEl = document.getElementById('total-remaining');
+            remainEl.textContent = (remaining < 0 ? '-$' : '$') + Math.abs(remaining).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            remainEl.className = 'summary-value remaining ' + (remaining >= 0 ? 'positive' : 'negative');
+        }
+
+        function addRow(type) {
+            const container = document.getElementById(type === 'income' ? 'income-rows' : 'expense-rows');
+            const row = document.createElement('div');
+            row.className = 'budget-row';
+            row.innerHTML = `
+                <input type="text" placeholder="${type === 'income' ? 'Source' : 'Expense'}">
+                <input type="number" placeholder="0.00" class="${type}-input">
+                <button class="remove-btn" onclick="removeRow(this)" title="Remove">&times;</button>
+            `;
+            container.appendChild(row);
+
+            row.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', calculate);
+            });
+        }
+
+        function removeRow(btn) {
+            const row = btn.parentElement;
+            const container = row.parentElement;
+            if (container.children.length > 1) {
+                row.remove();
+                calculate();
+            }
+        }
+
+        // Attach event listeners to all inputs
+        document.querySelectorAll('.budget-row input').forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+    </script>
+
+</body>
+</html>

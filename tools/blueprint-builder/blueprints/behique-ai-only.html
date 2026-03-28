@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEHIQUE Business Blueprint V2.0</title>
+    <style>
+
+/* ========================================================================
+   BLUEPRINT V2 - CORE STYLES
+   ======================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg: #0a0a0a;
+    --bg-secondary: #111111;
+    --text: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    --border: #333333;
+    --border-light: #222222;
+    --accent: #f0c040;
+    --accent-secondary: #d4a017;
+    --card-bg: #0f0f0f;
+    --nav-bg: rgba(10,10,10,0.95);
+    --hover: #1a1a1a;
+    --success: #22c55e;
+    --info: #3b82f6;
+    --font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+}
+
+html { scroll-behavior: smooth; font-size: 14px; }
+
+body {
+    font-family: var(--font-family);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- NAVIGATION ---- */
+
+.bp-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.bp-nav-brand {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-right: 2rem;
+    white-space: nowrap;
+}
+
+.bp-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex: 1;
+}
+
+.bp-nav-links::-webkit-scrollbar { display: none; }
+
+.bp-nav-link {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 0.85rem 1rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.bp-nav-link:hover {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+}
+
+.bp-nav-link.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.bp-nav-version {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-family: var(--font-mono);
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+/* ---- MAIN CONTENT ---- */
+
+.bp-main { padding-top: 48px; }
+
+.bp-section {
+    min-height: 100vh;
+    padding: 3rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* ---- SECTION HEADERS ---- */
+
+.bp-section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.bp-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.bp-section-name {
+    font-size: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-section-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.bp-section-line {
+    width: 60px;
+    height: 1px;
+    background: var(--accent);
+    margin: 1.5rem auto 0;
+}
+
+/* ---- GRID LAYOUTS ---- */
+
+.bp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ---- CARDS ---- */
+
+.bp-card {
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.bp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.bp-card-icon {
+    font-size: 1.2rem;
+    width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.bp-card-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.bp-card-number {
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    font-family: var(--font-mono);
+}
+
+.bp-card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-card-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+/* ---- LISTS ---- */
+
+.bp-list {
+    list-style: none;
+    padding: 0;
+}
+
+.bp-list li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 0.4rem 0;
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.bp-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 4px;
+    height: 4px;
+    background: var(--accent);
+}
+
+.bp-list-numbered li {
+    padding-left: 1.5rem;
+    counter-increment: bp-counter;
+}
+
+.bp-list-numbered li::before {
+    content: counter(bp-counter, decimal-leading-zero);
+    background: none;
+    width: auto;
+    height: auto;
+    top: 0.4rem;
+    font-size: 0.6rem;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+.bp-list-numbered { counter-reset: bp-counter; }
+
+/* ---- KEY-VALUE PAIRS ---- */
+
+.bp-kv {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.8rem;
+}
+
+.bp-kv:last-child { border-bottom: none; }
+
+.bp-kv-key {
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.65rem;
+    font-weight: 600;
+}
+
+.bp-kv-value {
+    color: var(--text);
+    text-align: right;
+    font-weight: 500;
+}
+
+/* ---- TAGS / BADGES ---- */
+
+.bp-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.bp-tag {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+}
+
+.bp-tag-accent {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ---- FLOW DIAGRAM ---- */
+
+.bp-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.bp-flow-node {
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    text-align: center;
+    min-width: 140px;
+    background: var(--card-bg);
+    position: relative;
+}
+
+.bp-flow-node-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.bp-flow-node-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.bp-flow-arrow {
+    width: 40px;
+    height: 1px;
+    background: var(--border);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.bp-flow-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -4px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid var(--border);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+}
+
+.bp-flow-arrow-accent { background: var(--accent); }
+.bp-flow-arrow-accent::after { border-left-color: var(--accent); }
+
+/* ---- PHASE TIMELINE ---- */
+
+.bp-phases {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    border: 1px solid var(--border);
+}
+
+.bp-phase {
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+}
+
+.bp-phase:last-child { border-right: none; }
+
+.bp-phase-number {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    margin-bottom: 0.75rem;
+}
+
+.bp-phase-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-phase-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.bp-phase-timeline {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+/* ---- TOOLS GRID ---- */
+
+.bp-tool {
+    border: 1px solid var(--border);
+    padding: 1rem;
+    text-align: center;
+    background: var(--card-bg);
+    transition: border-color 0.2s;
+}
+
+.bp-tool:hover { border-color: var(--accent); }
+
+.bp-tool-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.bp-tool-name {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+}
+
+.bp-tool-category {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+}
+
+/* ---- DEPARTMENT NAV CARDS ---- */
+
+.bp-dept-card {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    background: var(--card-bg);
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.bp-dept-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.bp-dept-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.bp-dept-card:hover::before { opacity: 1; }
+
+.bp-dept-card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.bp-dept-card-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.bp-dept-card-desc {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.bp-dept-card-count {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.1em;
+    margin-top: 0.75rem;
+}
+
+/* ---- DEPARTMENT BLUEPRINT LAYOUT ---- */
+
+.bp-dept-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.bp-dept-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+/* ---- GROWTH WHEEL ---- */
+
+.bp-wheel {
+    width: 500px;
+    height: 500px;
+    margin: 2rem auto;
+    position: relative;
+}
+
+.bp-wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    z-index: 2;
+}
+
+.bp-wheel-center-text {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.bp-wheel-spoke {
+    position: absolute;
+    width: 160px;
+    text-align: center;
+    z-index: 2;
+}
+
+.bp-wheel-spoke-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.bp-wheel-spoke-desc {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.bp-wheel-line {
+    position: absolute;
+    background: var(--border);
+    transform-origin: center center;
+    z-index: 1;
+}
+
+/* Spoke positions (5 spokes, evenly distributed) */
+.bp-wheel-spoke:nth-child(2) { top: -10px; left: 50%; transform: translateX(-50%); }
+.bp-wheel-spoke:nth-child(3) { top: 25%; right: -40px; }
+.bp-wheel-spoke:nth-child(4) { bottom: 5%; right: -20px; }
+.bp-wheel-spoke:nth-child(5) { bottom: 5%; left: -20px; }
+.bp-wheel-spoke:nth-child(6) { top: 25%; left: -40px; }
+
+/* Connecting lines */
+.bp-wheel-line:nth-child(7) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(-90deg) translateY(-65px); }
+.bp-wheel-line:nth-child(8) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(-18deg) translateY(-65px); }
+.bp-wheel-line:nth-child(9) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(54deg) translateY(-65px); }
+.bp-wheel-line:nth-child(10) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(126deg) translateY(-65px); }
+.bp-wheel-line:nth-child(11) { top: 50%; left: 50%; width: 130px; height: 1px; transform: translateX(-50%) rotate(198deg) translateY(-65px); }
+
+/* ---- FUNNEL ---- */
+
+.bp-funnel {
+    max-width: 700px;
+    margin: 2rem auto;
+}
+
+.bp-funnel-step {
+    border: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    margin-bottom: -1px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    background: var(--card-bg);
+}
+
+.bp-funnel-step::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+}
+
+.bp-funnel-num {
+    font-size: 1.5rem;
+    font-weight: 200;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    min-width: 2rem;
+}
+
+.bp-funnel-content { flex: 1; }
+
+.bp-funnel-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+}
+
+.bp-funnel-text {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+}
+
+/* ---- ARCHITECTURE DIAGRAM ---- */
+
+.bp-arch {
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+
+.bp-arch-layer {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.bp-arch-layer::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 12px;
+    background: var(--border);
+}
+
+.bp-arch-layer:last-child::after { display: none; }
+
+.bp-arch-layer-title {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+}
+
+.bp-arch-nodes {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.bp-arch-node {
+    border: 1px solid var(--border);
+    padding: 0.6rem 1rem;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: var(--bg);
+}
+
+/* ---- STAT BOX ---- */
+
+.bp-stat {
+    text-align: center;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+}
+
+.bp-stat-value {
+    font-size: 2rem;
+    font-weight: 200;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    margin-bottom: 0.25rem;
+}
+
+.bp-stat-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+/* ---- SEPARATOR ---- */
+
+.bp-sep {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 2rem 0;
+}
+
+/* ---- CONTAINER ---- */
+
+.bp-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ---- SECTION LABEL (inline) ---- */
+
+.bp-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.bp-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ---- FOOTER ---- */
+
+.bp-footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-top: 1px solid var(--border);
+}
+
+.bp-footer-text {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+}
+
+.bp-footer-brand {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-top: 0.5rem;
+}
+
+/* ---- RESPONSIVE ---- */
+
+@media (max-width: 1024px) {
+    .bp-grid-6 { grid-template-columns: repeat(3, 1fr); }
+    .bp-dept-layout { grid-template-columns: 1fr; }
+    .bp-phases { grid-template-columns: 1fr; }
+    .bp-phase { border-right: none; border-bottom: 1px solid var(--border); }
+    .bp-phase:last-child { border-bottom: none; }
+}
+
+@media (max-width: 768px) {
+    .bp-grid-2, .bp-grid-3, .bp-grid-4 { grid-template-columns: 1fr; }
+    .bp-nav { padding: 0 1rem; }
+    .bp-section { padding: 2rem 1rem; }
+    .bp-flow { flex-direction: column; }
+    .bp-flow-arrow { width: 1px; height: 30px; }
+    .bp-flow-arrow::after {
+        right: -4px;
+        top: auto;
+        bottom: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 6px solid var(--border);
+        border-bottom: none;
+    }
+    .bp-wheel { width: 300px; height: 300px; }
+}
+
+/* ---- PRINT ---- */
+
+@media print {
+    .bp-nav { display: none; }
+    .bp-main { padding-top: 0; }
+    .bp-section {
+        min-height: auto;
+        page-break-after: always;
+        page-break-inside: avoid;
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+    .bp-section:last-child { page-break-after: auto; }
+    body { background: white; color: #1a1a1a; font-size: 10pt; }
+    .bp-card, .bp-tool, .bp-dept-card, .bp-flow-node, .bp-arch-node, .bp-funnel-step, .bp-stat {
+        border-color: #ccc;
+        background: white;
+    }
+    .bp-section-name, .bp-card-title, .bp-flow-node-title, .bp-dept-card-title { color: #1a1a1a; }
+    .bp-nav-link, .bp-tag, .bp-card-text, .bp-list li, .bp-kv-key, .bp-kv-value { color: #333; }
+    .bp-accent-print { color: #333 !important; border-color: #333 !important; }
+}
+
+:root {
+    --bg: #0a0a0a;
+    --bg-secondary: #111111;
+    --text: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+    --border: #333333;
+    --border-light: #222222;
+    --accent: #f0c040;
+    --accent-secondary: #d4a017;
+    --card-bg: #0f0f0f;
+    --nav-bg: rgba(10,10,10,0.95);
+    --hover: #1a1a1a;
+    --success: #22c55e;
+    --info: #3b82f6;
+}
+    </style>
+</head>
+<body>
+
+<nav class="bp-nav">
+    <span class="bp-nav-brand">BEHIQUE</span>
+    <div class="bp-nav-links"><a class="bp-nav-link" href="#overview">OVERVIEW</a><a class="bp-nav-link" href="#dept-ai_automations">AI & AUTO</a></div>
+    <span class="bp-nav-version">V2.0 / MIDNIGHT</span>
+</nav>
+<main class="bp-main">
+
+<section class="bp-section" id="dept-ai_automations">
+    <div class="bp-section-header">
+        <div class="bp-section-title">BEHIQUE / DEPARTMENT BLUEPRINT</div>
+        <div class="bp-section-name">AI &amp; Automations Blueprint</div>
+        <div class="bp-section-subtitle">Build an AI-native business where agents handle research, content, operations, and communication. Human sets direction. Machines execute. The system learns and improves.</div>
+        <div class="bp-section-line"></div>
+    </div>
+    <div class="bp-dept-layout">
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">01</div>
+                    <div class="bp-card-icon">🧠</div>
+                    <div class="bp-card-label">THE NORTH STAR</div>
+                </div>
+                <div class="bp-card-text" style="font-size:0.9rem;color:var(--text);font-weight:500;margin-bottom:1rem;">AI is not a feature. It is the operating system. Every business function runs through an intelligent layer that learns, adapts, and executes.</div>
+<ul class="bp-list">
+<li>AI-first, not AI-added. Every workflow starts with &#39;can an agent do this?&#39;</li>
+<li>Three-layer architecture: Brain (planning), Hands (execution), Memory (context).</li>
+<li>Local-first when possible (Ollama), cloud when necessary (Claude, GPT).</li>
+<li>Human-in-the-loop for strategy. AI autonomous for execution.</li>
+<li>The system teaches itself. Every session improves the next.</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">02</div>
+                    <div class="bp-card-icon">⚡</div>
+                    <div class="bp-card-label">THE FRAMEWORK</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">The AI Operating System. How tasks flow from human intent to autonomous execution.</div>
+<ul class="bp-list bp-list-numbered">
+<li><strong>Intent</strong> - Human defines objective and constraints</li>
+<li><strong>Planning</strong> - Claude/Ceiba breaks task into subtasks, assigns agents</li>
+<li><strong>Execution</strong> - Agents run via MCP servers, bridge, n8n workflows</li>
+<li><strong>Review</strong> - Human reviews output, provides feedback</li>
+<li><strong>Learning</strong> - System stores patterns, improves prompts, updates memory</li>
+</ul>
+<div class="bp-flow" style="margin-top:1rem;">
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">INTENT</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">PLAN</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">EXECUTE</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">REVIEW</div>
+                </div>
+<div class="bp-flow-arrow bp-flow-arrow-accent"></div>
+
+                <div class="bp-flow-node">
+                    <div class="bp-flow-node-title">LEARN</div>
+                </div>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">04</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">KEY METRICS</div>
+                </div>
+                <div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Tasks Automated</span>
+                    <span class="bp-kv-value">80% of repeatable work</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">AI Accuracy</span>
+                    <span class="bp-kv-value">&gt; 90% useful outputs</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Session Context Loss</span>
+                    <span class="bp-kv-value">0% (memory system)</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">Agent Uptime</span>
+                    <span class="bp-kv-value">99% for BehiqueBot</span>
+                </div>
+</div>
+            </div>
+        </div>
+        <div class="bp-dept-col">
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">05</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE TECH STACK</div>
+                </div>
+                <div class="bp-tags">
+<span class="bp-tag bp-tag-accent" title="Primary AI brain and coding agent">Claude / Claude Code</span>
+<span class="bp-tag bp-tag-accent" title="BehiqueBot classification and Whisper transcription">GPT-4o-mini</span>
+<span class="bp-tag bp-tag-accent" title="Local LLM for privacy-sensitive and compute tasks">Ollama</span>
+<span class="bp-tag bp-tag-accent" title="Visual workflow automation and API orchestration">n8n</span>
+<span class="bp-tag bp-tag-accent" title="Tool access layer for Claude Code agents">MCP Servers</span>
+<span class="bp-tag bp-tag-accent" title="Cross-machine task delegation (Ceiba to Cobo)">Bridge Protocol</span>
+<span class="bp-tag bp-tag-accent" title="Autonomous agent orchestration platform">Behique Hub</span>
+</div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">06</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE ASSET LIBRARY</div>
+                </div>
+                <ul class="bp-list">
+<li><strong>Memory Stack</strong> - 7-file persistent context system</li>
+<li><strong>Prompt Library</strong> - Categorized prompt templates for all functions</li>
+<li><strong>Agent Configurations</strong> - Spawn configs for each agent type</li>
+<li><strong>n8n Workflow Library</strong> - Reusable automation templates</li>
+<li><strong>MCP Server Registry</strong> - Available tool servers and capabilities</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">07</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">GLOBAL GUARDRAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>AI suggests, human decides on strategy</li>
+<li>Every AI-generated output gets human review before external use</li>
+<li>No API keys in code. Environment variables only.</li>
+<li>Rate limiting on all external API calls</li>
+<li>Fallback to manual process if automation fails</li>
+<li>Document every new automation in process library</li>
+</ul>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">08</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">AGENT ROLES</div>
+                </div>
+                
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Ceiba (Core Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Primary thinking partner, planning, code generation, memory management. Runs on Claude via Claude Code.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Claude Code</span>
+<span class="bp-tag">MCP</span>
+<span class="bp-tag">Git</span>
+<span class="bp-tag">Obsidian</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Cobo (Compute Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">GPU-powered tasks. Local LLM inference, heavy scraping, video processing. Connected via bridge protocol.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Ollama</span>
+<span class="bp-tag">Playwright</span>
+<span class="bp-tag">GTX 1080 Ti</span>
+<span class="bp-tag">Bridge</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">BehiqueBot (Accountability Agent)</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Telegram bot. Captures ideas, classifies by category and pillar, sends check-ins. Built on psychologist framework.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Telegram</span>
+<span class="bp-tag">GPT-4o-mini</span>
+<span class="bp-tag">Whisper</span>
+<span class="bp-tag">Railway</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Research Agent</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Product discovery, trend analysis, competitor monitoring. Feeds the sales pipeline.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Google Trends</span>
+<span class="bp-tag">eBay API</span>
+<span class="bp-tag">Playwright</span>
+<span class="bp-tag">n8n</span>
+</div></div>
+
+                <div style="border-bottom:1px solid var(--border-light);padding:0.75rem 0;">
+                    <div style="font-size:0.75rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);margin-bottom:0.25rem;">Content Agent</div>
+                    <div style="font-size:0.7rem;color:var(--text-secondary);">Generates marketing content, social posts, product descriptions. Human reviews before publish.</div>
+                    <div class="bp-tags" style="margin-top:0.5rem;">
+<span class="bp-tag">Claude</span>
+<span class="bp-tag">CapCut</span>
+<span class="bp-tag">Canva</span>
+<span class="bp-tag">n8n</span>
+</div></div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">09</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">THE PROMPT LIBRARY</div>
+                </div>
+                <div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Product Research</div>
+<ul class="bp-list">
+<li>Analyze Google Trends data for niche product opportunities</li>
+<li>Score product viability based on margin, competition, demand</li>
+<li>Generate eBay listing copy optimized for search</li>
+<li>Compare supplier pricing and calculate true landed cost</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Content Creation</div>
+<ul class="bp-list">
+<li>Write social media post series for product launch</li>
+<li>Generate video script for product review (60s format)</li>
+<li>Create SEO-optimized blog post from research notes</li>
+<li>Build email sequence for new subscriber onboarding</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Operations</div>
+<ul class="bp-list">
+<li>Generate morning briefing from overnight metrics</li>
+<li>Audit system health and identify broken connectors</li>
+<li>Create SOP documentation from process description</li>
+<li>Triage incoming ideas into actionable tasks</li>
+</ul></div>
+<div style="margin-bottom:1rem;">
+<div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.5rem;">Strategy</div>
+<ul class="bp-list">
+<li>Analyze last 30 days and recommend next moves</li>
+<li>Identify bottlenecks in current workflow</li>
+<li>Compare revenue streams and suggest reallocation</li>
+<li>Generate quarterly goal breakdown with milestones</li>
+</ul></div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">10</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">MEMORY SYSTEM</div>
+                </div>
+                <div class="bp-card-text" style="margin-bottom:1rem;">Persistent context across sessions. The AI never starts from zero.</div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">CLAUDE.md</span>
+                    <span class="bp-kv-value">Static rules, identity, project list, frameworks</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">primer.md</span>
+                    <span class="bp-kv-value">Live session state. Rewritten every session.</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">shared-memory.md</span>
+                    <span class="bp-kv-value">Cross-machine synced state (Syncthing)</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">context.md</span>
+                    <span class="bp-kv-value">Big picture vision, goals, WHY behind work</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">VAULT_INDEX.md</span>
+                    <span class="bp-kv-value">Master index of all projects and infrastructure</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">observations.md</span>
+                    <span class="bp-kv-value">Pattern recognition, session history, behavioral notes</span>
+                </div>
+
+                <div class="bp-kv">
+                    <span class="bp-kv-key">project_memory.md</span>
+                    <span class="bp-kv-value">Auto-logged via git post-commit hook</span>
+                </div>
+            </div>
+
+            <div class="bp-card">
+                <div class="bp-card-header">
+                    <div class="bp-card-number">11</div>
+                    <div class="bp-card-icon"></div>
+                    <div class="bp-card-label">SAFETY RAILS</div>
+                </div>
+                <ul class="bp-list">
+<li>Pre-build gate: every new feature answers WHO, WHY, WHAT before code</li>
+<li>Human-in-the-loop for all publishing and financial decisions</li>
+<li>Audit trail via git commits and project_memory.md</li>
+<li>No autonomous spending. All purchases require human approval.</li>
+<li>Weekly system audit catches drift before it compounds</li>
+<li>Local-first processing for sensitive data (Ollama, not cloud)</li>
+<li>Session protocol ensures nothing gets lost between conversations</li>
+</ul>
+            </div>
+        </div>
+    </div>
+    <hr class="bp-sep">
+    <div class="bp-label">ARCHITECTURE</div>
+<div class="bp-arch">
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Brain Layer (Planning &amp; Reasoning)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">Claude (Ceiba)</div>
+<div class="bp-arch-node">GPT-4o-mini</div>
+<div class="bp-arch-node">Ollama Local</div>
+<div class="bp-arch-node">NotebookLM</div>
+</div></div>
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Hands Layer (Execution &amp; Tools)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">MCP Servers</div>
+<div class="bp-arch-node">n8n Workflows</div>
+<div class="bp-arch-node">Playwright Scraper</div>
+<div class="bp-arch-node">Telegram Bots</div>
+<div class="bp-arch-node">Bridge Protocol</div>
+</div></div>
+
+            <div class="bp-arch-layer">
+                <div class="bp-arch-layer-title">Memory Layer (Context &amp; Learning)</div>
+                <div class="bp-arch-nodes">
+<div class="bp-arch-node">CLAUDE.md</div>
+<div class="bp-arch-node">primer.md</div>
+<div class="bp-arch-node">Obsidian Vault</div>
+<div class="bp-arch-node">Notion DB</div>
+<div class="bp-arch-node">Git History</div>
+</div></div>
+</div>
+</section>
+
+<footer class="bp-footer">
+    <div class="bp-footer-text">GENERATED 2026-03-20 14:25 / THEME: MIDNIGHT</div>
+    <div class="bp-footer-brand">BEHIQUE BLUEPRINT V2.0</div>
+</footer>
+
+</main>
+<script>
+// Highlight active nav link on scroll
+(function() {
+    var links = document.querySelectorAll('.bp-nav-link');
+    var sections = [];
+    links.forEach(function(link) {
+        var id = link.getAttribute('href');
+        if (id && id.startsWith('#')) {
+            var el = document.querySelector(id);
+            if (el) sections.push({ el: el, link: link });
+        }
+    });
+    function onScroll() {
+        var scrollY = window.scrollY + 100;
+        var active = null;
+        sections.forEach(function(s) {
+            if (s.el.offsetTop <= scrollY) active = s;
+        });
+        links.forEach(function(l) { l.classList.remove('active'); });
+        if (active) active.link.classList.add('active');
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+})();
+</script>
+</body>
+</html>

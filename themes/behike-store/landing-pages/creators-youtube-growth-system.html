@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Creator's YouTube Growth System — Build a Real Channel, Not Just a Feed</title>
+  <meta name="description" content="A complete framework for YouTube growth: algorithm mechanics, channel positioning, thumbnail psychology, retention structure, and monetization. $22.99.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+    .fade-up.delay-5 { transition-delay: 0.5s; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-cta {
+      font-size: 13px;
+      font-weight: 600;
+      color: #000;
+      background: var(--cta);
+      padding: 7px 16px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .hero-title span { color: var(--accent); }
+    .hero-subtitle {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.5;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 600;
+      color: #000;
+      background: var(--cta);
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .btn-primary:hover { background: var(--cta-hover); transform: scale(1.02); }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .hero-price strong {
+      color: var(--text);
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    /* SECTION SHARED */
+    section { padding: 100px 0; }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.65;
+    }
+
+    /* PROBLEM */
+    #problem {
+      border-top: 1px solid var(--border);
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 64px;
+    }
+    @media (max-width: 640px) { .problem-grid { grid-template-columns: 1fr; } }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 32px;
+    }
+    .problem-card:first-child { border-radius: 16px 0 0 0; }
+    .problem-card:nth-child(2) { border-radius: 0 16px 0 0; }
+    .problem-card:nth-child(3) { border-radius: 0 0 0 16px; }
+    .problem-card:last-child { border-radius: 0 0 16px 0; }
+    .problem-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* WHAT YOU GET */
+    #what-you-get {
+      border-top: 1px solid var(--border);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .toc-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s ease;
+    }
+    .toc-item:hover { border-color: #333; }
+    .toc-number {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .toc-item h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+    }
+    .toc-item p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* SECTION PREVIEWS */
+    #previews {
+      border-top: 1px solid var(--border);
+    }
+    .preview-list {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .preview-row {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 32px 40px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      align-items: start;
+      transition: border-color 0.2s ease;
+    }
+    .preview-row:first-child { border-radius: 12px 12px 0 0; }
+    .preview-row:last-child { border-radius: 0 0 12px 12px; }
+    .preview-row:hover { border-color: #333; }
+    @media (max-width: 640px) {
+      .preview-row { grid-template-columns: 1fr; gap: 12px; padding: 24px; }
+    }
+    .preview-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .preview-content h3 {
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: -0.4px;
+    }
+    .preview-content p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* CTA BLOCK */
+    #buy {
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .buy-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 64px 48px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .buy-price-tag {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .buy-price-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .buy-includes {
+      text-align: left;
+      margin-bottom: 40px;
+    }
+    .buy-includes li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text-muted);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .buy-includes li:last-child { border-bottom: none; }
+    .check {
+      width: 20px;
+      height: 20px;
+      background: rgba(48, 209, 88, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--cta);
+      font-size: 11px;
+    }
+    .btn-buy {
+      display: block;
+      width: 100%;
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      background: var(--cta);
+      padding: 18px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.2s ease, transform 0.15s ease;
+      margin-bottom: 16px;
+    }
+    .btn-buy:hover { background: var(--cta-hover); transform: scale(1.02); }
+    .buy-guarantee {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <a href="#buy" class="nav-cta">Get it for $22.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="fade-up">
+        <span class="hero-eyebrow">Creator Guide</span>
+      </div>
+      <h1 class="hero-title fade-up delay-1">
+        The Creator's<br><span>YouTube Growth System</span>
+      </h1>
+      <p class="hero-subtitle fade-up delay-2">
+        Channel growth is not a content output problem. It is a positioning and optimization problem. This guide gives you the complete system.
+      </p>
+      <div class="hero-cta-group fade-up delay-3">
+        <a href="#buy" class="btn-primary">Get the Guide</a>
+        <div class="hero-price">
+          <strong>$22.99</strong> &nbsp;one-time
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">Why channels stall out</h2>
+        <p class="section-body">Most creators produce content without understanding what the algorithm actually measures. The result is months of work with no growth and no clear reason why.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-up delay-1">
+          <div class="problem-icon">01</div>
+          <h3>Positioned for nobody</h3>
+          <p>The channel covers too many topics and attracts no consistent audience. Every video starts from zero with a different viewer.</p>
+        </div>
+        <div class="problem-card fade-up delay-2">
+          <div class="problem-icon">02</div>
+          <h3>Thumbnails that get ignored</h3>
+          <p>Click-through rate below 2%. The thumbnail communicates information instead of an emotional state. No curiosity gap, no click.</p>
+        </div>
+        <div class="problem-card fade-up delay-3">
+          <div class="problem-icon">03</div>
+          <h3>Viewers leave in 30 seconds</h3>
+          <p>The video opens with an animated intro and a summary of what is about to happen. The algorithm sees the drop-off and stops distributing.</p>
+        </div>
+        <div class="problem-card fade-up delay-4">
+          <div class="problem-icon">04</div>
+          <h3>No monetization path</h3>
+          <p>The channel waits for AdSense while ignoring the product and consulting revenue available at any subscriber count in the right niche.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section id="what-you-get">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">What's Inside</div>
+        <h2 class="section-title">Nine parts. One complete system.</h2>
+        <p class="section-body">Every section addresses a specific point where YouTube channels fail. Each connects directly to the ones before and after it.</p>
+      </div>
+      <div class="toc-grid">
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-number">Part 01</div>
+          <h3>Algorithm mechanics</h3>
+          <p>How CTR and watch time interact, what session time signals, and why the suggested feed matters more than search for most channels.</p>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-number">Part 02</div>
+          <h3>Channel positioning</h3>
+          <p>The one-sentence description formula that makes the right viewer subscribe immediately and the wrong viewer self-select out.</p>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-number">Part 03</div>
+          <h3>Thumbnail psychology</h3>
+          <p>The three elements that determine click-through rate: visual hierarchy, emotional signal, and the curiosity gap framework.</p>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-number">Part 04</div>
+          <h3>Title formulas</h3>
+          <p>Five proven title structures that balance keyword signals for the algorithm with curiosity triggers for the human reader.</p>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-number">Part 05</div>
+          <h3>The first 30 seconds</h3>
+          <p>The exact structure that eliminates the steepest drop-off point in your analytics and earns the viewer's commitment early.</p>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-number">Part 06</div>
+          <h3>Retention structure</h3>
+          <p>The hook-problem-solution-close framework with pattern interrupt timing that holds attention through the full video.</p>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-number">Part 07</div>
+          <h3>Upload cadence</h3>
+          <p>When consistency matters more than quality, when quality starts to matter more, and how to set a pace you can sustain.</p>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-number">Part 08</div>
+          <h3>Platform features</h3>
+          <p>Community tab, playlist strategy, and end screen design: the three underused growth tools available at no cost.</p>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-number">Part 09</div>
+          <h3>Monetization milestones</h3>
+          <p>What to pursue at 0, 1K, 10K, and 25K subscribers, and why digital products outperform AdSense at every stage.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section id="previews">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">From the Guide</div>
+        <h2 class="section-title">What the system actually says</h2>
+      </div>
+      <div class="preview-list">
+        <div class="preview-row fade-up delay-1">
+          <div class="preview-label">Algorithm</div>
+          <div class="preview-content">
+            <h3>YouTube tests before it distributes</h3>
+            <p>Every video gets tested on a small sample of your subscribers first. The algorithm watches CTR and watch time. If both are strong, distribution expands. If either is weak, it stops. Most creators never learn this cycle, so they cannot diagnose why a video underperforms.</p>
+          </div>
+        </div>
+        <div class="preview-row fade-up delay-2">
+          <div class="preview-label">Positioning</div>
+          <div class="preview-content">
+            <h3>A channel without positioning serves no one</h3>
+            <p>The positioning test: can a first-time visitor answer "is this for me?" within 10 seconds of landing on your channel page? If not, the channel description, the video titles, and the content itself are not aligned. Subscribers who do not know why they subscribed do not watch.</p>
+          </div>
+        </div>
+        <div class="preview-row fade-up delay-3">
+          <div class="preview-label">Thumbnails</div>
+          <div class="preview-content">
+            <h3>Emotional signal beats information every time</h3>
+            <p>The worst thumbnails communicate content: a graph, a product shot, a screenshot. These tell the viewer what the video contains. They do not communicate what the viewer will feel. A thumbnail that signals an emotional state (curiosity, relief, skepticism) outperforms an informational one consistently.</p>
+          </div>
+        </div>
+        <div class="preview-row fade-up delay-4">
+          <div class="preview-label">Monetization</div>
+          <div class="preview-content">
+            <h3>Products outperform AdSense at 500 subscribers</h3>
+            <p>A $30 guide sold to 100 viewers per month generates $3,000 in revenue. That is achievable at 5,000 subscribers in a focused niche. Waiting for AdSense at this scale means ignoring the highest-margin revenue stream available, one that compounds as the channel grows.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <section id="buy">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Get the Guide</div>
+        <h2 class="section-title" style="text-align:center;">One guide. The complete system.</h2>
+      </div>
+      <div class="buy-card fade-up delay-2">
+        <div class="buy-price-tag">$22.99</div>
+        <div class="buy-price-note">One-time payment. Instant download. No subscription.</div>
+        <ul class="buy-includes">
+          <li><span class="check">+</span> Full guide: ~2,500 words across 9 sections</li>
+          <li><span class="check">+</span> PDF format, read anywhere</li>
+          <li><span class="check">+</span> Channel positioning formula</li>
+          <li><span class="check">+</span> Title formulas and thumbnail framework</li>
+          <li><span class="check">+</span> Retention structure and first-30-seconds script</li>
+          <li><span class="check">+</span> Monetization milestones by subscriber count</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/creators-youtube-growth-system" class="btn-buy" target="_blank" rel="noopener">
+          Get it for $22.99
+        </a>
+        <p class="buy-guarantee">Instant access after purchase.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="https://behikeai.com">behikeai.com</a> &nbsp;&bull;&nbsp; <a href="/store">Browse all guides</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

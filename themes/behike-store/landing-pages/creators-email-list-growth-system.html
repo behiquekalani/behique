@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Email List Growth System | Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --border: #1D1D1F;
+      --card: #0A0A0A;
+      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .hero.visible { opacity: 1; transform: translateY(0); }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.15);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      margin-bottom: 28px;
+      letter-spacing: 0.3px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #F5F5F7 0%, #86868B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .price-block {
+      margin-bottom: 36px;
+    }
+    .price {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -1px;
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-weight: 700;
+      font-size: 18px;
+      padding: 18px 44px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.2px;
+    }
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .cta-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 12px;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-intro {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 620px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card:nth-child(2) { transition-delay: 0.1s; }
+    .problem-card:nth-child(3) { transition-delay: 0.2s; }
+
+    .problem-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* CONTENTS */
+    .chapters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .chapter-item.visible { opacity: 1; transform: translateX(0); }
+    .chapter-item:nth-child(2) { transition-delay: 0.05s; }
+    .chapter-item:nth-child(3) { transition-delay: 0.1s; }
+    .chapter-item:nth-child(4) { transition-delay: 0.15s; }
+    .chapter-item:nth-child(5) { transition-delay: 0.2s; }
+    .chapter-item:nth-child(6) { transition-delay: 0.25s; }
+    .chapter-item:nth-child(7) { transition-delay: 0.3s; }
+    .chapter-item:nth-child(8) { transition-delay: 0.35s; }
+    .chapter-item:nth-child(9) { transition-delay: 0.4s; }
+
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 1px;
+    }
+    .chapter-info h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+    }
+    .chapter-info p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .audience-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .audience-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 18px 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .audience-list li.visible { opacity: 1; transform: translateY(0); }
+    .audience-list li:nth-child(2) { transition-delay: 0.08s; }
+    .audience-list li:nth-child(3) { transition-delay: 0.16s; }
+    .audience-list li:nth-child(4) { transition-delay: 0.24s; }
+    .audience-list li:nth-child(5) { transition-delay: 0.32s; }
+    .audience-list li:nth-child(6) { transition-delay: 0.4s; }
+
+    .check {
+      color: var(--cta);
+      font-size: 16px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .stat-item {
+      padding: 32px 24px;
+      background: var(--card);
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -1.5px;
+      display: block;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* BOTTOM CTA */
+    .bottom-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .bottom-cta h2 {
+      margin-bottom: 16px;
+    }
+    .bottom-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .hero { padding: 72px 0 60px; }
+      .stats-row { grid-template-columns: 1fr; }
+      .stat-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+      nav { padding: 16px 20px; }
+      .container { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="/">Behike</a>
+    <a class="nav-cta" href="#buy">Get the System</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero-section" style="border-top: none;">
+    <div class="container">
+      <div class="hero-badge">Digital Product. Instant Download.</div>
+      <h1>Creator's Email List<br>Growth System</h1>
+      <p class="hero-sub">The complete playbook for building an email list that earns revenue. From zero subscribers to a list your business depends on.</p>
+      <div class="price-block">
+        <div class="price">$21.99</div>
+        <div class="price-note">One-time. No subscription. Yours to keep.</div>
+      </div>
+      <a class="cta-btn" href="#buy">Get Instant Access</a>
+      <p class="cta-sub">PDF delivery. 5000+ words. 10 chapters.</p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding: 40px 0; border-top: 1px solid var(--border);">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-num">10</span>
+          <div class="stat-label">Complete chapters</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">5K+</span>
+          <div class="stat-label">Words of dense content</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">1</span>
+          <div class="stat-label">Asset you actually own</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <div class="section-label">The problem</div>
+      <h2>You're building on borrowed land.</h2>
+      <p class="section-intro">Every follower you have on Instagram, TikTok, or YouTube belongs to the platform. One algorithm change, one policy update, one account issue, and your access disappears. Your email list is the only audience you actually own.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">&#x26A0;</div>
+          <h3>The platform owns your reach</h3>
+          <p>You published 200 posts and grew to 30,000 followers. Then the algorithm changed. Your posts now reach 3% of them. You have no way to contact the rest.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F4A5;</div>
+          <h3>Lead magnets that get ignored</h3>
+          <p>You built a free PDF. Drove traffic to it. Got a few downloads. Most people never opened it, and the ones who did never became buyers.</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#x1F4E7;</div>
+          <h3>Emails that land in the void</h3>
+          <p>You are writing emails but open rates are sliding. Engagement is low. You are not sure if the problem is the content, the list, or the technical setup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <div class="section-label">What's inside</div>
+      <h2>10 chapters. Nothing skipped.</h2>
+      <p class="section-intro">This is a complete operating system for list-building. Not a listicle. Not surface-level advice. A structured walkthrough of every component that makes a creator's email list actually work.</p>
+      <div class="chapters">
+        <div class="chapter-item">
+          <span class="chapter-num">01</span>
+          <div class="chapter-info">
+            <h4>The Foundation Before the List</h4>
+            <p>Why most creators build their list too late and what to define before you collect a single email address.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">02</span>
+          <div class="chapter-info">
+            <h4>Lead Magnets That Actually Convert</h4>
+            <p>The four lead magnet types with the highest conversion rates and why most free resources miss the mark entirely.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">03</span>
+          <div class="chapter-info">
+            <h4>The Opt-In Page Formula</h4>
+            <p>Five elements of a converting opt-in page and what to remove immediately if you want to stop leaking conversions.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">04</span>
+          <div class="chapter-info">
+            <h4>Traffic Sources for List Growth</h4>
+            <p>Organic content, cross-promotion, podcast appearances, and when paid ads actually make sense for list-building.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">05</span>
+          <div class="chapter-info">
+            <h4>Segmentation Basics</h4>
+            <p>Three core segmentation axes and how to organize your list so every email feels relevant to who receives it.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">06</span>
+          <div class="chapter-info">
+            <h4>List Health and Deliverability</h4>
+            <p>The hidden threat that makes good emails go to spam, how sender reputation works, and how to maintain it.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">07</span>
+          <div class="chapter-info">
+            <h4>The Welcome Sequence</h4>
+            <p>A five-email structure for the most critical period in a subscriber's relationship with your list.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">08</span>
+          <div class="chapter-info">
+            <h4>Email Content Strategy</h4>
+            <p>The four email types that build sustainable engagement and how to maintain consistency without burning out.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">09</span>
+          <div class="chapter-info">
+            <h4>Monetizing Without Burning It Out</h4>
+            <p>Products, affiliates, services, and the ratio that keeps your list engaged while generating consistent revenue.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">10</span>
+          <div class="chapter-info">
+            <h4>Tracking What Matters</h4>
+            <p>The five metrics that tell you something real and why list size is the metric you should care about least.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <div class="section-label">Who it's for</div>
+      <h2>Built for creators who are serious.</h2>
+      <p class="section-intro">This is not for everyone. It is specifically useful if you recognize yourself in one of these descriptions.</p>
+      <ul class="audience-list">
+        <li>
+          <span class="check">&#x2713;</span>
+          You are building a personal brand or content business and want an audience you control, not one the platform controls.
+        </li>
+        <li>
+          <span class="check">&#x2713;</span>
+          You have tried building an email list before but never had a system. You collected some subscribers and did not know what to do next.
+        </li>
+        <li>
+          <span class="check">&#x2713;</span>
+          You are about to launch something: a course, a product, a service. You want an email list that will actually buy, not just open.
+        </li>
+        <li>
+          <span class="check">&#x2713;</span>
+          Your current list exists but is underperforming. Open rates are low, engagement is low, and you are not sure why.
+        </li>
+        <li>
+          <span class="check">&#x2713;</span>
+          You want to monetize your knowledge without relying on platform algorithms, paid ads, or viral content every time.
+        </li>
+        <li>
+          <span class="check">&#x2713;</span>
+          You understand that building an owned audience is a long-term investment and you are ready to do it properly.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta" id="buy">
+    <div class="container">
+      <div class="hero-badge">Instant PDF Download</div>
+      <h2>Start building your list today.</h2>
+      <p>Everything in one document. No fluff, no filler. A system you can implement starting this week.</p>
+      <div class="price-block">
+        <div class="price">$21.99</div>
+        <div class="price-note">One-time payment. Instant access.</div>
+      </div>
+      <a class="cta-btn" href="https://behike.gumroad.com/l/creators-email-list-growth-system" target="_blank">Get Instant Access</a>
+      <p class="cta-sub">PDF delivery after purchase. Read it anywhere.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <a href="/">Behike</a> &nbsp;&middot;&nbsp;
+      behikeai.com &nbsp;&middot;&nbsp;
+      <a href="/landing-pages/about.html">About</a>
+    </p>
+    <p style="margin-top: 8px;">Built by creators, for creators.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.hero, .problem-card, .chapter-item, .audience-list li').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<section class="section-padding">
+  <div class="page-width">
+    <h1>{{ 'general.cart.title' | t }}</h1>
+    {%- if cart.item_count > 0 -%}
+      {% form 'cart', cart %}
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align: left; padding: 1.2rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Product</th>
+              <th style="text-align: right; padding: 1.2rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Price</th>
+              <th style="text-align: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Quantity</th>
+              <th style="text-align: right; padding: 1.2rem 0; border-bottom: 1px solid rgba(128,128,128,0.2);">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for item in cart.items -%}
+              <tr>
+                <td style="padding: 1.6rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">
+                  <a href="{{ item.url }}">{{ item.product.title }}</a>
+                  {%- unless item.variant.title == 'Default Title' -%}
+                    <br><small>{{ item.variant.title }}</small>
+                  {%- endunless -%}
+                </td>
+                <td style="text-align: right; padding: 1.6rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">{{ item.price | money }}</td>
+                <td style="text-align: center; padding: 1.6rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">
+                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" style="width: 60px; text-align: center;">
+                </td>
+                <td style="text-align: right; padding: 1.6rem 0; border-bottom: 1px solid rgba(128,128,128,0.1);">{{ item.line_price | money }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 2.4rem;">
+          <p style="font-size: 2rem; font-weight: 700;">{{ 'general.cart.subtotal' | t }}: {{ cart.total_price | money }}</p>
+          <button type="submit" name="update" class="button button--secondary" style="margin-right: 1.2rem;">Update</button>
+          <button type="submit" name="checkout" class="button">{{ 'general.cart.checkout' | t }}</button>
+        </div>
+      {% endform %}
+    {%- else -%}
+      <p>{{ 'general.cart.empty' | t }}</p>
+      <a href="/" class="button">Continue Shopping</a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "section"
+}
+{% endschema %}

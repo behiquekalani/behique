@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator's Content Research System — Behike</title>
+  <meta name="description" content="Find content ideas your audience already wants before you write a single word. The complete research system for creators who publish consistently." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a244;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #141414;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 14px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(17px, 2.5vw, 21px);
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-align: left;
+      line-height: 1.4;
+    }
+    .cta-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .cta-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION BASE */
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .lead {
+      font-size: 19px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 48px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* CHAPTERS */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .chapter-item {
+      display: flex;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .chapter-item.visible { opacity: 1; transform: translateX(0); }
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .chapter-body h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .chapter-body p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .for-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      font-size: 15px;
+      color: var(--text-muted);
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .for-list li.visible { opacity: 1; transform: translateY(0); }
+    .check {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(48, 209, 88, 0.15);
+      border: 1px solid rgba(48, 209, 88, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      font-size: 11px;
+      color: var(--cta);
+    }
+
+    /* QUOTE */
+    .quote-block {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 36px 40px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .quote-block.visible { opacity: 1; transform: translateY(0); }
+    .quote-block blockquote {
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      font-style: normal;
+      margin-bottom: 16px;
+    }
+    .quote-source { font-size: 14px; color: var(--text-muted); }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .final-cta h2 { margin-bottom: 16px; }
+    .final-cta .lead { margin: 0 auto 40px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+    }
+    footer p { font-size: 14px; color: var(--text-muted); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 60px 0 50px; }
+      section { padding: 56px 0; }
+      .price { font-size: 36px; }
+      .quote-block { padding: 24px; }
+      .quote-block blockquote { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-logo">Behike</a>
+      <a href="#get" class="nav-cta">Get It — $18.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Content Strategy</div>
+      <h1>The Creator's<br><span>Content Research System</span></h1>
+      <p class="hero-sub">Find ideas your audience already wants before you write them. A complete research system for creators who need to publish consistently.</p>
+      <div class="price-block">
+        <div class="price">$18.99</div>
+        <div class="price-note">One-time payment.<br>Instant PDF download.</div>
+      </div>
+      <a href="#get" class="cta-primary">Get Instant Access</a>
+      <p class="hero-meta">9 chapters. 5000+ words. Works on any niche.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Most creators skip research and pay for it with every post</h2>
+      <p class="lead">Guessing what to write is not a content strategy. It is a slow drain on time, energy, and motivation.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>The blank-screen cycle</h3>
+          <p>You sit down to write and spend an hour deciding what to write. Then the same thing happens next week.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Content that gets no traction</h3>
+          <p>You publish something you thought was good. It gets 200 views and dies. You have no idea why.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Ideas that feel like guessing</h3>
+          <p>You pick topics based on what you feel like writing, not what your audience needs. The results are unpredictable.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Watching competitors pull ahead</h3>
+          <p>Other creators in your space are growing. You cannot tell why their content works and yours does not.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section>
+    <div class="container">
+      <div class="quote-block">
+        <blockquote>"Content research is not about finding topics. It is about intercepting ideas that already exist in your audience's head, at the moment they are ready to be expressed."</blockquote>
+        <p class="quote-source">From the guide</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="chapters">
+    <div class="container">
+      <div class="section-label">What's Inside</div>
+      <h2>9 chapters. One complete system.</h2>
+      <p class="lead">Not a list of tools. A repeatable research operation that feeds your content pipeline indefinitely.</p>
+      <div class="chapters-grid">
+        <div class="chapter-item">
+          <div class="chapter-num">01</div>
+          <div class="chapter-body">
+            <h4>The Research Mindset Shift</h4>
+            <p>Why audience intelligence is the correct frame and how it changes everything about where you look and what you collect.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">02</div>
+          <div class="chapter-body">
+            <h4>The Free Research Stack</h4>
+            <p>Five layers of free tools covering search intent, community intelligence, keyword research, competitive data, and social listening.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">03</div>
+          <div class="chapter-body">
+            <h4>Audience Pain Points as a Content Mine</h4>
+            <p>The three-level pain framework that turns community research into specific, validated content briefs.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">04</div>
+          <div class="chapter-body">
+            <h4>Competitive Research Without Copying</h4>
+            <p>How to audit competitors, find the gaps they leave open, and differentiate your angle before writing a word.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">05</div>
+          <div class="chapter-body">
+            <h4>Building a Content Vault</h4>
+            <p>The five-component vault architecture and the 45-minute weekly routine that keeps it growing without consuming your time.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">06</div>
+          <div class="chapter-body">
+            <h4>Evaluating Ideas Before You Write</h4>
+            <p>The RISE framework for scoring ideas on relevance, interest evidence, specificity potential, and execution fit.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">07</div>
+          <div class="chapter-body">
+            <h4>From Research to Published Content</h4>
+            <p>The content brief format and five-stage pipeline that take an idea from vault entry to published piece, repeatably.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">08</div>
+          <div class="chapter-body">
+            <h4>Advanced Research Patterns</h4>
+            <p>Trend interception, evergreen content strategy, original research, and the question cluster system for topical authority.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">09</div>
+          <div class="chapter-body">
+            <h4>Maintaining the System Over Time</h4>
+            <p>The simplification principle, quarterly review process, and how to build research into your creator identity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="who">
+    <div class="container">
+      <div class="section-label">Who It's For</div>
+      <h2>Built for creators who are serious about growing</h2>
+      <p class="lead">This system works at any stage if you are willing to do the work consistently.</p>
+      <ul class="for-list">
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Writers, bloggers, and newsletter creators who want more traction per piece</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>YouTubers and podcasters researching their next batch of episodes</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Solopreneurs building an audience to sell digital products or services</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Content marketers who need to justify every piece before investing production time</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Creators who have been publishing for a while but still feel like they are guessing</span>
+        </li>
+        <li>
+          <span class="check">&#10003;</span>
+          <span>Anyone starting a new content channel who wants to get the foundation right from the beginning</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="get" class="final-cta">
+    <div class="container">
+      <div class="section-label">Get Started Today</div>
+      <h2>Stop guessing. Start researching.</h2>
+      <p class="lead">One system. Infinite ideas. The vault starts growing the day you start using it.</p>
+      <div class="price-block" style="margin-bottom: 32px;">
+        <div class="price">$18.99</div>
+        <div class="price-note">One-time payment.<br>PDF delivered instantly.</div>
+      </div>
+      <a href="https://behikeai.gumroad.com/l/creators-content-research-system" class="cta-primary">Get Creator's Content Research System</a>
+      <p style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">Instant download. No subscription. Yours to keep.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="/">behikeai.com</a> &mdash; &copy; 2026</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const siblings = el.parentElement.querySelectorAll(el.tagName + ', .problem-card, .chapter-item, .for-list li, .quote-block');
+          let delay = 0;
+          siblings.forEach((sib, idx) => {
+            if (sib === el) delay = idx * 80;
+          });
+          setTimeout(() => {
+            el.classList.add('visible');
+          }, delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.problem-card, .chapter-item, .for-list li, .quote-block').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

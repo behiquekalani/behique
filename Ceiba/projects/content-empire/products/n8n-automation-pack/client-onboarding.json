@@ -1,0 +1,194 @@
+{
+  "name": "Client Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "client-onboarding",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Clients",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Company": "={{ $json.body.company }}",
+            "Service": "={{ $json.body.service }}",
+            "Date": "={{ $now.toISO() }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "Google Sheets - Log Client",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [460, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "Welcome to Behike, {{ $('Webhook').item.json.body.name }}!",
+        "emailType": "html",
+        "message": "<h2>Welcome aboard!</h2><p>Hi {{ $('Webhook').item.json.body.name }},</p><p>We're so glad you're here. Your onboarding is now in progress and you can expect to hear from us within 24 hours.</p><p>In the meantime, here's what to expect:</p><ul><li>Kickoff call within 48 hours</li><li>Access to your client portal</li><li>First deliverable within 7 days</li></ul><p>Reply to this email with any questions.</p><br><p>— Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Gmail - Send Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "YOUR_NOTION_DATABASE_ID_HERE",
+        "title": "={{ $('Webhook').item.json.body.name }} — Client",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Email",
+              "textValue": "={{ $('Webhook').item.json.body.email }}"
+            },
+            {
+              "key": "Company",
+              "textValue": "={{ $('Webhook').item.json.body.company }}"
+            },
+            {
+              "key": "Service",
+              "textValue": "={{ $('Webhook').item.json.body.service }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "Onboarding"
+            },
+            {
+              "key": "Start Date",
+              "dateValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Notion - Create Client Page",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID",
+          "name": "YOUR_NOTION_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID_HERE",
+        "text": "New client onboarded!\n\nName: {{ $('Webhook').item.json.body.name }}\nEmail: {{ $('Webhook').item.json.body.email }}\nCompany: {{ $('Webhook').item.json.body.company }}\nService: {{ $('Webhook').item.json.body.service }}\n\nNotion page created. Go follow up.",
+        "additionalFields": {}
+      },
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Telegram - Notify Kalani",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"success\", \"message\": \"Client onboarded successfully\" }"
+      },
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Google Sheets - Log Client", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Google Sheets - Log Client": {
+      "main": [
+        [
+          { "node": "Gmail - Send Welcome Email", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Send Welcome Email": {
+      "main": [
+        [
+          { "node": "Notion - Create Client Page", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Notion - Create Client Page": {
+      "main": [
+        [
+          { "node": "Telegram - Notify Kalani", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Telegram - Notify Kalani": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "client-management", "onboarding"]
+}

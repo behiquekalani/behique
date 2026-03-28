@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator's Writing Masterclass — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1C1C1E;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #F5F5F7;
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 16px;
+      color: #86868B;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #F5F5F7 0%, #86868B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-size: 20px;
+      color: #86868B;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-price {
+      font-size: 36px;
+      font-weight: 700;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .hero-price-note {
+      font-size: 14px;
+      color: #48484A;
+      margin-bottom: 32px;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: #30D158;
+      color: #000000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid #1C1C1E;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section-tag {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #0A84FF;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: #86868B;
+      max-width: 680px;
+      line-height: 1.65;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .problem-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #F5F5F7;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    /* CHAPTERS */
+    .chapters-list {
+      margin-top: 40px;
+      display: grid;
+      gap: 12px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px;
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      transition: border-color 0.2s ease;
+    }
+    .chapter-item:hover {
+      border-color: #0A84FF;
+    }
+    .chapter-number {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #0A84FF;
+      min-width: 32px;
+      padding-top: 2px;
+    }
+    .chapter-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+    }
+    .chapter-content p {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.55;
+    }
+
+    /* WHO IT'S FOR */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .audience-card {
+      background: #0A0A0A;
+      border: 1px solid #1C1C1E;
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .audience-card .check {
+      width: 32px;
+      height: 32px;
+      background: rgba(48, 209, 88, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .audience-card .check::after {
+      content: '';
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid #30D158;
+      border-bottom: 2px solid #30D158;
+      transform: rotate(-45deg) translateY(-1px);
+    }
+    .audience-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5F5F7;
+      margin-bottom: 8px;
+    }
+    .audience-card p {
+      font-size: 14px;
+      color: #636366;
+      line-height: 1.6;
+    }
+
+    /* FINAL CTA */
+    .cta-section {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .cta-section .section-title {
+      margin-bottom: 16px;
+    }
+    .cta-section .section-body {
+      margin: 0 auto 40px;
+    }
+    .cta-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: #F5F5F7;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+    .cta-note {
+      font-size: 13px;
+      color: #48484A;
+      margin-bottom: 32px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid #1C1C1E;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: #48484A;
+    }
+    footer a {
+      color: #636366;
+      text-decoration: none;
+    }
+    footer a:hover { color: #F5F5F7; }
+
+    @media (max-width: 640px) {
+      .hero { padding: 80px 0 60px; }
+      section { padding: 60px 0; }
+      .cta-section { padding: 70px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <span class="nav-price">$24.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <span class="hero-tag">Digital Product</span>
+      <h1>Creator's Writing<br>Masterclass</h1>
+      <p class="hero-subtitle">Writing is the core skill of the creator economy. Every other asset you build starts as words. This is how you build that skill deliberately.</p>
+      <div class="hero-price">$24.99</div>
+      <p class="hero-price-note">Instant PDF download. 8 chapters. 5000+ words.</p>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-tag">The Problem</p>
+      <h2 class="section-title">You're optimizing the wrong things.</h2>
+      <p class="section-body">Most creators spend their energy on thumbnails, algorithms, and posting frequency. Writing is treated as an afterthought. This is the wrong priority order. Every piece of content, regardless of format, starts as a thought that needs to become words.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>Generic voice</h3>
+          <p>Content that sounds like it could have been written by anyone. Readers scroll past it because there's nothing to hold onto.</p>
+        </div>
+        <div class="problem-card">
+          <h3>No essay structure</h3>
+          <p>Information dumps that are educational but not compelling. Readable but not memorable. Nothing that moves readers to act.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Content that doesn't sell</h3>
+          <p>Either too pushy or completely invisible about offers. Neither builds the trust that makes buyers choose you consistently.</p>
+        </div>
+        <div class="problem-card">
+          <h3>No practice that compounds</h3>
+          <p>Writing in bursts followed by silence. Starting over each time instead of building a body of work that grows in value.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="inside">
+    <div class="container">
+      <p class="section-tag">What's Inside</p>
+      <h2 class="section-title">Eight chapters on writing as a business asset.</h2>
+      <p class="section-body">Not writing tips. The full picture of how to build writing as a compounding skill that multiplies the value of everything else you create.</p>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <span class="chapter-number">01</span>
+          <div class="chapter-content">
+            <h3>Why Writing Is the Core Skill of the Creator Economy</h3>
+            <p>The asymmetry between writing and every other content format, and why investing in this skill has the highest return available to a creator.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">02</span>
+          <div class="chapter-content">
+            <h3>Developing a Distinctive Written Voice</h3>
+            <p>Voice is not style. It is perspective. The techniques that move writing from competent to unmistakably yours.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">03</span>
+          <div class="chapter-content">
+            <h3>The Essay Structure That Builds Audiences</h3>
+            <p>The five-component structure that makes essays compelling rather than informational. Why most creator essays fail and what to do instead.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">04</span>
+          <div class="chapter-content">
+            <h3>Writing That Sells Without Being Salesy</h3>
+            <p>The mechanism behind writing that converts. How to create resonance before making any request. Why most creator sales writing fails.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">05</span>
+          <div class="chapter-content">
+            <h3>Writing for Specific Formats</h3>
+            <p>Long-form essays, threads, newsletters, landing pages. Each format has conventions that determine whether the writing works or falls flat.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">06</span>
+          <div class="chapter-content">
+            <h3>Editing Your Own Work</h3>
+            <p>Writing and editing are different cognitive tasks. The techniques for cutting aggressively, strengthening arguments, and knowing when something is ready to publish.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">07</span>
+          <div class="chapter-content">
+            <h3>Building a Writing Practice That Compounds</h3>
+            <p>The three-part structure of a sustainable practice: consistent production, a capture habit, and an input system that feeds ideas indefinitely.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-number">08</span>
+          <div class="chapter-content">
+            <h3>Writing as a Business Asset</h3>
+            <p>How to categorize your writing by function. Awareness content, depth content, authority content, product content. Using the full range to build a creator business.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="audience">
+    <div class="container">
+      <p class="section-tag">Who It's For</p>
+      <h2 class="section-title">Built for creators who are serious about the long game.</h2>
+      <p class="section-body">This is not a beginner's guide to writing. It is a creator's guide to writing as a business discipline.</p>
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Newsletter writers</h3>
+          <p>You're publishing but the audience isn't growing the way it should. Your writing needs more structure, more voice, more direction.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Content creators moving to text</h3>
+          <p>You've built an audience on video or audio and know writing would compound faster. You want to build that skill with intention.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Solopreneurs building products</h3>
+          <p>Your sales pages, email sequences, and product copy are underperforming. The writing skill is the missing piece.</p>
+        </div>
+        <div class="audience-card">
+          <div class="check"></div>
+          <h3>Early-stage creators</h3>
+          <p>You're starting a content practice and want to build it on the right foundation rather than fixing bad habits later.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <p class="section-tag">Get the Masterclass</p>
+      <h2 class="section-title">Start building the skill that compounds.</h2>
+      <p class="section-body">A one-time purchase. Instant PDF download. The full writing framework for creators who want to build something that lasts.</p>
+      <div class="cta-price">$24.99</div>
+      <p class="cta-note">Instant access. No subscription.</p>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>
+        <a href="/index.html">Behike</a> &nbsp;&middot;&nbsp;
+        <a href="/privacy.html">Privacy</a> &nbsp;&middot;&nbsp;
+        <a href="/refund.html">Refund Policy</a>
+      </p>
+      <p style="margin-top:12px;">All products are digital downloads. No physical goods.</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('section').forEach(s => observer.observe(s));
+  </script>
+
+</body>
+</html>

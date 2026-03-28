@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products - Behike</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#000;--text:#F5F5F7;--dim:#86868B;--accent:#007AFF;--surface:#111;--border:#222;--radius:12px;--max:1080px}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+nav .logo{font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+nav .links{display:flex;gap:28px;font-size:14px}
+nav .links a{color:var(--dim);transition:color .2s}
+nav .links a:hover{color:var(--text);text-decoration:none}
+
+.toolbar{padding:32px 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.search{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 16px;color:var(--text);font-size:15px;font-family:inherit;outline:none}
+.search:focus{border-color:var(--accent)}
+.search::placeholder{color:#555}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{background:none;border:1px solid var(--border);border-radius:980px;padding:7px 16px;color:var(--dim);font-size:13px;font-family:inherit;cursor:pointer;transition:all .2s}
+.filters button:hover,.filters button.active{border-color:var(--accent);color:var(--accent)}
+.sort-wrap{display:flex;gap:8px;align-items:center}
+.sort-wrap label{font-size:13px;color:var(--dim)}
+.sort-wrap select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;cursor:pointer}
+
+.count{font-size:14px;color:var(--dim);margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;padding-bottom:80px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;transition:border-color .2s}
+.card:hover{border-color:#333}
+.card .tag{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:12px}
+.card h3{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+.card .desc{font-size:14px;color:var(--dim);margin-bottom:20px;line-height:1.5}
+.card .bottom{display:flex;align-items:center;justify-content:space-between}
+.card .price{font-size:20px;font-weight:600}
+.card .price.free{color:var(--accent)}
+.card .btn{display:inline-block;padding:8px 20px;background:var(--accent);color:#fff;border-radius:980px;font-size:13px;font-weight:500;transition:opacity .2s;border:none;cursor:pointer;font-family:inherit}
+.card .btn:hover{opacity:.85;text-decoration:none}
+.empty{text-align:center;padding:80px 24px;color:var(--dim);font-size:18px}
+
+footer{border-top:1px solid var(--border);padding:48px 24px;text-align:center}
+footer .brand{font-size:14px;font-weight:600;margin-bottom:8px}
+footer .meta{font-size:13px;color:var(--dim)}
+footer .meta a{color:var(--dim)}
+footer .meta a:hover{color:var(--text)}
+
+@media(max-width:600px){
+  nav .links{gap:16px;font-size:13px}
+  .toolbar{padding:24px 0}
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="index.html" class="logo">behike</a>
+    <div class="links">
+      <a href="products.html">Products</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="toolbar">
+    <input type="text" class="search" id="search" placeholder="Search products...">
+    <div class="filters" id="filters">
+      <button data-cat="all" class="active">All</button>
+      <button data-cat="blueprint">Blueprints</button>
+      <button data-cat="guide">Guides</button>
+      <button data-cat="kit">Kits</button>
+      <button data-cat="template">Templates</button>
+      <button data-cat="free">Free</button>
+    </div>
+    <div class="sort-wrap">
+      <label>Sort:</label>
+      <select id="sort">
+        <option value="name">Name</option>
+        <option value="price-low">Price: Low</option>
+        <option value="price-high">Price: High</option>
+      </select>
+    </div>
+  </div>
+  <div class="count" id="count"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none">No products match your search.</div>
+</div>
+
+<footer>
+  <div class="brand">behike.co</div>
+  <div class="meta">
+    Built in Puerto Rico
+    &nbsp;&middot;&nbsp;
+    <a href="about.html">About</a>
+    &nbsp;&middot;&nbsp;
+    <a href="index.html">Home</a>
+  </div>
+</footer>
+
+<script>
+let products = [];
+let activeCat = 'all';
+
+async function init() {
+  const res = await fetch('products.json');
+  products = await res.json();
+
+  // Check URL params
+  const params = new URLSearchParams(window.location.search);
+  const cat = params.get('cat');
+  if (cat) {
+    activeCat = cat;
+    document.querySelectorAll('#filters button').forEach(b => {
+      b.classList.toggle('active', b.dataset.cat === cat);
+    });
+  }
+
+  render();
+  setupListeners();
+}
+
+function render() {
+  const query = document.getElementById('search').value.toLowerCase().trim();
+  const sortBy = document.getElementById('sort').value;
+
+  let filtered = products.filter(p => {
+    const matchCat = activeCat === 'all' || p.category === activeCat;
+    const matchSearch = !query || p.title.toLowerCase().includes(query) || p.description.toLowerCase().includes(query) || p.category.toLowerCase().includes(query);
+    return matchCat && matchSearch;
+  });
+
+  if (sortBy === 'name') filtered.sort((a, b) => a.title.localeCompare(b.title));
+  else if (sortBy === 'price-low') filtered.sort((a, b) => a.price - b.price);
+  else if (sortBy === 'price-high') filtered.sort((a, b) => b.price - a.price);
+
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const count = document.getElementById('count');
+
+  count.textContent = filtered.length + ' product' + (filtered.length !== 1 ? 's' : '');
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(p => {
+    const priceText = p.price === 0 ? 'Free' : '$' + p.price;
+    const priceClass = p.price === 0 ? 'price free' : 'price';
+    const btnText = p.price === 0 ? 'Get it free' : 'Get it';
+    const url = p.gumroad_url !== '#' ? p.gumroad_url : '#';
+    return `
+      <div class="card">
+        <div class="tag">${p.category}</div>
+        <h3>${p.title}</h3>
+        <div class="desc">${p.description}</div>
+        <div class="bottom">
+          <span class="${priceClass}">${priceText}</span>
+          <a href="${url}" class="btn" target="_blank" rel="noopener">${btnText}</a>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function setupListeners() {
+  document.getElementById('search').addEventListener('input', render);
+  document.getElementById('sort').addEventListener('change', render);
+  document.querySelectorAll('#filters button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCat = btn.dataset.cat;
+      render();
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>

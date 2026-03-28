@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Preview - Personal Budget Template</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #000000;
+            --bg2: #1D1D1F;
+            --accent: #0A84FF;
+            --text: #F5F5F7;
+            --gray: #86868B;
+            --green: #30D158;
+            --red: #FF453A;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .preview-banner {
+            background: var(--accent);
+            color: #fff;
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 0 48px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .hero .subtitle {
+            font-size: 18px;
+            color: var(--gray);
+        }
+
+        /* Budget Table */
+        .budget-section {
+            margin: 40px 0;
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .budget-table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--gray);
+            background: rgba(134, 134, 139, 0.1);
+            font-weight: 600;
+        }
+
+        .budget-table thead th:nth-child(n+2) {
+            text-align: right;
+        }
+
+        .budget-table tbody td {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(134, 134, 139, 0.15);
+            font-size: 15px;
+        }
+
+        .budget-table tbody td:first-child {
+            font-weight: 500;
+        }
+
+        .budget-table tbody td:nth-child(n+2) {
+            text-align: right;
+        }
+
+        .budget-table input {
+            background: rgba(245, 245, 247, 0.08);
+            border: 1px solid rgba(134, 134, 139, 0.25);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            width: 100px;
+            text-align: right;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .budget-table input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .remaining-positive { color: var(--green); font-weight: 600; }
+        .remaining-negative { color: var(--red); font-weight: 600; }
+
+        .total-row td {
+            font-weight: 700 !important;
+            font-size: 16px !important;
+            border-top: 2px solid rgba(134, 134, 139, 0.3) !important;
+            padding-top: 16px !important;
+            padding-bottom: 16px !important;
+        }
+
+        /* Bar Chart */
+        .chart-section {
+            margin: 48px 0;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .chart-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .chart-label {
+            width: 110px;
+            font-size: 13px;
+            color: var(--gray);
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        .chart-bars {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bar-container {
+            height: 18px;
+            background: rgba(134, 134, 139, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease;
+            min-width: 2px;
+        }
+
+        .bar-budget { background: var(--accent); opacity: 0.5; }
+        .bar-actual { background: var(--accent); }
+
+        .chart-legend {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-dot.budget { background: var(--accent); opacity: 0.5; }
+        .legend-dot.actual { background: var(--accent); }
+
+        /* Blurred Preview */
+        .locked-section {
+            margin: 60px 0;
+            position: relative;
+        }
+
+        .locked-content {
+            filter: blur(5px);
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .locked-content .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .locked-content .feature-card {
+            background: var(--bg2);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .locked-content .feature-card h4 {
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .locked-content .feature-card p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .locked-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            z-index: 10;
+        }
+
+        .locked-overlay .lock-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .locked-overlay .lock-sub {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .locked-label {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .locked-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 24px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .locked-list li::before {
+            content: '+ ';
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            padding: 16px 48px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .cta-price {
+            display: block;
+            margin-top: 12px;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            font-size: 13px;
+            color: var(--gray);
+            border-top: 1px solid rgba(134, 134, 139, 0.15);
+        }
+
+        @media (max-width: 600px) {
+            .budget-table input { width: 80px; font-size: 14px; padding: 6px 8px; }
+            .chart-label { width: 80px; font-size: 12px; }
+            .locked-list { grid-template-columns: 1fr; }
+            .locked-content .feature-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="preview-banner">Interactive Preview &mdash; Try it yourself</div>
+
+<div class="container">
+
+    <section class="hero">
+        <h1>Personal Budget Template</h1>
+        <p class="subtitle">Edit the numbers below. Everything updates in real time.</p>
+    </section>
+
+    <section class="budget-section">
+        <table class="budget-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Actual</th>
+                    <th>Remaining</th>
+                </tr>
+            </thead>
+            <tbody id="budget-body">
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td>Total</td>
+                    <td id="total-budget" style="text-align:right;">$0</td>
+                    <td id="total-actual" style="text-align:right;">$0</td>
+                    <td id="total-remaining" style="text-align:right;">$0</td>
+                </tr>
+            </tfoot>
+        </table>
+    </section>
+
+    <section class="chart-section">
+        <div class="chart-title">Budget vs Actual</div>
+        <div id="chart-container"></div>
+        <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot budget"></div> Budget</div>
+            <div class="legend-item"><div class="legend-dot actual"></div> Actual</div>
+        </div>
+    </section>
+
+    <section class="locked-section">
+        <div class="locked-content">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>12-Month View</h4>
+                    <p>Track your budget across the entire year with monthly breakdowns and trend analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Savings Goals</h4>
+                    <p>Set targets for emergency fund, vacation, or big purchases with progress tracking.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Debt Tracker</h4>
+                    <p>Snowball or avalanche method. See your payoff date and total interest saved.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Income Streams</h4>
+                    <p>Track multiple income sources and see your net cash flow month over month.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Custom Categories</h4>
+                    <p>Add your own spending categories beyond the defaults. Fully customizable.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Visual Dashboard</h4>
+                    <p>Charts, progress bars, and color-coded indicators at a glance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="locked-overlay">
+            <div class="lock-text">Get the full template to unlock</div>
+            <div class="lock-sub">12-month view, savings goals, debt tracker, and more</div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <a href="#" class="cta-btn">Get the Full Template - $9.99</a>
+        <span class="cta-price">Google Sheets + Excel. One-time purchase.</span>
+    </section>
+
+    <footer>
+        &copy; 2026 Behike
+    </footer>
+
+</div>
+
+<script>
+    const categories = [
+        { name: 'Housing', budget: 1200, actual: 1150 },
+        { name: 'Food', budget: 400, actual: 520 },
+        { name: 'Transport', budget: 200, actual: 180 },
+        { name: 'Entertainment', budget: 150, actual: 200 },
+        { name: 'Savings', budget: 300, actual: 300 },
+    ];
+
+    const tbody = document.getElementById('budget-body');
+    const chartContainer = document.getElementById('chart-container');
+
+    function createInput(value, rowIndex, field) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = value;
+        input.min = '0';
+        input.step = '1';
+        input.dataset.row = rowIndex;
+        input.dataset.field = field;
+        input.addEventListener('input', handleInput);
+        return input;
+    }
+
+    function handleInput(e) {
+        const row = parseInt(e.target.dataset.row);
+        const field = e.target.dataset.field;
+        const val = parseFloat(e.target.value) || 0;
+        categories[row][field] = val;
+        updateAll();
+    }
+
+    function updateAll() {
+        // Update remaining cells
+        categories.forEach((cat, i) => {
+            const remaining = cat.budget - cat.actual;
+            const cell = document.getElementById('remaining-' + i);
+            cell.textContent = (remaining >= 0 ? '+' : '') + '$' + remaining.toFixed(0);
+            cell.className = remaining >= 0 ? 'remaining-positive' : 'remaining-negative';
+        });
+
+        // Update totals
+        const totalBudget = categories.reduce((s, c) => s + c.budget, 0);
+        const totalActual = categories.reduce((s, c) => s + c.actual, 0);
+        const totalRemaining = totalBudget - totalActual;
+
+        document.getElementById('total-budget').textContent = '$' + totalBudget.toLocaleString();
+        document.getElementById('total-actual').textContent = '$' + totalActual.toLocaleString();
+
+        const tr = document.getElementById('total-remaining');
+        tr.textContent = (totalRemaining >= 0 ? '+' : '') + '$' + totalRemaining.toFixed(0);
+        tr.className = totalRemaining >= 0 ? 'remaining-positive' : 'remaining-negative';
+
+        // Update chart
+        updateChart();
+    }
+
+    function updateChart() {
+        const maxVal = Math.max(...categories.map(c => Math.max(c.budget, c.actual)), 1);
+        chartContainer.innerHTML = '';
+
+        categories.forEach(cat => {
+            const row = document.createElement('div');
+            row.className = 'chart-row';
+
+            const label = document.createElement('div');
+            label.className = 'chart-label';
+            label.textContent = cat.name;
+
+            const bars = document.createElement('div');
+            bars.className = 'chart-bars';
+
+            // Budget bar
+            const budgetContainer = document.createElement('div');
+            budgetContainer.className = 'bar-container';
+            const budgetBar = document.createElement('div');
+            budgetBar.className = 'bar bar-budget';
+            budgetBar.style.width = ((cat.budget / maxVal) * 100) + '%';
+            budgetContainer.appendChild(budgetBar);
+
+            // Actual bar
+            const actualContainer = document.createElement('div');
+            actualContainer.className = 'bar-container';
+            const actualBar = document.createElement('div');
+            actualBar.className = 'bar bar-actual';
+            actualBar.style.width = ((cat.actual / maxVal) * 100) + '%';
+            if (cat.actual > cat.budget) {
+                actualBar.style.background = 'var(--red)';
+            }
+            actualContainer.appendChild(actualBar);
+
+            bars.appendChild(budgetContainer);
+            bars.appendChild(actualContainer);
+
+            row.appendChild(label);
+            row.appendChild(bars);
+            chartContainer.appendChild(row);
+        });
+    }
+
+    // Build table
+    categories.forEach((cat, i) => {
+        const tr = document.createElement('tr');
+
+        const nameTd = document.createElement('td');
+        nameTd.textContent = cat.name;
+
+        const budgetTd = document.createElement('td');
+        budgetTd.appendChild(createInput(cat.budget, i, 'budget'));
+
+        const actualTd = document.createElement('td');
+        actualTd.appendChild(createInput(cat.actual, i, 'actual'));
+
+        const remainingTd = document.createElement('td');
+        remainingTd.id = 'remaining-' + i;
+
+        tr.appendChild(nameTd);
+        tr.appendChild(budgetTd);
+        tr.appendChild(actualTd);
+        tr.appendChild(remainingTd);
+        tbody.appendChild(tr);
+    });
+
+    updateAll();
+</script>
+<script src="../settings-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+{
+  "name": "Product Launch Email Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "launch-trigger",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "a7b8c9d0-0001-4000-8000-000000000001",
+      "name": "Webhook - Manual Launch Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "notes": "Kalani hits this endpoint manually to kick off the launch sequence. Pass product name and launch URL in body."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.convertkit.com/v3/tags",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "api_secret", "value": "YOUR_CONVERTKIT_API_SECRET_HERE" },
+            { "name": "tag[name]", "value": "=launch-{{ $now.toFormat('yyyy-MM') }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7b8c9d0-0002-4000-8000-000000000002",
+      "name": "ConvertKit - Tag Subscribers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "YOUR_LIST_EMAIL_HERE",
+        "subject": "{{ $('Webhook - Manual Launch Trigger').item.json.email1Subject || 'It\\'s here.' }}",
+        "emailType": "html",
+        "message": "={{ $('Webhook - Manual Launch Trigger').item.json.email1Body || '<p>Hey,</p><p>We just launched something new. Here is what it is and why it matters to you.</p><p><a href=\"YOUR_PRODUCT_URL_HERE\">Check it out here</a></p><p>— Kalani</p>' }}",
+        "options": {}
+      },
+      "id": "a7b8c9d0-0003-4000-8000-000000000003",
+      "name": "Gmail - Launch Email 1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours"
+      },
+      "id": "a7b8c9d0-0004-4000-8000-000000000004",
+      "name": "Wait - 24 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "YOUR_LIST_EMAIL_HERE",
+        "subject": "{{ $('Webhook - Manual Launch Trigger').item.json.email2Subject || 'The real reason I built this' }}",
+        "emailType": "html",
+        "message": "={{ $('Webhook - Manual Launch Trigger').item.json.email2Body || '<p>Hey,</p><p>Yesterday I announced something new. Today I want to tell you the real story behind it.</p><p>I built this because I was tired of [PROBLEM]. And I know you are too.</p><p>Here is what is different about this approach: [VALUE PROP].</p><p><a href=\"YOUR_PRODUCT_URL_HERE\">Grab it here while the launch price holds</a></p><p>— Kalani</p>' }}",
+        "options": {}
+      },
+      "id": "a7b8c9d0-0005-4000-8000-000000000005",
+      "name": "Gmail - Launch Email 2",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours"
+      },
+      "id": "a7b8c9d0-0006-4000-8000-000000000006",
+      "name": "Wait - 24 Hours (2)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "YOUR_LIST_EMAIL_HERE",
+        "subject": "{{ $('Webhook - Manual Launch Trigger').item.json.email3Subject || 'Last chance (I mean it)' }}",
+        "emailType": "html",
+        "message": "={{ $('Webhook - Manual Launch Trigger').item.json.email3Body || '<p>This is the last email about the launch.</p><p>Launch pricing closes at midnight tonight.</p><p>If this is for you, here is the link: <a href=\"YOUR_PRODUCT_URL_HERE\">Get it now</a></p><p>If it is not, no hard feelings. I will be back with something else soon.</p><p>— Kalani</p>' }}",
+        "options": {}
+      },
+      "id": "a7b8c9d0-0007-4000-8000-000000000007",
+      "name": "Gmail - Launch Email 3 (Close)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1560, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "application": "YOUR_AIRTABLE_BASE_ID_HERE",
+        "table": "LaunchMetrics",
+        "options": {},
+        "fields": {
+          "fieldMappingsUi": {
+            "fieldMappings": [
+              { "fieldId": "ProductName", "fieldValue": "={{ $('Webhook - Manual Launch Trigger').item.json.productName }}" },
+              { "fieldId": "LaunchDate", "fieldValue": "={{ $('Webhook - Manual Launch Trigger').item.json.launchDate || $now.toISO() }}" },
+              { "fieldId": "SequenceCompleted", "fieldValue": "={{ $now.toISO() }}" },
+              { "fieldId": "EmailsSent", "fieldValue": "3" },
+              { "fieldId": "Status", "fieldValue": "Sequence Complete" }
+            ]
+          }
+        }
+      },
+      "id": "a7b8c9d0-0008-4000-8000-000000000008",
+      "name": "Airtable - Log Launch Metrics",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [1780, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "name": "YOUR_AIRTABLE_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Manual Launch Trigger": {
+      "main": [
+        [
+          { "node": "ConvertKit - Tag Subscribers", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "ConvertKit - Tag Subscribers": {
+      "main": [
+        [
+          { "node": "Gmail - Launch Email 1", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Launch Email 1": {
+      "main": [
+        [
+          { "node": "Wait - 24 Hours", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Wait - 24 Hours": {
+      "main": [
+        [
+          { "node": "Gmail - Launch Email 2", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Launch Email 2": {
+      "main": [
+        [
+          { "node": "Wait - 24 Hours (2)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Wait - 24 Hours (2)": {
+      "main": [
+        [
+          { "node": "Gmail - Launch Email 3 (Close)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Launch Email 3 (Close)": {
+      "main": [
+        [
+          { "node": "Airtable - Log Launch Metrics", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "launch", "email-sequence", "convertkit"]
+}

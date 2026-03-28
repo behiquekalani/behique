@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Installer — Your AI System, Set Up in 2 Hours</title>
+<meta name="description" content="I install a custom AI system for your business. Three options: guided setup, full installation, or done-for-you. Pick your level.">
+<style>
+  :root {
+    --black: #000;
+    --surface: #1c1c1e;
+    --surface2: #2c2c2e;
+    --surface3: #3a3a3c;
+    --blue: #0a84ff;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --purple: #bf5af2;
+    --text: #f5f5f7;
+    --secondary: #8e8e93;
+    --tertiary: #48484a;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 16px 24px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-logo { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; }
+  .nav-logo span { color: var(--blue); }
+  .nav-cta {
+    background: var(--blue); color: #fff;
+    padding: 8px 20px; border-radius: 980px;
+    font-size: 14px; font-weight: 600; text-decoration: none;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 140px 24px 80px;
+    text-align: center;
+    max-width: 760px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(10,132,255,0.15);
+    color: var(--blue);
+    border: 1px solid rgba(10,132,255,0.3);
+    padding: 6px 16px; border-radius: 980px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6.5vw, 64px);
+    font-weight: 800; letter-spacing: -2px; line-height: 1.05;
+    margin-bottom: 20px;
+  }
+  .hero h1 .accent { color: var(--blue); }
+  .hero p {
+    font-size: 19px; color: var(--secondary); line-height: 1.6;
+    margin-bottom: 12px; max-width: 560px; margin-left: auto; margin-right: auto;
+  }
+  .hero-sub { font-size: 15px; color: var(--tertiary); margin-bottom: 40px; }
+  .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--blue); color: #fff;
+    padding: 16px 36px; border-radius: 980px;
+    font-size: 17px; font-weight: 700; text-decoration: none; display: inline-block;
+  }
+  .btn-secondary {
+    background: var(--surface2); color: var(--text);
+    padding: 16px 36px; border-radius: 980px;
+    font-size: 17px; font-weight: 600; text-decoration: none; display: inline-block;
+  }
+
+  /* SECTION */
+  .section { padding: 80px 24px; max-width: 960px; margin: 0 auto; }
+  .section-label {
+    text-align: center; font-size: 13px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; color: var(--secondary);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    text-align: center; font-size: 36px; font-weight: 800; letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+  .section-sub { text-align: center; font-size: 17px; color: var(--secondary); margin-bottom: 48px; }
+
+  /* TIER SELECTOR */
+  .tier-selector {
+    display: flex; gap: 12px; justify-content: center;
+    margin-bottom: 48px; flex-wrap: wrap;
+  }
+  .tier-tab {
+    background: var(--surface2); border: 2px solid transparent;
+    border-radius: 980px; padding: 10px 24px;
+    font-size: 15px; font-weight: 600; cursor: pointer; color: var(--secondary);
+    font-family: inherit; transition: all 0.2s;
+  }
+  .tier-tab.active { color: var(--text); }
+  .tier-tab[data-tier="beginner"].active { border-color: var(--green); background: rgba(48,209,88,0.1); color: var(--green); }
+  .tier-tab[data-tier="moderate"].active { border-color: var(--blue); background: rgba(10,132,255,0.1); color: var(--blue); }
+  .tier-tab[data-tier="advanced"].active { border-color: var(--purple); background: rgba(191,90,242,0.1); color: var(--purple); }
+
+  /* TIER DETAIL */
+  .tier-panel { display: none; }
+  .tier-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+  .tier-info {}
+  .tier-emoji { font-size: 48px; margin-bottom: 16px; display: block; }
+  .tier-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .tier-tagline { font-size: 17px; color: var(--secondary); margin-bottom: 24px; line-height: 1.5; }
+  .tier-for-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary); margin-bottom: 12px; }
+  .tier-for-list { list-style: none; }
+  .tier-for-list li { font-size: 15px; color: var(--secondary); padding: 6px 0; padding-left: 20px; position: relative; }
+  .tier-for-list li::before { content: ""; position: absolute; left: 0; top: 13px; width: 6px; height: 6px; border-radius: 50%; }
+  .tier-panel[data-panel="beginner"] .tier-for-list li::before { background: var(--green); }
+  .tier-panel[data-panel="moderate"] .tier-for-list li::before { background: var(--blue); }
+  .tier-panel[data-panel="advanced"] .tier-for-list li::before { background: var(--purple); }
+
+  .tier-card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 36px;
+    border: 1px solid var(--surface3);
+  }
+  .tier-card-badge {
+    display: inline-block;
+    padding: 5px 14px; border-radius: 980px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .badge-green { background: rgba(48,209,88,0.15); color: var(--green); }
+  .badge-blue { background: rgba(10,132,255,0.15); color: var(--blue); }
+  .badge-purple { background: rgba(191,90,242,0.15); color: var(--purple); }
+
+  .tier-price-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+  .tier-price { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+  .tier-price-note { font-size: 14px; color: var(--secondary); }
+  .tier-delivers { font-size: 14px; color: var(--secondary); margin-bottom: 24px; }
+  .includes-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--secondary); margin-bottom: 12px; }
+  .includes-list { list-style: none; margin-bottom: 28px; }
+  .includes-list li { font-size: 14px; color: var(--secondary); padding: 6px 0; padding-left: 22px; position: relative; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .includes-list li:last-child { border-bottom: none; }
+  .includes-list li::before { content: ""; position: absolute; left: 0; top: 13px; width: 8px; height: 8px; border-radius: 50%; }
+  .tier-panel[data-panel="beginner"] .includes-list li::before { background: var(--green); }
+  .tier-panel[data-panel="moderate"] .includes-list li::before { background: var(--blue); }
+  .tier-panel[data-panel="advanced"] .includes-list li::before { background: var(--purple); }
+
+  .tier-cta {
+    width: 100%; padding: 15px;
+    border-radius: 980px; border: none;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    text-decoration: none; display: block; text-align: center;
+    transition: opacity 0.2s;
+  }
+  .tier-cta:hover { opacity: 0.85; }
+  .cta-green { background: var(--green); color: #000; }
+  .cta-blue { background: var(--blue); color: #fff; }
+  .cta-purple { background: var(--purple); color: #fff; }
+
+  /* WHAT THEY GET */
+  .what-section { padding: 80px 24px; max-width: 900px; margin: 0 auto; }
+  .what-section h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 12px; }
+  .what-section .subtitle { text-align: center; color: var(--secondary); font-size: 17px; margin-bottom: 48px; }
+  .what-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+  .what-card { background: var(--surface); border-radius: var(--radius); padding: 28px; border: 1px solid var(--surface3); }
+  .what-icon { font-size: 26px; margin-bottom: 12px; display: block; }
+  .what-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .what-card p { font-size: 14px; color: var(--secondary); line-height: 1.6; }
+
+  /* PROCESS */
+  .process-section { padding: 60px 24px; max-width: 700px; margin: 0 auto; }
+  .process-section h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 48px; }
+  .process-steps { display: flex; flex-direction: column; }
+  .pstep { display: flex; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--surface3); }
+  .pstep:last-child { border-bottom: none; }
+  .pstep-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(10,132,255,0.15); color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px; flex-shrink: 0;
+  }
+  .pstep h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .pstep p { font-size: 14px; color: var(--secondary); line-height: 1.6; }
+
+  /* ABOUT */
+  .about-section { padding: 60px 24px; max-width: 700px; margin: 0 auto; }
+  .about-card { background: var(--surface); border-radius: 20px; padding: 36px; border: 1px solid var(--surface3); }
+  .about-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .about-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .about-name { font-size: 18px; font-weight: 700; }
+  .about-role { font-size: 14px; color: var(--secondary); }
+  .about-card p { font-size: 15px; color: var(--secondary); line-height: 1.7; margin-bottom: 12px; }
+  .about-card p:last-child { margin-bottom: 0; }
+
+  /* FAQ */
+  .faq-section { padding: 60px 24px; max-width: 700px; margin: 0 auto; }
+  .faq-section h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; text-align: center; margin-bottom: 40px; }
+  .faq-item { border-bottom: 1px solid var(--surface3); padding: 20px 0; }
+  .faq-q { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .faq-a { font-size: 14px; color: var(--secondary); line-height: 1.6; }
+
+  /* FOOTER CTA */
+  .footer-cta { padding: 80px 24px; text-align: center; background: linear-gradient(180deg, transparent, rgba(10,132,255,0.05)); }
+  .footer-cta h2 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+  .footer-cta p { color: var(--secondary); font-size: 17px; margin-bottom: 32px; }
+
+  footer { padding: 24px; text-align: center; border-top: 1px solid var(--surface3); font-size: 13px; color: var(--secondary); }
+  footer a { color: var(--secondary); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 680px) {
+    .tier-panel.active { grid-template-columns: 1fr; }
+    .tier-card { order: -1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>AI</span> Agent Installer</div>
+  <a href="#tiers" class="nav-cta">See Options</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Service. Puerto Rico and Remote.</div>
+  <h1>Your AI system,<br><span class="accent">set up in 2 hours.</span></h1>
+  <p>I install a custom AI agent stack for your business. Three options depending on how much you want me involved.</p>
+  <p class="hero-sub">No technical knowledge required. Works with any business.</p>
+  <div class="hero-ctas">
+    <a href="#tiers" class="btn-primary">See the 3 Options</a>
+    <a href="#what" class="btn-secondary">What You Get</a>
+  </div>
+</section>
+
+<!-- TIER SECTION -->
+<section class="section" id="tiers">
+  <p class="section-label">Three options</p>
+  <h2 class="section-title">Pick your level.</h2>
+  <p class="section-sub">Not everyone wants the same thing. Some people want to learn. Some want it done.</p>
+
+  <div class="tier-selector">
+    <button class="tier-tab active" data-tier="beginner" onclick="selectTier('beginner', this)">Beginner</button>
+    <button class="tier-tab" data-tier="moderate" onclick="selectTier('moderate', this)">Intermediate</button>
+    <button class="tier-tab" data-tier="advanced" onclick="selectTier('advanced', this)">Full Install</button>
+  </div>
+
+  <!-- BEGINNER -->
+  <div class="tier-panel active" data-panel="beginner">
+    <div class="tier-info">
+      <span class="tier-emoji">🟢</span>
+      <div class="tier-name">Starter Setup</div>
+      <div class="tier-tagline">A guided walkthrough. I set up 3 AI tools for your business and show you exactly how to use them.</div>
+      <p class="tier-for-label">This is for you if:</p>
+      <ul class="tier-for-list">
+        <li>You have heard about AI but never used it for work</li>
+        <li>You tried ChatGPT but didn't know how to apply it</li>
+        <li>You want someone to show you, step by step</li>
+        <li>You own a small business or work freelance</li>
+        <li>You have a limited budget for tools</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <span class="tier-card-badge badge-green">Beginner Friendly</span>
+      <div class="tier-price-row">
+        <span class="tier-price">$497</span>
+        <span class="tier-price-note">one-time</span>
+      </div>
+      <div class="tier-delivers">Delivered in: 90-minute video call + follow-up email</div>
+      <p class="includes-label">What's included:</p>
+      <ul class="includes-list">
+        <li>3 AI tools selected for your specific business</li>
+        <li>Live walkthrough via Zoom or Google Meet</li>
+        <li>Screen recording of the session (yours to keep)</li>
+        <li>Custom prompt templates for your business type</li>
+        <li>Simple written guide (no jargon)</li>
+        <li>1 follow-up email with questions answered</li>
+        <li>7-day email support after the call</li>
+      </ul>
+      <a href="mailto:behikeai@gmail.com?subject=Starter%20Setup%20Inquiry" class="tier-cta cta-green">Book a Call</a>
+    </div>
+  </div>
+
+  <!-- MODERATE -->
+  <div class="tier-panel" data-panel="moderate">
+    <div class="tier-info">
+      <span class="tier-emoji">🔵</span>
+      <div class="tier-name">AI Workflow Install</div>
+      <div class="tier-tagline">I build and install a working AI workflow for your business. You get the system. I show you how to maintain it.</div>
+      <p class="tier-for-label">This is for you if:</p>
+      <ul class="tier-for-list">
+        <li>You already use some tech tools in your business</li>
+        <li>You want to automate repetitive tasks</li>
+        <li>You have a specific workflow you want to improve</li>
+        <li>You can handle a bit of technical setup with guidance</li>
+        <li>Content, email, or scheduling is eating your time</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <span class="tier-card-badge badge-blue">Most Popular</span>
+      <div class="tier-price-row">
+        <span class="tier-price">$997</span>
+        <span class="tier-price-note">one-time</span>
+      </div>
+      <div class="tier-delivers">Delivered in: 1 week</div>
+      <p class="includes-label">What's included:</p>
+      <ul class="includes-list">
+        <li>AI audit call (30 min) to map your current workflow</li>
+        <li>Custom n8n or Make.com automation built for your business</li>
+        <li>AI content assistant configured to your brand voice</li>
+        <li>Email automation or scheduling workflow</li>
+        <li>30-minute handoff call to walk through everything</li>
+        <li>Written documentation of your system</li>
+        <li>14-day post-install support</li>
+      </ul>
+      <a href="mailto:behikeai@gmail.com?subject=AI%20Workflow%20Install%20Inquiry" class="tier-cta cta-blue">Book a Call</a>
+    </div>
+  </div>
+
+  <!-- ADVANCED -->
+  <div class="tier-panel" data-panel="advanced">
+    <div class="tier-info">
+      <span class="tier-emoji">🟣</span>
+      <div class="tier-name">Full AI System</div>
+      <div class="tier-tagline">I build your complete AI business stack. Content pipeline, automation, research tools, and AI agent. Everything connected.</div>
+      <p class="tier-for-label">This is for you if:</p>
+      <ul class="tier-for-list">
+        <li>You run an established business or agency</li>
+        <li>You want a competitive advantage through AI infrastructure</li>
+        <li>You need multiple systems working together</li>
+        <li>You have tried to implement AI but it felt disconnected</li>
+        <li>You want a custom solution, not a template</li>
+      </ul>
+    </div>
+    <div class="tier-card">
+      <span class="tier-card-badge badge-purple">Full Stack</span>
+      <div class="tier-price-row">
+        <span class="tier-price">$2,997</span>
+        <span class="tier-price-note">one-time</span>
+      </div>
+      <div class="tier-delivers">Delivered in: 2-3 weeks</div>
+      <p class="includes-label">What's included:</p>
+      <ul class="includes-list">
+        <li>2-hour discovery call and business audit</li>
+        <li>Custom AI content pipeline (source, draft, schedule)</li>
+        <li>n8n or Make.com automation suite (5-10 workflows)</li>
+        <li>Custom AI agent for your team's most repetitive task</li>
+        <li>Research automation (market, competitors, products)</li>
+        <li>Integration with your existing tools</li>
+        <li>1-hour training for you and your team</li>
+        <li>Full system documentation</li>
+        <li>30-day post-install support</li>
+      </ul>
+      <a href="mailto:behikeai@gmail.com?subject=Full%20AI%20System%20Inquiry" class="tier-cta cta-purple">Book a Call</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT THEY GET -->
+<section class="what-section" id="what">
+  <h2>What this actually is.</h2>
+  <p class="subtitle">Not a course. Not a template pack. A working system installed in your business.</p>
+  <div class="what-grid">
+    <div class="what-card">
+      <span class="what-icon">🤖</span>
+      <h3>AI agents that work</h3>
+      <p>Not generic prompts. Custom agents built for your specific workflow. Content writing, research, scheduling, or whatever takes your time right now.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🔗</span>
+      <h3>Connected automations</h3>
+      <p>Tools that talk to each other. An email comes in, a task is created, a draft is generated. One trigger. Multiple actions. No manual work.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">📋</span>
+      <h3>Documentation you keep</h3>
+      <p>Every system I build comes with written documentation. No black box. If something breaks, you know how to fix it. Or I fix it during support.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🎓</span>
+      <h3>Training included</h3>
+      <p>I don't drop a system and disappear. Every installation includes a walkthrough where I explain exactly what I built and how to use it.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🔒</span>
+      <h3>Your tools, your data</h3>
+      <p>Everything runs on tools you control. No subscriptions to a platform I own. No lock-in. If we stop working together, the system still runs.</p>
+    </div>
+    <div class="what-card">
+      <span class="what-icon">🇵🇷</span>
+      <h3>Built by a founder, not an agency</h3>
+      <p>One person. No project managers. No account executives. I build it myself. That means faster delivery, fewer miscommunications, and someone who actually cares.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section">
+  <h2>How the install works.</h2>
+  <div class="process-steps">
+    <div class="pstep">
+      <div class="pstep-num">1</div>
+      <div>
+        <h3>Discovery call (30 min, free)</h3>
+        <p>We talk through your business, your current workflow, and where you lose the most time. I ask questions. You don't need to prepare anything.</p>
+      </div>
+    </div>
+    <div class="pstep">
+      <div class="pstep-num">2</div>
+      <div>
+        <h3>Proposal and scope</h3>
+        <p>I send a written scope of what I'll build, what it costs, and how long it takes. No surprises. You approve before I start.</p>
+      </div>
+    </div>
+    <div class="pstep">
+      <div class="pstep-num">3</div>
+      <div>
+        <h3>Build phase</h3>
+        <p>I build everything. You get progress updates. If I have questions, I ask. If something needs to change, we discuss it before I proceed.</p>
+      </div>
+    </div>
+    <div class="pstep">
+      <div class="pstep-num">4</div>
+      <div>
+        <h3>Handoff call</h3>
+        <p>I walk you through the entire system on a call. You test it with me. I answer every question. You leave knowing exactly how it works.</p>
+      </div>
+    </div>
+    <div class="pstep">
+      <div class="pstep-num">5</div>
+      <div>
+        <h3>Support period</h3>
+        <p>Depending on your tier, you get 7-30 days of post-install support. Something breaks or you have questions, I respond within 24 hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section">
+  <div class="about-card">
+    <div class="about-header">
+      <div class="about-avatar">K</div>
+      <div>
+        <div class="about-name">Kalani</div>
+        <div class="about-role">Computer Engineering Student, Puerto Rico</div>
+      </div>
+    </div>
+    <p>I am a computer engineering student in Puerto Rico building a one-person AI business. I have built AI pipelines for my own operation: content generation, product research, automation workflows, and custom agents. All of it runs and produces real output every day.</p>
+    <p>I work with small business owners and solopreneurs who want to use AI but don't know where to start. I am not selling a course or a template. I am building the actual system and handing you the keys.</p>
+    <p>My goal is simple: after we work together, you spend less time on repetitive work and more time on the things that actually grow your business.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <h2>Common questions.</h2>
+  <div class="faq-item">
+    <div class="faq-q">Do I need to know how to code?</div>
+    <div class="faq-a">No. The Starter option requires zero technical knowledge. The other tiers involve some technical tools but I walk you through everything.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">What kind of businesses do you work with?</div>
+    <div class="faq-a">Primarily service businesses, content creators, freelancers, and small ecommerce operations. If your business involves repetitive work, AI can help. Schedule a free call and we will figure out if it is a good fit.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">What tools will you use?</div>
+    <div class="faq-a">Depends on your business. Commonly: n8n or Make.com for automation, Claude or ChatGPT for AI agents, Notion or Airtable for data, Zapier if needed. I use what makes sense for your situation, not what I prefer to use.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">What if it breaks after you're done?</div>
+    <div class="faq-a">Every install comes with a support period. During that time, I fix anything that breaks at no charge. After the support period, you can hire me for maintenance or handle it yourself with the documentation I provided.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Can I pay in installments?</div>
+    <div class="faq-a">For the $997 and $2,997 tiers, 50% upfront and 50% at delivery works. Reach out to discuss options.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">How do I book?</div>
+    <div class="faq-a">Click "Book a Call" on any tier. I will respond within 24 hours to schedule a free 30-minute discovery call.</div>
+  </div>
+</section>
+
+<!-- QUIZ CTA -->
+<section style="padding: 40px 24px; max-width: 700px; margin: 0 auto; text-align: center;">
+  <p style="font-size:15px; color:#8e8e93; margin-bottom:16px;">Not sure which option is right for you?</p>
+  <a href="quiz-automation-audit.html" style="display:inline-block; background:var(--blue); color:#fff; padding:14px 32px; border-radius:980px; font-size:15px; font-weight:600; text-decoration:none;">Take the Free Business Automation Audit</a>
+  <p style="font-size:13px; color:#636366; margin-top:12px;">8 questions. 3 minutes. We'll tell you exactly what to automate first.</p>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="footer-cta">
+  <h2>Ready to install?</h2>
+  <p>Start with a free 30-minute discovery call. No pitch. We just talk through your business.</p>
+  <a href="mailto:behikeai@gmail.com?subject=Discovery%20Call%20Request" class="btn-primary">Book a Free Discovery Call</a>
+</section>
+
+<footer>
+  <p>AI Agent Installer service by <a href="index.html">Behike</a>. &nbsp;|&nbsp; <a href="privacy.html">Privacy</a> &nbsp;|&nbsp; <a href="terms.html">Terms</a></p>
+</footer>
+
+<script>
+function selectTier(tier, el) {
+  document.querySelectorAll('.tier-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.tier-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector('.tier-panel[data-panel="' + tier + '"]').classList.add('active');
+}
+</script>
+</body>
+</html>

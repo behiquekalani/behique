@@ -1,0 +1,577 @@
+<!--
+  DARK LUXURY THEME
+  Premium dark aesthetic with gold accents. Think luxury watch brand or high-end fashion house.
+
+  SHOPIFY LIQUID CONVERSION GUIDE:
+  =========================================
+  1. Rename this file to theme.liquid or split into sections/
+  2. Replace product cards with {% for product in collections.frontpage.products %}
+  3. Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  4. Replace prices with {{ product.price | money }}
+  5. Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  6. Replace navigation with {% for link in linklists.main-menu.links %}
+  7. Replace footer links with {% for link in linklists.footer.links %}
+  8. Replace newsletter form action with Shopify customer endpoint
+  9. Move CSS custom properties into theme settings via settings_schema.json
+  10. Cart icon badge: {{ cart.item_count }}
+  =========================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Luxury</title>
+  <style>
+    /* ============================================
+       CSS Custom Properties
+       ============================================ */
+    :root {
+      --color-bg: #0a0a0a;
+      --color-bg-card: #111111;
+      --color-bg-elevated: #1a1a1a;
+      --color-text: #f0ece2;
+      --color-text-secondary: #8a8578;
+      --color-accent: #c9a84c;
+      --color-accent-dim: rgba(201, 168, 76, 0.15);
+      --color-border: rgba(201, 168, 76, 0.2);
+      --color-border-subtle: rgba(255, 255, 255, 0.06);
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-heading: Georgia, 'Times New Roman', serif;
+      --max-width: 1200px;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
+
+    /* Scroll reveal animation */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ============================================
+       Navigation
+       ============================================ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .nav__logo {
+      font-family: var(--font-heading);
+      font-size: 1.5rem; letter-spacing: 0.08em;
+      color: var(--color-accent);
+    }
+    .nav__links { display: flex; gap: var(--spacing-md); list-style: none; }
+    .nav__links a {
+      font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--color-text-secondary);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav__links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: var(--color-accent);
+      transition: width var(--transition);
+    }
+    .nav__links a:hover { color: var(--color-accent); }
+    .nav__links a:hover::after { width: 100%; }
+    .nav__cart {
+      background: none; border: none; color: var(--color-text);
+      position: relative;
+    }
+    .nav__cart-count {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--color-accent); color: var(--color-bg);
+      font-size: 0.6rem; font-weight: 700;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav__mobile-toggle { display: none; background: none; border: none; color: var(--color-text); font-size: 1.5rem; }
+
+    /* ============================================
+       Hero
+       ============================================ */
+    .hero {
+      padding: var(--spacing-xl) 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--color-accent-dim) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero__eyebrow {
+      font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.3em;
+      color: var(--color-accent); margin-bottom: var(--spacing-sm);
+    }
+    .hero__title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 400; font-style: italic;
+      line-height: 1.1; margin-bottom: var(--spacing-md);
+      letter-spacing: -0.01em;
+    }
+    .hero__description {
+      color: var(--color-text-secondary);
+      max-width: 500px; margin: 0 auto var(--spacing-md);
+      font-size: 1rem;
+    }
+    .btn {
+      display: inline-block; padding: 1rem 3rem;
+      font-size: 0.75rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.2em;
+      border: 1px solid var(--color-accent);
+      color: var(--color-accent); background: transparent;
+      transition: all var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .btn::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--color-accent);
+      transition: left var(--transition);
+      z-index: -1;
+    }
+    .btn:hover { color: var(--color-bg); }
+    .btn:hover::before { left: 0; }
+    .btn--filled {
+      background: var(--color-accent); color: var(--color-bg);
+    }
+    .btn--filled::before { background: transparent; }
+    .btn--filled:hover { background: transparent; color: var(--color-accent); }
+
+    /* ============================================
+       Divider
+       ============================================ */
+    .divider {
+      display: flex; align-items: center; gap: var(--spacing-sm);
+      padding: var(--spacing-md) 0; color: var(--color-accent);
+      font-size: 0.625rem; letter-spacing: 0.3em; text-transform: uppercase;
+      justify-content: center;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; max-width: 120px;
+      height: 1px; background: var(--color-border);
+    }
+
+    /* ============================================
+       Products
+       ============================================ */
+    .products { padding: var(--spacing-xl) 0; }
+    .section-header { text-align: center; margin-bottom: var(--spacing-lg); }
+    .section-header h2 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 400; font-style: italic;
+    }
+    .section-header p {
+      color: var(--color-text-secondary); margin-top: var(--spacing-xs);
+      font-size: 0.875rem; letter-spacing: 0.05em;
+    }
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .product-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-subtle);
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .product-card:hover {
+      border-color: var(--color-border);
+      transform: translateY(-4px);
+    }
+    .product-card__image {
+      aspect-ratio: 3/4; background: var(--color-bg-elevated);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+      position: relative; overflow: hidden;
+    }
+    .product-card__image::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 40%; background: linear-gradient(transparent, var(--color-bg-card));
+    }
+    .product-card__info { padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md); }
+    .product-card__name {
+      font-family: var(--font-heading);
+      font-size: 1.0625rem; font-weight: 400;
+      margin-bottom: var(--spacing-xs);
+    }
+    .product-card__price {
+      font-size: 0.875rem; color: var(--color-accent);
+      margin-bottom: var(--spacing-sm); letter-spacing: 0.05em;
+    }
+    .product-card__btn {
+      width: 100%; padding: 0.75rem;
+      background: transparent; border: 1px solid var(--color-border);
+      color: var(--color-text-secondary);
+      font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.15em;
+      transition: all var(--transition);
+    }
+    .product-card__btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: var(--color-accent-dim);
+    }
+
+    /* ============================================
+       About
+       ============================================ */
+    .about {
+      padding: var(--spacing-xl) 0;
+      border-top: 1px solid var(--color-border-subtle);
+    }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);
+      align-items: center;
+    }
+    .about__image {
+      aspect-ratio: 4/5; background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-subtle);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .about__content h2 {
+      font-family: var(--font-heading);
+      font-size: 2rem; font-weight: 400; font-style: italic;
+      margin-bottom: var(--spacing-sm);
+    }
+    .about__content p {
+      color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);
+      line-height: 1.9;
+    }
+
+    /* ============================================
+       Testimonials
+       ============================================ */
+    .testimonials {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg-card);
+    }
+    .testimonials__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .testimonial {
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border-subtle);
+      position: relative;
+    }
+    .testimonial::before {
+      content: '\201C'; position: absolute; top: 12px; left: 16px;
+      font-family: var(--font-heading);
+      font-size: 4rem; color: var(--color-accent); opacity: 0.3;
+      line-height: 1;
+    }
+    .testimonial__text {
+      font-size: 0.9375rem; line-height: 1.8;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm); padding-top: var(--spacing-sm);
+      font-style: italic;
+    }
+    .testimonial__author {
+      font-size: 0.8125rem; color: var(--color-accent);
+      letter-spacing: 0.05em;
+    }
+    .testimonial__role {
+      font-size: 0.6875rem; color: var(--color-text-secondary);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    /* ============================================
+       Footer
+       ============================================ */
+    .footer {
+      padding: var(--spacing-lg) 0 var(--spacing-md);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--spacing-md); margin-bottom: var(--spacing-lg);
+    }
+    .footer__brand-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem; color: var(--color-accent);
+      letter-spacing: 0.08em;
+    }
+    .footer__brand p {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem; margin-top: var(--spacing-xs);
+    }
+    .footer h4 {
+      font-size: 0.6875rem; text-transform: uppercase;
+      letter-spacing: 0.15em; color: var(--color-accent);
+      margin-bottom: var(--spacing-sm);
+    }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: var(--spacing-xs); }
+    .footer ul a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .footer ul a:hover { color: var(--color-accent); }
+    .footer__newsletter-form {
+      display: flex; gap: 0; margin-top: var(--spacing-xs);
+    }
+    .footer__newsletter-form input {
+      flex: 1; padding: 0.75rem;
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border-subtle); border-right: none;
+      color: var(--color-text); font-size: 0.875rem;
+      font-family: var(--font-body); outline: none;
+    }
+    .footer__newsletter-form input::placeholder { color: var(--color-text-secondary); }
+    .footer__newsletter-form input:focus { border-color: var(--color-border); }
+    .footer__newsletter-form button {
+      padding: 0.75rem 1.25rem;
+      background: var(--color-accent); color: var(--color-bg);
+      border: 1px solid var(--color-accent);
+      font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.1em;
+      font-weight: 600; transition: all var(--transition);
+    }
+    .footer__newsletter-form button:hover {
+      background: transparent; color: var(--color-accent);
+    }
+    .footer__social { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+    .footer__social a {
+      width: 32px; height: 32px;
+      border: 1px solid var(--color-border-subtle); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6875rem; color: var(--color-text-secondary);
+      transition: all var(--transition);
+    }
+    .footer__social a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .footer__bottom {
+      text-align: center; padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border-subtle);
+      font-size: 0.75rem; color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       Responsive
+       ============================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__mobile-toggle { display: block; }
+      .about__inner { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .footer__grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">MAISON</a>
+      <ul class="nav__links">
+        <li><a href="#products">Collection</a></li>
+        <li><a href="#about">Heritage</a></li>
+        <li><a href="#testimonials">Clientele</a></li>
+        <li><a href="#footer">Atelier</a></li>
+      </ul>
+      <button class="nav__cart" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="nav__cart-count">0</span>
+      </button>
+      <button class="nav__mobile-toggle" aria-label="Menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero__eyebrow">Autumn / Winter 2026</p>
+      <h1 class="hero__title">The Art of<br>Refined Living</h1>
+      <p class="hero__description">Where heritage craftsmanship meets modern elegance. Each piece is a statement of understated luxury.</p>
+      <a href="#products" class="btn">Explore Collection</a>
+    </div>
+  </section>
+
+  <div class="divider container">Collection</div>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Curated Selection</h2>
+        <p>Handpicked pieces for the discerning collector</p>
+      </div>
+      <div class="products__grid">
+        <div class="product-card reveal">
+          <div class="product-card__image">280 x 370</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Midnight Chronograph</h3>
+            <p class="product-card__price">$1,280.00</p>
+            <button class="product-card__btn">Add to Collection</button>
+          </div>
+        </div>
+        <div class="product-card reveal">
+          <div class="product-card__image">280 x 370</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Obsidian Leather Folio</h3>
+            <p class="product-card__price">$420.00</p>
+            <button class="product-card__btn">Add to Collection</button>
+          </div>
+        </div>
+        <div class="product-card reveal">
+          <div class="product-card__image">280 x 370</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Heritage Cufflinks</h3>
+            <p class="product-card__price">$340.00</p>
+            <button class="product-card__btn">Add to Collection</button>
+          </div>
+        </div>
+        <div class="product-card reveal">
+          <div class="product-card__image">280 x 370</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Silk Pocket Square</h3>
+            <p class="product-card__price">$180.00</p>
+            <button class="product-card__btn">Add to Collection</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about__inner">
+        <div class="about__image reveal">640 x 800</div>
+        <div class="about__content reveal">
+          <h2>A Legacy of Craft</h2>
+          <p>Founded in a small atelier with a singular vision, Maison has grown into a symbol of quiet excellence. We believe that true luxury whispers. It never shouts.</p>
+          <p>Every material is sourced from the finest producers in Europe. Every stitch is placed by hand. Every detail is considered. This is not fast fashion. This is forever.</p>
+          <a href="#" class="btn">Our Heritage</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider container">Testimonials</div>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>From Our Clients</h2>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testimonial reveal">
+          <p class="testimonial__text">The chronograph exceeded every expectation. The weight, the finish, the way light catches the dial. It is everything a timepiece should be.</p>
+          <p class="testimonial__author">Edward L.</p>
+          <p class="testimonial__role">London, UK</p>
+        </div>
+        <div class="testimonial reveal">
+          <p class="testimonial__text">I have been searching for a brand that understands restraint. Maison does not follow trends. They set a standard, and they hold it.</p>
+          <p class="testimonial__author">Isabelle D.</p>
+          <p class="testimonial__role">Paris, FR</p>
+        </div>
+        <div class="testimonial reveal">
+          <p class="testimonial__text">My leather folio gets more compliments than anything else I own. Three years in and the patina only makes it more beautiful.</p>
+          <p class="testimonial__author">Marcus T.</p>
+          <p class="testimonial__role">New York, US</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <p class="footer__brand-name">MAISON</p>
+          <p>Refined living since 2020. Crafted with heritage, designed for tomorrow.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Twitter">TW</a>
+            <a href="#" aria-label="LinkedIn">LI</a>
+          </div>
+        </div>
+        <div>
+          <h4>Collection</h4>
+          <ul>
+            <li><a href="#">Timepieces</a></li>
+            <li><a href="#">Leather Goods</a></li>
+            <li><a href="#">Accessories</a></li>
+            <li><a href="#">Limited Editions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Maison</h4>
+          <ul>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Craftsmanship</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Private Access</h4>
+          <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-xs);">Join for early access to new collections and private events.</p>
+          <form class="footer__newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" aria-label="Email address">
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 Maison. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Reveal Script -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

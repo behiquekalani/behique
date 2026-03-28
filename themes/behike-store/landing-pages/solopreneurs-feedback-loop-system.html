@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur's Feedback Loop System — $17.99</title>
+  <meta name="description" content="Build systems to collect, filter, and act on feedback. Client feedback, product feedback, audience signals, iterating products based on real data.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+
+    /* ======= NAV ======= */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* ======= HERO ======= */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(48, 209, 88, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cta);
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: clamp(36px, 5vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      max-width: 760px;
+    }
+    .hero-sub {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .hero-price strong {
+      color: var(--text);
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ======= SECTIONS ======= */
+    section {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* ======= INSIGHT STRIP ======= */
+    #insight {
+      background: var(--card-bg);
+    }
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) {
+      .insight-grid { grid-template-columns: 1fr; }
+    }
+    .insight-card {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .insight-num {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .insight-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .insight-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ======= PROBLEM ======= */
+    .problem-list {
+      list-style: none;
+      margin-top: 40px;
+      max-width: 680px;
+    }
+    .problem-list li {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 20px;
+    }
+    .problem-list li:last-child { border-bottom: none; }
+    .problem-list .num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      padding-top: 3px;
+    }
+    .problem-list h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .problem-list p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ======= SOLUTION ======= */
+    .solution-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 56px;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      .solution-two-col { grid-template-columns: 1fr; }
+    }
+    .solution-copy p {
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .solution-copy p strong { color: var(--text); }
+    .check-list {
+      list-style: none;
+    }
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+    }
+    .check-list li:last-child { border-bottom: none; }
+    .check-list .chk {
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ======= TOC ======= */
+    #toc {
+      background: var(--card-bg);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 48px;
+    }
+    @media (max-width: 640px) {
+      .toc-grid { grid-template-columns: 1fr; }
+    }
+    .toc-item {
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .toc-num {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .toc-item h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .toc-item p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ======= CTA ======= */
+    #cta-final {
+      text-align: center;
+      padding: 120px 0;
+    }
+    #cta-final h2 { max-width: 600px; margin: 0 auto 20px; }
+    #cta-final .section-body { margin: 0 auto 40px; }
+    .price-block { margin-bottom: 32px; }
+    .price-block .amount {
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .price-block .currency {
+      font-size: 24px;
+      vertical-align: super;
+      color: var(--text-muted);
+    }
+    .price-block .note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .guarantee {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-brand"><span>Behike</span> Store</div>
+      <a href="https://behike.gumroad.com/l/solopreneurs-feedback-loop-system" class="nav-cta" target="_blank">Get it for $17.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-label fade-up">Systems Guide for Solopreneurs</div>
+      <h1 class="fade-up delay-1">The Solopreneur's<br>Feedback Loop System</h1>
+      <p class="hero-sub fade-up delay-2">How to collect, filter, and act on feedback so your products, client work, and content get measurably better every iteration.</p>
+      <div class="hero-price fade-up delay-3">One-time payment. <strong>$17.99</strong></div>
+      <a href="https://behike.gumroad.com/l/solopreneurs-feedback-loop-system" class="cta-btn fade-up delay-3" target="_blank">Get the System</a>
+      <p class="hero-note fade-up delay-4">Instant PDF download. 5,900+ words. 10 chapters.</p>
+    </div>
+  </section>
+
+  <!-- INSIGHT STRIP -->
+  <section id="insight">
+    <div class="container">
+      <div class="section-label fade-up">The Gap</div>
+      <h2 class="fade-up">Solopreneurs collect feedback.<br>They do not act on it systematically.</h2>
+      <div class="insight-grid">
+        <div class="insight-card fade-up">
+          <div class="insight-num">3x</div>
+          <h3>Typical product improvement</h3>
+          <p>Conversion rates after two systematic iteration cycles versus no iteration. The product is the same premise. The delivery is sharper.</p>
+        </div>
+        <div class="insight-card fade-up delay-1">
+          <div class="insight-num">5%</div>
+          <h3>Default survey response rate</h3>
+          <p>What most post-purchase surveys get. The methods in this guide consistently reach 15-25% without pressure or incentives.</p>
+        </div>
+        <div class="insight-card fade-up delay-2">
+          <div class="insight-num">90%</div>
+          <h3>Client feedback that is social</h3>
+          <p>Nine out of ten post-project "how did it go?" responses are positive regardless of experience. You are designing for the other signal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="section-label fade-up">The Problem</div>
+      <h2 class="fade-up">Waiting for organic feedback produces sentiment, not intelligence.</h2>
+      <p class="section-body fade-up">The difference between a solopreneur who improves consistently and one who plateaus is not talent. It is whether they designed the feedback environment or waited for it to arrive on its own.</p>
+
+      <ul class="problem-list">
+        <li class="fade-up">
+          <div class="num">01</div>
+          <div>
+            <h3>Clients say "it was great" and move on</h3>
+            <p>Social behavior dominates post-project responses. The client with genuine frustrations defaults to a thank-you. The system gets no actionable signal.</p>
+          </div>
+        </li>
+        <li class="fade-up delay-1">
+          <div class="num">02</div>
+          <div>
+            <h3>Product buyers disappear after purchase</h3>
+            <p>Without a structured feedback sequence, you never know what they actually did with the product, where they got stuck, or whether the outcome matched the promise.</p>
+          </div>
+        </li>
+        <li class="fade-up delay-2">
+          <div class="num">03</div>
+          <div>
+            <h3>Content metrics measure reach, not fit</h3>
+            <p>Platform analytics tell you who saw something. They do not tell you whether the right people stopped scrolling, felt understood, or moved closer to buying.</p>
+          </div>
+        </li>
+        <li class="fade-up delay-3">
+          <div class="num">04</div>
+          <div>
+            <h3>All feedback gets treated equally</h3>
+            <p>Without a filtering framework, one person's opinion carries the same weight as a pattern across 50 buyers. Decisions get made on noise.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="container">
+      <div class="section-label fade-up">The System</div>
+      <h2 class="fade-up">Design the feedback environment.<br>Filter by pattern, not volume.</h2>
+
+      <div class="solution-two-col">
+        <div class="solution-copy fade-up">
+          <p>This guide covers <strong>every feedback domain</strong> a solopreneur needs to manage: client work, digital products, content, and long-term business direction.</p>
+          <p>For each domain, you get the collection method (what to ask, when to ask, through which channel), the filtering framework (signal vs. noise criteria), and the iteration protocol (how to act on what you find).</p>
+          <p>The goal is not to make you more responsive to feedback. It is to make you <strong>systematically better every quarter</strong>. The difference between those two things is the entire thesis of this guide.</p>
+        </div>
+        <ul class="check-list fade-up delay-1">
+          <li><span class="chk">+</span> Post-delivery client feedback protocol (5 questions)</li>
+          <li><span class="chk">+</span> 3-moment buyer feedback sequence</li>
+          <li><span class="chk">+</span> Survey format that gets 15-25% response rates</li>
+          <li><span class="chk">+</span> Signal-to-noise filter (3 questions)</li>
+          <li><span class="chk">+</span> Content feedback as a research instrument</li>
+          <li><span class="chk">+</span> Product iteration protocol (5-step)</li>
+          <li><span class="chk">+</span> Long-term strategic feedback extraction</li>
+          <li><span class="chk">+</span> Feedback infrastructure (tools, documents, cadence)</li>
+          <li><span class="chk">+</span> 90-day implementation roadmap</li>
+          <li><span class="chk">+</span> When to override feedback with intuition</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section id="toc">
+    <div class="container">
+      <div class="section-label fade-up">What's Inside</div>
+      <h2 class="fade-up">10 chapters. Every domain of feedback.</h2>
+      <p class="section-body fade-up">From client work to digital products to content to strategic direction. Each chapter delivers a specific, actionable framework.</p>
+
+      <div class="toc-grid">
+        <div class="toc-item fade-up">
+          <div class="toc-num">01</div>
+          <div>
+            <h4>The Feedback Paradox</h4>
+            <p>Why organic feedback is mostly noise and what you are actually collecting.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">02</div>
+          <div>
+            <h4>Client Feedback After Delivery</h4>
+            <p>Timing, format, 5-question structure, and process improvement mapping.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-num">03</div>
+          <div>
+            <h4>Product Feedback from Buyers</h4>
+            <p>Three feedback moments and the survey format that gets responses.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-num">04</div>
+          <div>
+            <h4>Audience Feedback on Content</h4>
+            <p>Designing feedback into content and four categories with strategic implications.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up">
+          <div class="toc-num">05</div>
+          <div>
+            <h4>Filtering Signal from Noise</h4>
+            <p>Three-question filter and the categories of feedback that should never drive decisions.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">06</div>
+          <div>
+            <h4>Iterating Products Based on Real Data</h4>
+            <p>The 5-step iteration protocol and the changelog practice.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-2">
+          <div class="toc-num">07</div>
+          <div>
+            <h4>Content Feedback as Research</h4>
+            <p>Treating your content channel as a research instrument. Research-driven calendar.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-3">
+          <div class="toc-num">08</div>
+          <div>
+            <h4>The Feedback Infrastructure</h4>
+            <p>Tools, documents, cadence, and what to do when feedback contradicts intuition.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up">
+          <div class="toc-num">09</div>
+          <div>
+            <h4>Long-Term Business Direction</h4>
+            <p>Using feedback for strategic decisions, product line development, and directional shifts.</p>
+          </div>
+        </div>
+        <div class="toc-item fade-up delay-1">
+          <div class="toc-num">10</div>
+          <div>
+            <h4>Building the System in Practice</h4>
+            <p>The 90-day implementation roadmap and the compounding return over time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta-final">
+    <div class="container">
+      <div class="section-label fade-up">Get It Now</div>
+      <h2 class="fade-up">Systematic improvement is a structural advantage.</h2>
+      <p class="section-body fade-up">The solopreneur with a feedback system is in a continuous learning loop with their market. The one without is building in isolation and hoping the next product lands better than the last.</p>
+
+      <div class="price-block fade-up">
+        <div><span class="currency">$</span><span class="amount">17.99</span></div>
+        <div class="note">One-time. Instant PDF download.</div>
+      </div>
+
+      <a href="https://behike.gumroad.com/l/solopreneurs-feedback-loop-system" class="cta-btn fade-up delay-1" target="_blank">Get the Feedback System</a>
+      <p class="guarantee fade-up delay-2">5,900+ words. 10 chapters. Instant download.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike Store &mdash; <a href="../storefront/index.html">Browse all products</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

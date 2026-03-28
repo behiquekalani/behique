@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Personal Brand Accelerator — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-secondary: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a845;
+      --border: #1d1d1f;
+      --card-bg: #0d0d0e;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      padding: 140px 0 100px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 24px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-sub {
+      font-size: clamp(17px, 2.5vw, 21px);
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .hero-price strong {
+      color: var(--text);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+      text-decoration: none;
+    }
+    .hero-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* THESIS SECTION */
+    .thesis {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .thesis-quote {
+      font-size: clamp(22px, 3.5vw, 32px);
+      font-weight: 500;
+      line-height: 1.45;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      max-width: 760px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .thesis-quote em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    /* PROBLEM SECTION */
+    .problem {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .problem h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 32px;
+      max-width: 640px;
+    }
+    .problem p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    .problem p strong { color: var(--text); }
+
+    /* WHAT YOU GET */
+    .contents {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .contents-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .contents-header h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .contents-header p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .chapter-card {
+      background: var(--card-bg);
+      padding: 32px 28px;
+      transition: background 0.2s;
+    }
+    .chapter-card:hover { background: #111; }
+    .chapter-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .chapter-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .chapter-card p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* KEY OUTCOMES */
+    .outcomes {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .outcomes-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .outcomes h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .outcomes-lead {
+      font-size: 17px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .outcome-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .outcome-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+    .outcome-list li .check {
+      color: var(--cta);
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .outcome-list li strong { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .outcomes-inner { grid-template-columns: 1fr; gap: 48px; }
+    }
+
+    /* WHO THIS IS FOR */
+    .audience {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+    }
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+    .audience h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+      grid-column: 1 / -1;
+    }
+    .audience-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .audience-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.01em;
+    }
+    .audience-card h3.yes { color: var(--cta); }
+    .audience-card h3.no { color: #FF453A; }
+    .audience-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .audience-card ul li {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      padding-left: 20px;
+      position: relative;
+    }
+    .audience-card ul li::before {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+    .audience-card.yes-card ul li::before { content: "+"; color: var(--cta); }
+    .audience-card.no-card ul li::before { content: "-"; color: #FF453A; }
+
+    @media (max-width: 640px) {
+      .audience-grid { grid-template-columns: 1fr; }
+    }
+
+    /* AUTHOR */
+    .author {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .author-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #5e5ce6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 auto 24px;
+    }
+    .author h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .author-role {
+      font-size: 14px;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+    .author p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* STATS */
+    .stats {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .stat-item {
+      background: var(--card-bg);
+      padding: 40px 32px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 120px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .cta-section h2 {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-section h2 span { color: var(--accent); }
+    .cta-section p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 440px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .cta-price-block {
+      margin-bottom: 32px;
+    }
+    .cta-price-block .was {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: line-through;
+      margin-bottom: 6px;
+    }
+    .cta-price-block .now {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+    .cta-guarantee-text {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .includes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      margin-top: 32px;
+    }
+    .includes-list span {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .includes-list span strong { color: var(--cta); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <span class="nav-logo">Behike</span>
+      <a href="#get" class="nav-cta">Get It — $22.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow reveal">Personal Branding for Solopreneurs</p>
+      <h1 class="reveal reveal-delay-1">Become known for something<br><span>without becoming a content machine</span></h1>
+      <p class="hero-sub reveal reveal-delay-2">The strategic approach to building a personal brand in 2024. Positioning-first, depth over volume, no identity sacrificed on the altar of the algorithm.</p>
+      <div class="hero-price reveal reveal-delay-3"><strong>$22.99</strong></div>
+      <a href="#get" class="btn-primary reveal reveal-delay-3">Get the Guide</a>
+      <p class="hero-guarantee reveal reveal-delay-4">Instant PDF download. No subscription required.</p>
+    </div>
+  </section>
+
+  <!-- THESIS -->
+  <section class="thesis">
+    <div class="container">
+      <p class="thesis-quote reveal">Most personal brand advice is disguised content marketing advice. It skips the foundational question entirely: <em>what do you actually want to be known for?</em> This guide starts there and builds everything else on top of it.</p>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem">
+    <div class="container">
+      <p class="section-label reveal">The Problem</p>
+      <h2 class="reveal reveal-delay-1">You can post every day for a year and end up more unknown than when you started.</h2>
+      <p class="reveal reveal-delay-2">If each post points in a different direction, the volume is noise. <strong>Consistency of point of view builds brand. Volume of content feeds an algorithm.</strong> You need both. But point of view comes first.</p>
+      <p class="reveal reveal-delay-3">The personal branding industry sells tactics because tactics are easier to teach. Post more. Optimize your bio. Engage in the comments. None of that is wrong. All of it is downstream of a more important question that nobody stops to ask.</p>
+      <p class="reveal reveal-delay-4">This guide asks that question first. Then builds the entire strategy from the answer.</p>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section class="contents">
+    <div class="container">
+      <div class="contents-header reveal">
+        <p class="section-label">What Is Inside</p>
+        <h2>Eight chapters. Zero filler.</h2>
+        <p>From foundational positioning through to turning your brand into a revenue source.</p>
+      </div>
+      <div class="chapters-grid">
+        <div class="chapter-card reveal">
+          <p class="chapter-num">Introduction</p>
+          <h3>The Problem with How Personal Branding Is Taught</h3>
+          <p>Why almost all personal brand advice is really just content marketing advice in disguise. The foundational question that gets skipped.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-1">
+          <p class="chapter-num">Chapter 1</p>
+          <h3>Brand vs. Marketing</h3>
+          <p>The critical distinction that changes everything about how you approach building recognition. Brand is a belief. Marketing is an activity.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-2">
+          <p class="chapter-num">Chapter 2</p>
+          <h3>The One-Thing Positioning Framework</h3>
+          <p>A four-step process to claim specific territory in your audience's mind. The intersection method, naming your enemy, and testing your thesis.</p>
+        </div>
+        <div class="chapter-card reveal">
+          <p class="chapter-num">Chapter 3</p>
+          <h3>Content as Proof of Expertise</h3>
+          <p>Content is not branding. Content is evidence. The three types of content that genuinely build authority versus the content that just feeds the algorithm.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-1">
+          <p class="chapter-num">Chapter 4</p>
+          <h3>Platform Selection for Brand Building</h3>
+          <p>Choose platforms based on fit between the platform culture and your brand behavior. The three-layer content stack that makes all of it manageable.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-2">
+          <p class="chapter-num">Chapter 5</p>
+          <h3>The Brand Voice Codex</h3>
+          <p>Five components of a voice system that makes your content immediately recognizable. Thesis vocabulary, argument structure, your never-say list.</p>
+        </div>
+        <div class="chapter-card reveal">
+          <p class="chapter-num">Chapter 6</p>
+          <h3>Collaborations and Borrowed Credibility</h3>
+          <p>How to accelerate positioning without having an existing audience. Three specific strategies that work before you are famous.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-1">
+          <p class="chapter-num">Chapter 7</p>
+          <h3>From Brand to Business</h3>
+          <p>The three-offer architecture. How to connect your positioning to products and services that people will pay for. Offer clarity as the missing layer.</p>
+        </div>
+        <div class="chapter-card reveal reveal-delay-2">
+          <p class="chapter-num">Chapter 8</p>
+          <h3>The Brand Operating System</h3>
+          <p>A sustainable cadence that runs your brand on ten hours a month. Monthly anchor, weekly rhythm, daily minimum. Plus the 90-day action plan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUTCOMES -->
+  <section class="outcomes">
+    <div class="container">
+      <div class="outcomes-inner">
+        <div class="reveal">
+          <p class="section-label">What Changes</p>
+          <h2>From scattered to specific. From ignored to sought out.</h2>
+          <p class="outcomes-lead">A genuine personal brand means you stop hunting for clients. They find you. They already trust you before they contact you. They are easier to close at higher prices.</p>
+          <p class="outcomes-lead">This guide builds the infrastructure for that outcome. Not overnight. Over six to eighteen months of consistent, strategic work that compounds.</p>
+        </div>
+        <ul class="outcome-list reveal reveal-delay-1">
+          <li><span class="check">&#10003;</span><div><strong>A clear positioning thesis</strong> you can defend in one sentence, with a named foil that makes it stick in people's minds.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A Brand Voice Codex</strong> with all five components: thesis vocabulary, argument structure, never-say list, reference frame, and emotional register.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A platform strategy</strong> that does not require you to be everywhere. Choose the right two channels for your brand, not the most popular ones.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A content production system</strong> that generates depth-first content without burning you out. The three-layer stack explained in full.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A collaboration playbook</strong> for building credibility even when you are not yet famous. Three strategies that actually work before you have an audience.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A revenue architecture</strong> with three offer layers. Free, low-ticket, high-ticket, and how your brand connects all three.</div></li>
+          <li><span class="check">&#10003;</span><div><strong>A 90-day action plan</strong> broken into four phases: positioning, voice, platform and content, offer.</div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <div class="stat-number">5,000+</div>
+          <div class="stat-label">Words of practical, zero-filler content</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+          <div class="stat-number">8</div>
+          <div class="stat-label">Chapters from positioning to revenue</div>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <div class="stat-number">90</div>
+          <div class="stat-label">Day action plan included</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO THIS IS FOR -->
+  <section class="audience">
+    <div class="container">
+      <div class="audience-grid">
+        <h2 class="reveal">Who this is for. And who it is not.</h2>
+        <div class="audience-card yes-card reveal">
+          <h3 class="yes">This is for you if...</h3>
+          <ul>
+            <li>You are a solopreneur, creator, or freelancer trying to build a recognized name in your field</li>
+            <li>You have been posting inconsistently or without a clear strategy</li>
+            <li>You want to be known for something specific, not just "a person who posts a lot"</li>
+            <li>You feel like your content does not reflect how deeply you actually understand your topic</li>
+            <li>You want clients who come to you already trusting you, not leads who shop on price</li>
+            <li>You are willing to do the positioning work before jumping to tactics</li>
+          </ul>
+        </div>
+        <div class="audience-card no-card reveal reveal-delay-1">
+          <h3 class="no">This is not for you if...</h3>
+          <ul>
+            <li>You want a "post every day" system that generates content on autopilot</li>
+            <li>You are looking for viral hacks or algorithm tricks</li>
+            <li>You have no specific expertise and want to build a brand around nothing in particular</li>
+            <li>You expect results in thirty days without doing the positioning work</li>
+            <li>You are not willing to have a clear point of view that some people will disagree with</li>
+            <li>You want a formula that removes the need to think</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTHOR -->
+  <section class="author">
+    <div class="container">
+      <div class="author-avatar reveal">K</div>
+      <h2 class="reveal reveal-delay-1">Kalani Andre Gomez Padin</h2>
+      <p class="author-role reveal reveal-delay-2">Founder, Behike</p>
+      <p class="reveal reveal-delay-3">Computer engineering student and solopreneur from Puerto Rico. Built a 60-product digital store and multi-platform content system from scratch. Focused on the intersection of clear thinking, AI leverage, and sustainable one-person business models.</p>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="cta-section" id="get">
+    <div class="container">
+      <p class="section-label reveal">Get the Guide</p>
+      <h2 class="reveal reveal-delay-1">Start building a brand that works<br><span>when you are not working.</span></h2>
+      <p class="reveal reveal-delay-2">A one-time purchase. Instant PDF download. No subscription, no upsell sequence, no drip course. Just the complete guide.</p>
+      <div class="cta-price-block reveal reveal-delay-3">
+        <div class="was">Previously $34.99</div>
+        <div class="now">$22.99</div>
+      </div>
+      <a href="https://behike.gumroad.com/l/personal-brand-accelerator" class="btn-primary reveal reveal-delay-3">Get Instant Access</a>
+      <p class="cta-guarantee-text reveal reveal-delay-4">30-day money-back guarantee. No questions asked.</p>
+      <div class="includes-list reveal reveal-delay-4">
+        <span><strong>Included:</strong> Full PDF guide (5,000+ words)</span>
+        <span>8 chapters + 90-day action plan</span>
+        <span>Brand Voice Codex template</span>
+        <span>Positioning thesis framework</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2024 Behike. <a href="/">behike.shop</a> &nbsp;|&nbsp; <a href="#">Terms</a> &nbsp;|&nbsp; <a href="#">Refund Policy</a></p>
+  </footer>
+
+  <script>
+    // IntersectionObserver scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

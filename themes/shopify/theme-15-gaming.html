@@ -1,0 +1,579 @@
+<!--
+  SHOPIFY THEME: Gaming / Tech
+  =============================
+  Shopify Liquid Conversion Notes:
+  - Replace logo placeholder with: {{ shop.name }} or {{ 'logo.png' | asset_url | img_tag }}
+  - Replace hero image placeholder with: {{ section.settings.hero_image | img_url: '1920x' | img_tag }}
+  - Replace product cards with: {% for product in collections['featured'].products limit:4 %}
+  - Replace prices with: {{ product.price | money }}
+  - Replace cart icon count with: {{ cart.item_count }}
+  - Replace newsletter form action with: {% form 'customer' %}...{% endform %}
+  - Extract CSS custom properties into theme settings via settings_schema.json
+  - Move sections into /sections/*.liquid files for drag-and-drop customization
+  - Replace testimonials with metafield content or section blocks
+  - Add {{ content_for_header }} to <head> and {{ content_for_layout }} to body
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS - Gaming Gear HQ</title>
+  <style>
+    :root {
+      --color-bg: #0d0a1a;
+      --color-bg-card: #13102a;
+      --color-bg-light: #1a1636;
+      --color-neon: #39ff14;
+      --color-neon-dim: rgba(57, 255, 20, 0.3);
+      --color-blue: #00d4ff;
+      --color-blue-dim: rgba(0, 212, 255, 0.3);
+      --color-purple: #6c3fff;
+      --color-text: #e4e0f0;
+      --color-text-muted: #7a7599;
+      --color-border: #2a2545;
+      --font-heading: 'Courier New', Courier, monospace;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --transition: 0.3s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    /* PIXEL BORDER UTILITY */
+    .pixel-border {
+      border: 2px solid var(--color-border);
+      box-shadow: 4px 4px 0 var(--color-border);
+    }
+
+    /* GLOW ANIMATIONS */
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 8px var(--color-neon-dim), 0 0 16px transparent; }
+      50% { box-shadow: 0 0 16px var(--color-neon-dim), 0 0 32px var(--color-neon-dim); }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13, 10, 26, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--color-neon);
+      box-shadow: 0 2px 20px var(--color-neon-dim);
+    }
+    .nav-inner {
+      max-width: var(--max-width); margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center; height: 64px;
+    }
+    .nav-logo {
+      font-family: var(--font-heading); font-size: 1.3rem;
+      color: var(--color-neon); text-decoration: none;
+      letter-spacing: 6px; font-weight: 700;
+      text-shadow: 0 0 10px var(--color-neon-dim);
+    }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a {
+      color: var(--color-text-muted); text-decoration: none;
+      font-family: var(--font-heading); font-size: 0.75rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      transition: all var(--transition);
+    }
+    .nav-links a:hover {
+      color: var(--color-neon);
+      text-shadow: 0 0 8px var(--color-neon-dim);
+    }
+    .nav-cart {
+      font-family: var(--font-heading); color: var(--color-bg);
+      background: var(--color-neon); padding: 6px 16px;
+      text-decoration: none; font-size: 0.75rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      border: none; transition: all var(--transition);
+    }
+    .nav-cart:hover {
+      background: var(--color-blue);
+      box-shadow: 0 0 16px var(--color-blue-dim);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 120px 0 80px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(57, 255, 20, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block; font-family: var(--font-heading);
+      font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--color-neon); border: 1px solid var(--color-neon);
+      padding: 6px 16px; margin-bottom: 24px;
+      text-shadow: 0 0 8px var(--color-neon-dim);
+    }
+    .hero h1 {
+      font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700; line-height: 1.2; margin-bottom: 20px;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .hero h1 .neon { color: var(--color-neon); text-shadow: 0 0 20px var(--color-neon-dim); }
+    .hero h1 .blue { color: var(--color-blue); text-shadow: 0 0 20px var(--color-blue-dim); }
+    .hero p {
+      font-size: 1rem; color: var(--color-text-muted);
+      max-width: 520px; margin: 0 auto 36px;
+    }
+    .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .hero-btn-primary {
+      display: inline-block; padding: 14px 36px;
+      background: var(--color-neon); color: var(--color-bg);
+      text-decoration: none; font-family: var(--font-heading);
+      font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 700; transition: all var(--transition);
+      box-shadow: 0 0 20px var(--color-neon-dim);
+    }
+    .hero-btn-primary:hover {
+      box-shadow: 0 0 40px var(--color-neon-dim), 0 0 60px var(--color-neon-dim);
+      transform: translateY(-2px);
+    }
+    .hero-btn-secondary {
+      display: inline-block; padding: 14px 36px;
+      background: transparent; color: var(--color-blue);
+      text-decoration: none; font-family: var(--font-heading);
+      font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--color-blue); font-weight: 700;
+      transition: all var(--transition);
+    }
+    .hero-btn-secondary:hover {
+      background: var(--color-blue); color: var(--color-bg);
+      box-shadow: 0 0 20px var(--color-blue-dim);
+    }
+
+    /* PRODUCTS */
+    .products { padding: 80px 0; }
+    .section-header { text-align: center; margin-bottom: 48px; }
+    .section-label {
+      font-family: var(--font-heading); font-size: 0.7rem;
+      letter-spacing: 4px; text-transform: uppercase;
+      color: var(--color-blue); margin-bottom: 8px; display: block;
+    }
+    .section-title {
+      font-family: var(--font-heading); font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+      letter-spacing: 3px; text-transform: uppercase;
+    }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .product-card {
+      background: var(--color-bg-card); border: 2px solid var(--color-border);
+      overflow: hidden; transition: all var(--transition);
+      position: relative;
+    }
+    .product-card::before {
+      content: ''; position: absolute; inset: 0; opacity: 0;
+      background: linear-gradient(135deg, var(--color-neon-dim), transparent, var(--color-blue-dim));
+      transition: opacity var(--transition); z-index: 1; pointer-events: none;
+    }
+    .product-card:hover {
+      border-color: var(--color-neon);
+      box-shadow: 0 0 24px var(--color-neon-dim), 4px 4px 0 var(--color-neon);
+      transform: translateY(-4px);
+    }
+    .product-card:hover::before { opacity: 0.1; }
+    .product-image {
+      aspect-ratio: 1; background: var(--color-bg-light);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .product-image span {
+      font-family: var(--font-heading); color: var(--color-text-muted);
+      font-size: 0.7rem; letter-spacing: 2px; opacity: 0.4;
+    }
+    .product-badge {
+      position: absolute; top: 8px; right: 8px;
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--color-neon); color: var(--color-bg);
+      padding: 4px 8px; font-weight: 700;
+    }
+    .product-info { padding: 20px; position: relative; z-index: 2; }
+    .product-category {
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--color-blue); margin-bottom: 4px;
+    }
+    .product-name {
+      font-family: var(--font-heading); font-size: 0.9rem;
+      letter-spacing: 1px; margin-bottom: 8px;
+    }
+    .product-specs {
+      font-size: 0.75rem; color: var(--color-text-muted);
+      margin-bottom: 16px;
+    }
+    .product-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .product-price {
+      font-family: var(--font-heading); font-size: 1.1rem;
+      color: var(--color-neon); font-weight: 700;
+    }
+    .product-btn {
+      font-family: var(--font-heading); background: var(--color-neon);
+      color: var(--color-bg); border: none; padding: 8px 14px;
+      font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; font-weight: 700; transition: all var(--transition);
+    }
+    .product-btn:hover {
+      background: var(--color-blue);
+      box-shadow: 0 0 12px var(--color-blue-dim);
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 80px 0; border-top: 2px solid var(--color-border);
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+    .about-image {
+      aspect-ratio: 16/10; background: var(--color-bg-card);
+      border: 2px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 4px 4px 0 var(--color-border);
+    }
+    .about-image span {
+      font-family: var(--font-heading); color: var(--color-text-muted);
+      font-size: 0.7rem; letter-spacing: 2px; opacity: 0.4;
+    }
+    .about h2 {
+      font-family: var(--font-heading); font-size: clamp(1.3rem, 2vw, 1.6rem);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .about h2 .neon { color: var(--color-neon); }
+    .about p {
+      color: var(--color-text-muted); font-size: 0.95rem;
+      margin-bottom: 16px; line-height: 1.8;
+    }
+    .about-stats {
+      display: flex; gap: 32px; margin-top: 24px;
+    }
+    .about-stat {
+      text-align: center;
+    }
+    .about-stat strong {
+      display: block; font-family: var(--font-heading);
+      font-size: 1.5rem; color: var(--color-neon);
+      text-shadow: 0 0 10px var(--color-neon-dim);
+    }
+    .about-stat span {
+      font-family: var(--font-heading); font-size: 0.6rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    /* TESTIMONIALS */
+    .testimonials { padding: 80px 0; border-top: 2px solid var(--color-border); }
+    .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .testimonial {
+      background: var(--color-bg-card); border: 2px solid var(--color-border);
+      padding: 28px; transition: border-color var(--transition);
+    }
+    .testimonial:hover {
+      border-color: var(--color-blue);
+      box-shadow: 0 0 16px var(--color-blue-dim);
+    }
+    .testimonial-rating {
+      font-family: var(--font-heading); font-size: 0.7rem;
+      color: var(--color-neon); letter-spacing: 2px; margin-bottom: 16px;
+    }
+    .testimonial-text {
+      font-size: 0.9rem; color: var(--color-text-muted);
+      line-height: 1.7; margin-bottom: 20px;
+    }
+    .testimonial-author {
+      font-family: var(--font-heading); font-size: 0.75rem;
+      color: var(--color-blue); letter-spacing: 1px;
+    }
+    .testimonial-tag {
+      font-size: 0.7rem; color: var(--color-text-muted); margin-top: 2px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 64px 0 32px;
+      border-top: 2px solid var(--color-neon);
+      background: var(--color-bg-card);
+      box-shadow: 0 -4px 20px var(--color-neon-dim);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px;
+    }
+    .footer-col h4 {
+      font-family: var(--font-heading); font-size: 0.75rem;
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 16px; color: var(--color-neon);
+    }
+    .footer-col p { color: var(--color-text-muted); font-size: 0.85rem; line-height: 1.7; }
+    .footer-col a {
+      display: block; color: var(--color-text-muted); text-decoration: none;
+      font-size: 0.85rem; margin-bottom: 8px; transition: all var(--transition);
+    }
+    .footer-col a:hover {
+      color: var(--color-neon);
+      text-shadow: 0 0 8px var(--color-neon-dim);
+    }
+    .newsletter-form { display: flex; gap: 0; margin-top: 12px; }
+    .newsletter-form input {
+      flex: 1; padding: 12px 16px; background: var(--color-bg);
+      border: 2px solid var(--color-border); color: var(--color-text);
+      font-family: var(--font-heading); font-size: 0.8rem;
+    }
+    .newsletter-form input::placeholder {
+      color: var(--color-text-muted);
+      font-family: var(--font-heading);
+    }
+    .newsletter-form button {
+      padding: 12px 20px; background: var(--color-neon);
+      color: var(--color-bg); border: 2px solid var(--color-neon);
+      font-family: var(--font-heading); font-size: 0.7rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; font-weight: 700;
+      transition: all var(--transition);
+    }
+    .newsletter-form button:hover {
+      background: var(--color-blue); border-color: var(--color-blue);
+      box-shadow: 0 0 16px var(--color-blue-dim);
+    }
+    .footer-bottom {
+      text-align: center; font-size: 0.75rem;
+      color: var(--color-text-muted); padding-top: 32px;
+      border-top: 1px solid var(--color-border);
+      font-family: var(--font-heading); letter-spacing: 1px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .about-grid { grid-template-columns: 1fr; gap: 32px; }
+      .about-stats { gap: 20px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .hero-buttons { flex-direction: column; align-items: center; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">[NEXUS]</a>
+      <ul class="nav-links">
+        <li><a href="#gear">Gear</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+      </ul>
+      <a href="#" class="nav-cart">CART [0]</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <span class="hero-tag">// NEW DROPS LIVE</span>
+      <h1>Level Up Your<br><span class="neon">Setup</span> <span class="blue">Today</span></h1>
+      <p>Pro-grade gaming peripherals and gear. Built for competitive players who refuse to compromise.</p>
+      <div class="hero-buttons">
+        <a href="#gear" class="hero-btn-primary">Shop Gear</a>
+        <a href="#about" class="hero-btn-secondary">Our Tech</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products" id="gear">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// Featured Gear</span>
+        <h2 class="section-title">Top Picks This Week</h2>
+      </div>
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-image">
+            <span>300 x 300</span>
+            <span class="product-badge">NEW</span>
+          </div>
+          <div class="product-info">
+            <p class="product-category">Keyboard</p>
+            <h3 class="product-name">Phantom 75% Mech</h3>
+            <p class="product-specs">Hot-swap, RGB, gasket mount</p>
+            <div class="product-bottom">
+              <span class="product-price">$149</span>
+              <button class="product-btn">ADD</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-category">Mouse</p>
+            <h3 class="product-name">Viper Ultra Wireless</h3>
+            <p class="product-specs">52g, 26K DPI, 80hr battery</p>
+            <div class="product-bottom">
+              <span class="product-price">$89</span>
+              <button class="product-btn">ADD</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image"><span>300 x 300</span></div>
+          <div class="product-info">
+            <p class="product-category">Headset</p>
+            <h3 class="product-name">Echo 7.1 Surround</h3>
+            <p class="product-specs">Wireless, 50mm drivers, mic</p>
+            <div class="product-bottom">
+              <span class="product-price">$119</span>
+              <button class="product-btn">ADD</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image">
+            <span>300 x 300</span>
+            <span class="product-badge">HOT</span>
+          </div>
+          <div class="product-info">
+            <p class="product-category">Mousepad</p>
+            <h3 class="product-name">Nexus Control XL</h3>
+            <p class="product-specs">900x400, RGB edge, stitched</p>
+            <div class="product-bottom">
+              <span class="product-price">$45</span>
+              <button class="product-btn">ADD</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image"><span>SETUP PHOTO 500 x 312</span></div>
+        <div>
+          <span class="section-label">// About Nexus</span>
+          <h2>Built by <span class="neon">Gamers</span>, for Gamers</h2>
+          <p>We got tired of overpaying for gear that did not perform. So we built our own. Every Nexus product is tested by competitive players before it ships.</p>
+          <p>No influencer tax. No brand markup. Just performance at a fair price.</p>
+          <div class="about-stats">
+            <div class="about-stat">
+              <strong>50K+</strong>
+              <span>Units Sold</span>
+            </div>
+            <div class="about-stat">
+              <strong>4.8</strong>
+              <span>Avg Rating</span>
+            </div>
+            <div class="about-stat">
+              <strong>30</strong>
+              <span>Day Returns</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="reviews">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">// Player Reviews</span>
+        <h2 class="section-title">What the Community Says</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial">
+          <div class="testimonial-rating">[*****] 5/5</div>
+          <p class="testimonial-text">"The Phantom keyboard replaced my $300 board. Better feel, better sound, half the price. I am not going back."</p>
+          <p class="testimonial-author">xNova_PR</p>
+          <p class="testimonial-tag">Valorant, Immortal</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-rating">[*****] 5/5</div>
+          <p class="testimonial-text">"52 grams and zero sensor issues. The Viper Ultra is the best mouse I have used in 10 years of competitive FPS."</p>
+          <p class="testimonial-author">ShadowFrag</p>
+          <p class="testimonial-tag">CS2, Faceit Lvl 10</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-rating">[****-] 4/5</div>
+          <p class="testimonial-text">"Solid headset for the price. The surround sound is legit and the mic quality surprised me. Only wish it had Bluetooth too."</p>
+          <p class="testimonial-author">LunaBytes</p>
+          <p class="testimonial-tag">Streamer, Apex Legends</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>[NEXUS]</h4>
+          <p>Pro gaming gear without the pro price tag. Built by the community, tested by competitors.</p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="your@email.gg">
+            <button type="submit">JOIN</button>
+          </form>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <a href="#">Keyboards</a>
+          <a href="#">Mice</a>
+          <a href="#">Headsets</a>
+          <a href="#">Accessories</a>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <a href="#">Shipping</a>
+          <a href="#">Returns</a>
+          <a href="#">Warranty</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Community</h4>
+          <a href="#">Discord</a>
+          <a href="#">Twitter/X</a>
+          <a href="#">YouTube</a>
+          <a href="#">TikTok</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 NEXUS GAMING. ALL RIGHTS RESERVED. GG.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

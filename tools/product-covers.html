@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Behike Product Covers — Screenshot Tool</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a1a1a;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+      color: #fff;
+    }
+
+    h1 { font-size: 18px; color: #888; margin-bottom: 8px; font-weight: 400; }
+    .instructions {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 48px;
+      line-height: 1.6;
+      max-width: 640px;
+    }
+    .instructions code {
+      background: #2a2a2a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .covers-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1280px);
+      gap: 32px;
+    }
+
+    /* Every cover is 1280x720 */
+    .cover {
+      width: 1280px;
+      height: 720px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0;
+      flex-shrink: 0;
+    }
+
+    /* ─── COVER 1: Personal Budget Template ─── */
+    .cover-budget {
+      background: linear-gradient(135deg, #0d1117 0%, #0a1628 50%, #0d2044 100%);
+    }
+    .cover-budget .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(52,152,219,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(52,152,219,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .cover-budget .accent-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 6px;
+      background: linear-gradient(to bottom, #3498db, #2980b9);
+    }
+    .cover-budget .sheet-mockup {
+      position: absolute;
+      right: 80px;
+      top: 60px;
+      width: 480px;
+      height: 420px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      transform: perspective(800px) rotateY(-8deg) rotateX(3deg);
+      box-shadow: -20px 20px 60px rgba(0,0,0,0.5);
+    }
+    .sheet-header {
+      height: 36px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 6px;
+    }
+    .sheet-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .sheet-tab {
+      background: #fff;
+      border: 1px solid #dee2e6;
+      border-bottom: none;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: #333;
+      border-radius: 4px 4px 0 0;
+      margin-left: auto;
+    }
+    .sheet-body {
+      padding: 0;
+      overflow: hidden;
+    }
+    .sheet-row {
+      display: grid;
+      grid-template-columns: 120px repeat(4, 1fr);
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .sheet-row.header-row {
+      background: #1a56a0;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .sheet-cell {
+      padding: 6px 8px;
+      font-size: 10px;
+      color: #333;
+      border-right: 1px solid #f0f0f0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .cell-green { background: #e8f5e9; color: #2e7d32; font-weight: 600; }
+    .cell-red { background: #fce4ec; color: #c62828; }
+    .cell-blue { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+    .cell-gray { background: #f5f5f5; color: #777; }
+    .cover-budget .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 560px;
+    }
+    .cover-badge {
+      display: inline-block;
+      background: rgba(52,152,219,0.2);
+      border: 1px solid rgba(52,152,219,0.4);
+      color: #74b9ff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 980px;
+      margin-bottom: 20px;
+    }
+    .cover-title {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+    .cover-sub {
+      font-size: 18px;
+      color: #8899aa;
+      line-height: 1.5;
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+    .cover-price-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 980px;
+      padding: 10px 20px;
+    }
+    .price-num { font-size: 28px; font-weight: 800; color: #fff; }
+    .price-label { font-size: 13px; color: #666; }
+    .cover-brand {
+      position: absolute;
+      bottom: 28px;
+      left: 72px;
+      font-size: 13px;
+      color: #444;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ─── COVER 2: Cash Flow Dashboard ─── */
+    .cover-cashflow {
+      background: linear-gradient(135deg, #0a1a0f 0%, #0d2214 50%, #082010 100%);
+    }
+    .cover-cashflow .chart-visual {
+      position: absolute;
+      right: 60px;
+      top: 80px;
+      width: 500px;
+      height: 380px;
+    }
+    .chart-bar-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      height: 200px;
+      margin-bottom: 16px;
+    }
+    .chart-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+    }
+    .bar-jan { height: 60%; background: linear-gradient(to top, #00b894, #00d2a0); }
+    .bar-feb { height: 40%; background: linear-gradient(to top, #00b894, #00d2a0); opacity: 0.7; }
+    .bar-mar { height: 80%; background: linear-gradient(to top, #00b894, #00d2a0); }
+    .bar-apr { height: 55%; background: linear-gradient(to top, #00b894, #00d2a0); opacity: 0.8; }
+    .bar-may { height: 90%; background: linear-gradient(to top, #00b894, #00d2a0); }
+    .bar-jun { height: 75%; background: linear-gradient(to top, #2ecc71, #00d2a0); }
+    .chart-labels {
+      display: flex;
+      gap: 14px;
+    }
+    .chart-label { flex: 1; text-align: center; font-size: 10px; color: #555; }
+    .stat-boxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .stat-box {
+      background: rgba(0,184,148,0.08);
+      border: 1px solid rgba(0,184,148,0.2);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .stat-box .sval { font-size: 20px; font-weight: 700; color: #00b894; }
+    .stat-box .slabel { font-size: 10px; color: #555; margin-top: 2px; }
+    .cover-cashflow .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 520px;
+    }
+    .badge-green {
+      background: rgba(0,184,148,0.15);
+      border-color: rgba(0,184,148,0.3);
+      color: #00cec9;
+    }
+
+    /* ─── COVER 3: AI Employee Guide ─── */
+    .cover-aiemployee {
+      background: linear-gradient(135deg, #0a0a1a 0%, #0d0d2e 50%, #0a1244 100%);
+    }
+    .cover-aiemployee .nodes {
+      position: absolute;
+      right: 60px;
+      top: 60px;
+      width: 500px;
+      height: 480px;
+    }
+    .node {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .node-ceiba {
+      background: rgba(10,132,255,0.15);
+      border: 2px solid rgba(10,132,255,0.5);
+      color: #74b9ff;
+      left: 210px; top: 40px;
+    }
+    .node-cobo {
+      background: rgba(191,90,242,0.15);
+      border: 2px solid rgba(191,90,242,0.5);
+      color: #d98ef0;
+      left: 60px; top: 200px;
+    }
+    .node-hutia {
+      background: rgba(48,209,88,0.15);
+      border: 2px solid rgba(48,209,88,0.5);
+      color: #5de885;
+      left: 360px; top: 200px;
+    }
+    .node-line {
+      position: absolute;
+      background: rgba(255,255,255,0.08);
+      height: 1px;
+      transform-origin: left center;
+    }
+    .line-1 { width: 160px; left: 150px; top: 160px; transform: rotate(40deg); }
+    .line-2 { width: 160px; left: 248px; top: 160px; transform: rotate(-40deg); }
+    .node-tags {
+      position: absolute;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ntag {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: #666;
+    }
+    .cover-aiemployee .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 520px;
+    }
+
+    /* ─── COVER 4: eBay Dropshipping Guide ─── */
+    .cover-ebay {
+      background: linear-gradient(135deg, #1a0a00 0%, #2a1000 50%, #1a0800 100%);
+    }
+    .cover-ebay .terminal {
+      position: absolute;
+      right: 60px;
+      top: 80px;
+      width: 500px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .terminal-bar {
+      background: #161b22;
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid #30363d;
+    }
+    .t-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .t-title { font-size: 12px; color: #8b949e; margin-left: 8px; font-family: 'SF Mono', monospace; }
+    .terminal-body {
+      padding: 16px;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    .t-prompt { color: #56d364; }
+    .t-cmd { color: #e6edf3; }
+    .t-output { color: #8b949e; }
+    .t-green { color: #56d364; }
+    .t-yellow { color: #d29922; }
+    .t-blue { color: #79c0ff; }
+    .t-red { color: #f85149; }
+    .cover-ebay .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 520px;
+    }
+    .badge-amber {
+      background: rgba(255,159,10,0.15);
+      border-color: rgba(255,159,10,0.3);
+      color: #FF9F0A;
+    }
+
+    /* ─── COVER 5: AI Prompt Cheat Sheet ─── */
+    .cover-prompts {
+      background: linear-gradient(135deg, #0a0014 0%, #130022 50%, #0a001a 100%);
+    }
+    .cover-prompts .cards {
+      position: absolute;
+      right: 50px;
+      top: 60px;
+      width: 520px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .prompt-card {
+      background: rgba(191,90,242,0.06);
+      border: 1px solid rgba(191,90,242,0.2);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .pc-num { font-size: 10px; color: #7a4b9e; font-weight: 600; margin-bottom: 6px; }
+    .pc-title { font-size: 12px; color: #e0b3ff; font-weight: 600; margin-bottom: 6px; }
+    .pc-example {
+      font-family: 'SF Mono', monospace;
+      font-size: 10px;
+      color: #888;
+      background: rgba(0,0,0,0.3);
+      padding: 6px;
+      border-radius: 4px;
+      line-height: 1.5;
+    }
+    .cover-prompts .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 480px;
+    }
+    .badge-purple {
+      background: rgba(191,90,242,0.15);
+      border-color: rgba(191,90,242,0.3);
+      color: #BF5AF2;
+    }
+
+    /* ─── COVER 6: Solopreneur OS ─── */
+    .cover-solos {
+      background: linear-gradient(135deg, #0a1410 0%, #0d1e16 50%, #081a10 100%);
+    }
+    .cover-solos .os-ui {
+      position: absolute;
+      right: 50px;
+      top: 60px;
+      width: 520px;
+      height: 440px;
+    }
+    .os-titlebar {
+      background: #1c1c1e;
+      border-radius: 10px 10px 0 0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .os-body {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-top: none;
+      border-radius: 0 0 10px 10px;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      height: 390px;
+    }
+    .os-sidebar {
+      border-right: 1px solid #222;
+      padding: 12px 0;
+    }
+    .os-item {
+      padding: 8px 14px;
+      font-size: 11px;
+      color: #666;
+      cursor: pointer;
+    }
+    .os-item.active {
+      background: rgba(48,209,88,0.08);
+      color: #30D158;
+    }
+    .os-main {
+      padding: 16px;
+    }
+    .os-section { font-size: 10px; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+    .os-task {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 11px;
+      color: #888;
+    }
+    .os-check {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1.5px solid #30D158;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .os-check.done { background: #30D158; }
+    .os-progress {
+      margin-top: 12px;
+      background: #1a1a1a;
+      height: 6px;
+      border-radius: 3px;
+    }
+    .os-bar { height: 100%; background: #30D158; border-radius: 3px; width: 65%; }
+    .cover-solos .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 480px;
+    }
+    .badge-teal {
+      background: rgba(48,213,200,0.15);
+      border-color: rgba(48,213,200,0.3);
+      color: #30D5C8;
+    }
+
+    /* ─── COVER 7: Behike Method V2 ─── */
+    .cover-method {
+      background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+    }
+    .cover-method .pyramid {
+      position: absolute;
+      right: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 400px;
+    }
+    .pyramid-level {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #fff;
+      clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+      margin-bottom: 2px;
+    }
+    .pyr-1 { background: #0A84FF; width: 100%; }
+    .pyr-2 { background: #30D158; width: 83%; margin: 0 auto 2px; }
+    .pyr-3 { background: #FF9F0A; width: 66%; margin: 0 auto 2px; }
+    .pyr-4 { background: #BF5AF2; width: 50%; margin: 0 auto 2px; }
+    .pyr-5 { background: #FF453A; width: 33%; margin: 0 auto; }
+    .cover-method .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 520px;
+    }
+    .badge-default {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.15);
+      color: #888;
+    }
+
+    /* ─── COVER 8: AI Security Guide ─── */
+    .cover-security {
+      background: linear-gradient(135deg, #0a0000 0%, #1a0000 50%, #0f0000 100%);
+    }
+    .cover-security .shield {
+      position: absolute;
+      right: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 360px;
+      text-align: center;
+    }
+    .shield-svg {
+      width: 200px;
+      height: 220px;
+      margin: 0 auto 24px;
+    }
+    .shield-threat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,59,48,0.08);
+      border: 1px solid rgba(255,59,48,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+    }
+    .threat-dot { width: 8px; height: 8px; border-radius: 50%; background: #FF453A; }
+    .threat-text { font-size: 12px; color: #ff8a80; }
+    .threat-blocked {
+      background: rgba(48,209,88,0.08);
+      border-color: rgba(48,209,88,0.2);
+    }
+    .threat-blocked .threat-dot { background: #30D158; }
+    .threat-blocked .threat-text { color: #81c784; }
+    .cover-security .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 480px;
+    }
+    .badge-red {
+      background: rgba(255,59,48,0.15);
+      border-color: rgba(255,59,48,0.3);
+      color: #FF453A;
+    }
+
+    /* ─── COVER 9: Behike Starter Theme ─── */
+    .cover-theme {
+      background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+    }
+    .cover-theme .browser {
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%) perspective(1200px) rotateY(-6deg);
+      width: 540px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: -30px 30px 80px rgba(0,0,0,0.6);
+    }
+    .browser-bar {
+      background: #2a2a2a;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .b-dots { display: flex; gap: 6px; }
+    .b-url {
+      flex: 1;
+      background: #333;
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    }
+    .browser-screen {
+      height: 380px;
+      background: #000;
+      overflow: hidden;
+    }
+    .bs-hero {
+      padding: 32px;
+      text-align: center;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .bs-logo { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .bs-tagline { font-size: 11px; color: #555; margin-bottom: 16px; }
+    .bs-btn {
+      background: #0A84FF;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .bs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #1a1a1a;
+    }
+    .bs-card {
+      background: #0a0a0a;
+      padding: 14px;
+    }
+    .bs-card-title { font-size: 10px; font-weight: 600; color: #ddd; margin-bottom: 4px; }
+    .bs-card-price { font-size: 10px; color: #0A84FF; }
+    .cover-theme .content {
+      position: absolute;
+      left: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      max-width: 480px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Behike Product Covers</h1>
+<p class="instructions">
+  Each cover is 1280 x 720px. To export: open browser DevTools, set zoom to 100%, right-click a cover, "Screenshot node" or use <code>Ctrl+Shift+P → Capture node screenshot</code>. Or use the browser print-to-PDF at 1:1 scale.<br><br>
+  Covers are designed to be captured individually. Scroll to find each product.
+</p>
+
+<div style="display: flex; flex-direction: column; gap: 48px; align-items: flex-start;">
+
+  <!-- 1. Personal Budget Template -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">01 — Personal Budget Template ($9.99)</p>
+    <div class="cover cover-budget">
+      <div class="bg-grid"></div>
+      <div class="accent-bar"></div>
+      <div class="content">
+        <div class="cover-badge">Spreadsheet</div>
+        <div class="cover-title">Personal Budget<br>Template</div>
+        <div class="cover-sub">Track every dollar. No app subscription. Works in Excel and Google Sheets. One-time setup.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$9.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="sheet-mockup">
+        <div class="sheet-header">
+          <div class="sheet-dot" style="background:#FF5F57"></div>
+          <div class="sheet-dot" style="background:#FFBD2E"></div>
+          <div class="sheet-dot" style="background:#28C840"></div>
+          <div class="sheet-tab">Budget 2026</div>
+        </div>
+        <div class="sheet-body">
+          <div class="sheet-row header-row">
+            <div class="sheet-cell" style="color:#fff">Category</div>
+            <div class="sheet-cell" style="color:#fff">Budget</div>
+            <div class="sheet-cell" style="color:#fff">Actual</div>
+            <div class="sheet-cell" style="color:#fff">Left</div>
+            <div class="sheet-cell" style="color:#fff">%</div>
+          </div>
+          <div class="sheet-row">
+            <div class="sheet-cell">Housing</div>
+            <div class="sheet-cell">$800</div>
+            <div class="sheet-cell cell-blue">$800</div>
+            <div class="sheet-cell cell-green">$0</div>
+            <div class="sheet-cell">100%</div>
+          </div>
+          <div class="sheet-row">
+            <div class="sheet-cell">Food</div>
+            <div class="sheet-cell">$400</div>
+            <div class="sheet-cell cell-red">$430</div>
+            <div class="sheet-cell cell-red">-$30</div>
+            <div class="sheet-cell">108%</div>
+          </div>
+          <div class="sheet-row">
+            <div class="sheet-cell">Transport</div>
+            <div class="sheet-cell">$150</div>
+            <div class="sheet-cell">$110</div>
+            <div class="sheet-cell cell-green">$40</div>
+            <div class="sheet-cell">73%</div>
+          </div>
+          <div class="sheet-row">
+            <div class="sheet-cell">Subscriptions</div>
+            <div class="sheet-cell">$80</div>
+            <div class="sheet-cell">$80</div>
+            <div class="sheet-cell cell-gray">$0</div>
+            <div class="sheet-cell">100%</div>
+          </div>
+          <div class="sheet-row">
+            <div class="sheet-cell">Savings</div>
+            <div class="sheet-cell">$300</div>
+            <div class="sheet-cell">$300</div>
+            <div class="sheet-cell cell-green">$0</div>
+            <div class="sheet-cell">100%</div>
+          </div>
+          <div class="sheet-row" style="background:#f8f9fa;font-weight:700">
+            <div class="sheet-cell">Total</div>
+            <div class="sheet-cell">$1,730</div>
+            <div class="sheet-cell">$1,720</div>
+            <div class="sheet-cell cell-blue">$10</div>
+            <div class="sheet-cell cell-green">99%</div>
+          </div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 2. Cash Flow Dashboard -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">02 — Cash Flow Dashboard ($14.99)</p>
+    <div class="cover cover-cashflow">
+      <div class="content">
+        <div class="cover-badge badge-green">Dashboard</div>
+        <div class="cover-title">Cash Flow<br>Dashboard</div>
+        <div class="cover-sub">Your entire financial picture. One spreadsheet. Four tabs, all pre-built formulas, monthly and annual views.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$14.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="chart-visual">
+        <div class="chart-bar-wrap">
+          <div class="chart-bar bar-jan"></div>
+          <div class="chart-bar bar-feb"></div>
+          <div class="chart-bar bar-mar"></div>
+          <div class="chart-bar bar-apr"></div>
+          <div class="chart-bar bar-may"></div>
+          <div class="chart-bar bar-jun"></div>
+        </div>
+        <div class="chart-labels">
+          <div class="chart-label">JAN</div>
+          <div class="chart-label">FEB</div>
+          <div class="chart-label">MAR</div>
+          <div class="chart-label">APR</div>
+          <div class="chart-label">MAY</div>
+          <div class="chart-label">JUN</div>
+        </div>
+        <div class="stat-boxes">
+          <div class="stat-box">
+            <div class="sval">+$2,400</div>
+            <div class="slabel">Net cash this month</div>
+          </div>
+          <div class="stat-box">
+            <div class="sval">87%</div>
+            <div class="slabel">Budget adherence</div>
+          </div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 3. AI Employee Guide -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">03 — AI Employee Guide ($19.99)</p>
+    <div class="cover cover-aiemployee">
+      <div class="content">
+        <div class="cover-badge">Guide</div>
+        <div class="cover-title">How I Built an<br>AI Employee</div>
+        <div class="cover-sub">Three computers. Six agents. Zero monthly cost. The complete system guide from a computer engineering student in PR.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$19.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="nodes">
+        <div class="node-line line-1"></div>
+        <div class="node-line line-2"></div>
+        <div class="node node-ceiba">Ceiba<br>HQ</div>
+        <div class="node node-cobo">Cobo<br>GPU</div>
+        <div class="node node-hutia">Hutia<br>Server</div>
+        <div class="node-tags">
+          <div class="ntag">LangGraph</div>
+          <div class="ntag">Python</div>
+          <div class="ntag">Local AI</div>
+          <div class="ntag">Zero Cloud Cost</div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 4. eBay Dropshipping Guide -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">04 — eBay Dropshipping Guide ($14.99)</p>
+    <div class="cover cover-ebay">
+      <div class="content">
+        <div class="cover-badge badge-amber">eBay Guide</div>
+        <div class="cover-title">eBay Dropshipping<br>Playbook</div>
+        <div class="cover-sub">Product research, margin math, listing strategy, and the overnight pipeline. What actually works in 2026.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$14.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="t-dot" style="background:#FF5F57"></div>
+          <div class="t-dot" style="background:#FFBD2E"></div>
+          <div class="t-dot" style="background:#28C840"></div>
+          <span class="t-title">niche_sniper.py</span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">$</span> <span class="t-cmd">python3 niche_sniper.py --category electronics</span></div>
+          <div class="t-output">Scanning 847 products...</div>
+          <div>&nbsp;</div>
+          <div><span class="t-blue">NICHE FOUND:</span> <span class="t-cmd">USB-C Hubs (3-port)</span></div>
+          <div><span class="t-green">Margin:</span> <span class="t-cmd">$18.40 avg per unit</span></div>
+          <div><span class="t-green">Sell-through:</span> <span class="t-cmd">73% in 14 days</span></div>
+          <div><span class="t-green">Competition:</span> <span class="t-cmd">Low (score: 2.1/10)</span></div>
+          <div><span class="t-yellow">Supplier:</span> <span class="t-cmd">3 found, best at $6.80/unit</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-green">VERDICT:</span> <span class="t-cmd">APPROVED FOR LISTING</span></div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 5. AI Prompt Cheat Sheet -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">05 — AI Prompt Cheat Sheet ($7.99)</p>
+    <div class="cover cover-prompts">
+      <div class="content">
+        <div class="cover-badge badge-purple">Reference</div>
+        <div class="cover-title">AI Prompt<br>Cheat Sheet</div>
+        <div class="cover-sub">40 patterns. Real examples. The exact reference used to build Behike's content pipeline. No fluff.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$7.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="prompt-card">
+          <div class="pc-num">Pattern 01</div>
+          <div class="pc-title">Role + Context</div>
+          <div class="pc-example">You are a [role] with expertise in [domain]. Given [context]...</div>
+        </div>
+        <div class="prompt-card">
+          <div class="pc-num">Pattern 07</div>
+          <div class="pc-title">Chain of Thought</div>
+          <div class="pc-example">Think through this step by step before giving your final answer...</div>
+        </div>
+        <div class="prompt-card">
+          <div class="pc-num">Pattern 14</div>
+          <div class="pc-title">Output Format</div>
+          <div class="pc-example">Return your response as JSON with keys: title, body, cta...</div>
+        </div>
+        <div class="prompt-card">
+          <div class="pc-num">Pattern 22</div>
+          <div class="pc-title">Constrain + Expand</div>
+          <div class="pc-example">Write this in under 60 words. Then expand on the third point...</div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 6. Solopreneur OS -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">06 — Solopreneur OS ($12.99)</p>
+    <div class="cover cover-solos">
+      <div class="content">
+        <div class="cover-badge badge-teal">System</div>
+        <div class="cover-title">Solopreneur OS</div>
+        <div class="cover-sub">The operating system for one-person businesses. Tasks, projects, revenue tracking, and habit systems. All in one Notion workspace.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$12.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="os-ui">
+        <div class="os-titlebar">
+          <div class="sheet-dot" style="background:#FF5F57"></div>
+          <div class="sheet-dot" style="background:#FFBD2E"></div>
+          <div class="sheet-dot" style="background:#28C840"></div>
+          <span style="font-size:12px;color:#888;margin-left:8px;">Solopreneur OS</span>
+        </div>
+        <div class="os-body">
+          <div class="os-sidebar">
+            <div class="os-item active">Dashboard</div>
+            <div class="os-item">Projects</div>
+            <div class="os-item">Revenue</div>
+            <div class="os-item">Habits</div>
+            <div class="os-item">Ideas</div>
+            <div class="os-item">Calendar</div>
+          </div>
+          <div class="os-main">
+            <div class="os-section">Today's Focus</div>
+            <div class="os-task">
+              <div class="os-check done"></div>
+              <span>List 3 products on Gumroad</span>
+            </div>
+            <div class="os-task">
+              <div class="os-check done"></div>
+              <span>Post 2 Instagram captions</span>
+            </div>
+            <div class="os-task">
+              <div class="os-check"></div>
+              <span>Reply to 5 DMs</span>
+            </div>
+            <div class="os-task">
+              <div class="os-check"></div>
+              <span>Review eBay listings</span>
+            </div>
+            <div style="margin-top:16px;font-size:10px;color:#555;">Weekly progress</div>
+            <div class="os-progress" style="margin-top:6px;">
+              <div class="os-bar"></div>
+            </div>
+            <div style="font-size:10px;color:#30D158;margin-top:4px;">65% complete this week</div>
+          </div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 7. Behike Method V2 -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">07 — Behike Method V2 ($14.99)</p>
+    <div class="cover cover-method">
+      <div class="content">
+        <div class="cover-badge badge-default">Framework</div>
+        <div class="cover-title">Behike Method<br>V2</div>
+        <div class="cover-sub">The one-person business framework. Content, products, services, systems, and community. Built in Puerto Rico.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$14.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="pyramid">
+        <div class="pyramid-level pyr-5">Community</div>
+        <div class="pyramid-level pyr-4">Services</div>
+        <div class="pyramid-level pyr-3">Products</div>
+        <div class="pyramid-level pyr-2">Content</div>
+        <div class="pyramid-level pyr-1">Foundation</div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 8. AI Security Guide -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">08 — AI Security Guide ($12.99)</p>
+    <div class="cover cover-security">
+      <div class="content">
+        <div class="cover-badge badge-red">Security</div>
+        <div class="cover-title">AI Security<br>Guide</div>
+        <div class="cover-sub">The risks nobody is teaching. Prompt injection, data leaks, model manipulation. What to check before you deploy anything AI.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$12.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="shield">
+        <svg class="shield-svg" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 10L180 45V110C180 155 145 190 100 210C55 190 20 155 20 110V45L100 10Z" fill="rgba(255,59,48,0.08)" stroke="rgba(255,59,48,0.4)" stroke-width="1.5"/>
+          <path d="M100 30L160 58V110C160 145 135 172 100 188C65 172 40 145 40 110V58L100 30Z" fill="rgba(255,59,48,0.04)" stroke="rgba(255,59,48,0.2)" stroke-width="1"/>
+          <text x="100" y="115" text-anchor="middle" font-size="40" fill="rgba(255,59,48,0.8)" font-family="system-ui">AI</text>
+        </svg>
+        <div class="shield-threat">
+          <div class="threat-dot"></div>
+          <span class="threat-text">Prompt injection detected</span>
+        </div>
+        <div class="shield-threat threat-blocked">
+          <div class="threat-dot"></div>
+          <span class="threat-text">PII leak blocked</span>
+        </div>
+        <div class="shield-threat threat-blocked">
+          <div class="threat-dot"></div>
+          <span class="threat-text">Model manipulation: mitigated</span>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 9. Behike Starter Theme -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">09 — Behike Starter Theme ($14.99)</p>
+    <div class="cover cover-theme">
+      <div class="content">
+        <div class="cover-badge badge-default">Theme</div>
+        <div class="cover-title">Behike Starter<br>Theme</div>
+        <div class="cover-sub">The HTML theme behind this store. No framework. No dependencies. Pure CSS. Edit in any text editor.</div>
+        <div class="cover-price-tag">
+          <span class="price-num">$14.99</span>
+          <span class="price-label">One-time download</span>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="browser-bar">
+          <div class="b-dots">
+            <div class="sheet-dot" style="background:#FF5F57;width:10px;height:10px;"></div>
+            <div class="sheet-dot" style="background:#FFBD2E;width:10px;height:10px;"></div>
+            <div class="sheet-dot" style="background:#28C840;width:10px;height:10px;"></div>
+          </div>
+          <div class="b-url">behike.shop</div>
+        </div>
+        <div class="browser-screen">
+          <div class="bs-hero">
+            <div class="bs-logo">Behike</div>
+            <div class="bs-tagline">Tools for one-person businesses.</div>
+            <div class="bs-btn">Browse Products</div>
+          </div>
+          <div class="bs-grid">
+            <div class="bs-card">
+              <div class="bs-card-title">Budget Template</div>
+              <div class="bs-card-price">$9.99</div>
+            </div>
+            <div class="bs-card">
+              <div class="bs-card-title">Cash Flow</div>
+              <div class="bs-card-price">$14.99</div>
+            </div>
+            <div class="bs-card">
+              <div class="bs-card-title">AI Guide</div>
+              <div class="bs-card-price">$19.99</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 10. Content Waterfall -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">10 — The Content Waterfall ($4.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0d1a0d 50%, #0a1410 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(48,209,88,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(48,209,88,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#30D158,#22a846);"></div>
+      <!-- Waterfall diagram -->
+      <div style="position:absolute;right:80px;top:80px;display:flex;flex-direction:column;align-items:center;gap:0;">
+        <div style="background:rgba(48,209,88,0.15);border:1px solid rgba(48,209,88,0.4);border-radius:10px;padding:10px 24px;font-size:13px;font-weight:700;color:#30D158;letter-spacing:0.02em;">ANCHOR IDEA</div>
+        <div style="width:2px;height:20px;background:rgba(48,209,88,0.4);"></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="width:2px;height:16px;background:rgba(48,209,88,0.3);transform:rotate(-20deg);transform-origin:top;"></div>
+            <div style="background:#111;border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#aaa;text-align:center;width:80px;">YouTube</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="width:2px;height:10px;background:rgba(48,209,88,0.3);"></div>
+            <div style="background:#111;border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#aaa;text-align:center;width:80px;">X Thread</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="width:2px;height:10px;background:rgba(48,209,88,0.3);"></div>
+            <div style="background:#111;border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#aaa;text-align:center;width:80px;">Instagram</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="width:2px;height:10px;background:rgba(48,209,88,0.3);"></div>
+            <div style="background:#111;border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#aaa;text-align:center;width:80px;">Reel</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="width:2px;height:16px;background:rgba(48,209,88,0.3);transform:rotate(20deg);transform-origin:top;"></div>
+            <div style="background:#111;border:1px solid rgba(48,209,88,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#aaa;text-align:center;width:80px;">Newsletter</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:#555;">+3 more formats</div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:500px;">
+        <div style="background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#30D158;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Content System</div>
+        <div style="font-size:50px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">The Content<br>Waterfall</div>
+        <div style="font-size:16px;color:#86868B;line-height:1.5;margin-bottom:24px;">One anchor idea.<br>Eight pieces of content.<br>One working session.</div>
+        <div style="font-size:26px;font-weight:700;color:#30D158;">$4.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 11. Mastery for Builders -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">11 — Mastery for Builders ($14.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0d0a1a 50%, #120a1e 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(94,92,230,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(94,92,230,0.04) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#BF5AF2,#9b59b6);"></div>
+      <!-- Progress curve -->
+      <div style="position:absolute;right:80px;top:80px;width:480px;height:380px;">
+        <svg width="480" height="380" viewBox="0 0 480 380">
+          <defs>
+            <linearGradient id="curveGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#BF5AF2" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#BF5AF2" stop-opacity="0.8"/>
+            </linearGradient>
+          </defs>
+          <path d="M 40 320 Q 120 300 180 240 Q 240 180 300 120 Q 360 60 440 40" stroke="url(#curveGrad)" stroke-width="3" fill="none"/>
+          <circle cx="40" cy="320" r="6" fill="#555"/>
+          <circle cx="180" cy="240" r="6" fill="#BF5AF2" opacity="0.6"/>
+          <circle cx="300" cy="120" r="6" fill="#BF5AF2" opacity="0.8"/>
+          <circle cx="440" cy="40" r="8" fill="#BF5AF2"/>
+          <text x="40" y="345" fill="#555" font-size="11" font-family="system-ui">Start</text>
+          <text x="420" y="35" fill="#BF5AF2" font-size="11" font-family="system-ui">Mastery</text>
+          <line x1="40" y1="330" x2="460" y2="330" stroke="#222" stroke-width="1"/>
+        </svg>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:440px;">
+        <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#BF5AF2;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Skill Development</div>
+        <div style="font-size:50px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Mastery for<br>Builders</div>
+        <div style="font-size:16px;color:#86868B;line-height:1.5;margin-bottom:24px;">The AI-accelerated path.<br>6 chapters. 30-day sprint.<br>For ADHD builders.</div>
+        <div style="font-size:26px;font-weight:700;color:#BF5AF2;">$14.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 12. n8n Automation Pack -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">12 — n8n Automation Starter Pack ($34.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0d1117 50%, #0a0f1a 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,159,10,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,159,10,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#FF9F0A,#e67e22);"></div>
+      <!-- Workflow nodes diagram -->
+      <div style="position:absolute;right:60px;top:60px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="background:#111;border:1px solid rgba(255,159,10,0.3);border-radius:8px;padding:8px 14px;font-size:11px;color:#FF9F0A;font-weight:600;min-width:100px;text-align:center;">RSS Feed</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">OpenAI</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">Buffer</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="background:#111;border:1px solid rgba(255,159,10,0.2);border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">YouTube URL</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">Whisper</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">Newsletter</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <div style="background:#111;border:1px solid rgba(255,159,10,0.2);border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">Telegram</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:8px 14px;font-size:11px;color:#888;min-width:100px;text-align:center;">OpenAI x5</div>
+          <div style="font-size:14px;color:#444;">→</div>
+          <div style="background:#111;border:1px solid rgba(48,209,88,0.3);border-radius:8px;padding:8px 14px;font-size:11px;color:#30D158;min-width:100px;text-align:center;">5 Platforms</div>
+        </div>
+        <div style="font-size:11px;color:#444;text-align:right;padding-right:4px;">5 workflows total</div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:420px;">
+        <div style="background:rgba(255,159,10,0.1);border:1px solid rgba(255,159,10,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#FF9F0A;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">n8n Workflows</div>
+        <div style="font-size:48px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Automation<br>Starter Pack</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">5 ready-to-import workflows.<br>15 minutes to run your<br>content system automatically.</div>
+        <div style="font-size:26px;font-weight:700;color:#FF9F0A;">$34.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 13. AI Agent Installer Kit -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">13 — AI Agent Installer Kit ($29.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0d 50%, #0d1a10 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(48,209,88,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(48,209,88,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#30D158,#22a846);"></div>
+      <!-- 3 tiers visual -->
+      <div style="position:absolute;right:70px;top:80px;display:flex;flex-direction:column;gap:14px;width:420px;">
+        <div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.3);border-radius:12px;padding:14px 20px;">
+          <div style="font-size:12px;font-weight:700;color:#30D158;margin-bottom:4px;letter-spacing:0.04em;text-transform:uppercase;">Beginner</div>
+          <div style="font-size:13px;color:#888;">Click-through installer. 20 minutes. No code.</div>
+        </div>
+        <div style="background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:12px;padding:14px 20px;">
+          <div style="font-size:12px;font-weight:700;color:#0A84FF;margin-bottom:4px;letter-spacing:0.04em;text-transform:uppercase;">Guided</div>
+          <div style="font-size:13px;color:#888;">Step-by-step wizard. 45 minutes. You learn.</div>
+        </div>
+        <div style="background:rgba(255,159,10,0.08);border:1px solid rgba(255,159,10,0.3);border-radius:12px;padding:14px 20px;">
+          <div style="font-size:12px;font-weight:700;color:#FF9F0A;margin-bottom:4px;letter-spacing:0.04em;text-transform:uppercase;">Blueprint</div>
+          <div style="font-size:13px;color:#888;">Full architecture docs. 90 minutes. You own it.</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:400px;">
+        <div style="background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#30D158;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">AI Setup Kit</div>
+        <div style="font-size:46px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">AI Agent<br>Installer Kit</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Three paths. Zero coding.<br>Pick your level and<br>get a working agent today.</div>
+        <div style="font-size:26px;font-weight:700;color:#30D158;">$29.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+
+  <!-- 14. Solopreneur OS Live -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">14 — Solopreneur OS Live ($29.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0d 50%, #0d1a10 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(48,209,88,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(48,209,88,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#30D158,#22a846);"></div>
+      <!-- 13 module grid -->
+      <div style="position:absolute;right:60px;top:80px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;width:420px;">
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">01</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Vision</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">02</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Domain</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">03</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Content</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">04</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Monetize</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">05</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Ops</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">06</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Finance</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">07</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Audience</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.06);border:1px solid rgba(48,209,88,0.2);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">08</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Products</div>
+        </div>
+        <div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.3);border-radius:8px;padding:9px 10px;">
+          <div style="font-size:10px;color:#555;letter-spacing:0.02em;">13</div>
+          <div style="font-size:11px;color:#30D158;margin-top:2px;">Legacy</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:380px;">
+        <div style="background:rgba(48,209,88,0.1);border:1px solid rgba(48,209,88,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#30D158;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Live Dashboard</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Solopreneur<br>OS Live</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Not a PDF you read once.<br>A dashboard you open<br>every morning.</div>
+        <div style="font-size:26px;font-weight:700;color:#30D158;">$29.99</div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 15. Ghost Writer Kit -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">15 — Ghost Writer Kit ($99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #140a1a 50%, #0f0a16 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(191,90,242,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(191,90,242,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#BF5AF2,#9b3dd4);"></div>
+      <!-- Compare: Generic vs. Voice -->
+      <div style="position:absolute;right:60px;top:80px;display:flex;flex-direction:column;gap:12px;width:440px;">
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px 18px;">
+          <div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Generic AI Output</div>
+          <div style="font-size:12px;color:#555;line-height:1.5;">"Leverage powerful AI tools to transform your content strategy and unlock your potential."</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;font-size:11px;color:#BF5AF2;font-weight:600;letter-spacing:0.04em;">vs.</div>
+        <div style="background:rgba(191,90,242,0.06);border:1px solid rgba(191,90,242,0.3);border-radius:10px;padding:14px 18px;">
+          <div style="font-size:10px;font-weight:700;color:#BF5AF2;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Your Voice</div>
+          <div style="font-size:12px;color:#aaa;line-height:1.5;">"Most creators spend 80% of their time on logistics. That is backwards."</div>
+        </div>
+        <div style="background:rgba(191,90,242,0.04);border:1px solid rgba(191,90,242,0.15);border-radius:10px;padding:11px 16px;display:flex;gap:20px;justify-content:space-around;">
+          <div style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;">Voice Bible</div><div style="font-size:11px;color:#BF5AF2;">Template</div></div>
+          <div style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;">10 Prompts</div><div style="font-size:11px;color:#BF5AF2;">Templates</div></div>
+          <div style="text-align:center;"><div style="font-size:10px;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.04em;">Voice Audit</div><div style="font-size:11px;color:#BF5AF2;">Checklist</div></div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:370px;">
+        <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#BF5AF2;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Voice System</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Ghost<br>Writer<br>Kit</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">AI that writes as you.<br>Not at you.</div>
+        <div style="font-size:26px;font-weight:700;color:#BF5AF2;">$99.00</div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 16. ADHD Finance -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">16 — ADHD Finance ($9.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #130a1a 50%, #100d1a 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(191,90,242,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(191,90,242,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#BF5AF2,#9b3dd4);"></div>
+      <!-- 5 category pills -->
+      <div style="position:absolute;right:70px;top:100px;display:flex;flex-direction:column;gap:12px;width:400px;">
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.3);border-radius:980px;padding:8px 20px;font-size:13px;font-weight:700;color:#BF5AF2;">Needs</div>
+          <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.3);border-radius:980px;padding:8px 20px;font-size:13px;font-weight:700;color:#BF5AF2;">Wants</div>
+          <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.3);border-radius:980px;padding:8px 20px;font-size:13px;font-weight:700;color:#BF5AF2;">Savings</div>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.3);border-radius:980px;padding:8px 20px;font-size:13px;font-weight:700;color:#BF5AF2;">Debt</div>
+          <div style="background:rgba(191,90,242,0.12);border:1px solid rgba(191,90,242,0.4);border-radius:980px;padding:8px 20px;font-size:13px;font-weight:700;color:#cf7af8;">Fun</div>
+        </div>
+        <div style="margin-top:10px;background:rgba(191,90,242,0.06);border:1px solid rgba(191,90,242,0.2);border-radius:12px;padding:14px 18px;">
+          <div style="font-size:12px;color:#555;margin-bottom:6px;letter-spacing:0.03em;">Impulse Cooldown Protocol</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="font-size:11px;color:#888;">Purchase $20+</div>
+            <div style="width:40px;height:1px;background:rgba(191,90,242,0.3);"></div>
+            <div style="font-size:11px;color:#888;">24h wait</div>
+            <div style="width:40px;height:1px;background:rgba(191,90,242,0.3);"></div>
+            <div style="font-size:11px;color:#BF5AF2;">Still want it?</div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:380px;">
+        <div style="background:rgba(191,90,242,0.1);border:1px solid rgba(191,90,242,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#BF5AF2;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">For ADHD Brains</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">ADHD<br>Finance</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Five categories.<br>One 10-minute weekly review.<br>Built for how you actually work.</div>
+        <div style="font-size:26px;font-weight:700;color:#BF5AF2;">$9.99</div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 17. Claude Code Course -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">17 — Claude Code Course ($19.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0a1520 50%, #091418 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(100,210,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(100,210,255,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#64D2FF,#3bb8e8);"></div>
+      <!-- Terminal-style lesson list -->
+      <div style="position:absolute;right:60px;top:80px;width:440px;background:rgba(0,0,0,0.6);border:1px solid rgba(100,210,255,0.2);border-radius:12px;padding:20px 24px;font-family:'SF Mono','Fira Code',monospace;">
+        <div style="display:flex;gap:6px;margin-bottom:16px;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#febc2e;"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#28c840;"></div>
+        </div>
+        <div style="font-size:11px;color:#64D2FF;margin-bottom:10px;opacity:0.7;">10 lessons. 10 working tools.</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">01</span> File organizer</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">02</span> Data analyzer</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">03</span> Content pipeline</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">04</span> Invoice builder</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">05</span> Web scraper</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">06</span> Knowledge base</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">07</span> Email drafts</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">08</span> MCP integration</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">09</span> Telegram bot</div>
+          <div style="font-size:11px;color:#888;"><span style="color:#64D2FF;">10</span> <span style="color:#F5F5F7;">Your custom tool</span></div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:380px;">
+        <div style="background:rgba(100,210,255,0.1);border:1px solid rgba(100,210,255,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#64D2FF;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">10 Lessons</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Claude<br>Code<br>Course</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Build real tools with AI.<br>No prior coding required.<br>Each lesson ships something.</div>
+        <div style="font-size:26px;font-weight:700;color:#64D2FF;">$19.99</div>
+      </div>
+      <div class="cover-brand">Behike</div>
+    </div>
+  </div>
+
+  <!-- 18. YouTube Channel Blueprint -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">18 — YouTube Channel Blueprint ($19.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #0d0d1a 50%, #0a0a1a 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(94,92,230,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(94,92,230,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#5E5CE6,#4744c9);"></div>
+      <!-- Channel growth visual -->
+      <div style="position:absolute;right:70px;top:80px;display:flex;flex-direction:column;gap:10px;width:420px;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:rgba(94,92,230,0.08);border:1px solid rgba(94,92,230,0.25);border-radius:10px;padding:12px 14px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#5E5CE6;">Day 1</div>
+            <div style="font-size:11px;color:#555;margin-top:4px;">Niche locked</div>
+          </div>
+          <div style="flex:1;background:rgba(94,92,230,0.08);border:1px solid rgba(94,92,230,0.25);border-radius:10px;padding:12px 14px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#5E5CE6;">Day 30</div>
+            <div style="font-size:11px;color:#555;margin-top:4px;">10 videos live</div>
+          </div>
+          <div style="flex:1;background:rgba(94,92,230,0.12);border:1px solid rgba(94,92,230,0.4);border-radius:10px;padding:12px 14px;text-align:center;">
+            <div style="font-size:22px;font-weight:800;color:#7b79f0;">Day 90</div>
+            <div style="font-size:11px;color:#666;margin-top:4px;">First revenue</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:rgba(94,92,230,0.05);border:1px solid rgba(94,92,230,0.15);border-radius:10px;padding:11px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#5E5CE6;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Niche</div>
+            <div style="font-size:12px;color:#666;">Research framework</div>
+          </div>
+          <div style="flex:1;background:rgba(94,92,230,0.05);border:1px solid rgba(94,92,230,0.15);border-radius:10px;padding:11px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#5E5CE6;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">SEO</div>
+            <div style="font-size:12px;color:#666;">Title + thumbnail</div>
+          </div>
+          <div style="flex:1;background:rgba(94,92,230,0.05);border:1px solid rgba(94,92,230,0.15);border-radius:10px;padding:11px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#5E5CE6;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Money</div>
+            <div style="font-size:12px;color:#666;">4-layer ladder</div>
+          </div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:390px;">
+        <div style="background:rgba(94,92,230,0.1);border:1px solid rgba(94,92,230,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#5E5CE6;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">90-Day System</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">YouTube<br>Channel<br>Blueprint</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Start, grow, and monetize.<br>No team. No camera crew.<br>Just you and a system.</div>
+        <div style="font-size:26px;font-weight:700;color:#5E5CE6;">$19.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 19. Niche Sniper -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">19 — Niche Sniper ($14.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a0d00 50%, #120a00 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,159,10,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,159,10,0.03) 1px,transparent 1px);background-size:40px 40px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#FF9F0A,#cc7d08);"></div>
+      <!-- Pipeline diagram -->
+      <div style="position:absolute;right:70px;top:70px;display:flex;flex-direction:column;gap:0;align-items:flex-start;width:420px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="background:rgba(255,159,10,0.12);border:1px solid rgba(255,159,10,0.35);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;color:#FF9F0A;min-width:160px;">Reddit Demand</div>
+          <div style="font-size:11px;color:#444;">complaints + wishes</div>
+        </div>
+        <div style="width:2px;height:14px;background:rgba(255,159,10,0.3);margin-left:20px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="background:rgba(255,159,10,0.12);border:1px solid rgba(255,159,10,0.35);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;color:#FF9F0A;min-width:160px;">eBay Supply Check</div>
+          <div style="font-size:11px;color:#444;">sell-through + margin</div>
+        </div>
+        <div style="width:2px;height:14px;background:rgba(255,159,10,0.3);margin-left:20px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <div style="background:rgba(255,159,10,0.12);border:1px solid rgba(255,159,10,0.35);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;color:#FF9F0A;min-width:160px;">Score (10-point)</div>
+          <div style="font-size:11px;color:#444;">min 7 to enter</div>
+        </div>
+        <div style="width:2px;height:14px;background:rgba(255,159,10,0.3);margin-left:20px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="background:rgba(255,159,10,0.20);border:1px solid rgba(255,159,10,0.6);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:800;color:#FF9F0A;min-width:160px;">Validated Product</div>
+          <div style="font-size:11px;color:#666;">list or build</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:390px;">
+        <div style="background:rgba(255,159,10,0.1);border:1px solid rgba(255,159,10,0.25);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#FF9F0A;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Product Research</div>
+        <div style="font-size:52px;font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:#F5F5F7;margin-bottom:16px;">Niche<br>Sniper</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Find what people want<br>before you build or buy it.<br>Validated. Scored. Ready.</div>
+        <div style="font-size:26px;font-weight:700;color:#FF9F0A;">$14.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#444;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 20. Ceiba Sanctuary -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">20 — Ceiba Sanctuary ($49.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #030308 0%, #06030e 50%, #0a0312 100%);">
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle at 50% 42%, rgba(100,210,255,0.04) 0%, transparent 60%);"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#64D2FF,#0A84FF);"></div>
+      <!-- Particle face suggestion (dots arranged in oval) -->
+      <div style="position:absolute;right:90px;top:50%;transform:translateY(-50%);width:340px;height:420px;">
+        <svg width="340" height="420" viewBox="0 0 340 420" style="overflow:visible;">
+          <!-- Faint particle dots forming face outline -->
+          <g opacity="0.6">
+            <!-- Face oval -->
+            <ellipse cx="170" cy="200" rx="95" ry="130" fill="none" stroke="rgba(100,210,255,0.08)" stroke-width="1" stroke-dasharray="4 8"/>
+            <!-- Breathing glow -->
+            <ellipse cx="170" cy="200" rx="120" ry="155" fill="none" stroke="rgba(100,210,255,0.03)" stroke-width="1"/>
+            <!-- Eye suggestion dots -->
+            <g fill="rgba(100,210,255,0.45)">
+              <circle cx="140" cy="175" r="2.5"/><circle cx="146" cy="172" r="1.5"/><circle cx="135" cy="177" r="1.5"/>
+              <circle cx="200" cy="175" r="2.5"/><circle cx="206" cy="172" r="1.5"/><circle cx="195" cy="177" r="1.5"/>
+            </g>
+            <!-- Mouth suggestion -->
+            <path d="M 150 240 Q 170 252 190 240" stroke="rgba(100,210,255,0.3)" stroke-width="1.5" fill="none"/>
+            <!-- Scattered particles -->
+            <g fill="rgba(100,210,255,0.2)">
+              <circle cx="100" cy="150" r="1.5"/><circle cx="240" cy="155" r="1"/><circle cx="95" cy="210" r="1"/>
+              <circle cx="245" cy="215" r="1.5"/><circle cx="110" cy="280" r="1"/><circle cx="230" cy="275" r="1"/>
+              <circle cx="155" cy="110" r="1.5"/><circle cx="185" cy="108" r="1"/><circle cx="170" cy="340" r="1.5"/>
+            </g>
+          </g>
+        </svg>
+        <!-- Breathing indicator -->
+        <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(100,210,255,0.3);letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;">breathing companion</div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:380px;">
+        <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.2);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#64D2FF;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Browser Wellness App</div>
+        <div style="font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:1.05;color:#F5F5F7;margin-bottom:16px;">Ceiba<br>Sanctuary</div>
+        <div style="font-size:14px;color:#86868B;line-height:1.6;margin-bottom:20px;">Particle face. Generative audio.<br>Circadian filter. Focus timer.<br>Meditation. One tab. Lifetime access.</div>
+        <!-- Feature pills -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+          <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.15);border-radius:980px;padding:3px 10px;font-size:11px;color:rgba(100,210,255,0.6);">Breathe</div>
+          <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.15);border-radius:980px;padding:3px 10px;font-size:11px;color:rgba(100,210,255,0.6);">Focus</div>
+          <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.15);border-radius:980px;padding:3px 10px;font-size:11px;color:rgba(100,210,255,0.6);">Meditate</div>
+          <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.15);border-radius:980px;padding:3px 10px;font-size:11px;color:rgba(100,210,255,0.6);">Offline</div>
+        </div>
+        <div style="font-size:26px;font-weight:700;color:#64D2FF;">$49.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#333;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+  <!-- 21. Focus DJ -->
+  <div>
+    <p style="font-size:12px;color:#444;margin-bottom:12px;">21 — Focus DJ ($29.99)</p>
+    <div class="cover" style="background: linear-gradient(135deg, #030a0a 0%, #020d10 50%, #041012 100%);">
+      <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(100,210,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(100,210,255,0.025) 1px,transparent 1px);background-size:60px 60px;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(to bottom,#64D2FF,#0A84FF);"></div>
+      <!-- Waveform bars -->
+      <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:5px;height:200px;">
+        <!-- 20 bars of varying heights to suggest a waveform -->
+        <div style="width:14px;background:rgba(100,210,255,0.15);border-radius:3px;height:30%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.2);border-radius:3px;height:50%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.3);border-radius:3px;height:70%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.5);border-radius:3px;height:90%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.7);border-radius:3px;height:100%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.6);border-radius:3px;height:85%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.5);border-radius:3px;height:65%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.4);border-radius:3px;height:45%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.3);border-radius:3px;height:55%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.45);border-radius:3px;height:75%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.6);border-radius:3px;height:95%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.7);border-radius:3px;height:80%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.4);border-radius:3px;height:40%;"></div>
+        <div style="width:14px;background:rgba(100,210,255,0.25);border-radius:3px;height:25%;"></div>
+      </div>
+      <!-- Mode pills -->
+      <div style="position:absolute;right:80px;bottom:90px;display:flex;gap:8px;">
+        <div style="background:rgba(100,210,255,0.18);border:1px solid rgba(100,210,255,0.5);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:700;color:#64D2FF;">Focus</div>
+        <div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:980px;padding:5px 14px;font-size:12px;color:rgba(48,209,88,0.5);">Break</div>
+        <div style="background:rgba(191,90,242,0.08);border:1px solid rgba(191,90,242,0.2);border-radius:980px;padding:5px 14px;font-size:12px;color:rgba(191,90,242,0.5);">Sleep</div>
+      </div>
+      <div style="position:absolute;left:72px;top:50%;transform:translateY(-50%);max-width:380px;">
+        <div style="background:rgba(100,210,255,0.08);border:1px solid rgba(100,210,255,0.2);border-radius:980px;padding:5px 14px;font-size:12px;font-weight:600;color:#64D2FF;letter-spacing:0.04em;text-transform:uppercase;display:inline-block;margin-bottom:20px;">Generated Audio</div>
+        <div style="font-size:52px;font-weight:800;letter-spacing:-0.04em;line-height:1.0;color:#F5F5F7;margin-bottom:16px;">Focus<br>DJ</div>
+        <div style="font-size:15px;color:#86868B;line-height:1.5;margin-bottom:24px;">Music for your brain state.<br>Generated in real time.<br>No playlists. No subscriptions.</div>
+        <div style="font-size:14px;color:#555;margin-bottom:16px;">40Hz binaural beats. Web Audio synthesis.<br>Runs offline in your browser.</div>
+        <div style="font-size:26px;font-weight:700;color:#64D2FF;">$29.99</div>
+      </div>
+      <div style="position:absolute;bottom:24px;right:32px;font-size:13px;font-weight:600;color:#333;letter-spacing:0.08em;text-transform:uppercase;">Behike</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Quick screenshot helper — click any cover to isolate it
+  document.querySelectorAll('.cover').forEach(cover => {
+    cover.style.cursor = 'pointer';
+    cover.title = 'Click to open in full screen for screenshot';
+    cover.addEventListener('dblclick', function() {
+      const w = window.open('', '_blank', 'width=1280,height=720');
+      w.document.write(`<!DOCTYPE html><html><head><style>*{margin:0;padding:0;box-sizing:border-box;}body{width:1280px;height:720px;overflow:hidden;}</style></head><body>${this.outerHTML}</body></html>`);
+      w.document.close();
+    });
+  });
+</script>
+
+</body>
+</html>

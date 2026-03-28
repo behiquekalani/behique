@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Outsourcing Guide | Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a244;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 60px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      max-width: 800px;
+      margin: 0 auto 20px;
+    }
+
+    .hero-sub {
+      font-size: clamp(17px, 2.2vw, 22px);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .price-block {
+      margin-bottom: 40px;
+    }
+
+    .price {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .price-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: -0.01em;
+    }
+
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+
+    .cta-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .section-body {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.65;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .problem-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* WHAT'S INSIDE */
+    .chapters {
+      margin-top: 48px;
+    }
+
+    .chapter-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      margin-bottom: 8px;
+    }
+
+    .chapter-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 32px;
+      padding-top: 2px;
+    }
+
+    .chapter-content h3 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .chapter-content p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+
+    .audience-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .audience-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .audience-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+
+    .audience-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .audience-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* STAT STRIP */
+    .stat-strip {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 0;
+    }
+
+    .stat-strip .container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat-item {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .stat-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stat-num {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .stat-num span {
+      color: var(--accent);
+    }
+
+    .stat-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* QUOTE BLOCK */
+    .quote-block {
+      background: var(--surface);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 28px 32px;
+      margin-top: 48px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .quote-block.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .quote-block p {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .final-cta .section-title {
+      max-width: 600px;
+      margin: 0 auto 16px;
+    }
+
+    .final-cta .section-body {
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .hero { padding: 72px 0 60px; }
+      .stat-strip .container { grid-template-columns: 1fr; gap: 32px; }
+      nav .container { gap: 12px; }
+      footer .container { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="/index.html" class="nav-brand">Behike</a>
+      <a href="#buy" class="nav-cta">Get the Guide</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" style="border: none;">
+    <div class="container">
+      <span class="hero-label">Digital Product</span>
+      <h1>Solopreneur's Outsourcing Guide</h1>
+      <p class="hero-sub">Stop being the ceiling of your own business. A complete system for delegating without losing control, quality, or your mind.</p>
+      <div class="price-block">
+        <div class="price">$19.99</div>
+        <div class="price-note">One-time purchase. Instant PDF download.</div>
+      </div>
+      <a href="#buy" class="cta-btn">Get the Guide for $19.99</a>
+      <p class="cta-sub">PDF download. No subscription required.</p>
+    </div>
+  </section>
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <div class="container">
+      <div class="stat-item">
+        <div class="stat-num"><span>7</span>+</div>
+        <div class="stat-desc">Chapters covering the full outsourcing system</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num"><span>3</span></div>
+        <div class="stat-desc">Core frameworks for decisions, SOPs, and quality</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">5<span>K</span>+</div>
+        <div class="stat-desc">Words. Direct, no filler.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <p class="section-label">The Problem</p>
+      <h2 class="section-title">The solopreneur who does everything themselves has a permanent ceiling.</h2>
+      <p class="section-body">It is set by the number of hours they can work and the number of tasks they can hold in their head simultaneously. No amount of productivity optimization removes that ceiling. It only pushes it slightly higher. Outsourcing removes the ceiling. But only when it is done with a system.</p>
+
+      <div class="quote-block">
+        <p>"The solopreneur who cannot outsource anything is not free. They are the highest-paid employee of a business they own."</p>
+      </div>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>Outsourcing horror stories come from missing systems</h3>
+          <p>The contractor who disappeared. The VA who misunderstood everything. These failures were not outsourcing failures. They were SOP failures. Documentation failures. Selection failures.</p>
+        </div>
+        <div class="problem-card">
+          <h3>The true cost calculation is almost always wrong</h3>
+          <p>Most solopreneurs compare contractor rates to their average hourly rate. The right comparison is to their marginal rate: what an additional hour of their highest-leverage work is worth.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Micromanagement is a systems failure, not a people failure</h3>
+          <p>When you are checking everything before it ships, the problem is not the contractor. The problem is that you did not build the quality system that makes that level of oversight unnecessary.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <h2 class="section-title">Seven chapters. A complete operating system for delegation.</h2>
+      <p class="section-body">From the decision framework for what to outsource first, through contractor selection and SOPs, to the lean discipline that keeps you building rather than managing.</p>
+      <div class="chapters">
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 1</span>
+          <div class="chapter-content">
+            <h3>The Decision Framework for What to Outsource</h3>
+            <p>The time audit method. Zone of Genius vs. Zone of Competence vs. Zone of Incompetence. The frequency filter and the emotional resistance test. How to know when you are ready.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 2</span>
+          <div class="chapter-content">
+            <h3>Finding the Right Contractors</h3>
+            <p>The platform landscape and when to use each. How to evaluate candidates using evidence of output and professional behavior. The test project method. Red flags that save you months of pain.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 3</span>
+          <div class="chapter-content">
+            <h3>Creating SOPs So You Do Not Have to Babysit</h3>
+            <p>What a complete SOP contains. The recording method for building them in minutes. How to structure your SOP library. The feedback loop that keeps it current.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 4</span>
+          <div class="chapter-content">
+            <h3>Managing Quality Without Micromanaging</h3>
+            <p>Building quality checklists. The feedback cadence that gives visibility without dependency. Outcome-based evaluation. Knowing when a contractor relationship is not working.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 5</span>
+          <div class="chapter-content">
+            <h3>The True Cost Calculation</h3>
+            <p>Your actual marginal hourly rate. The cost of not outsourcing. Quality-adjusted cost. The ramp-up investment amortization. How to build a real outsourcing budget.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 6</span>
+          <div class="chapter-content">
+            <h3>Staying Lean While Delegating Smartly</h3>
+            <p>Automation vs. humans. Project vs. retainer decisions. The asynchronous-first principle. Avoiding contractor dependency with backup relationships.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">Ch 7</span>
+          <div class="chapter-content">
+            <h3>Building Toward a Team Without Becoming a Manager</h3>
+            <p>The maker-manager distinction and why it matters. The coordinator role. Staying strategic as your team grows. The feedback loop that compounds contractor quality over time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label">Who It's For</p>
+      <h2 class="section-title">For solopreneurs who are ready to build something beyond themselves.</h2>
+      <p class="section-body">This guide is not for people who want tips on finding cheap freelancers. It is for solopreneurs who want a repeatable system for building a business that does not entirely depend on them being present for every hour of work.</p>
+      <div class="audience-grid">
+        <div class="audience-card">
+          <div class="audience-icon">&#9935;</div>
+          <h3>Solopreneurs doing everything themselves</h3>
+          <p>You are the designer, writer, marketer, and operator. You know this is not sustainable but every time you have tried to delegate, it has created more work than it saved.</p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon">&#128736;</div>
+          <h3>Builders who have been burned before</h3>
+          <p>You have a horror story. A contractor who disappeared or misunderstood everything. This guide is specifically built to address what went wrong and how to prevent it the next time.</p>
+        </div>
+        <div class="audience-card">
+          <div class="audience-icon">&#127919;</div>
+          <h3>Freelancers transitioning to business owner</h3>
+          <p>You are good at the work but the business keeps you too occupied to grow it. Outsourcing the right things is what creates the margin to focus on the next level.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="buy" class="final-cta" style="border-top: 1px solid var(--border);">
+    <div class="container">
+      <p class="section-label">Get the Guide</p>
+      <h2 class="section-title">Stop being the ceiling. Build the system that lets you scale.</h2>
+      <p class="section-body">Seven complete chapters. The decision framework, contractor selection process, SOP system, quality management approach, and true cost analysis in one guide. PDF download, available immediately after purchase.</p>
+      <div class="price-block" style="margin-bottom: 32px;">
+        <div class="price">$19.99</div>
+        <div class="price-note">One-time. Instant access. Yours to keep.</div>
+      </div>
+      <a href="https://behike.gumroad.com/l/solopreneurs-outsourcing-guide" class="cta-btn">Get the Guide for $19.99</a>
+      <p class="cta-sub">PDF download via Gumroad. Secure checkout.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike. Building tools for independent creators and solopreneurs.</p>
+      <p><a href="/index.html" style="color: var(--accent); text-decoration: none;">Back to store</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll(
+      '.problem-card, .chapter-item, .audience-card, .stat-item, .quote-block'
+    ).forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>

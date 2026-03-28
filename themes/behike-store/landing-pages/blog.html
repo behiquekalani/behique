@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog - Behike</title>
+  <meta name="description" content="Honest writing about building with AI, ADHD, and zero budget. From a computer engineering student in Puerto Rico.">
+  <meta name="robots" content="noai, noimageai">
+  <style>
+    :root {
+      --black: #000000;
+      --blue: #0A84FF;
+      --light: #F5F5F7;
+      --secondary-bg: #1D1D1F;
+      --gray: #86868B;
+      --cream: #FAF9F6;
+      --text: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --border: rgba(0,0,0,0.08);
+      --card-bg: #FFFFFF;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* -- Nav -- */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(250, 249, 246, 0.9);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-logo { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a { font-size: 14px; color: var(--text-secondary); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--blue); color: #fff !important; padding: 8px 20px;
+      border-radius: 980px; font-weight: 600; font-size: 14px;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    .nav-toggle {
+      display: none; background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 20px; height: 2px; background: var(--text); margin: 4px 0;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+
+    /* -- Blog Header -- */
+    .blog-header {
+      padding: 120px 24px 40px;
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .blog-header h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+
+    .blog-header p {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* -- Search and Filters -- */
+    .blog-controls {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 32px;
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .search-bar:focus {
+      border-color: var(--blue);
+    }
+
+    .search-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .tag-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag-btn {
+      padding: 6px 16px;
+      border-radius: 980px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .tag-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .tag-btn.active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    /* -- Posts -- */
+    .blog-feed {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      transition: box-shadow 0.2s;
+    }
+
+    .post-card:hover {
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .post-tag {
+      padding: 2px 10px;
+      border-radius: 980px;
+      background: rgba(10, 132, 255, 0.08);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .post-card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .post-excerpt {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .post-body {
+      display: none;
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .post-body p {
+      margin-bottom: 16px;
+    }
+
+    .post-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .post-card.expanded .post-body {
+      display: block;
+    }
+
+    .post-card.expanded .post-excerpt {
+      display: none;
+    }
+
+    .read-more {
+      display: inline-block;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .read-more:hover {
+      opacity: 0.7;
+    }
+
+    /* -- Ad Slot -- */
+    .ad-slot {
+      background: var(--card-bg);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      margin-bottom: 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .ad-slot-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+
+    /* -- Newsletter -- */
+    .newsletter {
+      max-width: 720px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .newsletter-box {
+      background: var(--text);
+      color: var(--cream);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+
+    .newsletter-box h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .newsletter-box p {
+      font-size: 15px;
+      opacity: 0.7;
+      margin-bottom: 24px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 8px;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .newsletter-form input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      color: var(--cream);
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .newsletter-form input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+
+    .newsletter-form button {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .newsletter-form button:hover {
+      opacity: 0.85;
+    }
+
+    /* -- Footer -- */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+      font-size: 16px;
+      display: none;
+    }
+
+    /* -- Mobile -- */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: block; }
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 56px; left: 0; right: 0;
+        background: rgba(250, 249, 246, 0.98);
+        padding: 20px 24px;
+        gap: 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .blog-header { padding: 100px 20px 32px; }
+      .blog-header h1 { font-size: 32px; }
+      .blog-controls { padding: 0 20px 24px; }
+      .blog-feed { padding: 0 20px 60px; }
+      .post-card { padding: 24px; }
+      .post-card h2 { font-size: 20px; }
+      .newsletter { padding: 0 20px; margin-bottom: 60px; }
+      .newsletter-box { padding: 36px 24px; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-form button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <a href="index.html" class="nav-logo">Behike</a>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-links">
+      <a href="index.html">Store</a>
+      <a href="learn.html">Learn</a>
+      <a href="blog.html" style="color: var(--text); font-weight: 600;">Blog</a>
+      <a href="about.html">About</a>
+      <a href="index.html#products" class="nav-cta">Browse Tools</a>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="blog-header">
+    <h1>The Build Log</h1>
+    <p>Honest writing about building with AI, ADHD, and zero budget. From Puerto Rico.</p>
+  </div>
+
+  <!-- Search + Filters -->
+  <div class="blog-controls">
+    <div class="search-wrapper">
+      <span class="search-icon">&#x1F50D;</span>
+      <input type="text" class="search-bar" id="searchInput" placeholder="Search posts...">
+    </div>
+    <div class="tag-filters">
+      <button class="tag-btn active" data-tag="all">All</button>
+      <button class="tag-btn" data-tag="ai">AI</button>
+      <button class="tag-btn" data-tag="business">Business</button>
+      <button class="tag-btn" data-tag="adhd">ADHD</button>
+      <button class="tag-btn" data-tag="building">Building</button>
+      <button class="tag-btn" data-tag="personal">Personal</button>
+    </div>
+  </div>
+
+  <!-- Post Feed -->
+  <div class="blog-feed" id="blogFeed"></div>
+
+  <!-- No Results -->
+  <div class="no-results" id="noResults">No posts match your search.</div>
+
+  <!-- Newsletter -->
+  <div class="newsletter">
+    <div class="newsletter-box">
+      <h2>Get the build log in your inbox</h2>
+      <p>One email per week. What I built, what broke, what I learned. No spam.</p>
+      <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+        <input type="email" placeholder="your@email.com" required>
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 Behike. Built in Puerto Rico.
+  </footer>
+
+  <!-- Settings Widget -->
+  <script src="settings-widget.js"></script>
+
+  <script>
+    // -- Inline posts (sample data from journal entries) --
+    const inlinePosts = [
+      {
+        id: "zero-to-launch",
+        title: "I Have $35K in Debt and Zero Revenue. Tomorrow That Changes.",
+        date: "2026-03-22",
+        readingTime: "4 min",
+        tags: ["business", "personal"],
+        excerpt: "27 PDFs. 31 landing pages. 42 tools. A system that generates content while I sleep. Most people would call this crazy. Building all of this before making a single dollar.",
+        body: [
+          "I have $35,000 in debt and zero revenue.",
+          "But I also have 27 PDFs ready to sell. 31 landing pages. 42 tools. A system that generates content while I sleep. An email funnel that starts with a free ebook and ends at a $499 service call. A wellness app that competes with Calm. A music studio with 7 genres. A virtual operating system with Minecraft.",
+          "Most people would call this crazy. Building all of this before making a single dollar. My psychologist would probably say it's the ADHD avoiding the scary thing. And maybe she's right. Building feels safe. Selling feels exposed.",
+          "But here's what I know. The infrastructure is done. The products exist. They're not outlines. They're PDFs with real content. 15,000 words in one of them. 14,000 in another. Science-backed wellness features. Interactive financial dashboards.",
+          "Tomorrow morning I open Gumroad and list the first product. The Behike Method. $24.99. It's 15,020 words about building a one-person business with AI and ADHD. I wrote it from my dorm in Puerto Rico using old laptops running AI models that cost me nothing per month.",
+          "My family doesn't fully understand what I'm building. Para que mi familia no tenga que preocuparse. That's the why. Not the products. Not the revenue number. Just that sentence.",
+          "I'm scared to press publish. But I'm more scared of what happens if I don't."
+        ]
+      },
+      {
+        id: "marathon-build",
+        title: "I Built 70+ Things in One Night. Zero Failures.",
+        date: "2026-03-22",
+        readingTime: "5 min",
+        tags: ["building", "ai"],
+        excerpt: "Started around 8pm. It's almost 5am now and I'm still going. I lost count somewhere around agent 50. Last check it was 70+. Zero failures. Not one.",
+        body: [
+          "Today was the biggest build session of my life.",
+          "Started around 8pm. It's almost 5am now and I'm still going. I lost count somewhere around agent 50. Last check it was 70+. Zero failures. Not one.",
+          "Built a complete financial dashboard. Not a demo, a real app with 8 tabs. Debt payoff calculator that compares snowball vs avalanche methods. Subscription tracker. Financial health score. The kind of thing I would actually use myself. And I need to, because I have $35K in debt and no budget app ever worked for me before.",
+          "Rewrote the flagship book from 7,000 words to 15,000. Every chapter has real stories now. The ADHD chapter alone is 4,000 words. Wrote about \"pero que van a decir,\" about building for strangers instead of performing for people who already have opinions about you. It felt like writing a letter to my past self.",
+          "Built a virtual operating system. With Minecraft inside it. And a music studio with 7 genres. And a particle face that appears as a screensaver after 60 seconds. A terminal where you can type commands. I know it sounds crazy but someone is going to screenshot this and share it and that's how people find us.",
+          "The wellness app has binaural beats now. Real stereo oscillators through the Web Audio API. 40Hz for focus, 10Hz for calm. Body doubling for ADHD. Guided sessions. Science-backed circadian curves. This competes with apps that charge $70 a year. Ours is $9.99 forever.",
+          "Revenue is still $0. That number has been staring at me for a week. But tonight it doesn't bother me. Because everything is built. 27 PDFs. 31 landing pages. A complete funnel from free ebook to $499 service. Email sequences. A self-improving content pipeline.",
+          "Tomorrow I press publish. Dale."
+        ]
+      },
+      {
+        id: "adhd-superpower",
+        title: "ADHD Told Me I'd Fail at Business. I Built 25 Products in a Week.",
+        date: "2026-03-22",
+        readingTime: "3 min",
+        tags: ["adhd", "building"],
+        excerpt: "Someone once told me ADHD makes you bad at business. I just built 25 products in a week. Not outlines. Not \"coming soon\" pages. Real products with real content.",
+        body: [
+          "Someone once told me ADHD makes you bad at business. I just built 25 products in a week.",
+          "Not outlines. Not \"coming soon\" pages. Real products with real content. Some are 15,000 words. Some are interactive apps. One has a playable Minecraft game inside it.",
+          "The trick is not fighting the hyperfocus. It's aiming it. My psychologist calls it the Post-It Mental principle. You capture everything that comes to mind immediately, without needing to execute it right now. Then you pick ONE thing and aim the full force of your brain at it.",
+          "That's what BehiqueBot was supposed to be. A capture system. So the ideas don't get lost between the shower and the desk.",
+          "The productivity books say \"plan your day in advance\" and \"stick to the schedule.\" Mira, my brain doesn't work like that. Some days I can't start until 11pm. And then I build until sunrise. The productivity system has to flex around the brain, not the other way around.",
+          "Built an ADHD-specific budget app today. Five categories instead of fifty. Impulse cooldown timer. Visual jars that fill up. Because every budget app I've tried made me close it after 5 seconds. Too many inputs. Too many decisions. My app has ONE number pad and ONE tap to categorize.",
+          "Also wrote a chapter called \"The ADHD Builder's Edge\" for the book. 4,000 words about why our brains are actually built for entrepreneurship. Hyperfocus is the engine. The problem is never intensity. It's direction.",
+          "I don't want to \"manage\" my ADHD. I want to aim it."
+        ]
+      }
+    ];
+
+    // -- State --
+    let allPosts = [];
+    let activeTag = 'all';
+    let searchQuery = '';
+
+    // -- Load posts --
+    async function loadPosts() {
+      // Try to load from blog-index.json, fall back to inline posts
+      try {
+        const res = await fetch('blog-index.json');
+        if (res.ok) {
+          const json = await res.json();
+          allPosts = json.posts || json;
+        } else {
+          allPosts = inlinePosts;
+        }
+      } catch {
+        allPosts = inlinePosts;
+      }
+
+      // Sort reverse chronological
+      allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      renderPosts();
+    }
+
+    // -- Render --
+    function renderPosts() {
+      const feed = document.getElementById('blogFeed');
+      const noResults = document.getElementById('noResults');
+      feed.innerHTML = '';
+
+      const filtered = allPosts.filter(post => {
+        const matchesTag = activeTag === 'all' || post.tags.includes(activeTag);
+        const matchesSearch = searchQuery === '' ||
+          post.title.toLowerCase().includes(searchQuery) ||
+          post.excerpt.toLowerCase().includes(searchQuery) ||
+          post.tags.some(t => t.includes(searchQuery));
+        return matchesTag && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+
+      filtered.forEach((post, i) => {
+        // Insert ad slot every 3 posts
+        if (i > 0 && i % 3 === 0) {
+          const ad = document.createElement('div');
+          ad.className = 'ad-slot';
+          ad.innerHTML = '<div class="ad-slot-label">Sponsored</div><p>Your ad here. <a href="mailto:kalani@behike.store" style="color: var(--blue);">Get in touch.</a></p>';
+          feed.appendChild(ad);
+        }
+
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.dataset.id = post.id;
+
+        const primaryTag = post.tags[0] || 'general';
+        const dateStr = formatDate(post.date);
+
+        let bodyHtml = '';
+        if (post.body && Array.isArray(post.body)) {
+          bodyHtml = post.body.map(p => `<p>${p}</p>`).join('');
+        } else if (post.body && typeof post.body === 'string') {
+          bodyHtml = `<p>${post.body}</p>`;
+        }
+
+        card.innerHTML = `
+          <div class="post-meta">
+            <span class="post-tag">${primaryTag}</span>
+            <span>${dateStr}</span>
+            <span>${post.readingTime || '3 min'}</span>
+          </div>
+          <h2>${post.title}</h2>
+          <p class="post-excerpt">${post.excerpt}</p>
+          <div class="post-body">${bodyHtml}</div>
+          <span class="read-more" onclick="togglePost(this)">Read more</span>
+        `;
+        feed.appendChild(card);
+      });
+    }
+
+    function formatDate(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function togglePost(el) {
+      const card = el.closest('.post-card');
+      const isExpanded = card.classList.contains('expanded');
+      card.classList.toggle('expanded');
+      el.textContent = isExpanded ? 'Read more' : 'Show less';
+    }
+
+    // -- Tag filtering --
+    document.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTag = btn.dataset.tag;
+        renderPosts();
+      });
+    });
+
+    // -- Search --
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderPosts();
+    });
+
+    // -- Newsletter --
+    function handleSubscribe(e) {
+      e.preventDefault();
+      const input = e.target.querySelector('input');
+      const btn = e.target.querySelector('button');
+      btn.textContent = 'Subscribed!';
+      btn.style.background = '#30D158';
+      input.value = '';
+      setTimeout(() => {
+        btn.textContent = 'Subscribe';
+        btn.style.background = '';
+      }, 3000);
+    }
+
+    // -- Init --
+    loadPosts();
+  </script>
+
+</body>
+</html>

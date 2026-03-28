@@ -1,0 +1,67 @@
+<section class="image-slider section-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="image-slider__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+  </div>
+
+  <div class="page-width">
+    <div class="image-slider__track">
+      {%- for block in section.blocks -%}
+        <div class="image-slider__slide" {{ block.shopify_attributes }}>
+          {%- if block.settings.image != blank -%}
+            <img
+              src="{{ block.settings.image | image_url: width: 600 }}"
+              alt="{{ block.settings.image.alt | default: 'Slide image' }}"
+              width="600"
+              height="280"
+              loading="lazy"
+            >
+          {%- else -%}
+            {{ 'collection-' | append: forloop.index | placeholder_svg_tag }}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image Slider",
+  "tag": "section",
+  "class": "section-image-slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Gallery"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Slider",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}

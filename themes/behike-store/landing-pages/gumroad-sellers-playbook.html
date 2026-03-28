@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Gumroad Seller's Playbook — Behike</title>
+  <meta name="description" content="From zero to consistent Gumroad sales. The complete setup, launch, and scale guide for digital product sellers." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #8E8E93;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #28B84E;
+      --surface: #111111;
+      --surface-2: #1A1A1A;
+      --border: #2C2C2E;
+      --radius: 12px;
+      --max-width: 980px;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 20px;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10,132,255,0.15);
+      border: 1px solid rgba(10,132,255,0.3);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      letter-spacing: 0.3px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cta);
+      color: #000;
+      padding: 16px 36px;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 17px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+    .btn-primary:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .btn-price {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .hero-meta {
+      margin-top: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-meta-item {
+      text-align: center;
+    }
+    .hero-meta-item strong {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .hero-meta-item span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTIONS */
+    section { padding: 80px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 540px;
+      line-height: 1.5;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* WHAT'S INSIDE */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .chapter-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .chapter-card.visible { opacity: 1; transform: translateY(0); }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: rgba(10,132,255,0.15);
+      border: 1px solid rgba(10,132,255,0.25);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .chapter-info h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .chapter-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* CALLOUT BOX */
+    .callout {
+      background: rgba(48,209,88,0.08);
+      border: 1px solid rgba(48,209,88,0.25);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-top: 40px;
+    }
+    .callout p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .callout strong { color: var(--cta); }
+
+    /* COMPARISON TABLE */
+    .table-wrapper {
+      margin-top: 48px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+    thead th {
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th:first-child { border-radius: 12px 0 0 0; }
+    thead th:last-child { border-radius: 0 12px 0 0; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: 14px 20px;
+      color: var(--text);
+      background: var(--surface);
+    }
+    tbody td:first-child { font-weight: 600; }
+    .check { color: var(--cta); font-weight: 700; }
+    .cross { color: #FF453A; font-weight: 700; }
+    .partial { color: #FFD60A; font-weight: 700; }
+    .gumroad-col { background: rgba(10,132,255,0.07); }
+
+    /* PAGE FORMULA */
+    .formula-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      margin-top: 48px;
+    }
+    .formula-section h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.3px;
+    }
+    .formula-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .formula-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #000;
+      margin-top: 2px;
+    }
+    .step-content strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step-content p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* PERSONAS */
+    .personas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .persona {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    .persona.visible { opacity: 1; transform: translateY(0); }
+    .persona-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+    .persona h3 {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .persona p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* FAQ */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 48px;
+    }
+    .faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 20px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      user-select: none;
+    }
+    .faq-q .arrow {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      background: var(--surface-2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-muted);
+      transition: transform 0.25s ease;
+    }
+    .faq-item.open .faq-q .arrow { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s ease;
+      padding: 0 24px;
+    }
+    .faq-item.open .faq-a {
+      max-height: 300px;
+      padding: 0 24px 20px;
+    }
+    .faq-a p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ANIMATIONS */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 640px) {
+      .hero { padding: 64px 0 48px; }
+      .hero-meta { gap: 20px; }
+      .formula-section { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="index.html" class="nav-brand">Behike</a>
+      <a href="https://behikeai.gumroad.com/l/gumroad-sellers-playbook" class="nav-cta" target="_blank" rel="noopener">Get it for $17.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">Digital Product Guide</div>
+      <h1>Your Gumroad store.<br><span>Actually making sales.</span></h1>
+      <p>The complete setup, launch, and scale guide for selling digital products on Gumroad. No audience required to start.</p>
+      <div class="hero-actions">
+        <a href="https://behikeai.gumroad.com/l/gumroad-sellers-playbook" class="btn-primary" target="_blank" rel="noopener">
+          Get the Playbook
+        </a>
+        <span class="btn-price">$17.99 — instant download</span>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <strong>11</strong>
+          <span>chapters</span>
+        </div>
+        <div class="hero-meta-item">
+          <strong>5,000+</strong>
+          <span>words</span>
+        </div>
+        <div class="hero-meta-item">
+          <strong>PDF</strong>
+          <span>instant access</span>
+        </div>
+        <div class="hero-meta-item">
+          <strong>$17.99</strong>
+          <span>one-time</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section>
+    <div class="container">
+      <p class="section-label">The problem</p>
+      <h2 class="section-title fade-in">Most Gumroad stores make $0 after six months. Here is why.</h2>
+      <p class="section-sub fade-in">It is not the platform. It is not luck. It is three specific mistakes that almost everyone makes at the start.</p>
+
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="icon">&#128269;</div>
+          <h3>Wrong product, wrong price</h3>
+          <p>Sellers launch the product they want to make at the price that feels comfortable. Both are wrong. Pricing too low kills your margins. Building without demand kills your time.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#128100;</div>
+          <h3>Product page that describes, not sells</h3>
+          <p>Most listings describe what the product contains. Buyers do not care about your table of contents. They care about what changes for them after they read it.</p>
+        </div>
+        <div class="problem-card">
+          <div class="icon">&#128292;</div>
+          <h3>No follow-up system</h3>
+          <p>The sale ends and the buyer disappears. No email. No upsell. No review request. The most profitable channel in any digital product business is buyers you already have.</p>
+        </div>
+      </div>
+
+      <div class="callout fade-in">
+        <p>The stores making <strong>$1,000 to $5,000 per month</strong> on Gumroad are not more talented. They shipped first, fixed the page, and built the follow-up sequence. This guide shows you exactly how to do all three.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section>
+    <div class="container">
+      <p class="section-label">What's inside</p>
+      <h2 class="section-title fade-in">11 chapters. Every stage covered.</h2>
+      <p class="section-sub fade-in">From picking the right platform to scaling past $1K/month with a product stack that compounds.</p>
+
+      <div class="chapters-grid">
+        <div class="chapter-card">
+          <div class="chapter-num">01</div>
+          <div class="chapter-info">
+            <h3>Why Gumroad (Honest Platform Comparison)</h3>
+            <p>Gumroad vs. Lemon Squeezy vs. Payhip vs. Shopify. Which platform wins for your situation and why most people choose wrong.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">02</div>
+          <div class="chapter-info">
+            <h3>Setting Up Your Store</h3>
+            <p>Profile, cover image, about page, and custom domain. What actually matters on day one and what you can skip until later.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">03</div>
+          <div class="chapter-info">
+            <h3>Creating Your First Product</h3>
+            <p>File formats, cover design, and the description formula that turns a listing into a sales page.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">04</div>
+          <div class="chapter-info">
+            <h3>Pricing That Sells</h3>
+            <p>The psychology of Gumroad price points, when pay-what-you-want works (and when it does not), and the tiered bundle play.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">05</div>
+          <div class="chapter-info">
+            <h3>The Product Page That Converts</h3>
+            <p>The exact headline formula, how to write bullets that make buyers think "I need to know that," and the social proof structure.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">06</div>
+          <div class="chapter-info">
+            <h3>Launch Strategy</h3>
+            <p>The 24-hour launch framework. Soft launch vs. hard launch and which one fits your current platform size.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">07</div>
+          <div class="chapter-info">
+            <h3>Traffic Sources That Drive Sales</h3>
+            <p>Twitter, TikTok, newsletters, Pinterest, SEO, and Gumroad's own discovery. What actually converts for digital products.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">08</div>
+          <div class="chapter-info">
+            <h3>The Follow-Up System</h3>
+            <p>Post-purchase email sequences, the three-email trust builder, and how to configure upsells that do not feel pushy.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">09</div>
+          <div class="chapter-info">
+            <h3>Gumroad Analytics</h3>
+            <p>What to track, what to ignore, and how to read conversion rate data to know whether you have a traffic problem or a page problem.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">10</div>
+          <div class="chapter-info">
+            <h3>Scaling to $1K Per Month</h3>
+            <p>The product stack, the bundle strategy, when to raise prices, and the consistency pattern that separates sellers who hit the target from those who do not.</p>
+          </div>
+        </div>
+        <div class="chapter-card">
+          <div class="chapter-num">11</div>
+          <div class="chapter-info">
+            <h3>Common Mistakes in the First 90 Days</h3>
+            <p>Six specific patterns that kill most Gumroad stores before they generate traction. How to recognize them and what to do instead.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section>
+    <div class="container">
+      <p class="section-label">Platform comparison</p>
+      <h2 class="section-title fade-in">Gumroad vs. the alternatives</h2>
+      <p class="section-sub fade-in">An honest side-by-side so you can make the right call for your situation.</p>
+
+      <div class="table-wrapper fade-in">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="gumroad-col">Gumroad</th>
+              <th>Lemon Squeezy</th>
+              <th>Payhip</th>
+              <th>Shopify</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Free to start</td>
+              <td class="gumroad-col check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="cross">No ($39/mo)</td>
+            </tr>
+            <tr>
+              <td>Free plan transaction fee</td>
+              <td class="gumroad-col">10%</td>
+              <td>5% + $0.50</td>
+              <td>5%</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td>Built-in marketplace discovery</td>
+              <td class="gumroad-col check">Yes</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+              <td class="cross">No</td>
+            </tr>
+            <tr>
+              <td>Digital product delivery</td>
+              <td class="gumroad-col check">Native</td>
+              <td class="check">Native</td>
+              <td class="check">Native</td>
+              <td class="partial">Via app ($)</td>
+            </tr>
+            <tr>
+              <td>Email to buyers</td>
+              <td class="gumroad-col check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="partial">Basic</td>
+              <td class="partial">Via app</td>
+            </tr>
+            <tr>
+              <td>Affiliate management</td>
+              <td class="gumroad-col check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="check">Yes</td>
+              <td class="partial">Via app</td>
+            </tr>
+            <tr>
+              <td>Best for</td>
+              <td class="gumroad-col">Info products, guides, templates</td>
+              <td>Software, SaaS, licensing</td>
+              <td>Budget-conscious creators</td>
+              <td>Physical products, $5K+/mo stores</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE FORMULA PREVIEW -->
+  <section>
+    <div class="container">
+      <p class="section-label">Inside the guide</p>
+      <h2 class="section-title fade-in">The product page formula from Chapter 5</h2>
+      <p class="section-sub fade-in">Every element of a converting Gumroad product page, in the exact order it should appear.</p>
+
+      <div class="formula-section fade-in">
+        <h3>The 7-Part Product Page Structure</h3>
+        <div class="formula-steps">
+          <div class="formula-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <strong>Headline: Specific Outcome + Time Frame + Without Common Objection</strong>
+              <p>Not your product name. A clear statement of what changes for the buyer. Written for a stranger who knows nothing about you.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <strong>Problem frame (2-3 lines)</strong>
+              <p>Name the exact situation your buyer is in right now. Specificity here signals you understand their problem better than they do.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <strong>Why the usual approach fails</strong>
+              <p>One or two sentences. This is where you disqualify bad alternatives and position your guide as the direct path.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <strong>5-8 benefit bullets (not feature bullets)</strong>
+              <p>Each bullet names something the buyer will know or be able to do after reading. Not chapter names. Not topics covered.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <strong>Social proof (reviews or beta reader quotes)</strong>
+              <p>Five honest reviews on a Gumroad product page measurably increase conversion rate. The guide covers exactly how to get them fast.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">6</div>
+            <div class="step-content">
+              <strong>Who this is for (3 specific personas)</strong>
+              <p>Narrow targeting increases conversion. Buyers who see themselves in your description convert at higher rates than buyers addressed generically.</p>
+            </div>
+          </div>
+          <div class="formula-step">
+            <div class="step-num">7</div>
+            <div class="step-content">
+              <strong>Price anchor and CTA</strong>
+              <p>State the price and what they get one more time. Make the action completely clear. No clever phrasing. Just the button.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO THIS IS FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label">Who this is for</p>
+      <h2 class="section-title fade-in">Three people this was written for.</h2>
+
+      <div class="personas">
+        <div class="persona">
+          <div class="persona-icon">&#128221;</div>
+          <h3>The person sitting on a product idea</h3>
+          <p>You have knowledge worth selling. You have not launched because the setup feels unclear, the pricing feels wrong, or you are not sure if anyone will buy. This guide removes all three blockers in one read.</p>
+        </div>
+        <div class="persona">
+          <div class="persona-icon">&#128200;</div>
+          <h3>The seller with a live product and no sales</h3>
+          <p>The product exists. It has zero or very few sales. You are not sure if the problem is traffic, the page, or the product itself. This guide tells you how to diagnose it and what to change.</p>
+        </div>
+        <div class="persona">
+          <div class="persona-icon">&#127775;</div>
+          <h3>The creator building a product catalog</h3>
+          <p>You have made some sales and want to scale. You need a product stack strategy, a follow-up system, and a clear path to $1K/month without burning out on content creation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section>
+    <div class="container">
+      <p class="section-label">FAQ</p>
+      <h2 class="section-title fade-in">Questions.</h2>
+
+      <div class="faq-list fade-in">
+        <div class="faq-item">
+          <div class="faq-q">
+            Do I need an existing audience to make this work?
+            <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">
+            <p>No. Chapter 7 covers traffic sources that do not require a following, including Gumroad's own marketplace discovery, specific Reddit and community strategies, and a Pinterest approach that compounds over time. The guide is built for people starting from zero.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            What kind of digital products can I sell on Gumroad?
+            <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">
+            <p>PDF guides, templates, spreadsheets, Notion dashboards, video courses, audio files, Figma files, ebooks, ZIP bundles, and more. The playbook is written for information products and templates specifically, but the platform setup, page formula, and launch strategy apply to any digital file.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            Is the guide specific to Gumroad or does it apply to other platforms?
+            <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">
+            <p>The product page formula, pricing strategy, traffic approach, and follow-up system in Chapters 4-8 apply to any digital product platform. Chapter 1 covers the platform comparison honestly. Chapter 2 and the Gumroad-specific mechanics are specific to the platform, but the core selling principles transfer.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            How long does it take to read?
+            <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">
+            <p>About 90 minutes to read completely. You can set up a Gumroad store and have a product live in the same afternoon you read it. The guide is written to be immediately actionable, not as a long theoretical framework.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">
+            Is there a refund policy?
+            <span class="arrow">+</span>
+          </div>
+          <div class="faq-a">
+            <p>Yes. Gumroad's standard 30-day refund policy applies. If you go through the guide, implement what is in it, and genuinely feel it was not worth $17.99, request a refund. No issue.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta">
+    <div class="container">
+      <h2 class="fade-in">Your store should be<br>making sales by this weekend.</h2>
+      <p class="fade-in">The setup takes 20 minutes. The page formula is in the guide. The launch sequence is in Chapter 6. Everything you need to go from zero to your first sale is in one PDF.</p>
+      <a href="https://behikeai.gumroad.com/l/gumroad-sellers-playbook" class="btn-primary" target="_blank" rel="noopener">
+        Get The Playbook &mdash; $17.99
+      </a>
+      <p style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">Instant download. PDF format. 30-day refund guarantee.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Built by <a href="index.html">Behike</a>. Questions? Find us on <a href="https://twitter.com/behikeai" target="_blank" rel="noopener">Twitter</a>.</p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in, .problem-card, .chapter-card, .persona').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Stagger chapter cards
+    document.querySelectorAll('.chapter-card').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 40}ms`;
+    });
+
+    // Stagger problem cards
+    document.querySelectorAll('.problem-card').forEach((el, i) => {
+      el.style.transitionDelay = `${i * 80}ms`;
+    });
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.querySelector('.faq-q').addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(o => o.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+  </script>
+</body>
+</html>

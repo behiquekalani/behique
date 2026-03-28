@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Studio | Spotify Integration</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08060e;--panel:rgba(12,10,20,0.8);--border:rgba(0,212,255,0.15);--border-glow:rgba(0,212,255,0.4);
+  --cyan:#00D4FF;--cyan-dim:rgba(0,212,255,0.1);--cyan-glow:rgba(0,212,255,0.5);
+  --text:#e0e8f0;--text-dim:#5a7a8a;--green:#1DB954}
+body{background:var(--bg);color:var(--text);font-family:'Orbitron',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,212,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,0.05) 0%,transparent 50%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;background:linear-gradient(rgba(0,212,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:1}
+.container{max-width:720px;margin:0 auto;padding:20px;position:relative;z-index:2}
+.header{text-align:center;margin-bottom:24px}
+.header h1{font-size:22px;font-weight:900;letter-spacing:5px;color:var(--cyan);text-shadow:0 0 20px var(--cyan-glow)}
+.header p{font-family:'VT323',monospace;font-size:14px;color:var(--text-dim);margin-top:4px;letter-spacing:2px}
+.glass{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:border-color .3s}
+.glass:hover{border-color:var(--border-glow)}
+.glass h2{font-size:13px;font-weight:700;letter-spacing:3px;color:var(--cyan);margin-bottom:14px;text-transform:uppercase}
+.btn{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:10px 20px;border:1px solid var(--cyan);border-radius:8px;background:rgba(0,212,255,0.08);color:var(--cyan);cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn:hover{background:rgba(0,212,255,0.2);box-shadow:0 0 16px var(--cyan-glow)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-green{border-color:var(--green);color:var(--green);background:rgba(29,185,84,0.08)}
+.btn-green:hover{background:rgba(29,185,84,0.2);box-shadow:0 0 16px rgba(29,185,84,0.4)}
+#login-section{text-align:center;padding:40px 20px}
+#login-section .spotify-logo{font-size:48px;margin-bottom:12px}
+input[type="text"]{width:100%;padding:10px 14px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'VT323',monospace;font-size:16px;outline:none;transition:border-color .2s}
+input[type="text"]:focus{border-color:var(--cyan)}
+.search-row{display:flex;gap:8px;margin-bottom:14px}
+.search-row input{flex:1}
+.results{max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--cyan) transparent}
+.track-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;transition:background .2s}
+.track-item:hover{background:rgba(0,212,255,0.08)}
+.track-item.active{background:rgba(0,212,255,0.12);border:1px solid var(--border-glow)}
+.track-item img{width:48px;height:48px;border-radius:6px;flex-shrink:0}
+.track-info{flex:1;min-width:0}
+.track-info .name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-info .artist{font-family:'VT323',monospace;font-size:14px;color:var(--text-dim)}
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.feat-card{text-align:center;padding:12px 8px;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border)}
+.feat-card .val{font-size:20px;font-weight:900;color:var(--cyan);text-shadow:0 0 10px var(--cyan-glow)}
+.feat-card .lbl{font-family:'VT323',monospace;font-size:13px;color:var(--text-dim);margin-top:4px}
+.playback-bar{display:flex;align-items:center;gap:12px}
+.playback-bar .controls{display:flex;gap:8px}
+.playback-bar .controls button{width:36px;height:36px;border-radius:50%;border:1px solid var(--cyan);background:rgba(0,212,255,0.06);color:var(--cyan);font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.playback-bar .controls button:hover{background:rgba(0,212,255,0.2)}
+.seek-bar{flex:1;height:4px;-webkit-appearance:none;background:rgba(0,212,255,0.15);border-radius:2px;outline:none}
+.seek-bar::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--cyan);cursor:pointer}
+.time-label{font-family:'VT323',monospace;font-size:13px;color:var(--text-dim);min-width:36px;text-align:right}
+.remix-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.remix-slider label{font-family:'VT323',monospace;font-size:14px;color:var(--text-dim);display:flex;justify-content:space-between;margin-bottom:6px}
+.remix-slider input[type="range"]{width:100%;height:4px;-webkit-appearance:none;background:rgba(0,212,255,0.15);border-radius:2px;outline:none}
+.remix-slider input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow);cursor:pointer}
+.studio-link{margin-top:8px}
+.studio-link .btn{font-size:10px;padding:8px 14px}
+.footer{text-align:center;margin-top:24px;padding:16px;font-family:'VT323',monospace;font-size:13px;color:var(--text-dim);letter-spacing:2px}
+.hidden{display:none}
+.status{font-family:'VT323',monospace;font-size:13px;color:var(--text-dim);text-align:center;padding:8px}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>SPOTIFY LINK</h1>
+    <p>Behike Studio // Track Analysis + Remix</p>
+  </div>
+  <div id="login-section" class="glass">
+    <div class="spotify-logo">&#9835;</div>
+    <p style="margin-bottom:16px;font-family:'VT323',monospace;font-size:16px;color:var(--text-dim)">Connect your Spotify account to analyze tracks</p>
+    <button class="btn btn-green" onclick="spotifyLogin()">CONNECT SPOTIFY</button>
+  </div>
+  <div id="app" class="hidden">
+    <div class="glass">
+      <h2>Search Tracks</h2>
+      <div class="search-row">
+        <input type="text" id="search-input" placeholder="Track name or artist..." onkeydown="if(event.key==='Enter')searchTracks()">
+        <button class="btn" onclick="searchTracks()">SEARCH</button>
+      </div>
+      <div id="results" class="results"></div>
+    </div>
+    <div id="features-panel" class="glass hidden">
+      <h2>Track Analysis</h2>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <img id="feat-art" width="56" height="56" style="border-radius:8px">
+        <div>
+          <div id="feat-name" style="font-size:14px;font-weight:700"></div>
+          <div id="feat-artist" style="font-family:'VT323',monospace;font-size:15px;color:var(--text-dim)"></div>
+        </div>
+      </div>
+      <div class="features-grid">
+        <div class="feat-card"><div class="val" id="f-bpm">--</div><div class="lbl">BPM</div></div>
+        <div class="feat-card"><div class="val" id="f-key">--</div><div class="lbl">KEY</div></div>
+        <div class="feat-card"><div class="val" id="f-energy">--</div><div class="lbl">ENERGY</div></div>
+        <div class="feat-card"><div class="val" id="f-dance">--</div><div class="lbl">DANCE</div></div>
+      </div>
+      <div class="studio-link">
+        <button class="btn" onclick="sendToStudio()">APPLY TO STUDIO</button>
+        <span id="studio-status" class="status"></span>
+      </div>
+    </div>
+    <div id="playback-panel" class="glass hidden">
+      <h2>Playback</h2>
+      <div class="playback-bar">
+        <div class="controls">
+          <button onclick="seekRelative(-15)" title="Back 15s">&#9194;</button>
+          <button id="play-btn" onclick="togglePlay()">&#9654;</button>
+          <button onclick="seekRelative(15)" title="Forward 15s">&#9193;</button>
+        </div>
+        <input type="range" class="seek-bar" id="seek-bar" min="0" max="100" value="0" oninput="seekTo(this.value)">
+        <span class="time-label" id="time-label">0:00</span>
+      </div>
+      <div id="playback-status" class="status">Waiting for player...</div>
+    </div>
+    <div id="remix-panel" class="glass hidden">
+      <h2>Remix Mode</h2>
+      <div class="remix-grid">
+        <div class="remix-slider">
+          <label>Tempo Shift <span id="rv-tempo">0</span> BPM</label>
+          <input type="range" min="-20" max="20" value="0" oninput="updateRemix('tempo',this.value)">
+        </div>
+        <div class="remix-slider">
+          <label>Filter Sweep <span id="rv-filter">50</span>%</label>
+          <input type="range" min="0" max="100" value="50" oninput="updateRemix('filter',this.value)">
+        </div>
+        <div class="remix-slider">
+          <label>Bass Boost <span id="rv-bass">0</span>%</label>
+          <input type="range" min="0" max="100" value="0" oninput="updateRemix('bass',this.value)">
+        </div>
+        <div class="remix-slider">
+          <label>Reverb <span id="rv-reverb">0</span>%</label>
+          <input type="range" min="0" max="100" value="0" oninput="updateRemix('reverb',this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">Behike Studio | behike.co</div>
+</div>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
+<script>
+const CONFIG = {
+  SPOTIFY_CLIENT_ID: '',
+  REDIRECT_URI: 'https://behike.co/callback',
+  SCOPES: 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state'
+};
+const KEY_MAP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const MODE_MAP = ['min','maj'];
+let accessToken=null, player=null, deviceId=null, currentTrack=null, currentFeatures=null, isPlaying=false, seekInterval=null;
+
+function spotifyLogin() {
+  if (!CONFIG.SPOTIFY_CLIENT_ID) { alert('Set CONFIG.SPOTIFY_CLIENT_ID before connecting.'); return; }
+  const p = new URLSearchParams({ client_id:CONFIG.SPOTIFY_CLIENT_ID, response_type:'token',
+    redirect_uri:CONFIG.REDIRECT_URI, scope:CONFIG.SCOPES, show_dialog:'true' });
+  window.location.href = 'https://accounts.spotify.com/authorize?' + p.toString();
+}
+function parseToken() {
+  const h = window.location.hash.substring(1);
+  return h ? new URLSearchParams(h).get('access_token') : null;
+}
+function initApp(token) {
+  accessToken = token;
+  document.getElementById('login-section').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  initPlayer();
+}
+
+async function apiGet(ep) {
+  const r = await fetch('https://api.spotify.com'+ep, { headers:{'Authorization':'Bearer '+accessToken} });
+  if (!r.ok) throw new Error('API '+r.status);
+  return r.json();
+}
+async function apiPut(ep, body) {
+  await fetch('https://api.spotify.com'+ep, { method:'PUT',
+    headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+    body: body ? JSON.stringify(body) : undefined });
+}
+
+async function searchTracks() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  try {
+    const data = await apiGet('/v1/search?type=track&limit=8&q='+encodeURIComponent(q));
+    renderResults(data.tracks.items);
+  } catch(e) { document.getElementById('results').innerHTML='<div class="status">Search failed. Check token.</div>'; }
+}
+function renderResults(tracks) {
+  const el = document.getElementById('results');
+  if (!tracks.length) { el.innerHTML='<div class="status">No results found</div>'; return; }
+  el.innerHTML = tracks.map(t => {
+    const img = t.album.images[2]?.url || t.album.images[0]?.url || '';
+    const art = t.artists.map(a=>a.name).join(', ');
+    return `<div class="track-item" onclick="selectTrack('${t.id}','${esc(t.name)}','${esc(art)}','${t.uri}','${img}')">
+      <img src="${img}" alt=""><div class="track-info"><div class="name">${esc(t.name)}</div><div class="artist">${esc(art)}</div></div></div>`;
+  }).join('');
+}
+function esc(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+async function selectTrack(id, name, artist, uri, img) {
+  currentTrack = { id, name, artist, uri, img };
+  document.querySelectorAll('.track-item').forEach(el=>el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('feat-art').src = img;
+  document.getElementById('feat-name').textContent = name;
+  document.getElementById('feat-artist').textContent = artist;
+  document.getElementById('features-panel').classList.remove('hidden');
+  document.getElementById('remix-panel').classList.remove('hidden');
+  ['f-bpm','f-key','f-energy','f-dance'].forEach(x=>document.getElementById(x).textContent='...');
+  try {
+    const f = await apiGet('/v1/audio-features/'+id);
+    currentFeatures = f;
+    document.getElementById('f-bpm').textContent = Math.round(f.tempo);
+    document.getElementById('f-key').textContent = (f.key>=0?KEY_MAP[f.key]:'?')+' '+MODE_MAP[f.mode];
+    document.getElementById('f-energy').textContent = Math.round(f.energy*100)+'%';
+    document.getElementById('f-dance').textContent = Math.round(f.danceability*100)+'%';
+  } catch(e) {
+    ['f-bpm','f-key','f-energy','f-dance'].forEach(x=>document.getElementById(x).textContent='N/A');
+  }
+  if (deviceId) { playTrack(uri); document.getElementById('playback-panel').classList.remove('hidden'); }
+}
+
+function sendToStudio() {
+  if (!currentFeatures) return;
+  const msg = { type:'spotify-sync', bpm:Math.round(currentFeatures.tempo),
+    key: currentFeatures.key>=0 ? KEY_MAP[currentFeatures.key]+' '+MODE_MAP[currentFeatures.mode] : null,
+    energy:currentFeatures.energy, danceability:currentFeatures.danceability,
+    track:currentTrack.name, artist:currentTrack.artist };
+  if (window.opener) window.opener.postMessage(msg,'*');
+  else if (window.parent!==window) window.parent.postMessage(msg,'*');
+  localStorage.setItem('behike-studio-spotify', JSON.stringify(msg));
+  const el = document.getElementById('studio-status');
+  el.textContent = 'Sent: '+msg.bpm+' BPM / '+(msg.key||'?')+' to studio';
+  setTimeout(()=>el.textContent='', 3000);
+}
+
+window.onSpotifyWebPlaybackSDKReady = () => { if (accessToken) initPlayer(); };
+function initPlayer() {
+  if (!accessToken||player||typeof Spotify==='undefined') return;
+  player = new Spotify.Player({ name:'Behike Studio', getOAuthToken:cb=>cb(accessToken), volume:0.7 });
+  player.addListener('ready', ({device_id})=>{
+    deviceId=device_id;
+    document.getElementById('playback-status').textContent='Player ready';
+    if (currentTrack) { playTrack(currentTrack.uri); document.getElementById('playback-panel').classList.remove('hidden'); }
+  });
+  player.addListener('not_ready', ()=>{ document.getElementById('playback-status').textContent='Player disconnected'; deviceId=null; });
+  player.addListener('player_state_changed', state=>{
+    if (!state) return;
+    isPlaying=!state.paused;
+    document.getElementById('play-btn').innerHTML = isPlaying?'&#9646;&#9646;':'&#9654;';
+    updateSeekBar(state);
+  });
+  player.addListener('initialization_error', ({message})=>{ document.getElementById('playback-status').textContent='Init error: '+message; });
+  player.addListener('authentication_error', ({message})=>{ document.getElementById('playback-status').textContent='Auth error: '+message; });
+  player.connect();
+  if (seekInterval) clearInterval(seekInterval);
+  seekInterval = setInterval(async()=>{ if(!player||!isPlaying)return; const s=await player.getCurrentState(); if(s)updateSeekBar(s); },1000);
+}
+async function playTrack(uri) {
+  if (!deviceId) return;
+  try { await apiPut('/v1/me/player/play?device_id='+deviceId, {uris:[uri]}); document.getElementById('playback-status').textContent='Playing'; }
+  catch(e) { document.getElementById('playback-status').textContent='Playback error (Premium required)'; }
+}
+async function togglePlay() { if(player) await player.togglePlay(); }
+async function seekRelative(sec) {
+  if(!player) return; const s=await player.getCurrentState();
+  if(s) await player.seek(Math.max(0,Math.min(s.duration,s.position+sec*1000)));
+}
+async function seekTo(pct) {
+  if(!player) return; const s=await player.getCurrentState();
+  if(s) await player.seek(Math.round((pct/100)*s.duration));
+}
+function updateSeekBar(s) {
+  if(!s) return;
+  document.getElementById('seek-bar').value = s.duration?(s.position/s.duration)*100:0;
+  const sec=Math.floor(s.position/1000);
+  document.getElementById('time-label').textContent = Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+}
+function updateRemix(param, val) {
+  document.getElementById('rv-'+param).textContent = val;
+  const msg = {type:'spotify-remix', param, value:Number(val)};
+  if (window.opener) window.opener.postMessage(msg,'*');
+  else if (window.parent!==window) window.parent.postMessage(msg,'*');
+  localStorage.setItem('behike-studio-remix-'+param, val);
+}
+window.addEventListener('DOMContentLoaded', ()=>{
+  const token=parseToken();
+  if(token){ window.location.hash=''; initApp(token); }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Special Offer - AI Employee Guide</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#fff;min-height:100vh;padding:20px}
+.container{max-width:560px;margin:0 auto}
+
+.timer-bar{background:#ff4444;text-align:center;padding:10px;border-radius:8px;margin-bottom:24px;font-weight:700;font-size:.9em;letter-spacing:.5px}
+.timer-bar span{font-size:1.1em}
+
+.header{text-align:center;margin-bottom:24px}
+.header .wait{color:#ff9800;font-size:.85em;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.header h1{font-size:2em;font-weight:800;letter-spacing:-1px;line-height:1.15}
+@media(max-width:500px){.header h1{font-size:1.5em}}
+.header h1 span{color:#0066ff}
+.header p{color:#888;margin-top:10px;font-size:1em}
+
+.offer-box{background:#111;border:2px solid #0066ff;border-radius:16px;padding:28px;margin:20px 0;text-align:center}
+.offer-box .original{color:#555;font-size:1.1em;text-decoration:line-through}
+.offer-box .price{font-size:3em;font-weight:800;color:#00c853;margin:6px 0}
+.offer-box .savings{color:#ff9800;font-size:.9em;font-weight:600}
+
+.includes{margin:24px 0}
+.includes h3{font-size:1em;margin-bottom:12px;text-align:center}
+.includes ul{list-style:none;max-width:400px;margin:0 auto}
+.includes li{padding:8px 0;padding-left:24px;position:relative;color:#ccc;font-size:.95em}
+.includes li::before{content:'+';position:absolute;left:0;color:#00c853;font-weight:700;font-size:1.1em}
+
+.cta-section{text-align:center;margin:28px 0}
+.cta-btn{display:block;width:100%;padding:16px;background:#0066ff;color:#fff;border:none;border-radius:12px;font-size:1.15em;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.cta-btn:hover{background:#0052cc;transform:translateY(-1px)}
+.cta-sub{color:#555;font-size:.8em;margin-top:10px}
+
+.skip{text-align:center;margin-top:20px}
+.skip a{color:#444;font-size:.8em;text-decoration:underline;cursor:pointer}
+.skip a:hover{color:#888}
+
+.guarantee{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:20px;text-align:center;margin:24px 0}
+.guarantee .icon{font-size:2em;margin-bottom:8px}
+.guarantee h4{margin-bottom:4px}
+.guarantee p{color:#888;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="timer-bar">This offer expires in <span id="timer">14:59</span></div>
+
+<div class="header">
+  <div class="wait">WAIT - YOUR GUIDE IS BEING SENT</div>
+  <h1>Before you go, here is a <span>one-time deal</span>.</h1>
+  <p>You just grabbed the free guide. Here is the complete system behind it.</p>
+</div>
+
+<div class="offer-box">
+  <div class="original">Regular price: $19.99</div>
+  <div class="price">$9.99</div>
+  <div class="savings">You save 50% - today only</div>
+</div>
+
+<div class="includes">
+  <h3>The AI Employee Guide includes:</h3>
+  <ul>
+    <li>8 ready-to-deploy AI agent blueprints</li>
+    <li>Step-by-step setup for each agent (with screenshots)</li>
+    <li>Tool selection guide with honest cost breakdowns</li>
+    <li>Workflow templates for n8n, Make, and Zapier</li>
+    <li>25 prompt templates that actually work</li>
+    <li>Security checklist (protect your data)</li>
+    <li>Case study: 6-agent system running for $0/month</li>
+    <li>Bonus: AI Safety Checklist (2-page quick reference)</li>
+  </ul>
+</div>
+
+<div class="cta-section">
+  <button class="cta-btn" onclick="acceptOTO()">Yes, I Want the Full Guide for $9.99</button>
+  <p class="cta-sub">Instant download. 30-day money-back guarantee.</p>
+</div>
+
+<div class="guarantee">
+  <div class="icon">&#128274;</div>
+  <h4>30-Day Money-Back Guarantee</h4>
+  <p>If the guide does not help you automate at least one task, email us for a full refund. No questions asked.</p>
+</div>
+
+<div class="skip">
+  <a onclick="skipOTO()">No thanks, I just want the free guide</a>
+</div>
+
+</div>
+
+<script>
+// Countdown timer
+let seconds = 15 * 60;
+function updateTimer() {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  document.getElementById('timer').textContent = `${m}:${s.toString().padStart(2, '0')}`;
+  if (seconds > 0) { seconds--; setTimeout(updateTimer, 1000); }
+  else { document.getElementById('timer').textContent = 'EXPIRED'; }
+}
+updateTimer();
+
+function acceptOTO() {
+  const leads = JSON.parse(localStorage.getItem('behike_leads') || '[]');
+  if (leads.length > 0) {
+    leads[leads.length - 1].oto_accepted = true;
+    leads[leads.length - 1].oto_product = 'AI Employee Guide';
+    leads[leads.length - 1].oto_price = 9.99;
+    localStorage.setItem('behike_leads', JSON.stringify(leads));
+  }
+  // Redirect to Gumroad checkout (placeholder)
+  alert('Redirecting to checkout... (connect Gumroad link here)');
+}
+
+function skipOTO() {
+  const leads = JSON.parse(localStorage.getItem('behike_leads') || '[]');
+  if (leads.length > 0) {
+    leads[leads.length - 1].oto_accepted = false;
+    localStorage.setItem('behike_leads', JSON.stringify(leads));
+  }
+  // Redirect to thank you / download
+  document.querySelector('.container').innerHTML = `
+    <div style="text-align:center;padding:60px 0">
+      <div style="font-size:3em;margin-bottom:16px">&#128230;</div>
+      <h1 style="font-size:1.6em;margin-bottom:10px">Your guide is on the way.</h1>
+      <p style="color:#888">Check your inbox. If you do not see it, check spam.</p>
+      <a href="#" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#0066ff;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Browse Free Tools</a>
+    </div>`;
+}
+</script>
+</body>
+</html>

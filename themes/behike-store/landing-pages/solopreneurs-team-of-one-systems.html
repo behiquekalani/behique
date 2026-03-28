@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solopreneur's Team of One Systems - Behike</title>
+  <meta name="description" content="Five documented systems every one-person business needs. Client intake, project delivery, content production, finance, and communication. $20.99.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      background: var(--cta);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s ease;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(10,132,255,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      padding: 6px 14px;
+      border: 1px solid rgba(10,132,255,0.3);
+      border-radius: 20px;
+    }
+    .hero-headline {
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+      max-width: 760px;
+    }
+    .hero-headline span { color: var(--accent); }
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.55;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-bottom: 48px;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover { background: var(--cta-hover); transform: translateY(-1px); }
+    .btn-price {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .hero-meta {
+      margin-top: 60px;
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .hero-stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .hero-stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* PROBLEM */
+    #problem {
+      padding: 100px 0;
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      .problem-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+    .problem-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .problem-headline {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .problem-body {
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    .problem-body p + p { margin-top: 14px; }
+    .contrast-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .contrast-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .contrast-item:last-child { border-bottom: none; }
+    .contrast-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .contrast-icon.bad { background: rgba(255,59,48,0.15); color: #FF3B30; }
+    .contrast-icon.good { background: rgba(48,209,88,0.15); color: var(--cta); }
+    .contrast-text {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      padding-top: 4px;
+    }
+    .contrast-text strong { color: var(--text); }
+
+    /* WHAT YOU GET */
+    #contents {
+      padding: 100px 0;
+      background: #050505;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-headline {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+    .section-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .contents-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    @media (max-width: 860px) {
+      .contents-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .contents-grid { grid-template-columns: 1fr; }
+    }
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 32px 28px;
+      transition: border-color 0.2s ease;
+    }
+    .content-card:hover { border-color: rgba(10,132,255,0.3); }
+    .content-card-number {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .content-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .content-card-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FIVE SYSTEMS FEATURE */
+    #systems {
+      padding: 100px 0;
+    }
+    .systems-intro {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .systems-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .system-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr;
+      gap: 0;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+    }
+    @media (max-width: 720px) {
+      .system-row { grid-template-columns: 1fr; }
+    }
+    .system-number-col {
+      background: rgba(10,132,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 16px;
+      border-right: 1px solid var(--border);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.04em;
+    }
+    .system-title-col {
+      padding: 28px 32px;
+      border-right: 1px solid var(--border);
+    }
+    .system-title-col h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+    .system-title-col p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .system-desc-col {
+      padding: 28px 32px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* SECTION PREVIEWS */
+    #previews {
+      padding: 100px 0;
+      background: #050505;
+    }
+    .preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .preview-item {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 48px;
+      padding: 48px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    .preview-item:first-child { border-top: 1px solid var(--border); }
+    @media (max-width: 720px) {
+      .preview-item { grid-template-columns: 1fr; gap: 20px; }
+    }
+    .preview-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .preview-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+    }
+    .preview-body {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .preview-body p + p { margin-top: 12px; }
+    .preview-insight {
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-left: 2px solid var(--accent);
+      background: rgba(10,132,255,0.04);
+      border-radius: 0 8px 8px 0;
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* CTA SECTION */
+    #buy {
+      padding: 100px 0;
+    }
+    .buy-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 64px;
+      max-width: 680px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      .buy-card { padding: 40px 24px; }
+    }
+    .buy-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+      padding: 6px 14px;
+      border: 1px solid rgba(10,132,255,0.3);
+      border-radius: 20px;
+    }
+    .buy-title {
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      margin-bottom: 16px;
+    }
+    .buy-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .buy-includes {
+      text-align: left;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .buy-includes-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .buy-includes ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .buy-includes li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      color: var(--text);
+    }
+    .buy-includes li::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      background: rgba(48,209,88,0.15);
+      border-radius: 50%;
+      flex-shrink: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='8' viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='%2330D158' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    .buy-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .buy-price span {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-muted);
+      vertical-align: super;
+    }
+    .buy-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+    .btn-buy {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--cta);
+      color: #000;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+      width: 100%;
+      max-width: 380px;
+    }
+    .btn-buy:hover { background: var(--cta-hover); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-brand {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .footer-note {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">Behike</a>
+      <a href="#buy" class="nav-cta">Get the Guide — $20.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-label fade-up">Solopreneur Guide</div>
+      <h1 class="hero-headline fade-up delay-1">
+        Your business runs on memory.<br>
+        <span>That's the problem.</span>
+      </h1>
+      <p class="hero-sub fade-up delay-2">
+        Five documented systems for the one-person business. Client intake to project delivery. Finance to communication. Get everything out of your head and into infrastructure that works without you.
+      </p>
+      <div class="hero-actions fade-up delay-3">
+        <a href="#buy" class="btn-primary">Get the Guide</a>
+        <span class="btn-price">$20.99 - Instant PDF download</span>
+      </div>
+      <div class="hero-meta fade-up delay-4">
+        <div class="hero-stat">
+          <span class="hero-stat-number">5</span>
+          <span class="hero-stat-label">Core systems</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-number">4 hrs</span>
+          <span class="hero-stat-label">Setup sprint</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-number">2,500+</span>
+          <span class="hero-stat-label">Words of frameworks</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="problem-grid">
+        <div class="fade-up">
+          <p class="problem-eyebrow">The real problem</p>
+          <h2 class="problem-headline">Memory is not a system. It fails under load, and it cannot scale.</h2>
+          <div class="problem-body">
+            <p>Most solopreneurs keep their entire business in their head. The follow-up cadence, the project timeline, the invoice due date. It works until it doesn't. One high-volume week and something breaks.</p>
+            <p>The instinct is to hire. But hiring into chaos multiplies the problem. The real answer is documented systems first. This guide builds all five, starting with the one that's generating the most chaos.</p>
+            <p>Four hours. Everything out of your head. Infrastructure that runs without you having to reinvent the steps every time.</p>
+          </div>
+        </div>
+        <div class="fade-up delay-1">
+          <div class="contrast-card">
+            <div class="contrast-item">
+              <div class="contrast-icon bad">x</div>
+              <div class="contrast-text">Rebuilding your <strong>client onboarding</strong> from scratch every engagement</div>
+            </div>
+            <div class="contrast-item">
+              <div class="contrast-icon bad">x</div>
+              <div class="contrast-text">Invoices sent <strong>days late</strong> because billing lives in your head</div>
+            </div>
+            <div class="contrast-item">
+              <div class="contrast-icon bad">x</div>
+              <div class="contrast-text">Content sessions that take <strong>3 hours</strong> and produce one draft</div>
+            </div>
+            <div class="contrast-item">
+              <div class="contrast-icon good">v</div>
+              <div class="contrast-text">Client intake that runs <strong>15-20 minutes</strong> of active time</div>
+            </div>
+            <div class="contrast-item">
+              <div class="contrast-icon good">v</div>
+              <div class="contrast-text">A <strong>finance tracker</strong> that closes the month in 60 minutes</div>
+            </div>
+            <div class="contrast-item">
+              <div class="contrast-icon good">v</div>
+              <div class="contrast-text">Content sessions that go from <strong>blank page to published</strong> in 70 minutes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- FIVE SYSTEMS -->
+  <section id="systems">
+    <div class="container">
+      <div class="systems-intro section-header fade-up">
+        <p class="section-eyebrow">The five systems</p>
+        <h2 class="section-headline">Every system a one-person business needs.</h2>
+        <p class="section-sub">Each one covers inputs, steps, outputs, and supporting templates.</p>
+      </div>
+      <div class="systems-list">
+        <div class="system-row fade-up">
+          <div class="system-number-col">01</div>
+          <div class="system-title-col">
+            <h3>Client Intake</h3>
+            <p>Inquiry to signed contract</p>
+          </div>
+          <div class="system-desc-col">Five-step process from first contact to onboarding packet. Eliminates back-and-forth scheduling, piecemeal scoping, and verbal agreements.</div>
+        </div>
+        <div class="system-row fade-up delay-1">
+          <div class="system-number-col">02</div>
+          <div class="system-title-col">
+            <h3>Project Delivery</h3>
+            <p>Contract to final deliverable</p>
+          </div>
+          <div class="system-desc-col">Milestone structure, feedback intake in one document, and a close note that captures testimonials and referrals automatically.</div>
+        </div>
+        <div class="system-row fade-up delay-2">
+          <div class="system-number-col">03</div>
+          <div class="system-title-col">
+            <h3>Content Production</h3>
+            <p>Idea to published in one session</p>
+          </div>
+          <div class="system-desc-col">A 70-minute session structure: outline, write, edit, publish. No decision-making at the start. No editing while writing. One template per content format.</div>
+        </div>
+        <div class="system-row fade-up">
+          <div class="system-number-col">04</div>
+          <div class="system-title-col">
+            <h3>Finance</h3>
+            <p>Invoicing through quarterly review</p>
+          </div>
+          <div class="system-desc-col">Invoice on the day of the milestone. One tracker. Monthly close in 60 minutes. Quarterly review that drives pricing decisions.</div>
+        </div>
+        <div class="system-row fade-up delay-1">
+          <div class="system-number-col">05</div>
+          <div class="system-title-col">
+            <h3>Communication</h3>
+            <p>Async-first, time-boxed</p>
+          </div>
+          <div class="system-desc-col">Response time policy, channel consolidation, two communication windows per day, and a template library that handles 80% of incoming messages.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- WHAT YOU GET -->
+  <section id="contents">
+    <div class="container">
+      <div class="section-header fade-up">
+        <p class="section-eyebrow">Full guide contents</p>
+        <h2 class="section-headline">Nine sections. Complete infrastructure.</h2>
+        <p class="section-sub">From the mindset shift to the four-hour sprint.</p>
+      </div>
+      <div class="contents-grid">
+        <div class="content-card fade-up">
+          <p class="content-card-number">01</p>
+          <h3 class="content-card-title">The systems mindset</h3>
+          <p class="content-card-desc">Why documented processes replace memory, reduce cognitive load, and make growth possible without chaos.</p>
+        </div>
+        <div class="content-card fade-up delay-1">
+          <p class="content-card-number">02</p>
+          <h3 class="content-card-title">The 5 core systems</h3>
+          <p class="content-card-desc">Overview of all five systems and how they connect. The order to build them in when starting from zero.</p>
+        </div>
+        <div class="content-card fade-up delay-2">
+          <p class="content-card-number">03</p>
+          <h3 class="content-card-title">Client intake system</h3>
+          <p class="content-card-desc">Five steps from inquiry to signed contract. Templates for each touchpoint.</p>
+        </div>
+        <div class="content-card fade-up">
+          <p class="content-card-number">04</p>
+          <h3 class="content-card-title">Project delivery system</h3>
+          <p class="content-card-desc">Milestone structure, feedback intake, deliverable templates, and close note that captures referrals.</p>
+        </div>
+        <div class="content-card fade-up delay-1">
+          <p class="content-card-number">05</p>
+          <h3 class="content-card-title">Content production system</h3>
+          <p class="content-card-desc">From idea capture to published in 70 minutes. Idea list, session structure, and one template per format.</p>
+        </div>
+        <div class="content-card fade-up delay-2">
+          <p class="content-card-number">06</p>
+          <h3 class="content-card-title">Finance system</h3>
+          <p class="content-card-desc">Invoice timing, expense tracking, monthly close, and the quarterly review that drives pricing decisions.</p>
+        </div>
+        <div class="content-card fade-up">
+          <p class="content-card-number">07</p>
+          <h3 class="content-card-title">Communication system</h3>
+          <p class="content-card-desc">Response time policy, channel consolidation, time-boxed windows, and a 15-item template library.</p>
+        </div>
+        <div class="content-card fade-up delay-1">
+          <p class="content-card-number">08</p>
+          <h3 class="content-card-title">The chaos audit</h3>
+          <p class="content-card-desc">60-minute audit process to identify your three highest-priority systems before building anything.</p>
+        </div>
+        <div class="content-card fade-up delay-2">
+          <p class="content-card-number">09</p>
+          <h3 class="content-card-title">4-hour system sprint</h3>
+          <p class="content-card-desc">Hour-by-hour breakdown of the setup sprint. Three systems documented, tested, and ready to use.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- SECTION PREVIEWS -->
+  <section id="previews">
+    <div class="container">
+      <div class="section-header fade-up">
+        <p class="section-eyebrow">Inside the guide</p>
+        <h2 class="section-headline">How the systems actually work.</h2>
+      </div>
+      <div class="preview-list">
+
+        <div class="preview-item fade-up">
+          <div>
+            <p class="preview-label">Client intake</p>
+            <h3 class="preview-title">From inquiry to signed contract in five steps and 15 minutes.</h3>
+          </div>
+          <div class="preview-body">
+            <p>The first email response is a template. It acknowledges the inquiry, sets a response window, and asks for the three pieces of information you need before a call is productive. This filters poor fits before you invest call time. The guide covers every step, every template, and when to use each one.</p>
+            <div class="preview-insight">
+              Do not start work before the contract is signed. Every time you have, you have regretted it. The system removes the pressure to skip this step.
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-item fade-up">
+          <div>
+            <p class="preview-label">Finance system</p>
+            <h3 class="preview-title">The quarterly review is the session most solopreneurs skip.</h3>
+          </div>
+          <div class="preview-body">
+            <p>It is also the session that generates the most revenue over a one to three year period. Two hours, end of each quarter. Review the income statement. Confirm tax estimates. Evaluate pricing against the market. Assess which clients are profitable. The guide gives the exact structure and the decisions to make at each step.</p>
+            <div class="preview-insight">
+              Most pricing decisions get deferred indefinitely without a scheduled forcing function. The quarterly review is that function.
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-item fade-up">
+          <div>
+            <p class="preview-label">The sprint</p>
+            <h3 class="preview-title">Four hours. Three systems. Everything out of your head.</h3>
+          </div>
+          <div class="preview-body">
+            <p>Hours one and two: write the process document for each task identified in the audit. Every step you currently take, in order, including the tools and the decisions. Hour three: build the supporting templates. Hour four: test the system from start to finish using only the document. No memory allowed. Any gaps found during the test get filled immediately.</p>
+            <div class="preview-insight">
+              By the end of hour four, the document is usable by someone who has never done the task. That is the test.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- BUY -->
+  <section id="buy">
+    <div class="container">
+      <div class="buy-card fade-up">
+        <div class="buy-tag">Instant Download</div>
+        <h2 class="buy-title">Solopreneur's Team of One Systems</h2>
+        <p class="buy-sub">Five documented systems for the one-person business. Built in a single weekend.</p>
+        <div class="buy-includes">
+          <p class="buy-includes-title">What you get</p>
+          <ul>
+            <li>Full guide in PDF format (2,500+ words)</li>
+            <li>Five complete system frameworks with steps and templates</li>
+            <li>Client intake process from inquiry to signed contract</li>
+            <li>Project delivery with milestone structure and feedback intake</li>
+            <li>Content production session that goes to published in 70 minutes</li>
+            <li>Finance system with monthly close and quarterly review</li>
+            <li>60-minute chaos audit process</li>
+            <li>Four-hour system setup sprint, hour by hour</li>
+          </ul>
+        </div>
+        <div class="buy-price"><span>$</span>20.99</div>
+        <p class="buy-note">One-time payment. Instant PDF download. No subscription.</p>
+        <a href="https://behike.gumroad.com/l/solopreneurs-team-of-one-systems" class="btn-buy">
+          Get the Guide for $20.99
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-brand">Behike</span>
+        <span class="footer-note">Build things worth keeping.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

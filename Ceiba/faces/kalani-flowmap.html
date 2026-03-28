@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BEHIKE // Command Center</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    color: #fff;
+    font-family: 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Top bar with progress */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 16px;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #333;
+  }
+
+  .topbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .topbar-title {
+    font-size: 11px;
+    letter-spacing: 6px;
+    color: #888;
+    text-transform: uppercase;
+  }
+
+  .topbar-date {
+    font-size: 10px;
+    color: #555;
+  }
+
+  .progress-outer {
+    width: 100%;
+    height: 4px;
+    background: #222;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-inner {
+    height: 100%;
+    background: #fff;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: #666;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Main content */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+
+  /* Section nodes */
+  .section-node {
+    border: 1px solid #333;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .section-node:active { opacity: 0.9; }
+
+  .section-node.border-green { border-color: #0a0; }
+  .section-node.border-yellow { border-color: #aa0; }
+  .section-node.border-red { border-color: #a00; }
+  .section-node.border-gray { border-color: #444; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    font-weight: normal;
+  }
+
+  .section-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-green { background: #0a0; }
+  .dot-yellow { background: #aa0; }
+  .dot-red { background: #a00; }
+  .dot-gray { background: #555; }
+  .dot-green.pulse {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .expand-arrow {
+    font-size: 10px;
+    color: #666;
+    transition: transform 0.2s;
+  }
+
+  .section-node.expanded .expand-arrow {
+    transform: rotate(90deg);
+  }
+
+  .section-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid #222;
+  }
+
+  .section-node.expanded .section-body {
+    display: block;
+  }
+
+  /* Sub-items inside sections */
+  .sub-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .sub-item:last-child { border-bottom: none; }
+
+  .sub-name {
+    color: #fff;
+    font-weight: normal;
+    margin-bottom: 4px;
+  }
+
+  .sub-detail {
+    color: #777;
+    font-size: 11px;
+  }
+
+  .sub-status {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border: 1px solid;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+
+  .sub-status.green { color: #0a0; border-color: #0a0; }
+  .sub-status.yellow { color: #aa0; border-color: #aa0; }
+  .sub-status.red { color: #a00; border-color: #a00; }
+  .sub-status.gray { color: #666; border-color: #444; }
+
+  .sub-next {
+    color: #aa0;
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  /* Checklist items */
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    cursor: pointer;
+    font-size: 12px;
+    transition: opacity 0.2s;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+
+  .check-item.done { opacity: 0.35; text-decoration: line-through; }
+
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #555;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-top: 1px;
+  }
+
+  .check-item.done .check-box {
+    border-color: #0a0;
+    color: #0a0;
+  }
+
+  .check-mark { display: none; }
+  .check-item.done .check-mark { display: block; }
+
+  /* Revenue tracker */
+  .revenue-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    padding-top: 8px;
+  }
+
+  .revenue-cell {
+    text-align: center;
+  }
+
+  .revenue-label {
+    font-size: 9px;
+    color: #666;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .revenue-input {
+    background: #111;
+    border: 1px solid #333;
+    color: #fff;
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-size: 16px;
+    padding: 8px;
+    width: 100%;
+    text-align: center;
+    outline: none;
+  }
+
+  .revenue-input:focus { border-color: #fff; }
+
+  .revenue-input.goal {
+    color: #555;
+    border-style: dashed;
+  }
+
+  /* Quick links */
+  .quick-link {
+    display: block;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    color: #888;
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.15s;
+  }
+
+  .quick-link:last-child { border-bottom: none; }
+  .quick-link:active { color: #fff; }
+
+  .quick-link-label {
+    color: #555;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  /* BIOS live tags */
+  .bios-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  @media (max-width: 500px) {
+    .bios-grid { grid-template-columns: 1fr; }
+    .revenue-grid { grid-template-columns: 1fr; gap: 8px; }
+  }
+
+  .bios-cell {
+    border: 1px solid #222;
+    padding: 10px 12px;
+  }
+
+  .bios-label {
+    font-size: 9px;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .bios-value {
+    font-size: 11px;
+    color: #ccc;
+  }
+
+  .bios-value.live { color: #0a0; }
+  .bios-value.signal { color: #aa0; }
+
+  /* Infra grid */
+  .infra-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  @media (max-width: 500px) {
+    .infra-grid { grid-template-columns: 1fr; }
+  }
+
+  .infra-cell {
+    border: 1px solid #222;
+    padding: 10px 12px;
+  }
+
+  .infra-name {
+    font-size: 12px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .infra-ip {
+    font-size: 10px;
+    color: #555;
+    margin-bottom: 4px;
+  }
+
+  .infra-detail {
+    font-size: 10px;
+    color: #777;
+    line-height: 1.5;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-row">
+    <div class="topbar-title">Behike Command Center</div>
+    <div class="topbar-date" id="dateDisplay"></div>
+  </div>
+  <div class="progress-outer">
+    <div class="progress-inner" id="globalProgress" style="width:0%"></div>
+  </div>
+  <div class="progress-label">
+    <span>OVERALL COMPLETION</span>
+    <span id="globalProgressText">0%</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ============ 1. REVENUE STREAMS ============ -->
+  <div class="section-node border-yellow" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Revenue Streams</div>
+      <div class="section-indicator">
+        <div class="status-dot dot-yellow"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="sub-item">
+        <div class="sub-name">Digital Products</div>
+        <div class="sub-detail">81 products built. 12 SVG blueprints, 70 PDF guides.</div>
+        <div class="sub-detail"><span class="sub-status yellow">0 LISTED</span></div>
+        <div class="sub-next">NEXT: List on Gumroad</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">AI Services</div>
+        <div class="sub-detail">$497 - $4,997 tiers. Landing page built.</div>
+        <div class="sub-detail"><span class="sub-status yellow">NEEDS ACTION</span></div>
+        <div class="sub-next">NEXT: Get first client</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">Trading / Polymarket</div>
+        <div class="sub-detail">$500 to deploy. Conviction engine LIVE.</div>
+        <div class="sub-detail"><span class="sub-status yellow">NEEDS ACTION</span></div>
+        <div class="sub-next">NEXT: Create Polymarket account</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">eBay Reselling</div>
+        <div class="sub-detail"><span class="sub-status red">SUSPENDED</span></div>
+        <div class="sub-next">NEXT: Appeal or create new account</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">Facebook Marketplace</div>
+        <div class="sub-detail">Blueprint built.</div>
+        <div class="sub-detail"><span class="sub-status gray">NOT STARTED</span></div>
+        <div class="sub-next">NEXT: List first item</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ 2. CONTENT CHANNELS ============ -->
+  <div class="section-node border-gray" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Content Channels</div>
+      <div class="section-indicator">
+        <div class="status-dot dot-gray"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="sub-item">
+        <div class="sub-name">Instagram @behikeai</div>
+        <div class="sub-detail">2000+ posts ready.</div>
+        <div class="sub-detail"><span class="sub-status gray">ACCOUNT NOT CREATED</span></div>
+        <div class="sub-next">NEXT: Create account</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">YouTube (3 channels)</div>
+        <div class="sub-detail">150+ scripts ready.</div>
+        <div class="sub-detail"><span class="sub-status gray">NOT CREATED</span></div>
+        <div class="sub-next">NEXT: Create channels</div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">TikTok</div>
+        <div class="sub-detail">175+ posts ready.</div>
+        <div class="sub-detail"><span class="sub-status gray">NOT CREATED</span></div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">Newsletter (Beehiiv)</div>
+        <div class="sub-detail"><span class="sub-status gray">NOT SET UP</span></div>
+      </div>
+
+      <div class="sub-item">
+        <div class="sub-name">X / Twitter</div>
+        <div class="sub-detail">5 threads ready.</div>
+        <div class="sub-detail"><span class="sub-status gray">NOT CREATED</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ 3. BIOS INTELLIGENCE ============ -->
+  <div class="section-node border-green" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">BIOS Intelligence</div>
+      <div class="section-indicator">
+        <span style="font-size:9px;color:#0a0;letter-spacing:2px;margin-right:4px">LIVE</span>
+        <div class="status-dot dot-green pulse"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="bios-grid">
+        <div class="bios-cell">
+          <div class="bios-label">News Pipeline</div>
+          <div class="bios-value live">Every 6h -- RUNNING</div>
+        </div>
+        <div class="bios-cell">
+          <div class="bios-label">Social Scraper</div>
+          <div class="bios-value live">Every 30min -- RUNNING</div>
+        </div>
+        <div class="bios-cell">
+          <div class="bios-label">Conviction Engine</div>
+          <div class="bios-value live">Every 1h -- RUNNING</div>
+        </div>
+        <div class="bios-cell">
+          <div class="bios-label">High Signals</div>
+          <div class="bios-value signal">crypto, war</div>
+        </div>
+        <div class="bios-cell">
+          <div class="bios-label">Content Wiring</div>
+          <div class="bios-value">1212 files matched, 21 PUBLISH_NOW</div>
+        </div>
+        <div class="bios-cell">
+          <div class="bios-label">Fleet Sync</div>
+          <div class="bios-value live">Hourly</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <a href="http://192.168.0.145:8093/dashboard/" class="quick-link" onclick="event.stopPropagation()" style="padding:6px 0;border:none;color:#0a0">
+          Dashboard: 192.168.0.145:8093/dashboard/
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 4. INFRASTRUCTURE ============ -->
+  <div class="section-node border-green" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Infrastructure</div>
+      <div class="section-indicator">
+        <div class="status-dot dot-green"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="infra-grid">
+        <div class="infra-cell">
+          <div class="infra-name">Ceiba</div>
+          <div class="infra-ip">192.168.0.145</div>
+          <div class="infra-detail">M4 16GB<br>Command center<br>All crons running</div>
+        </div>
+        <div class="infra-cell">
+          <div class="infra-name">Cobo</div>
+          <div class="infra-ip">192.168.0.151</div>
+          <div class="infra-detail">GTX 1080 Ti<br>Heavy compute<br>Bridge running 41h+</div>
+        </div>
+        <div class="infra-cell">
+          <div class="infra-name">Naboria</div>
+          <div class="infra-ip">192.168.0.152</div>
+          <div class="infra-detail">Always-on processing<br>Syncthing active</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 5. PENDING TASKS ============ -->
+  <div class="section-node border-yellow" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Pending Tasks</div>
+      <div class="section-indicator">
+        <span id="taskCount" style="font-size:10px;color:#666;margin-right:4px"></span>
+        <div class="status-dot dot-yellow"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body" id="taskBody">
+
+      <div class="check-item" data-key="task-gumroad-bundle" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>List blueprint bundle on Gumroad ($29.99)</div>
+      </div>
+      <div class="check-item" data-key="task-gumroad-individual" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>List individual blueprints ($9.99 each)</div>
+      </div>
+      <div class="check-item" data-key="task-gumroad-starter" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>List Gumroad starter kit ($4.99)</div>
+      </div>
+      <div class="check-item" data-key="task-instagram" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Create Instagram @behikeai</div>
+      </div>
+      <div class="check-item" data-key="task-youtube" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Create YouTube channels (3)</div>
+      </div>
+      <div class="check-item" data-key="task-tiktok" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Create TikTok @behikeai</div>
+      </div>
+      <div class="check-item" data-key="task-beehiiv" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Set up Beehiiv newsletter</div>
+      </div>
+      <div class="check-item" data-key="task-polymarket" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Create Polymarket account</div>
+      </div>
+      <div class="check-item" data-key="task-proxies" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Get proxies from webshare.io</div>
+      </div>
+      <div class="check-item" data-key="task-ebay" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Appeal eBay suspension</div>
+      </div>
+      <div class="check-item" data-key="task-domain" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Register behike.co domain</div>
+      </div>
+      <div class="check-item" data-key="task-llc" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>File LLC</div>
+      </div>
+      <div class="check-item" data-key="task-trademark" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Trademark "Behike"</div>
+      </div>
+      <div class="check-item" data-key="task-deploy-naboria" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Deploy Naboria scripts</div>
+      </div>
+      <div class="check-item" data-key="task-deploy-cobo" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Deploy Cobo scripts</div>
+      </div>
+      <div class="check-item" data-key="task-first-ig-post" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Post first Instagram content</div>
+      </div>
+      <div class="check-item" data-key="task-first-yt" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Launch first YouTube video</div>
+      </div>
+      <div class="check-item" data-key="task-email-sequence" onclick="event.stopPropagation();toggleCheck(this)">
+        <div class="check-box"><span class="check-mark">x</span></div>
+        <div>Set up email welcome sequence</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ 6. REVENUE TRACKER ============ -->
+  <div class="section-node border-yellow" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Revenue Tracker</div>
+      <div class="section-indicator">
+        <div class="status-dot dot-yellow"></div>
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="revenue-grid">
+        <div class="revenue-cell">
+          <div class="revenue-label">This Week</div>
+          <input type="text" class="revenue-input" id="revWeek" value="$0" inputmode="text"
+            onclick="event.stopPropagation()" onfocus="this.select()">
+        </div>
+        <div class="revenue-cell">
+          <div class="revenue-label">This Month</div>
+          <input type="text" class="revenue-input" id="revMonth" value="$0" inputmode="text"
+            onclick="event.stopPropagation()" onfocus="this.select()">
+        </div>
+        <div class="revenue-cell">
+          <div class="revenue-label">Goal</div>
+          <input type="text" class="revenue-input goal" id="revGoal" value="$10,000/mo" inputmode="text"
+            onclick="event.stopPropagation()" onfocus="this.select()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 7. QUICK LINKS ============ -->
+  <div class="section-node border-gray" onclick="toggleSection(this)">
+    <div class="section-header">
+      <div class="section-title">Quick Links</div>
+      <div class="section-indicator">
+        <div class="expand-arrow">&#9654;</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <a href="http://192.168.0.145:8093/dashboard/" class="quick-link" onclick="event.stopPropagation()">
+        <span class="quick-link-label">BIOS</span> Dashboard
+      </a>
+      <a href="http://192.168.0.145:8092/warroom.html" class="quick-link" onclick="event.stopPropagation()">
+        <span class="quick-link-label">VR</span> War Room
+      </a>
+      <a href="http://192.168.0.145:8091" class="quick-link" onclick="event.stopPropagation()">
+        <span class="quick-link-label">FACES</span> Face Gallery
+      </a>
+      <a href="https://gumroad.com" class="quick-link" onclick="event.stopPropagation()">
+        <span class="quick-link-label">STORE</span> Gumroad
+      </a>
+      <a href="https://beehiiv.com" class="quick-link" onclick="event.stopPropagation()">
+        <span class="quick-link-label">EMAIL</span> Beehiiv
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Date display
+  (function() {
+    var d = new Date();
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('dateDisplay').textContent =
+      months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  })();
+
+  // Section toggle
+  function toggleSection(el) {
+    el.classList.toggle('expanded');
+  }
+
+  // Checkbox toggle with localStorage
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    var key = el.dataset.key;
+    if (el.classList.contains('done')) {
+      localStorage.setItem(key, '1');
+    } else {
+      localStorage.removeItem(key);
+    }
+    updateTaskCount();
+    updateGlobalProgress();
+  }
+
+  // Task counter
+  function updateTaskCount() {
+    var total = document.querySelectorAll('.check-item').length;
+    var done = document.querySelectorAll('.check-item.done').length;
+    document.getElementById('taskCount').textContent = done + '/' + total;
+  }
+
+  // Global progress: tasks + revenue streams + content channels
+  function updateGlobalProgress() {
+    // Count completed tasks
+    var tasks = document.querySelectorAll('.check-item');
+    var tasksDone = document.querySelectorAll('.check-item.done');
+    var pct = tasks.length > 0 ? Math.round((tasksDone.length / tasks.length) * 100) : 0;
+    document.getElementById('globalProgress').style.width = pct + '%';
+    document.getElementById('globalProgressText').textContent = pct + '%';
+  }
+
+  // Revenue persistence
+  ['revWeek', 'revMonth', 'revGoal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    var saved = localStorage.getItem('behike-' + id);
+    if (saved) el.value = saved;
+    el.addEventListener('change', function() {
+      localStorage.setItem('behike-' + id, this.value);
+    });
+  });
+
+  // Restore checkbox state
+  function restoreState() {
+    document.querySelectorAll('.check-item').forEach(function(item) {
+      if (localStorage.getItem(item.dataset.key) === '1') {
+        item.classList.add('done');
+      }
+    });
+    updateTaskCount();
+    updateGlobalProgress();
+  }
+
+  restoreState();
+</script>
+
+</body>
+</html>

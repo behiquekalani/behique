@@ -1,0 +1,192 @@
+{
+  "name": "Email List Cleanup",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "e5f6a7b8-0001-4000-8000-000000000001",
+      "name": "Schedule Trigger - Sunday 9am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.convertkit.com/v3/subscribers",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "api_secret", "value": "YOUR_CONVERTKIT_API_SECRET_HERE" },
+            { "name": "sort_field", "value": "created_at" },
+            { "name": "sort_order", "value": "desc" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0002-4000-8000-000000000002",
+      "name": "ConvertKit - Get All Subscribers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter subscribers inactive for 60+ days\nconst response = $input.first().json;\nconst subscribers = response.subscribers || [];\n\nconst cutoffDate = new Date();\ncutoffDate.setDate(cutoffDate.getDate() - 60);\n\nconst inactive = subscribers.filter(sub => {\n  const lastActivity = new Date(sub.last_activated_at || sub.created_at);\n  return lastActivity < cutoffDate;\n});\n\nconsole.log(`Total subscribers: ${subscribers.length}`);\nconsole.log(`Inactive (60+ days): ${inactive.length}`);\n\nreturn inactive.map(sub => ({\n  json: {\n    id: sub.id,\n    email: sub.email_address,\n    firstName: sub.first_name || 'Friend',\n    lastActive: sub.last_activated_at || sub.created_at,\n    createdAt: sub.created_at\n  }\n}));"
+      },
+      "id": "e5f6a7b8-0003-4000-8000-000000000003",
+      "name": "Code - Filter Inactive Subscribers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Still want in, {{ $json.firstName }}?",
+        "emailType": "html",
+        "message": "<p>Hey {{ $json.firstName }},</p><p>I noticed you haven't opened our emails in a while.</p><p>No hard feelings. Inboxes get busy.</p><p>But I'm doing a quick list cleanup and wanted to check in: <strong>do you still want to hear from Behike?</strong></p><p>If yes, just click this link and you're good:<br><a href='YOUR_RE_ENGAGEMENT_LINK_HERE'>Yes, keep me on the list</a></p><p>If I don't hear from you in 3 days, I'll remove you. No spam, no drama.</p><p>Either way, thanks for being here at some point.</p><br><p>— Kalani<br>Behike</p><p style='font-size:11px;color:#999;'>You're getting this because you signed up at behike.shop. <a href='YOUR_UNSUBSCRIBE_LINK_HERE'>Unsubscribe</a></p>",
+        "options": {}
+      },
+      "id": "e5f6a7b8-0004-4000-8000-000000000004",
+      "name": "Gmail - Send Re-engagement Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "id": "e5f6a7b8-0005-4000-8000-000000000005",
+      "name": "Wait - 3 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.convertkit.com/v3/subscribers/{{ $json.id }}/unsubscribe",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "api_secret", "value": "YOUR_CONVERTKIT_API_SECRET_HERE" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0006-4000-8000-000000000006",
+      "name": "ConvertKit - Remove Non-Openers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RemovedSubscribers",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.email }}",
+            "SubscriberID": "={{ $json.id }}",
+            "LastActive": "={{ $json.lastActive }}",
+            "RemovedDate": "={{ $now.toISO() }}",
+            "Reason": "Inactive 60+ days, no re-engagement"
+          }
+        },
+        "options": {}
+      },
+      "id": "e5f6a7b8-0007-4000-8000-000000000007",
+      "name": "Google Sheets - Log Removed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [1560, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "YOUR_GOOGLE_SHEETS_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Sunday 9am": {
+      "main": [
+        [
+          { "node": "ConvertKit - Get All Subscribers", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "ConvertKit - Get All Subscribers": {
+      "main": [
+        [
+          { "node": "Code - Filter Inactive Subscribers", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Code - Filter Inactive Subscribers": {
+      "main": [
+        [
+          { "node": "Gmail - Send Re-engagement Email", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Send Re-engagement Email": {
+      "main": [
+        [
+          { "node": "Wait - 3 Days", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Wait - 3 Days": {
+      "main": [
+        [
+          { "node": "ConvertKit - Remove Non-Openers", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "ConvertKit - Remove Non-Openers": {
+      "main": [
+        [
+          { "node": "Google Sheets - Log Removed", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "email", "list-hygiene", "convertkit"]
+}

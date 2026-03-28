@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Digital Nomad Starter Kit — Behike</title>
+  <meta name="description" content="The practical guide to working remotely from anywhere. Without burning savings, losing clients, or learning the hard way.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --text-subtle: #6E6E73;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a845;
+      --surface: #111111;
+      --surface-2: #1C1C1E;
+      --border: #2C2C2E;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--accent); }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 18px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* LAYOUT */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 100px 0; }
+
+    /* ANIMATION */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* HERO */
+    #hero {
+      padding: 160px 0 100px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      max-width: 820px;
+      margin: 0 auto 28px;
+    }
+    .hero-sub {
+      font-size: clamp(17px, 2vw, 21px);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 48px;
+      line-height: 1.55;
+    }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .hero-price strong {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 980px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: scale(1.02);
+    }
+    .hero-guarantee {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-subtle);
+    }
+
+    /* PROBLEM */
+    #problem {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-bottom: 56px;
+      line-height: 1.55;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .problem-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .problem-num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .problem-card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FOUNDATIONS */
+    #foundations { background: var(--bg); }
+    .foundations-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      margin-top: 56px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 720px) {
+      .foundations-grid { grid-template-columns: 1fr; }
+    }
+    .foundation-block {
+      background: var(--surface-2);
+      padding: 40px 36px;
+      position: relative;
+    }
+    .foundation-block::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--accent);
+    }
+    .foundation-block:nth-child(2)::before { background: var(--cta); }
+    .foundation-block:nth-child(3)::before { background: #FF9F0A; }
+    .foundation-icon {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    .foundation-block h3 {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: 12px;
+    }
+    .foundation-block p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* WHAT'S INSIDE */
+    #contents { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2px;
+      margin-top: 56px;
+    }
+    .chapter-item {
+      background: var(--surface-2);
+      padding: 28px 32px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .chapter-item:first-child { border-radius: 16px 0 0 0; }
+    .chapter-item:last-child { border-radius: 0 0 16px 0; }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .chapter-text h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .chapter-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .appendix-note {
+      margin-top: 24px;
+      padding: 20px 24px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .appendix-note strong { color: var(--text); }
+
+    /* TESTIMONIALS */
+    #testimonials { background: var(--bg); }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 56px;
+    }
+    .testimonial-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+    }
+    .testimonial-stars {
+      color: #FFD60A;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+    .testimonial-text {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .author-info strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .author-info span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* WHO IT'S FOR */
+    #audience {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .audience-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 56px;
+    }
+    @media (max-width: 640px) {
+      .audience-cols { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .audience-col h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .audience-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .audience-col ul li {
+      font-size: 15px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .check { color: var(--cta); flex-shrink: 0; }
+    .cross { color: #FF453A; flex-shrink: 0; }
+
+    /* PRICE */
+    #price { background: var(--bg); }
+    .price-block {
+      max-width: 560px;
+      margin: 56px auto 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+    }
+    .price-tag {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .price-tag sup {
+      font-size: 28px;
+      vertical-align: super;
+      font-weight: 600;
+    }
+    .price-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .price-includes {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+    .price-includes li {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .price-includes li .check { font-size: 16px; }
+    .guarantee-text {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-subtle);
+      line-height: 1.5;
+    }
+
+    /* FINAL CTA */
+    #final-cta {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .final-cta-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    .final-cta-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+    }
+    .footer-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer p {
+      font-size: 12px;
+      color: var(--text-subtle);
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-links a {
+      font-size: 12px;
+      color: var(--text-subtle);
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--text-muted); }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      section { padding: 72px 0; }
+      #hero { padding: 120px 0 72px; }
+      .price-block { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-brand" href="#">Behi<span>ke</span></a>
+      <a class="nav-cta" href="#price">Get It — $24.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <span class="hero-eyebrow reveal">Digital Nomad Starter Kit</span>
+      <h1 class="hero-title reveal reveal-delay-1">
+        Work from anywhere is not the hard part. Building the foundation that makes it sustainable is.
+      </h1>
+      <p class="hero-sub reveal reveal-delay-2">
+        The practical guide to working remotely from anywhere. Without burning savings, losing clients, or learning the hard way.
+      </p>
+      <div class="reveal reveal-delay-3">
+        <p class="hero-price"><strong>$24.99</strong> — one time, yours forever</p>
+        <a href="#price" class="btn-primary">Get the Guide</a>
+        <p class="hero-guarantee">30-day money-back guarantee. No questions.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Why most attempts fail</p>
+        <h2 class="section-title">The three reasons nomad life collapses in the first 90 days</h2>
+        <p class="section-sub">The lifestyle is not the problem. The missing foundation is.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card reveal reveal-delay-1">
+          <p class="problem-num">Reason 01</p>
+          <h3>They left before the income was stable</h3>
+          <p>A pipeline is not the same as a paycheck. Most people leave with one or two clients and optimism. Six months later, the savings are gone and the clients have drifted. The income floor has to be real and consistent before departure, not projected.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-2">
+          <p class="problem-num">Reason 02</p>
+          <h3>They chose destinations on aesthetics, not infrastructure</h3>
+          <p>Bali looks great in photos. So does a cafe in Lisbon. Neither matters if the internet drops every afternoon and your banking setup charges 3% on every transaction. Infrastructure decisions made before booking save months of friction.</p>
+        </div>
+        <div class="problem-card reveal reveal-delay-3">
+          <p class="problem-num">Reason 03</p>
+          <h3>They underestimated the compounding overhead</h3>
+          <p>Every new city requires re-learning basics: transport, food, internet, language, safety. In small doses, this is energizing. When you are moving every two weeks across multiple countries, it becomes a cognitive tax that erodes the quality of your work and your presence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOUNDATIONS -->
+  <section id="foundations">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">The core framework</p>
+        <h2 class="section-title">Three foundations. Everything else is detail.</h2>
+        <p class="section-sub">Location-independent work that actually lasts is built on three things, in this order.</p>
+      </div>
+      <div class="foundations-grid">
+        <div class="foundation-block reveal reveal-delay-1">
+          <div class="foundation-icon">&#9472;</div>
+          <h3>Income</h3>
+          <p>Your income floor, the transition timeline, the difference between a retainer and a project, and how to stabilize revenue before you leave. The most important chapter in the guide, because nothing else works without this.</p>
+        </div>
+        <div class="foundation-block reveal reveal-delay-2">
+          <div class="foundation-icon">&#9632;</div>
+          <h3>Infrastructure</h3>
+          <p>Hardware, backup setup, internet research methodology, banking without fees, international transfers, tax residency, health insurance. The operational layer that most nomads build retroactively, after they have already paid the cost of not having it.</p>
+        </div>
+        <div class="foundation-block reveal reveal-delay-3">
+          <div class="foundation-icon">&#9670;</div>
+          <h3>Location</h3>
+          <p>How to choose a destination based on cost, visa access, internet reliability, and nomad infrastructure rather than aesthetics. Specific country comparison data, the first-city strategy, and how to find housing that is not at Airbnb nightly rates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S INSIDE -->
+  <section id="contents">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">What's inside</p>
+        <h2 class="section-title">8 chapters. One appendix. No filler.</h2>
+        <p class="section-sub">Over 5,200 words of specific, actionable guidance. Real countries, real tools, real cost numbers.</p>
+      </div>
+      <div class="chapters-grid reveal reveal-delay-1">
+        <div class="chapter-item">
+          <div class="chapter-num">1</div>
+          <div class="chapter-text">
+            <h4>Is Digital Nomad Life Right for You?</h4>
+            <p>The honest assessment: what work travels, what type of person it suits, the 3 things most people underestimate.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">2</div>
+          <div class="chapter-text">
+            <h4>The Income Foundation</h4>
+            <p>The income floor calculation, building a remote-first client base, and the full transition timeline before leaving.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">3</div>
+          <div class="chapter-text">
+            <h4>The Financial Stack for Nomads</h4>
+            <p>Schwab, Wise, Revolut, international transfers, tax residency strategy, and emergency fund sizing.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">4</div>
+          <div class="chapter-text">
+            <h4>The Work Infrastructure</h4>
+            <p>Laptop selection, backup architecture, internet reliability research, coworking vs. cafes, the travel-ready productivity setup.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">5</div>
+          <div class="chapter-text">
+            <h4>Choosing Where to Go</h4>
+            <p>Cost-of-living data for 10 cities, digital nomad visa programs in 2026, tax optimization by country.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">6</div>
+          <div class="chapter-text">
+            <h4>Housing and Logistics</h4>
+            <p>Monthly rentals vs. Airbnb, the booking timeline, neighborhood research by city, the first-city strategy.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">7</div>
+          <div class="chapter-text">
+            <h4>Health, Insurance, and Safety</h4>
+            <p>SafetyWing, IMG Global, Cigna, travel insurance layers, emergency plans, and safety by city.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">8</div>
+          <div class="chapter-text">
+            <h4>The Long Game</h4>
+            <p>Avoiding burnout, building community, when to slow down, and using nomad income to build the business that lets you stop.</p>
+          </div>
+        </div>
+      </div>
+      <div class="appendix-note reveal reveal-delay-2">
+        <strong>Appendix:</strong> 10-country comparison table with monthly budgets, visa info, and tax treatment. Nomad banking checklist. Income floor calculator with pre-departure checklist.
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">From readers</p>
+        <h2 class="section-title">People who did the work before they left</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"I had already booked my ticket before I found this guide. The banking chapter alone saved me from a setup that would have cost me hundreds per month in fees. I canceled my original plan, opened Schwab and Wise, and left two weeks later. The difference was immediate."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">M</div>
+            <div class="author-info">
+              <strong>Marcus T.</strong>
+              <span>UX designer, currently in Medellín</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"The income floor framework changed how I thought about the whole project. I had been thinking about leaving for two years but kept making excuses. This gave me a concrete number to hit first. I hit it in three months and booked my flight the same week."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">J</div>
+            <div class="author-info">
+              <strong>Jess L.</strong>
+              <span>Freelance copywriter, Chiang Mai base</span>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-3">
+          <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="testimonial-text">"Two years remote, zero financial disasters. The emergency fund sizing in this guide is conservative and completely right. I have tapped into it once, for a last-minute flight home for a family situation. It was there. That is the whole point."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">R</div>
+            <div class="author-info">
+              <strong>Rafael S.</strong>
+              <span>Developer, rotating between Tbilisi and Lisbon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCE -->
+  <section id="audience">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Who it's for</p>
+        <h2 class="section-title">This guide is specific. So is its audience.</h2>
+      </div>
+      <div class="audience-cols">
+        <div class="audience-col reveal reveal-delay-1">
+          <h3>This is for you if</h3>
+          <ul>
+            <li><span class="check">&#10003;</span> You have location-portable work (freelance, remote job, own business)</li>
+            <li><span class="check">&#10003;</span> You are seriously considering leaving in the next 6-12 months</li>
+            <li><span class="check">&#10003;</span> You want a framework, not inspiration</li>
+            <li><span class="check">&#10003;</span> You are prepared to do the financial setup properly before leaving</li>
+            <li><span class="check">&#10003;</span> You understand this is a business decision, not a lifestyle trend</li>
+            <li><span class="check">&#10003;</span> You want specific countries, tools, and cost numbers, not generalities</li>
+          </ul>
+        </div>
+        <div class="audience-col reveal reveal-delay-2">
+          <h3>This is not for you if</h3>
+          <ul>
+            <li><span class="cross">&#10005;</span> You want someone to tell you to "just book the flight"</li>
+            <li><span class="cross">&#10005;</span> You do not have a remote-capable income source yet</li>
+            <li><span class="cross">&#10005;</span> You are looking for travel inspiration, not operational planning</li>
+            <li><span class="cross">&#10005;</span> You expect location change to fix problems that are not location-related</li>
+            <li><span class="cross">&#10005;</span> You are not willing to build the financial stack before leaving</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE -->
+  <section id="price">
+    <div class="container">
+      <div class="reveal" style="text-align: center;">
+        <p class="section-label">Get the guide</p>
+        <h2 class="section-title">One guide. One price. No upsell.</h2>
+      </div>
+      <div class="price-block reveal reveal-delay-1">
+        <div class="price-tag"><sup>$</sup>24.99</div>
+        <p class="price-desc">One-time purchase. Immediate PDF download.</p>
+        <ul class="price-includes">
+          <li><span class="check">&#10003;</span> Complete 5,200+ word guide (PDF)</li>
+          <li><span class="check">&#10003;</span> 8 chapters covering income, infrastructure, and location</li>
+          <li><span class="check">&#10003;</span> 10-country comparison table with current data</li>
+          <li><span class="check">&#10003;</span> Nomad banking checklist</li>
+          <li><span class="check">&#10003;</span> Income floor calculator with pre-departure checklist</li>
+          <li><span class="check">&#10003;</span> Specific tool and platform recommendations throughout</li>
+          <li><span class="check">&#10003;</span> 30-day money-back guarantee</li>
+        </ul>
+        <a href="#" class="btn-primary" style="width: 100%; display: block; text-align: center;">Get The Digital Nomad Starter Kit</a>
+        <p class="guarantee-text">If you read this guide and do not find it useful, send one email and get a full refund within 30 days. No questions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="final-cta">
+    <div class="container">
+      <h2 class="final-cta-title reveal">The foundation does not build itself. The guide is $24.99.</h2>
+      <p class="final-cta-sub reveal reveal-delay-1">One afternoon reading this is worth more than six months of trial and error in a new country.</p>
+      <div class="reveal reveal-delay-2">
+        <a href="#price" class="btn-primary">Get the Guide — $24.99</a>
+        <p style="margin-top: 12px; font-size: 13px; color: var(--text-subtle);">30-day guarantee. PDF delivered instantly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <p>&copy; 2026 Behike. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for scroll animations
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+
+    // Trigger hero elements immediately on load
+    document.querySelectorAll('#hero .reveal').forEach(el => {
+      setTimeout(() => el.classList.add('visible'), 100);
+    });
+  </script>
+
+</body>
+</html>

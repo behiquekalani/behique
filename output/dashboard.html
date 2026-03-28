@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COBO // Trends Intelligence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cyan: #00f0ff;
+    --cyan-dim: #00f0ff44;
+    --orange: #ff6b2b;
+    --orange-dim: #ff6b2b44;
+    --green: #00ff88;
+    --green-dim: #00ff8844;
+    --red: #ff3366;
+    --purple: #b44dff;
+    --bg-dark: #0a0e17;
+    --bg-card: #0d1220;
+    --bg-card-hover: #111a2e;
+    --border: #1a2744;
+    --text: #c8d6e5;
+    --text-dim: #5a6a80;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: -1;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+  }
+
+  /* Scan line effect */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: scanLine 4s ease-in-out infinite;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  @keyframes scanLine {
+    0% { top: -2px; }
+    100% { top: 100vh; }
+  }
+
+  /* Header */
+  .header {
+    padding: 30px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--cyan);
+    text-shadow: 0 0 20px var(--cyan-dim), 0 0 40px rgba(0,240,255,0.1);
+  }
+
+  .logo span {
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  .header-stat {
+    text-align: right;
+  }
+
+  .header-stat .label {
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-stat .value {
+    color: var(--cyan);
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  /* KPI Cards */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    padding: 24px 40px;
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px var(--cyan-dim);
+    transform: translateY(-2px);
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .kpi-card:nth-child(1)::before { background: var(--cyan); }
+  .kpi-card:nth-child(2)::before { background: var(--green); }
+  .kpi-card:nth-child(3)::before { background: var(--orange); }
+  .kpi-card:nth-child(4)::before { background: var(--purple); }
+  .kpi-card:nth-child(5)::before { background: var(--red); }
+
+  .kpi-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  .kpi-card:nth-child(1) .kpi-value { color: var(--cyan); }
+  .kpi-card:nth-child(2) .kpi-value { color: var(--green); }
+  .kpi-card:nth-child(3) .kpi-value { color: var(--orange); }
+  .kpi-card:nth-child(4) .kpi-value { color: var(--purple); }
+  .kpi-card:nth-child(5) .kpi-value { color: var(--red); }
+
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Main grid */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 20px;
+    padding: 0 40px 40px;
+  }
+
+  /* Panel styling */
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    text-transform: uppercase;
+  }
+
+  .panel-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: var(--cyan-dim);
+    color: var(--cyan);
+  }
+
+  /* Table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    cursor: pointer;
+  }
+
+  .data-table th:hover {
+    color: var(--cyan);
+  }
+
+  .data-table td {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(26,39,68,0.5);
+    font-family: 'Rajdhani', sans-serif;
+    transition: background 0.2s;
+  }
+
+  .data-table tr:hover td {
+    background: var(--bg-card-hover);
+  }
+
+  .data-table .rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    width: 40px;
+  }
+
+  .data-table .query-name {
+    font-weight: 600;
+    font-size: 15px;
+    max-width: 300px;
+  }
+
+  .table-scroll {
+    max-height: 600px;
+    overflow-y: auto;
+  }
+
+  .table-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .table-scroll::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+  }
+
+  .table-scroll::-webkit-scrollbar-thumb {
+    background: var(--cyan-dim);
+    border-radius: 4px;
+  }
+
+  /* Score bar */
+  .score-bar-container {
+    width: 80px;
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  .score-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .score-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+
+  .tag-emerging { background: rgba(0,255,136,0.15); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+  .tag-spike { background: rgba(255,51,102,0.15); color: var(--red); border: 1px solid rgba(255,51,102,0.3); }
+  .tag-seasonal { background: rgba(180,77,255,0.15); color: var(--purple); border: 1px solid rgba(180,77,255,0.3); }
+  .tag-stable { background: rgba(90,106,128,0.15); color: var(--text-dim); border: 1px solid rgba(90,106,128,0.3); }
+  .tag-rising { background: rgba(255,107,43,0.15); color: var(--orange); border: 1px solid rgba(255,107,43,0.3); }
+  .tag-top { background: rgba(0,240,255,0.15); color: var(--cyan); border: 1px solid rgba(0,240,255,0.3); }
+
+  /* Category bar chart */
+  .cat-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(26,39,68,0.3);
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .cat-row:hover {
+    background: var(--bg-card-hover);
+  }
+
+  .cat-name {
+    width: 100px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .cat-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 12px;
+  }
+
+  .cat-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cat-count {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    color: var(--cyan);
+    width: 30px;
+    text-align: right;
+  }
+
+  /* Velocity chart */
+  .vel-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px;
+    border-bottom: 1px solid rgba(26,39,68,0.3);
+  }
+
+  .vel-rank {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 24px;
+  }
+
+  .vel-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 10px;
+  }
+
+  .vel-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .vel-hot { color: var(--red); background: rgba(255,51,102,0.15); }
+  .vel-warm { color: var(--orange); background: rgba(255,107,43,0.15); }
+  .vel-cool { color: var(--green); background: rgba(0,255,136,0.15); }
+
+  /* Right sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Filter buttons */
+  .filter-row {
+    padding: 16px 40px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-dim);
+  }
+
+  /* Loading animation */
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .loading-ring {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border);
+    border-top: 2px solid var(--cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .main-grid { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .header { flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="logo">COBO<span>Trends Intelligence System</span></div>
+  </div>
+  <div class="header-stats">
+    <div class="header-stat">
+      <div class="label">Scan Date</div>
+      <div class="value" id="scan-date">--</div>
+    </div>
+    <div class="header-stat">
+      <div class="label">Market</div>
+      <div class="value" id="scan-geo">--</div>
+    </div>
+    <div class="header-stat">
+      <div class="label">Status</div>
+      <div class="value" style="color: var(--green);">ONLINE</div>
+    </div>
+  </div>
+</div>
+
+<div class="kpi-row" id="kpi-row"></div>
+
+<div class="filter-row" id="filter-row"></div>
+
+<div class="main-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Product Intelligence</div>
+      <div class="panel-badge" id="result-count">--</div>
+    </div>
+    <div class="table-scroll" id="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('query')">Product</th>
+            <th onclick="sortTable('score')">Score</th>
+            <th onclick="sortTable('trend_velocity')">Velocity</th>
+            <th onclick="sortTable('trend_classification')">Trend</th>
+            <th onclick="sortTable('trend_type')">Signal</th>
+            <th onclick="sortTable('category')">Sector</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="7"><div class="loading"><div class="loading-ring"></div><div class="loading-text">SCANNING</div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">By Sector</div>
+      </div>
+      <div id="cat-chart"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Top Velocity</div>
+        <div class="panel-badge">FASTEST</div>
+      </div>
+      <div id="vel-chart"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let DATA = null;
+let currentFilter = 'all';
+let currentSort = { key: 'score', asc: false };
+
+// Load JSON data
+async function loadData() {
+  try {
+    // Try loading from same directory
+    const resp = await fetch('./trending_products_2026-03-15.json');
+    DATA = await resp.json();
+  } catch(e) {
+    // Fallback: try embedded data
+    console.error('Failed to load JSON:', e);
+    document.getElementById('table-body').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red);">Failed to load data. Serve this directory with a local server:<br><code style="color:var(--cyan)">python -m http.server 8080</code></td></tr>';
+    return;
+  }
+  render();
+}
+
+function getScoreColor(score) {
+  if (score >= 0.6) return 'var(--green)';
+  if (score >= 0.45) return 'var(--cyan)';
+  if (score >= 0.3) return 'var(--orange)';
+  return 'var(--text-dim)';
+}
+
+function getVelClass(vel) {
+  if (vel >= 2.0) return 'vel-hot';
+  if (vel >= 1.3) return 'vel-warm';
+  return 'vel-cool';
+}
+
+function render() {
+  if (!DATA) return;
+
+  // Header
+  document.getElementById('scan-date').textContent = DATA.scraped_at;
+  document.getElementById('scan-geo').textContent = DATA.geo;
+
+  let products = DATA.products;
+
+  // Filter
+  if (currentFilter !== 'all') {
+    products = products.filter(p => p.category === currentFilter);
+  }
+
+  // Sort
+  products.sort((a, b) => {
+    let va = a[currentSort.key], vb = b[currentSort.key];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    return currentSort.asc ? (va > vb ? 1 : -1) : (va < vb ? 1 : -1);
+  });
+
+  // KPIs
+  const allProducts = DATA.products;
+  const emerging = allProducts.filter(p => p.trend_classification === 'emerging').length;
+  const spikes = allProducts.filter(p => p.trend_classification === 'spike').length;
+  const avgScore = (allProducts.reduce((s, p) => s + p.score, 0) / allProducts.length).toFixed(3);
+  const topVel = Math.max(...allProducts.map(p => p.trend_velocity)).toFixed(1);
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Products Found</div>
+      <div class="kpi-value">${allProducts.length}</div>
+      <div class="kpi-sub">${DATA.failed_keywords.length} failed scans</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Emerging</div>
+      <div class="kpi-value">${emerging}</div>
+      <div class="kpi-sub">growth detected</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Spikes</div>
+      <div class="kpi-value">${spikes}</div>
+      <div class="kpi-sub">potential fads</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Score</div>
+      <div class="kpi-value">${avgScore}</div>
+      <div class="kpi-sub">viability index</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Peak Velocity</div>
+      <div class="kpi-value">${topVel}x</div>
+      <div class="kpi-sub">acceleration</div>
+    </div>
+  `;
+
+  // Filters
+  const cats = [...new Set(allProducts.map(p => p.category))].sort();
+  document.getElementById('filter-row').innerHTML =
+    `<button class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">ALL</button>` +
+    cats.map(c =>
+      `<button class="filter-btn ${currentFilter === c ? 'active' : ''}" onclick="setFilter('${c}')">${c}</button>`
+    ).join('');
+
+  // Table
+  document.getElementById('result-count').textContent = products.length + ' results';
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = products.map((p, i) => `
+    <tr>
+      <td class="rank">${i + 1}</td>
+      <td class="query-name">${p.query}</td>
+      <td>
+        <div class="score-bar-container">
+          <div class="score-bar" style="width:${p.score * 100}%; background:${getScoreColor(p.score)}"></div>
+        </div>
+        <span class="score-value" style="color:${getScoreColor(p.score)}">${p.score.toFixed(3)}</span>
+      </td>
+      <td>
+        <span class="score-value" style="color:${p.trend_velocity >= 1.5 ? 'var(--orange)' : 'var(--text-dim)'}">${p.trend_velocity.toFixed(2)}x</span>
+      </td>
+      <td><span class="tag tag-${p.trend_classification}">${p.trend_classification}</span></td>
+      <td><span class="tag tag-${p.trend_type}">${p.trend_type}</span></td>
+      <td style="color:var(--text-dim);font-size:12px;font-family:'JetBrains Mono',monospace;">${p.category}</td>
+    </tr>
+  `).join('');
+
+  // Category chart
+  const catCounts = {};
+  allProducts.forEach(p => { catCounts[p.category] = (catCounts[p.category] || 0) + 1; });
+  const maxCat = Math.max(...Object.values(catCounts));
+  document.getElementById('cat-chart').innerHTML =
+    Object.entries(catCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => `
+        <div class="cat-row" onclick="setFilter('${cat}')">
+          <div class="cat-name">${cat}</div>
+          <div class="cat-bar-wrap">
+            <div class="cat-bar" style="width:${(count / maxCat * 100)}%"></div>
+          </div>
+          <div class="cat-count">${count}</div>
+        </div>
+      `).join('');
+
+  // Velocity chart (top 8)
+  const topVels = [...allProducts]
+    .sort((a, b) => b.trend_velocity - a.trend_velocity)
+    .filter((p, i, arr) => arr.findIndex(x => x.query === p.query) === i)
+    .slice(0, 8);
+
+  document.getElementById('vel-chart').innerHTML =
+    topVels.map((p, i) => `
+      <div class="vel-item">
+        <div class="vel-rank">${i + 1}</div>
+        <div class="vel-name">${p.query}</div>
+        <div class="vel-badge ${getVelClass(p.trend_velocity)}">${p.trend_velocity.toFixed(2)}x</div>
+      </div>
+    `).join('');
+}
+
+function setFilter(cat) {
+  currentFilter = cat;
+  render();
+}
+
+function sortTable(key) {
+  if (currentSort.key === key) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { key, asc: false };
+  }
+  render();
+}
+
+// Boot
+loadData();
+</script>
+</body>
+</html>

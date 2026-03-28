@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etsy Seller Blueprint v3.0</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  .container { max-width: 1400px; margin: 0 auto; padding: 80px 40px; }
+
+  .header { text-align: center; padding: 120px 0 100px; }
+  .header h1 { font-size: 80px; font-weight: 200; letter-spacing: 0.5em; color: var(--white); margin-right: -0.5em; }
+  .header .subtitle { font-size: 18px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 32px auto; }
+  .header .tagline { font-size: 14px; color: var(--gray); letter-spacing: 0.1em; }
+
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap);  }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+  .stacked-bar { display: flex; border-radius: 8px; overflow: hidden; height: 48px; margin: 16px 0; }
+  .stacked-bar .segment { display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; color: var(--white); }
+
+  .phase-card { border: 1px solid var(--border); border-radius: 12px; padding: 32px; display: flex; flex-direction: column; min-height: 340px; }
+  .phase-card.target { border-color: var(--cyan); box-shadow: 0 0 40px rgba(0, 212, 255, 0.06); }
+  .phase-card .phase-header { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; margin-bottom: 8px; }
+  .phase-card .phase-range { font-size: 28px; font-weight: 700; color: var(--white); margin-bottom: 24px; }
+  .phase-card .phase-range span { color: var(--gray); font-weight: 400; font-size: 16px; }
+  .phase-card ul { flex: 1; }
+  .phase-card .revenue-target { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+  .phase-card .revenue-target strong { display: block; font-size: 20px; color: var(--white); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+
+  
+    .module {  break-inside: avoid;   }
+    .module:first-of-type { break-before: auto; page-break-before: auto; }
+    .inner-card { break-inside: avoid;  }
+    .checklist { break-inside: avoid;  }
+  .module { break-inside: avoid; }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>BEHIKE</h1>
+    <p class="subtitle">Etsy Seller Blueprint</p>
+    <div class="line"></div>
+    <p class="tagline">Find winning niches. Create digital products. Optimize listings. Scale passive income.</p>
+    <p style="font-size: 14px; color: #555; margin-top: 24px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and build your entire Etsy digital product business on paper before listing.</p>
+  </div>
+
+  <!-- MODULE 01: DIGITAL PRODUCT NICHES -->
+  <div class="module">
+    <div class="module-number">01 -- Digital Product Niches</div>
+    <h2 class="module-title">Digital Product Niches</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Printables</div>
+        <h4>Print-at-Home</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Planners and journals</li>
+          <li>Wall art and posters</li>
+          <li>Invitations and cards</li>
+          <li>Checklists and trackers</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Templates</div>
+        <h4>Editable Files</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>Canva templates (social media)</li>
+          <li>Resume and CV templates</li>
+          <li>Business card designs</li>
+          <li>Spreadsheet templates</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Digital Assets</div>
+        <h4>Creative Files</h4>
+        <hr class="section-divider">
+        <ul class="checklist">
+          <li>SVG cut files (Cricut)</li>
+          <li>Fonts and clipart bundles</li>
+          <li>Lightroom presets</li>
+          <li>Notion / spreadsheet systems</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="label">Your Niche</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Target Customer</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 02: CREATION TOOLS -->
+  <div class="module">
+    <div class="module-number">02 -- Creation Tools</div>
+    <h2 class="module-title">Creation Tools</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Design Tools</div>
+        <ul class="checklist">
+          <li>Canva Pro (templates, social media)</li>
+          <li>Adobe Illustrator (SVGs, vectors)</li>
+          <li>Procreate (hand-drawn art)</li>
+          <li>Figma (UI kits, mockups)</li>
+          <li>Google Sheets (spreadsheet products)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">AI-Assisted Creation</div>
+        <ul class="checklist">
+          <li>Midjourney / DALL-E (art generation)</li>
+          <li>ChatGPT (content for journals)</li>
+          <li>Kittl (print-on-demand designs)</li>
+          <li>Creative Fabrica (fonts, graphics)</li>
+          <li>Placeit (mockup generation)</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Product Creation Flow</div>
+    <div class="h-flow">
+      <div class="step">Research Niche</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Design Product</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Create Mockups</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Write Listing</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Publish</div>
+    </div>
+  </div>
+
+  <!-- MODULE 03: ETSY SEO -->
+  <div class="module">
+    <div class="module-number">03 -- Etsy SEO</div>
+    <h2 class="module-title">Etsy SEO</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label">Listing Optimization</div>
+        <ul class="checklist">
+          <li>Use all 13 tags (long-tail keywords)</li>
+          <li>Keyword in first 5 words of title</li>
+          <li>Fill all 10 image slots</li>
+          <li>Use all categories and attributes</li>
+          <li>Description with keywords naturally</li>
+          <li>Video preview for digital products</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Keyword Research</div>
+        <div class="label" style="margin-top: 12px;">Primary Keyword</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Secondary Keywords</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Long-Tail Variations</div>
+        <div class="fill-line"></div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">SEO Tools</div>
+    <div class="pills">
+      <span class="pill">eRank</span>
+      <span class="pill">Marmalead</span>
+      <span class="pill">Etsy Search Bar</span>
+      <span class="pill">Sale Samurai</span>
+      <span class="pill">Google Trends</span>
+      <span class="pill">____</span>
+    </div>
+  </div>
+
+  <!-- MODULE 04: PRICING STRATEGY -->
+  <div class="module">
+    <div class="module-number">04 -- Pricing Strategy</div>
+    <h2 class="module-title">Pricing Strategy</h2>
+
+    <div class="label">Fee Breakdown</div>
+    <div class="stacked-bar" style="margin-bottom: 32px;">
+      <div class="segment" style="flex: 2; background: rgba(0,212,255,0.3);">$0.20 Listing</div>
+      <div class="segment" style="flex: 3; background: rgba(0,212,255,0.5);">6.5% Transaction</div>
+      <div class="segment" style="flex: 2; background: var(--cyan-mid);">3% + $0.25 Payment</div>
+      <div class="segment" style="flex: 3; background: var(--cyan);">~88% You Keep</div>
+    </div>
+
+    <div class="label">Pricing Grid</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Product</th><th>Price</th><th>Etsy Fees</th><th>Net Profit</th><th>Margin %</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+
+    <div class="grid-2">
+      <div class="inner-card">
+        <div class="label">Pricing Rules</div>
+        <ul class="checklist">
+          <li>Research competitor pricing first</li>
+          <li>Start mid-range, adjust based on sales</li>
+          <li>Bundle products for higher AOV</li>
+          <li>Run sales during peak seasons</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label">Revenue Goals</div>
+        <div class="label" style="margin-top: 12px;">Target Monthly Revenue</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Average Order Value</div>
+        <div class="fill-line"></div>
+        <div class="label" style="margin-top: 12px;">Sales Needed / Month</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 05: MARKETING -->
+  <div class="module">
+    <div class="module-number">05 -- Marketing</div>
+    <h2 class="module-title">Marketing</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Organic Traffic</div>
+        <ul class="checklist">
+          <li>Pinterest pins linking to listings</li>
+          <li>TikTok product showcases</li>
+          <li>Instagram Reels (process videos)</li>
+          <li>Blog / SEO content</li>
+          <li>Etsy Ads (start at $1/day)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Conversion Optimization</div>
+        <ul class="checklist">
+          <li>Professional mockup images</li>
+          <li>Clear "what you get" section</li>
+          <li>FAQ in description</li>
+          <li>Instant download instructions</li>
+          <li>Cross-sell related products</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Marketing Calendar</div>
+    <table class="clean">
+      <tr><th>Platform</th><th>Content Type</th><th>Frequency</th><th>Goal</th></tr>
+      <tr><td>Pinterest</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>TikTok</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td>Instagram</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 06: REVIEWS & REPUTATION -->
+  <div class="module">
+    <div class="module-number">06 -- Reviews & Reputation</div>
+    <h2 class="module-title">Reviews & Reputation</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Getting Reviews</div>
+        <ul class="checklist">
+          <li>Include thank-you note in delivery</li>
+          <li>Follow up message after purchase</li>
+          <li>Exceed expectations on quality</li>
+          <li>Respond to all messages within 24h</li>
+          <li>Offer bonus file as surprise</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Handling Issues</div>
+        <ul class="checklist">
+          <li>Respond professionally, never defensive</li>
+          <li>Offer immediate replacement / refund</li>
+          <li>Update listing if recurring complaint</li>
+          <li>Keep star seller status requirements</li>
+          <li>Track common issues to fix products</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="grid-3">
+      <div>
+        <div class="label">Current Star Rating</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Total Reviews</div>
+        <div class="fill-line"></div>
+      </div>
+      <div>
+        <div class="label">Star Seller Status</div>
+        <div class="fill-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 07: SCALING -->
+  <div class="module">
+    <div class="module-number">07 -- Scaling</div>
+    <h2 class="module-title">Scaling</h2>
+
+    <div class="grid-4">
+      <div class="phase-card">
+        <div class="phase-header">Month 1-2</div>
+        <div class="phase-range">Launch <span>+ Test</span></div>
+        <ul class="checklist">
+          <li>Create 10-20 listings</li>
+          <li>Optimize SEO on each</li>
+          <li>Set up Pinterest account</li>
+          <li>Track which niches sell</li>
+        </ul>
+        <div class="revenue-target">Target<strong>First 10 sales</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Month 3-4</div>
+        <div class="phase-range">Optimize <span>+ Expand</span></div>
+        <ul class="checklist">
+          <li>Double down on winners</li>
+          <li>Create product bundles</li>
+          <li>Start Etsy Ads on top listings</li>
+          <li>Grow to 50+ listings</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$500 - $1K/mo</strong></div>
+      </div>
+      <div class="phase-card target">
+        <div class="phase-header">Month 5-8</div>
+        <div class="phase-range">Scale <span>+ Automate</span></div>
+        <ul class="checklist">
+          <li>100+ active listings</li>
+          <li>Outsource design work</li>
+          <li>Pinterest automation</li>
+          <li>Expand to new niches</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$2K - $5K/mo</strong></div>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">Month 9-12</div>
+        <div class="phase-range">Multi <span>Platform</span></div>
+        <ul class="checklist">
+          <li>Sell on Gumroad / own site</li>
+          <li>Creative Market listings</li>
+          <li>Build email list</li>
+          <li>Passive income machine</li>
+        </ul>
+        <div class="revenue-target">Target<strong>$5K+/mo passive</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 08: SHOP TRACKER -->
+  <div class="module">
+    <div class="module-number">08 -- Shop Tracker</div>
+    <h2 class="module-title">Shop Tracker</h2>
+
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Active Listings</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Total products live on Etsy</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Monthly Revenue</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Gross sales this month</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Conversion Rate</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Visits to purchase %</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Order Value</div>
+        <div class="kpi-value">&nbsp;</div>
+        <div class="kpi-desc">Revenue per transaction</div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Top Performing Listings</div>
+    <table class="clean">
+      <tr><th>Listing</th><th>Views</th><th>Favorites</th><th>Sales</th><th>Revenue</th></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+      <tr><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td><td style="border-bottom: 1px dotted var(--gray);">&nbsp;</td></tr>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>ETSY SELLER BLUEPRINT v3.0</strong><br>
+    behike.co | Built in Puerto Rico
+  </div>
+
+</div>
+
+</body>
+</html>

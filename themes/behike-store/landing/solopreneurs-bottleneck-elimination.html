@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bottleneck Elimination — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #f5f5f7;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      padding: 60px 24px 100px;
+    }
+
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .label {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #2997ff;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      color: #f5f5f7;
+    }
+
+    .tagline {
+      font-size: 18px;
+      color: #a1a1a6;
+      margin-bottom: 48px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .price {
+      font-size: 56px;
+      font-weight: 700;
+      color: #f5f5f7;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .price-note {
+      font-size: 13px;
+      color: #6e6e73;
+      margin-bottom: 48px;
+    }
+
+    .cta-btn {
+      display: block;
+      background: #2997ff;
+      color: #fff;
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-align: center;
+      letter-spacing: -0.01em;
+      margin-bottom: 60px;
+      transition: opacity 0.15s ease;
+    }
+
+    .cta-btn:hover { opacity: 0.88; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #1d1d1f;
+      margin: 48px 0;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6e6e73;
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+
+    .problem {
+      font-size: 18px;
+      color: #f5f5f7;
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+
+    .problem p {
+      margin-bottom: 16px;
+    }
+
+    .three-pillars {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .pillar {
+      background: #111;
+      border: 1px solid #1d1d1f;
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .pillar-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #f5f5f7;
+      margin-bottom: 8px;
+    }
+
+    .pillar-desc {
+      font-size: 13px;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+
+    .chapters {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .chapter {
+      padding: 20px 0;
+      border-bottom: 1px solid #1d1d1f;
+    }
+
+    .chapter:first-child { border-top: 1px solid #1d1d1f; }
+
+    .chapter-num {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #2997ff;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .chapter-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #f5f5f7;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .chapter-desc {
+      font-size: 14px;
+      color: #a1a1a6;
+      line-height: 1.5;
+    }
+
+    .guarantee {
+      background: #111;
+      border: 1px solid #1d1d1f;
+      border-radius: 14px;
+      padding: 32px;
+      margin: 48px 0;
+    }
+
+    .guarantee-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .guarantee h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #f5f5f7;
+      margin-bottom: 10px;
+    }
+
+    .guarantee p {
+      font-size: 14px;
+      color: #a1a1a6;
+      line-height: 1.6;
+    }
+
+    .final-cta {
+      text-align: center;
+      padding-top: 16px;
+    }
+
+    .final-cta .price {
+      font-size: 48px;
+      margin-bottom: 6px;
+    }
+
+    .final-cta .price-note {
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      font-size: 12px;
+      color: #6e6e73;
+      text-align: center;
+      margin-top: 48px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 480px) {
+      .three-pillars { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="label">Solopreneurs / Operations</div>
+
+    <h1>Bottleneck Elimination: Fix the Three Things Killing Your Solo Business</h1>
+
+    <p class="tagline">Time, clarity, and systems. Every stalled solopreneur is blocked by one of these. Most are blocked by all three.</p>
+
+    <div class="price">$29.99</div>
+    <p class="price-note">One-time purchase. Instant access. PDF guide.</p>
+
+    <a href="https://behike.gumroad.com/l/solopreneurs-bottleneck-elimination" class="cta-btn">Eliminate Your Bottleneck</a>
+
+    <hr class="divider">
+
+    <p class="section-label">The Problem</p>
+    <div class="problem">
+      <p>You work constantly. You are capable. You have the skills. But the business never accelerates. Revenue plateaus. Projects pile up. Always busy. Never productive.</p>
+      <p>This is not an energy problem. It is a bottleneck problem. One blocked point limits everything downstream from it.</p>
+    </div>
+
+    <p class="section-label">The Three Bottlenecks</p>
+    <div class="three-pillars">
+      <div class="pillar">
+        <div class="pillar-name">Time</div>
+        <div class="pillar-desc">You are the only resource. You are maxed out.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">Clarity</div>
+        <div class="pillar-desc">You do not know what to work on, so you work on everything.</div>
+      </div>
+      <div class="pillar">
+        <div class="pillar-name">Systems</div>
+        <div class="pillar-desc">You rebuild from scratch every time instead of operating from process.</div>
+      </div>
+    </div>
+
+    <p class="section-label">What's Inside</p>
+    <div class="chapters">
+      <div class="chapter">
+        <div class="chapter-num">Chapter 1</div>
+        <div class="chapter-title">The Time Bottleneck, When You Are the Only Resource</div>
+        <div class="chapter-desc">The seven-day time audit that reveals where your hours actually go, and the structural change that protects what matters.</div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-num">Chapter 2</div>
+        <div class="chapter-title">The Clarity Bottleneck, Busy Without Direction</div>
+        <div class="chapter-desc">Why a list of ten goals provides zero clarity, and the one-session process for finding your real ninety-day priority.</div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-num">Chapter 3</div>
+        <div class="chapter-title">The Systems Bottleneck, Rebuilding Every Time</div>
+        <div class="chapter-desc">When improvising stops being learning and starts being waste, and the documentation habit that ends it.</div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-num">Chapter 4</div>
+        <div class="chapter-title">Identifying Your Primary Bottleneck Right Now</div>
+        <div class="chapter-desc">Three diagnostic questions that identify which constraint is costing you the most capacity today.</div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-num">Chapter 5</div>
+        <div class="chapter-title">Practical Elimination Plans for Each Bottleneck</div>
+        <div class="chapter-desc">Step-by-step action plans for each bottleneck type. Concrete, specific, actionable this week.</div>
+      </div>
+      <div class="chapter">
+        <div class="chapter-num">Chapter 6</div>
+        <div class="chapter-title">Maintaining Clear Throughput Over the Long Term</div>
+        <div class="chapter-desc">The quarterly audit, the weekly review habit, and the systems-first principle that keeps the business unblocked.</div>
+      </div>
+    </div>
+
+    <div class="guarantee">
+      <div class="guarantee-icon">&#x2713;</div>
+      <h3>30-Day Money-Back Guarantee</h3>
+      <p>Work through the guide. Run the diagnostic. If you can't identify and begin addressing your primary bottleneck within 30 days, email us for a full refund. No questions. No forms.</p>
+    </div>
+
+    <div class="final-cta">
+      <div class="price">$29.99</div>
+      <p class="price-note">Instant download. PDF format.</p>
+      <a href="https://behike.gumroad.com/l/solopreneurs-bottleneck-elimination" class="cta-btn">Eliminate Your Bottleneck</a>
+    </div>
+
+    <div class="brand">Behike</div>
+
+  </div>
+</body>
+</html>

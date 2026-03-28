@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solopreneur's Scaling Without Hiring Guide — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868b;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --border: #1d1d1f;
+      --card: #0a0a0a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 820px;
+      margin: 0 auto 24px;
+    }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .price {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-sub-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* STATS STRIP */
+    .stats-strip {
+      padding: 64px 0;
+      border-top: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; } }
+    .stat-item {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .stat-item.visible { opacity: 1; transform: translateY(0); }
+    .stat-num {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--cta);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    /* CHAPTERS */
+    .chapters-list {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .chapters-list { grid-template-columns: 1fr; } }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .chapter-item.visible { opacity: 1; transform: translateY(0); }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .thesis-quote {
+      font-size: clamp(22px, 3.5vw, 32px);
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      max-width: 740px;
+      border-left: 3px solid var(--cta);
+      padding-left: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .thesis-quote.visible { opacity: 1; transform: translateY(0); }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .for-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .for-item.visible { opacity: 1; transform: translateX(0); }
+    .for-dot {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      background: var(--cta);
+      border-radius: 50%;
+      margin-top: 8px;
+    }
+    .for-item p {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 720px;
+      margin: 0 auto 20px;
+    }
+    .final-cta p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .final-cta .price {
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero { padding: 64px 0 56px; }
+      section { padding: 56px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <a href="#get-access" class="nav-cta">Get Access — $22.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <span class="hero-label">Behike Guide</span>
+      <h1>Solopreneur's Scaling Without Hiring Guide</h1>
+      <p class="hero-sub">Revenue does not have to grow in direct proportion to your time. This guide shows exactly how to scale a solo business without adding headcount.</p>
+      <div class="price-block">
+        <span class="price">$22.99</span>
+        <span class="price-note">One-time. Yours forever.</span>
+      </div>
+      <a href="#get-access" class="btn-primary">Get Instant Access</a>
+      <p class="hero-sub-note">PDF download. 5,000+ words. 9 chapters.</p>
+    </div>
+  </header>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label">The Staffing Trap</p>
+      <h2 class="section-title">Working more is not the same as scaling.</h2>
+      <p class="section-body">Most solopreneurs reach a revenue ceiling not because the market is limited, but because the model is. Every dollar of new revenue requires a proportional increase in time. That is the trap. This guide is the way out.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>You are the bottleneck</h3>
+          <p>Every process in your business runs through you. When you are unavailable, the business stops. Revenue should not depend on your daily presence.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Hiring creates management work</h3>
+          <p>You hire to escape delivery. You end up managing the person doing delivery. The time you saved goes into oversight. Net result: more stress, similar availability.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Your services are not systematized</h3>
+          <p>Bespoke delivery means every engagement starts from scratch. Productized delivery means you built the system once and run it many times.</p>
+        </div>
+        <div class="problem-card">
+          <h3>Your tools work in silos</h3>
+          <p>Most solopreneurs have ten tools that do not communicate. The integration layer, where automation creates leverage, has never been built.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <section class="stats-strip">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-num">9</div>
+          <div class="stat-label">chapters of working frameworks</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5K+</div>
+          <div class="stat-label">words of dense, applicable content</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">0</div>
+          <div class="stat-label">employees needed to use any of it</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS QUOTE -->
+  <section class="thesis">
+    <div class="container">
+      <p class="thesis-quote">"Scaling is when your revenue grows faster than your time investment. Everything else is just working more. The goal is to convert as much of your work as possible from the linear column to the scaling column."</p>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="inside">
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <h2 class="section-title">9 chapters. No theory without application.</h2>
+      <p class="section-body">Each chapter gives you a specific framework you can apply to your current operation. The sequence builds from model clarity through execution.</p>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <div class="chapter-num">1</div>
+          <div class="chapter-text">
+            <h4>Scaling vs. Just Working More</h4>
+            <p>The test for whether any activity in your business is linear or compounding. Most people are doing the former.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">2</div>
+          <div class="chapter-text">
+            <h4>Automation as Real Leverage</h4>
+            <p>The four-category automation audit plus the anti-patterns that create more problems than they solve.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">3</div>
+          <div class="chapter-text">
+            <h4>Productizing Services</h4>
+            <p>The six-step process for converting a bespoke service into a systematized deliverable that does not require your constant presence.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">4</div>
+          <div class="chapter-text">
+            <h4>AI Tools for Operational Scale</h4>
+            <p>Where AI creates genuine leverage for solopreneurs and where it absolutely does not. No hype, specific applications.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">5</div>
+          <div class="chapter-text">
+            <h4>Systems That Compound</h4>
+            <p>Four categories of compounding infrastructure every solo business needs. Content, email, catalog, and process documentation.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">6</div>
+          <div class="chapter-text">
+            <h4>Financial Architecture</h4>
+            <p>Variable revenue management, margin by product, and the reinvestment cadence that produces a different business in three years.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">7</div>
+          <div class="chapter-text">
+            <h4>Time Architecture</h4>
+            <p>Structuring your week so deep work is protected, communication is batched, and administrative drag stays contained.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">8</div>
+          <div class="chapter-text">
+            <h4>Building the Machine</h4>
+            <p>What a solo business that runs mostly without you actually looks like, component by component.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">9</div>
+          <div class="chapter-text">
+            <h4>Common Failure Modes</h4>
+            <p>Six specific ways solopreneurs get stuck in this model and how to navigate each one before they cost you months.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="who">
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2 class="section-title">A specific model for a specific builder.</h2>
+      <p class="section-body">This is not for people building teams. It is for people who have deliberately chosen the solo model and want to make it work at scale.</p>
+      <div class="for-list">
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You are making money in your solo business but feel like every new client or project adds proportional work with no compounding return.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You have thought about hiring but are not convinced adding management complexity is the right answer for the business you want to build.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You have automations and tools but they work in silos and you have never built the integration layer that would let them create genuine leverage.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You want to build a catalog of products that generate revenue without requiring your personal delivery time on each transaction.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You value time ownership and location independence as much as you value revenue, and you want a business model that protects both.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta" id="get-access">
+    <div class="container">
+      <h2>Build the machine. Own the machine. Be the only person on payroll.</h2>
+      <p>The complete framework for growing a solo business without adding headcount.</p>
+      <span class="price">$22.99</span>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+      <p style="margin-top: 16px; font-size: 14px; color: var(--muted);">PDF format. Instant download. No subscription.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026 &nbsp;|&nbsp; <a href="/">behiqueai.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const children = entry.target.querySelectorAll('.problem-card, .chapter-item, .for-item, .stat-item');
+          if (children.length > 0) {
+            children.forEach((child, idx) => {
+              setTimeout(() => child.classList.add('visible'), idx * 80);
+            });
+          }
+          const quote = entry.target.querySelector('.thesis-quote');
+          if (quote) {
+            setTimeout(() => quote.classList.add('visible'), 100);
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.problem-grid, .chapters-list, .for-list, .stats-grid, .thesis').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

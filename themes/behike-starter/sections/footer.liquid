@@ -1,0 +1,80 @@
+<footer class="footer">
+  <div class="page-width">
+    <div class="footer__grid">
+      {%- for block in section.blocks -%}
+        <div class="footer__column" {{ block.shopify_attributes }}>
+          {%- case block.type -%}
+            {%- when 'link_list' -%}
+              {%- if block.settings.heading != blank -%}
+                <h3 class="footer__heading">{{ block.settings.heading }}</h3>
+              {%- endif -%}
+              <ul class="footer__links">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- when 'text' -%}
+              {%- if block.settings.heading != blank -%}
+                <h3 class="footer__heading">{{ block.settings.heading }}</h3>
+              {%- endif -%}
+              <div class="footer__text">{{ block.settings.text }}</div>
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+    </div>
+    <div class="footer__bottom">
+      <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved. (c) 2026 Behike</p>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_copyright",
+      "label": "Show copyright",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4
+}
+{% endschema %}

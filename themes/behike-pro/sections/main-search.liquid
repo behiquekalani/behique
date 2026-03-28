@@ -1,0 +1,41 @@
+<section class="section-padding">
+  <div class="page-width">
+    <h1>Search</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search" style="margin-bottom: 3.2rem;">
+      <div class="newsletter__form">
+        <input type="text" name="q" value="{{ search.terms | escape }}" class="newsletter__input" placeholder="Search...">
+        <button type="submit" class="button">Search</button>
+      </div>
+    </form>
+    {%- if search.performed -%}
+      {%- if search.results_count > 0 -%}
+        <div class="grid grid--3">
+          {%- for result in search.results -%}
+            <a href="{{ result.url }}" class="card">
+              {%- if result.featured_image -%}
+                <div class="card__image">
+                  <img src="{{ result.featured_image | image_url: width: 400 }}" alt="{{ result.title }}" loading="lazy">
+                </div>
+              {%- endif -%}
+              <div class="card__content">
+                <h3 class="card__title">{{ result.title }}</h3>
+                {%- if result.price -%}
+                  <p class="card__price">{{ result.price | money }}</p>
+                {%- endif -%}
+              </div>
+            </a>
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <p>No results found for "{{ search.terms }}".</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Search",
+  "tag": "section"
+}
+{% endschema %}

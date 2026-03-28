@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "professor", "runs": [{"id": "eval-ebay-architecture-with_skill", "prompt": "I'm building an eBay Listing Assistant in Python. It needs to: take a product name + image as input, research sold listings via eBay's API to get price range, use an LLM to generate a title/description/item specifics, then actually publish the listing via Trading API. What's the cleanest architecture for this? I want it to be modular so I can add more marketplaces later.", "eval_id": 0, "outputs": [{"name": "response.md", "type": "text", "content": "# eBay Listing Assistant Architecture \u2014 Expert Panel Response\n\n## The Architect\n\nYour instinct to build this modularly from day one is right. Here's the clean structure:\n\n**Three-layer architecture:**\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  Presentation Layer                 \u2502\n\u2502  (CLI, Webhook, Web form)           \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n               \u2502\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  Orchestration Layer                \u2502\n\u2502  (Listing pipeline coordinator)     \u2502\n\u2502  - Takes product input              \u2502\n\u2502  - Routes to research \u2192 LLM \u2192 list  \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n               \u2502\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u25bc\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  Service Layer (pluggable)          \u2502\n\u2502                                     \u2502\n\u2502  \u251c\u2500\u2500 Research Service               \u2502\n\u2502  \u2502   \u2514\u2500\u2500 eBay, Amazon, Etsy impls   \u2502\n\u2502  \u2502                                  \u2502\n\u2502  \u251c\u2500\u2500 Content Service                \u2502\n\u2502  \u2502   \u2514\u2500\u2500 GPT, Claude, Llama impls   \u2502\n\u2502  \u2502                                  \u2502\n\u2502  \u251c\u2500\u2500 Publishing Service             \u2502\n\u2502  \u2502   \u2514\u2500\u2500 eBay, Shopify, Etsy impls  \u2502\n\u2502  \u2502                                  \u2502\n\u2502  \u2514\u2500\u2500 Data Layer                     \u2502\n\u2502      \u2514\u2500\u2500 Cache, DB, media storage   \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n```\n\n**Key design decisions:**\n\n1. **Abstract the marketplace dependency.** Define a `MarketplaceAdapter` interface that both eBay and future platforms implement. Don't hardcode eBay API calls in the core pipeline.\n\n2. **Separate concerns strictly:**\n   - `research_service.py` \u2014 Get sold listings, price ranges, category data (eBay-specific implementation plugs in here)\n   - `content_service.py` \u2014 Transform research + product image into title/description/specifics (LLM logic here)\n   - `publishing_service.py` \u2014 Actually post the listing (eBay Trading API here)\n\n3. **Configuration over code.** Use a provider registry pattern:\n   ```python\n   registry = {\n       'research': {'ebay': EbayResearchAdapter, 'amazon': AmazonResearchAdapter},\n       'content': {'gpt4': GPT4ContentGenerator, 'claude': ClaudeContentGenerator},\n       'publishing': {'ebay': EbayPublishingAdapter, 'shopify': ShopifyPublishingAdapter}\n   }\n   ```\n\n   Then instantiate at runtime: `content_gen = registry['content']['gpt4']()`\n\n4. **Use dependency injection.** Pass adapters into the orchestrator, not hardcoded singletons. This makes testing trivial \u2014 swap mock adapters.\n\n5. **Data model is your contract.** Define a shared `Product`, `ResearchResult`, `ListingContent` schema that all adapters agree on. This is your API between layers. Use Pydantic for validation.\n\nWhy this works: You can add Shopify publishing next month with minimal changes to the core pipeline. You can swap Claude for GPT-4o with one line. You can add Amazon research without touching existing code.\n\n---\n\n## The Researcher\n\nFor the LLM integration, here's what I'd recommend:\n\n**Model choice:** Use Claude 3.5 Sonnet. Why:\n- Better instruction-following for structured outputs (you need valid title + description + item specifics)\n- Cheaper than GPT-4o for this workload\n- Excellent at multi-step reasoning (analyzing price range, then generating specifics)\n\n**Integration pattern:**\n\nBuild a `ContentGenerator` class with three methods:\n```python\nclass ContentGenerator:\n    def generate_title(self, product_name, research_data) -> str\n    def generate_description(self, product_name, research_data, image_url) -> str\n    def generate_item_specifics(self, category, research_data) -> Dict[str, str]\n```\n\nEach method should:\n1. Build a system prompt specific to that task (eBay titles have keyword rules, descriptions need persuasion)\n2. Include context from `research_data` (competitive prices, condition, shipping, etc.)\n3. Use structured output (Claude's JSON mode if you need parsed specifics)\n\n**Image handling:** Pass the image as a base64 string or URL in the prompt. Claude can analyze product photos to describe condition, color, materials. This is golden for eBay listings where visual authenticity matters.\n\n**Cost optimization:**\n- Batch API calls if you're running multiple listings at once (Claude's batch API is 50% cheaper)\n- Cache the system prompts using prompt caching (eBay category rules are static)\n- Start with 3.5 Sonnet; only upgrade to 4o if quality isn't there\n\n**Don't overthink this:** A single LLM call per listing (concatenate title + description + specifics into one prompt) is often faster and cheaper than three separate calls. Let the model handle the multi-step reasoning in one go.\n\n---\n\n## The Trader\n\nArchitecture-wise, your eBay integration needs to handle these realities:\n\n**Research layer specifics:**\n- Use the `findCompletedItems` API to get sold listings in your category + price range\n- Filter by: condition (used/new), shipping method, completed date (last 30-90 days)\n- Extract: final price, quantity sold, seller feedback, item specifics, shipping cost\n- Cache this for 24h \u2014 eBay rate limits hard, and price data doesn't change daily anyway\n\n**Publishing layer specifics:**\n- Use `addItem` (legacy but stable) or `createListingVariation` if multi-variant\n- Required fields for eBay: title, description, category, condition, starting price, duration, item specifics\n- Specifics matter \u2014 they're how eBay's algorithm (Cassini) ranks you. Stuff them with researched keywords\n- Set reasonable defaults: 30-day auction, standard shipping, 0.5% fee to PayPal\n\n**Gotcha you'll hit:** Item specifics vary by category. A \"Vintage Camera\" has different specifics than \"Used Phone.\" The research data tells you the category; use eBay's `getCategory` endpoint to fetch valid specifics for that category, then feed them to Claude.\n\n**Don't list yet without this:** Validate your margins. Your costs = image research time + API calls (~$0.01 per listing) + eBay fees (12.9% of sale price) + shipping. If the research says average margin is <20%, skip that product. Your Shopify store will struggle with low-margin products.\n\n---\n\n## \ud83d\udd17 The Connector\n\nThree insights at the intersection:\n\n1. **Your real bottleneck isn't architecture \u2014 it's data quality.** A perfect system design with garbage research data produces garbage listings. Prioritize research quality: eBay data accuracy, price range confidence, market saturation. The architecture can scale horizontally (more listings), but it scales *sideways* (new marketplaces) only if your research layer is abstract enough to plug in Amazon/Etsy data feeds later.\n\n2. **LLM output + eBay constraints = validation layer.** Claude can generate a beautiful description, but eBay has limits: title \u226480 chars, description \u22644000 chars, specifics must match category schema. Build a validation step between content generation and publishing \u2014 reject and regenerate if the LLM breaks eBay's rules. This is where most \"automated listing\" systems fail.\n\n3. **Architecture for one is architecture for many.** The moment you decouple research/content/publishing, you've already built the skeleton for a multi-marketplace SaaS. Add Shopify publishing next, then Amazon research. Each is a new adapter, not a new codebase. This is where the real value is \u2014 not eBay listings, but a listing engine that works everywhere.\n\n---\n\n**Bottom line:** Build the three-layer architecture with abstract adapters now (one day of design, saves you two weeks of refactoring later), start with eBay + Claude, and validate that your margin math works before you automate 100 listings.\n"}], "grading": {"eval_id": 0, "run_type": "with_skill", "pass_rate": 1.0, "passed": 5, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": true, "evidence": "Pattern found in response"}, {"text": "The Connector activates", "passed": true, "evidence": "Pattern found in response"}, {"text": "Ends with bottom-line action", "passed": true, "evidence": "Pattern found in response"}, {"text": "Recommends abstraction pattern", "passed": true, "evidence": "Pattern found in response"}, {"text": "Uses Kalani-specific context", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-ebay-architecture-without_skill", "prompt": "I'm building an eBay Listing Assistant in Python. It needs to: take a product name + image as input, research sold listings via eBay's API to get price range, use an LLM to generate a title/description/item specifics, then actually publish the listing via Trading API. What's the cleanest architecture for this? I want it to be modular so I can add more marketplaces later.", "eval_id": 0, "outputs": [{"name": "response.md", "type": "text", "content": "# eBay Listing Assistant \u2014 Modular Architecture\n\n## The Problem\nYou're building something that needs to:\n1. Pull market data (eBay's Sold Listings API)\n2. Generate content intelligently (LLM layer)\n3. Post back to a marketplace (eBay Trading API)\n4. Scale to multiple marketplaces eventually\n\nThe risk: tightly coupling marketplace logic with content generation = painful when you add Facebook Marketplace, Shopify, etc.\n\nThe solution: **Pipeline + Provider pattern**. Think of this like BehiqueBot's architecture \u2014 separate concerns, stack them cleanly.\n\n---\n\n## Recommended Architecture\n\n```\nebay_listing_assistant/\n\u251c\u2500\u2500 core/\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u251c\u2500\u2500 pipeline.py           # Main orchestrator (generic)\n\u2502   \u251c\u2500\u2500 types.py              # Shared data models\n\u2502   \u2514\u2500\u2500 config.py             # Centralized config\n\u2502\n\u251c\u2500\u2500 providers/                # Marketplace-agnostic interface\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u251c\u2500\u2500 base.py               # Abstract base class\n\u2502   \u251c\u2500\u2500 ebay/\n\u2502   \u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u2502   \u251c\u2500\u2500 client.py         # eBay API wrapper\n\u2502   \u2502   \u251c\u2500\u2500 research.py       # Sold listings research\n\u2502   \u2502   \u2514\u2500\u2500 publish.py        # Listing publication\n\u2502   \u2514\u2500\u2500 facebook/             # (stub for future)\n\u2502       \u2514\u2500\u2500 __init__.py\n\u2502\n\u251c\u2500\u2500 ai/                       # LLM layer (marketplace-agnostic)\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u251c\u2500\u2500 generator.py          # Title/description/specifics generation\n\u2502   \u251c\u2500\u2500 prompts.py            # Prompt templates (versioned)\n\u2502   \u2514\u2500\u2500 models.py             # LLM client config\n\u2502\n\u251c\u2500\u2500 media/                    # Image processing\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u2514\u2500\u2500 processor.py          # Resize, validate, optimize for platform\n\u2502\n\u251c\u2500\u2500 storage/                  # Persistence layer\n\u2502   \u251c\u2500\u2500 __init__.py\n\u2502   \u251c\u2500\u2500 db.py                 # Listing DB (SQLite or Supabase)\n\u2502   \u2514\u2500\u2500 cache.py              # Redis for API response caching\n\u2502\n\u2514\u2500\u2500 main.py                   # Entry point\n```\n\n---\n\n## Core Patterns\n\n### 1. **Data Models (types.py)**\n\nUse Pydantic for validation \u2014 keeps you honest about what flows through the system:\n\n```python\nfrom pydantic import BaseModel\nfrom typing import Dict, List, Optional\nfrom enum import Enum\n\nclass PricingData(BaseModel):\n    \"\"\"Result from marketplace research\"\"\"\n    min_price: float\n    max_price: float\n    avg_price: float\n    sold_count: int\n    currency: str\n    source: str  # \"ebay\", \"facebook\", etc.\n\nclass ListingContent(BaseModel):\n    \"\"\"Generated content (marketplace-agnostic)\"\"\"\n    title: str\n    description: str\n    item_specifics: Dict[str, str]  # category-dependent\n    recommended_price: float\n    confidence_score: float\n\nclass PublishRequest(BaseModel):\n    \"\"\"What goes to marketplace\"\"\"\n    product_name: str\n    image_path: str\n    marketplace: str  # \"ebay\", \"facebook\"\n    category_id: Optional[str] = None  # eBay needs this\n    pricing: PricingData\n    content: ListingContent\n\nclass PublishResponse(BaseModel):\n    \"\"\"What comes back\"\"\"\n    listing_id: str\n    url: str\n    timestamp: str\n    status: str  # \"live\", \"scheduled\", \"error\"\n```\n\nThis is crucial: **your data models become your API contract**. When you add Facebook later, you extend these, not rewrite the pipeline.\n\n---\n\n### 2. **Provider Base Class (providers/base.py)**\n\n```python\nfrom abc import ABC, abstractmethod\nfrom typing import Dict, Optional\nfrom core.types import PricingData, PublishRequest, PublishResponse\n\nclass MarketplaceProvider(ABC):\n    \"\"\"Abstract base for any marketplace\"\"\"\n\n    def __init__(self, config: Dict):\n        self.config = config\n\n    @abstractmethod\n    async def research_pricing(self, product_name: str) -> PricingData:\n        \"\"\"Get pricing data for a product\"\"\"\n        pass\n\n    @abstractmethod\n    async def publish_listing(self, request: PublishRequest) -> PublishResponse:\n        \"\"\"Publish listing and return live URL\"\"\"\n        pass\n\n    @abstractmethod\n    def validate_config(self) -> bool:\n        \"\"\"Check that API keys, endpoints are valid\"\"\"\n        pass\n```\n\n**Why abstract?** When you add Facebook Marketplace or Shopify, you inherit this class once and implement these three methods. The pipeline doesn't change.\n\n---\n\n### 3. **eBay Provider (providers/ebay/client.py)**\n\n```python\nimport httpx\nfrom typing import List, Dict\nfrom core.types import PricingData\nfrom providers.base import MarketplaceProvider\n\nclass eBayProvider(MarketplaceProvider):\n    \"\"\"eBay-specific implementation\"\"\"\n\n    def __init__(self, config: Dict):\n        super().__init__(config)\n        self.http = httpx.AsyncClient(\n            base_url=\"https://api.ebay.com\",\n            headers={\n                \"Authorization\": f\"Bearer {config['access_token']}\",\n                \"Content-Language\": \"en-US\"\n            }\n        )\n        self.app_id = config['app_id']\n        self.cert_id = config['cert_id']\n\n    async def research_pricing(self, product_name: str) -> PricingData:\n        \"\"\"\n        Query eBay's Browse API for sold listings.\n        Real use: Trading API has FindCompletedItems.\n        \"\"\"\n        params = {\n            \"q\": product_name,\n            \"filter\": \"itemLocationCountry:US\",\n            \"limit\": 50,\n            \"SORTORDER\": \"EndTimeSoonest\"\n        }\n\n        response = await self.http.get(\n            \"/buy/browse/v1/item_summary/search\",\n            params=params\n        )\n        response.raise_for_status()\n\n        data = response.json()\n        # Parse sold listings and extract pricing\n        prices = [item['price']['value'] for item in data.get('itemSummaries', [])]\n\n        return PricingData(\n            min_price=min(prices) if prices else 0,\n            max_price=max(prices) if prices else 0,\n            avg_price=sum(prices) / len(prices) if prices else 0,\n            sold_count=len(prices),\n            currency=\"USD\",\n            source=\"ebay\"\n        )\n\n    async def publish_listing(self, request: PublishRequest) -> PublishResponse:\n        \"\"\"\n        Use Trading API AddItem to publish.\n        This is synchronous (eBay blocks), but wrap in async wrapper.\n        \"\"\"\n        payload = {\n            \"Item\": {\n                \"Title\": request.content.title,\n                \"Description\": request.content.description,\n                \"ItemSpecifics\": [\n                    {\"Name\": k, \"Value\": v}\n                    for k, v in request.content.item_specifics.items()\n                ],\n                \"StartPrice\": str(request.content.recommended_price),\n                \"CategoryID\": request.category_id or self._get_category(request.product_name),\n                \"ListingType\": \"FixedPriceItem\",\n                \"Quantity\": 1,\n                \"PictureDetails\": {\n                    \"PictureURL\": self._upload_image(request.image_path)\n                }\n            }\n        }\n\n        # This would use eBay's SOAP/XML Trading API in practice\n        # For now, assume you have ebay_trading_client wrapper\n        listing_id = await self._call_trading_api(\"AddItem\", payload)\n\n        return PublishResponse(\n            listing_id=listing_id,\n            url=f\"https://www.ebay.com/itm/{listing_id}\",\n            timestamp=datetime.now().isoformat(),\n            status=\"live\"\n        )\n```\n\n**Real talk:** eBay's Trading API is SOAP/XML, not REST. You'll want to wrap it with something like `ebaysdk` or build thin wrappers around the SOAP calls. Keep it isolated here, not in the pipeline.\n\n---\n\n### 4. **AI/LLM Layer (ai/generator.py)**\n\n```python\nfrom anthropic import Anthropic\nfrom core.types import ListingContent, PricingData\nfrom ai.prompts import LISTING_GENERATION_PROMPT\n\nclass ListingGenerator:\n    \"\"\"Generate marketplace-agnostic content using Claude\"\"\"\n\n    def __init__(self, model: str = \"claude-opus-4-1\"):\n        self.client = Anthropic()\n        self.model = model\n\n    async def generate(\n        self,\n        product_name: str,\n        pricing: PricingData,\n        category: str = \"electronics\"\n    ) -> ListingContent:\n        \"\"\"\n        Use Claude to generate title, description, specifics.\n        Keep this simple \u2014 let the LLM do the heavy lifting.\n        \"\"\"\n\n        prompt = LISTING_GENERATION_PROMPT.format(\n            product_name=product_name,\n            min_price=pricing.min_price,\n            max_price=pricing.max_price,\n            avg_price=pricing.avg_price,\n            category=category\n        )\n\n        response = self.client.messages.create(\n            model=self.model,\n            max_tokens=1500,\n            messages=[\n                {\n                    \"role\": \"user\",\n                    \"content\": prompt\n                }\n            ]\n        )\n\n        # Parse Claude's response into structured format\n        text = response.content[0].text\n        title, description, specifics = self._parse_response(text)\n\n        return ListingContent(\n            title=title,\n            description=description,\n            item_specifics=specifics,\n            recommended_price=pricing.avg_price,\n            confidence_score=0.95  # You can enhance this\n        )\n\n    def _parse_response(self, text: str) -> tuple[str, str, dict]:\n        \"\"\"Parse Claude's structured output\"\"\"\n        # Use regex or JSON parsing depending on your prompt format\n        # For now: assume Claude returns JSON\n        import json\n        data = json.loads(text)\n        return data['title'], data['description'], data['specifics']\n```\n\n**Why separate?** Your LLM logic doesn't care about eBay. When you switch to GPT-4, Claude, or fine-tuned models, you only touch this file.\n\n---\n\n### 5. **Pipeline Orchestrator (core/pipeline.py)**\n\n```python\nfrom core.types import PublishRequest, PublishResponse, PricingData\nfrom ai.generator import ListingGenerator\nfrom providers.base import MarketplaceProvider\nfrom media.processor import ImageProcessor\n\nclass ListingPipeline:\n    \"\"\"Main orchestrator \u2014 coordinates all steps\"\"\"\n\n    def __init__(\n        self,\n        provider: MarketplaceProvider,\n        generator: ListingGenerator,\n        image_processor: ImageProcessor\n    ):\n        self.provider = provider\n        self.generator = generator\n        self.image_processor = image_processor\n\n    async def execute(\n        self,\n        product_name: str,\n        image_path: str,\n        marketplace: str = \"ebay\",\n        category_id: str = None\n    ) -> PublishResponse:\n        \"\"\"\n        Step 1: Research pricing\n        Step 2: Generate content\n        Step 3: Process image\n        Step 4: Publish listing\n        \"\"\"\n\n        # Step 1: Get pricing data from marketplace\n        pricing = await self.provider.research_pricing(product_name)\n\n        # Step 2: Generate listing content\n        content = await self.generator.generate(\n            product_name=product_name,\n            pricing=pricing\n        )\n\n        # Step 3: Process image\n        processed_image = await self.image_processor.optimize(\n            image_path,\n            marketplace=marketplace\n        )\n\n        # Step 4: Publish\n        request = PublishRequest(\n            product_name=product_name,\n            image_path=processed_image,\n            marketplace=marketplace,\n            category_id=category_id,\n            pricing=pricing,\n            content=content\n        )\n\n        response = await self.provider.publish_listing(request)\n\n        # Log to database\n        await self._save_listing(response)\n\n        return response\n\n    async def _save_listing(self, response: PublishResponse):\n        \"\"\"Persist to your database for tracking\"\"\"\n        # Implement with SQLite or Supabase\n        pass\n```\n\n**This is the brain.** Everything flows through here. No marketplace-specific logic. If you're adding Facebook Marketplace tomorrow, you swap `eBayProvider` for `FacebookProvider` \u2014 pipeline doesn't change.\n\n---\n\n### 6. **Entry Point (main.py)**\n\n```python\nimport asyncio\nfrom core.config import load_config\nfrom core.pipeline import ListingPipeline\nfrom providers.ebay.client import eBayProvider\nfrom ai.generator import ListingGenerator\nfrom media.processor import ImageProcessor\n\nasync def main():\n    # Load config (eBay API keys, LLM settings, etc.)\n    config = load_config(\"config.yaml\")\n\n    # Instantiate components\n    ebay_provider = eBayProvider(config['ebay'])\n    generator = ListingGenerator(model=\"claude-opus-4-1\")\n    image_processor = ImageProcessor()\n\n    # Create pipeline\n    pipeline = ListingPipeline(\n        provider=ebay_provider,\n        generator=generator,\n        image_processor=image_processor\n    )\n\n    # Execute\n    result = await pipeline.execute(\n        product_name=\"iPhone 14 Pro Max\",\n        image_path=\"./products/iphone.jpg\",\n        marketplace=\"ebay\"\n    )\n\n    print(f\"\u2713 Listed at {result.url}\")\n\nif __name__ == \"__main__\":\n    asyncio.run(main())\n```\n\n---\n\n## Adding a Second Marketplace (Facebook)\n\nWhen you're ready, this becomes trivial:\n\n```python\n# providers/facebook/client.py\nfrom providers.base import MarketplaceProvider\n\nclass FacebookMarketplaceProvider(MarketplaceProvider):\n    async def research_pricing(self, product_name: str) -> PricingData:\n        # Query Facebook Graph API for similar listings\n        pass\n\n    async def publish_listing(self, request: PublishRequest) -> PublishResponse:\n        # Use Facebook Shop API\n        pass\n\n# main.py \u2014 just swap the provider\nfacebook_provider = FacebookMarketplaceProvider(config['facebook'])\npipeline = ListingPipeline(\n    provider=facebook_provider,  # \u2190 Different provider, same pipeline\n    generator=generator,\n    image_processor=image_processor\n)\n```\n\n**No pipeline changes. No AI changes. Just inherit the base class and implement the two methods.**\n\n---\n\n## Key Design Decisions\n\n### 1. **Async Throughout**\n- eBay API calls can be slow (research + image upload + publish)\n- Use `asyncio` + `httpx` for concurrency\n- Makes it easy to batch multiple listings later\n\n### 2. **Pydantic for Data Models**\n- Validation at boundaries (API input/output)\n- Self-documenting code\n- Easier to add new fields without breaking things\n\n### 3. **Provider Pattern**\n- Each marketplace is a black box\n- Pipeline doesn't know or care how eBay works vs Facebook\n- This is what makes scaling to 5+ marketplaces realistic\n\n### 4. **Separate AI Layer**\n- Your LLM logic is independent of eBay\n- Switch from Claude to GPT-4 without touching provider code\n- Can add fine-tuning, A/B testing, prompt versioning later\n\n### 5. **Config Management**\n- Store API keys, model names, rate limits in a config file\n- Never hardcode credentials\n- Make it easy to run against sandbox vs. production\n\n---\n\n## Implementation Checklist\n\n- [ ] Set up Pydantic models (`core/types.py`)\n- [ ] Build provider base class (`providers/base.py`)\n- [ ] Wrap eBay Trading API (start with `FindCompletedItems` for research)\n- [ ] Implement eBay provider (`providers/ebay/client.py`)\n- [ ] Build LLM generator using Claude\n- [ ] Add image optimization (resize for eBay, compress)\n- [ ] Wire up the pipeline\n- [ ] Add SQLite/Supabase for listing history\n- [ ] Test end-to-end with a real eBay sandbox listing\n- [ ] Plan Facebook Marketplace provider (stub it out)\n\n---\n\n## Testing Strategy\n\n```python\n# tests/test_pipeline.py\nimport pytest\nfrom unittest.mock import AsyncMock, patch\n\n@pytest.mark.asyncio\nasync def test_full_pipeline():\n    \"\"\"End-to-end: research \u2192 generate \u2192 publish\"\"\"\n\n    # Mock provider\n    mock_provider = AsyncMock()\n    mock_provider.research_pricing.return_value = PricingData(...)\n    mock_provider.publish_listing.return_value = PublishResponse(...)\n\n    pipeline = ListingPipeline(mock_provider, generator, image_processor)\n    result = await pipeline.execute(\"iPhone 14 Pro Max\", \"test.jpg\")\n\n    assert result.status == \"live\"\n    assert \"ebay.com/itm\" in result.url\n```\n\nMock the provider at test time \u2014 this is why the abstraction matters.\n\n---\n\n## Next Steps\n\n1. **Start with eBay research API** \u2014 get pricing data flowing first\n2. **Implement the simplest LLM prompt** \u2014 just title + description initially\n3. **Get one listing live** \u2014 validate the entire flow works end-to-end\n4. **Add item specifics** \u2014 eBay categories need specific fields (brand, condition, etc.)\n5. **Build database persistence** \u2014 track what you've listed and when\n6. **Plan Facebook Marketplace** \u2014 design the provider interface, don't implement yet\n\nThe architecture above makes each step isolated and testable. You won't rewrite the pipeline when you hit step 6.\n\n---\n\n## Why This Matters for Your Context\n\nYou're building an automation business around this. The cleaner the architecture now, the faster you can:\n- Add new marketplaces (Shopify, Amazon, Poshmark)\n- Test new LLM approaches (fine-tuning, multi-agent)\n- Scale from 1 product to 100+ listings\n- Hand off code to a team member without them needing a PhD\n\nThis is the difference between a prototype and a product you can actually sell to others.\n"}], "grading": {"eval_id": 0, "run_type": "without_skill", "pass_rate": 0.4, "passed": 2, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "The Connector activates", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Ends with bottom-line action", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Recommends abstraction pattern", "passed": true, "evidence": "Pattern found in response"}, {"text": "Uses Kalani-specific context", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-n8n-agency-with_skill", "prompt": "I want to start my n8n automation agency in Puerto Rico. I have n8n running locally, I've already built a few workflows (daily briefing bot, Telegram classification bot). What's the fastest path to landing my first paying client? Be specific \u2014 what do I send, to who, and what do I charge?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# n8n Agency Launch Strategy\n\n## The Closer\n\nYour first client doesn't come from a slick pitch deck. They come from solving a visible problem someone already feels.\n\nYou have two advantages right now: you're in Puerto Rico where English-fluent tech talent is expensive, and you already have working proof (the Telegram bot, daily briefing workflows). Start hyper-local.\n\n**The exact outreach path:**\n\n1. **Target:** Local Puerto Rico business owners (30-150 employees) who are drowning in manual work. Look for: e-commerce stores, real estate brokers, logistics dispatchers, sales teams. They don't need \"AI\" \u2014 they need their CRM to talk to their email, or their Slack to ping them when something happens. Instagram business accounts, Facebook storefronts, local business directories.\n\n2. **What you send:** Not \"I build automation workflows.\" Instead:\n   - A 30-second Loom video showing YOUR Telegram bot in action (classifying messages in real-time)\n   - Or a text: \"I saw you're managing [specific pain point visible from their business]. I built this [show video/screenshot]. Takes 2 hours to set up. Want a free 30-min call to see if it fits?\"\n   - Keep it in Spanish if they use Spanish publicly. This matters.\n\n3. **The ask:** Free 30-minute audit. During the call: ask exactly how they manage [their bottleneck]. Don't sell. Just show them one specific workflow you'd build (not five ideas). Example: \"Every time someone fills your form, this hits your CRM and sends your team a Slack reminder \u2014 2-minute setup.\"\n\n4. **Close:** \"I can have this running by Friday for $X.\" (See pricing below.)\n\n**Why this works:** You're not selling software as a service. You're selling time back. They don't care how you do it. They care that they stop doing the thing manually.\n\n---\n\n## The Accountant\n\nPricing for your first client: **$800-1200 for implementation + $200-400/month ongoing.**\n\nBreak this down:\n\n- **Implementation fee:** covers your time (10-20 hours), n8n setup, testing, handoff docs. At $80-100/hour (which is low for tech in PR), you're justified at $800 minimum. First client is slower because you're learning their system.\n- **Monthly fee:** covers your uptime responsibility, minor tweaks, if their API keys break you fix it, you're on call. This is not optional \u2014 it anchors the relationship and creates recurring revenue so your second client isn't starting from zero again.\n\n**Unit economics reality:**\n- Your costs: n8n cloud ($20-40/month depending on workflows), OpenAI API usage if you use it ($5-50/month), hosting (already paying for Railway). Call it $50/month all-in infrastructure.\n- If you land 5 clients at $300/month average: that's $1500/month revenue, $250 costs, $1250 profit. You're at sustainability.\n- If you land 2 clients: $600 revenue, $50 costs, $550 profit. You're viable but not life-changing.\n\n**Anchor the pricing early.** Don't start with \"let me give you a quote after we talk.\" Say: \"My standard implementation is $1000 + $250/month. Does that fit your budget?\" 80% will say yes, 20% will walk. The 20% who walk were never paying anyway.\n\n---\n\n## The Builder\n\nYou already have the hardest part done \u2014 proof that the automation works and solves a real problem.\n\nFor the first client, do NOT custom-build everything. Reuse your existing workflows as templates:\n\n1. **Telegram classification workflow** \u2014 map this to their actual use case. Instead of classifying product ideas, now it's classifying support tickets or lead quality. The logic stays the same; only the input/output changes.\n\n2. **Daily briefing bot** \u2014 adapt this to their metrics. If they're e-commerce: daily sales summary. If they're real estate: new leads summary. Same n8n structure, different data sources.\n\n3. **Keep it simple for sale #1.** Pick ONE workflow that solves their biggest pain. Don't build a full integration ecosystem yet. Example: \"Lead comes in \u2192 classified \u2192 sent to Slack \u2192 logged in Airtable.\" That's maybe 8 n8n nodes. Done in 4 hours.\n\n4. **Document as you build.** Screenshot each node's config, explain the logic in plain English. This becomes your sales collateral for client #2. Your time investment in client #1 becomes a template for client #5.\n\n**Technical note:** Host your demo workflows on your local n8n instance, but when you deploy for them, use n8n Cloud or a simple Railway setup (you already know this). Don't hand them your local instance\u2014too much liability and support overhead.\n\n---\n\n## \ud83d\udd17 The Connector\n\nThree things converge here that only someone doing all three sees:\n\n1. **Your first client buys belief, not features.** The Closer sends the video. The Builder makes sure it works flawlessly (because if it breaks, you lose $1200 + the next referral). The Accountant prices it high enough that you can afford to support it for a year without profit pressure. Cheap implementations die; well-priced ones live because you actually care.\n\n2. **Your template is worth more than any individual workflow.** After client #1, you'll have a repeatable process: find pain \u2192 adapt template \u2192 deploy \u2192 support. Client #2 takes 8 hours, not 20. By client #5, you're at 4 hours. That's not scaling a product; that's scaling a service. Price accordingly \u2014 don't drop your rate just because it's faster.\n\n3. **Puerto Rico is your moat, not your limitation.** Local businesses need you. They're not hiring engineers from Silicon Valley to build their workflow. They're looking for someone local, Spanish-capable, who can show up or hop on a call. Own that. Your competitors are expensive agencies in Miami; you're the scrappy alternative who delivers.\n\n---\n\n## Bottom Line\n\nPick one real business owner (someone you know or can find in a Facebook group), show them the Telegram bot video with their specific problem named, offer a free 30-min call, propose a single workflow at $1000 + $250/month, and ship it by end of next week. The first client doesn't need to be perfect\u2014it needs to exist and work.\n"}], "grading": {"eval_id": 1, "run_type": "with_skill", "pass_rate": 1.0, "passed": 5, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": true, "evidence": "Pattern found in response"}, {"text": "Gives specific dollar amounts", "passed": true, "evidence": "Pattern found in response"}, {"text": "References Puerto Rico context", "passed": true, "evidence": "Pattern found in response"}, {"text": "The Connector activates", "passed": true, "evidence": "Pattern found in response"}, {"text": "Ends with bottom-line action", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-n8n-agency-without_skill", "prompt": "I want to start my n8n automation agency in Puerto Rico. I have n8n running locally, I've already built a few workflows (daily briefing bot, Telegram classification bot). What's the fastest path to landing my first paying client? Be specific \u2014 what do I send, to who, and what do I charge?", "eval_id": 1, "outputs": [{"name": "response.md", "type": "text", "content": "# n8n Agency Launch: First Paying Client in 30 Days\n\nYou have momentum. You have working workflows. You have a builder mentality. What you need now is a client \u2014 and the fastest path is **inbound from a warm network, not cold outreach**.\n\nHere's the specific play:\n\n---\n\n## THE FASTEST PATH: WHO TO SELL TO\n\n**Target: Local Puerto Rico businesses that are already digitally mature enough to know they need automation, but small enough to say yes quickly.**\n\n### Tier 1 (Highest probability, 30-day close):\n1. **Real estate agents** \u2014 massive manual work (listing syndication, client follow-ups, lead nurturing)\n2. **E-commerce sellers** (Shopify/eBay) \u2014 they know pain points, they have budget, you speak their language\n3. **Freelancers/agencies** \u2014 designers, copywriters, social managers drowning in repetitive tasks\n4. **Local service businesses** \u2014 dentists, salons, accountants with manual scheduling + client follow-up\n\n### Tier 2 (Warm path, 45-day close):\n- Financial advisors (client onboarding + document collection)\n- HR/recruiting (applicant screening, interview scheduling, offer letters)\n- Restaurants/bars (reservation management, supplier ordering, staff scheduling)\n\n**Why these?** They have immediate ROI proof, feel the pain daily, and aren't waiting for perfect solutions. They just need \"working.\"\n\n---\n\n## WHAT YOU SEND (The Pitch)\n\n**Not a 10-page proposal.** Not a generic service page. Specific, one-pager, problem-first.\n\n### Format: The 3-Part Pitch (send via email or LinkedIn DM)\n\n```\nSubject: [Name], I automated [specific pain they have] for [similar business]. Got 30 min?\n\n---\n\nHi [Name],\n\nI noticed you're running [business type] in [location].\n\nMost businesses like yours waste 5-10 hours/week on [specific manual task \u2014 be exact]:\n- Manually posting listings to multiple platforms\n- Re-entering customer data from email into your system\n- Following up with leads manually\n- Scheduling appointments and sending reminders\n\nI built an automation system (using n8n) that handles this. It saved [reference business] 7 hours/week and cost them 1/3 what manual labor would.\n\nI'm taking on 2-3 clients this month. 30-min call to see if there's a fit?\n\n[Your name]\n[Phone]\n[Simple portfolio link or video demo link]\n```\n\n### What makes this work:\n- **Named the specific pain** \u2014 not \"automation solutions\" but \"[your exact workflow name]\"\n- **Shown ROI** \u2014 not \"we're efficient\" but \"7 hours/week saved\"\n- **Created urgency** \u2014 \"taking on 2-3 clients this month\" (scarcity works)\n- **Made the ask small** \u2014 30 minutes, not a full discovery call\n- **No jargon** \u2014 they don't care what \"n8n\" is\n\n---\n\n## WHERE TO SEND IT (The Right Targets)\n\n### Method 1: Direct warm introduction (FASTEST)\n- Ask your network: \"Who do you know that's constantly complaining about [manual task]?\"\n- Get a warm intro email from a mutual connection\n- **Response rate: 60-70%**\n\n### Method 2: LinkedIn/Outreach (Fastest solo)\nSearch for business owners in Puerto Rico matching your Tier 1 profile:\n- Real estate agents (search \"Puerto Rico real estate agent\")\n- Shopify/eBay sellers (search for local e-commerce groups)\n- Service providers (search \"salon owner Puerto Rico\" / \"dentist PR\" / \"accountant PR\")\n\nUse a simple LinkedIn DM version of the pitch above.\n- **Response rate: 10-15%** (cold)\n- **But with 20 targeted outreach = 2-3 responses**\n\n### Method 3: Facebook/WhatsApp groups\n- Join local Puerto Rico business owner groups\n- Join e-commerce communities (eBay/Shopify sellers)\n- Post: \"I automated [task] for 2 businesses. If you're struggling with [task], let's talk.\"\n- **Response rate: High (warm community)** \u2014 **15-30%**\n\n---\n\n## WHAT YOU CHARGE (First Client)\n\n**Not what n8n agencies charge ($2-5K/month). You're building proof of concept.**\n\n### Pricing Model:\n\n**One-time setup: $800-1,500**\n**Monthly maintenance: $200-400**\n\n**Why this:**\n- **You prove ROI quickly** \u2014 client can see 7-10 hours saved immediately\n- **You hit the threshold where they say yes** \u2014 big enough to feel valuable, small enough to justify for a small business\n- **You build a case study** \u2014 after 30 days, you have numbers to show the next client\n- **You accumulate recurring revenue** \u2014 5 clients at $300/month = $1,500/month passive\n\n### Alternative: Outcome-based (if you're confident)\n\n**$300-500/month to handle [specific process]**\n- They pay as long as it works\n- No setup fee\n- They see value immediately\n\n**Best for:** Clients who are skeptical or cash-strapped. They'll drop you if you don't deliver. So deliver.\n\n---\n\n## THE WORKFLOW: What You Actually Build (First Client Playbook)\n\nStart simple. Complex workflows come after you have proof.\n\n### Example 1: Real estate listing syndication\n- **Input:** Agent uploads new listing (address, description, price) to a Google Form\n- **Process:** n8n auto-fills listing on MLS, Airbnb, Facebook Marketplace, Zillow equivalent\n- **Output:** Agent gets a Telegram/email notification when live\n- **Time to build:** 4-6 hours\n- **Client saves:** 1-2 hours per listing (8-16 hours/month if they list 4-8 properties)\n- **ROI message:** \"Get listings live on 4 platforms in 2 minutes instead of 30 minutes\"\n\n### Example 2: E-commerce order followup automation\n- **Input:** New order from Shopify/eBay\n- **Process:** n8n sends order confirmation \u2192 shipping notification \u2192 feedback request \u2192 re-engagement email\n- **Output:** Client sees dashboard of open conversations\n- **Time to build:** 3-4 hours\n- **Client saves:** 30 min/day on manual follow-ups\n- **ROI message:** \"Every order gets a complete nurture sequence. You focus on new sales.\"\n\n### Example 3: Appointment scheduling + reminders\n- **Input:** Client books appointment on website or Calendly\n- **Process:** n8n sends calendar invite, reminder 24h before, post-appointment follow-up\n- **Output:** Client gets SMS/email summary of confirmations/no-shows\n- **Time to build:** 2-3 hours\n- **Client saves:** 15-20 min/day\n- **ROI message:** \"No-shows drop 50%. Clients feel cared for.\"\n\n**Pick ONE. Master it. Sell it to 3 clients. Then expand to the next workflow.**\n\n---\n\n## YOUR FIRST 30 DAYS: Concrete Steps\n\n### Week 1: Prepare\n- [ ] Write 3 pitch versions (one for real estate, one for e-commerce, one for services)\n- [ ] Record a 2-minute Loom video of one of your workflows in action (send with pitch)\n- [ ] Create a 1-page PDF case study template (even if it's hypothetical \u2014 shows professionalism)\n- [ ] Set up a simple rate sheet in a Google Doc (shared, easy to update)\n\n### Week 2: Outreach (start conversations)\n- [ ] Identify 20 warm prospects (ask network, LinkedIn search, Facebook groups)\n- [ ] Send 5 pitches this week (not all 20 \u2014 you'll refine as you go)\n- [ ] Ask for feedback: \"What would make this valuable for you?\"\n\n### Week 3: Sell (first call \u2192 discovery)\n- [ ] When someone responds, schedule a 30-min call\n- [ ] Ask: \"Walk me through your [specific process] today. What takes longest?\"\n- [ ] Don't pitch. **Listen.** Map their workflow.\n- [ ] Say: \"I think I can automate [X], saving you 5-7 hours/week. Let me build a prototype and show you Friday.\"\n\n### Week 4: Deliver proof\n- [ ] Build ONE small automated workflow for them (doesn't have to be perfect)\n- [ ] Show them it works\n- [ ] Get agreement: \"If this saves you time, you'll pay [X]?\" (confirm price before building full version)\n- [ ] Build the full version\n- [ ] Launch it live\n- [ ] **Celebrate.** You have your first client. You have proof. Everything after this is iteration.\n\n---\n\n## Common Objections (What to Say)\n\n**\"How much does this cost?\"**\n\u2192 \"Depends on complexity. Simple workflows start at $800 setup + $200/month. Let me see your process first.\"\n\n**\"What if it breaks?\"**\n\u2192 \"I monitor it daily and fix issues within 24 hours. If it goes down, I'm responsible. You keep your data.\"\n\n**\"Isn't n8n expensive?\"**\n\u2192 \"n8n is free to self-host or $30/month cloud-hosted. I include that cost in your price. You don't pay extra.\"\n\n**\"How do I know this will work?\"**\n\u2192 \"We start with a limited version for your top 3 use cases. 2-week trial. You'll see time saved. Then we expand.\"\n\n**\"I don't know anything about automation.\"**\n\u2192 \"You don't have to. I'll handle all technical setup. You just use the form/system I set up. It works like your current tools.\"\n\n---\n\n## Your Competitive Advantage\n\nYou're not selling n8n. You're selling **understanding of YOUR market**:\n- You're also an e-commerce seller (eBay/Shopify) \u2014 you speak their pain\n- You're in Puerto Rico \u2014 you get local nuance\n- You're young and hungry \u2014 you'll actually answer calls and iterate fast\n- You're not an agency with 3-week implementation cycles \u2014 you're one person who builds and ships\n\n**Lead with that.** \"I get it because I'm doing it too.\"\n\n---\n\n## Revenue Math: By Client 5\n\n| Client | Setup | Monthly | Type |\n|--------|-------|---------|------|\n| 1 | $1,000 | $250 | Real estate listing syndication |\n| 2 | $800 | $300 | E-commerce order followup |\n| 3 | $1,200 | $350 | Service business appointment automation |\n| 4 | $900 | $200 | Freelancer email automation |\n| 5 | $1,100 | $300 | Local restaurant reservation system |\n\n**Total first month:** $4,900 (one-time)\n**Recurring (month 2+):** $1,400/month\n**By month 6:** $4,900 + (1,400 \u00d7 5) = $11,900\n\nThat's not $100K. But it's the **foundation** to scale to n8n client #10-15 at $800-1500/month each.\n\n---\n\n## The Hard Truth\n\nThe fastest path to first client isn't better pitches or lower prices. **It's warm introductions from people who trust you.**\n\nEmail the 5 people in your network who know you're a builder. Say:\n*\"I'm launching an automation consulting side. Who do you know that's drowning in repetitive work? Real estate agent, salon owner, e-commerce seller? I'm taking on 2 clients this month and need a case study.\"*\n\nThat one email gets you to your first client faster than 50 cold LinkedIn messages.\n\n---\n\n## Next: You Tell Me\n\nBefore you send a single pitch, answer these:\n\n1. **Which workflow are you most confident in?** (the daily briefing bot, the Telegram classifier, or something else?)\n2. **Which of Tier 1 above excites you most?** Real estate, e-commerce, or service business?\n3. **Do you have 5 people you can ask for a warm intro?** (This is the actual blocker.)\n\nOnce you answer, we lock in the pitch, record a video, and you send 5 this week.\n\nThe first $800 is harder than the second. But the second is the pattern.\n\n---\n\n*Built by Ceiba. Puerto Rico. March 2026.*\n"}], "grading": {"eval_id": 1, "run_type": "without_skill", "pass_rate": 0.4, "passed": 2, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Gives specific dollar amounts", "passed": true, "evidence": "Pattern found in response"}, {"text": "References Puerto Rico context", "passed": true, "evidence": "Pattern found in response"}, {"text": "The Connector activates", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Ends with bottom-line action", "passed": false, "evidence": "Pattern NOT found in response"}]}}, {"id": "eval-behiquebot-infra-with_skill", "prompt": "My BehiqueBot is live on Railway. Right now it uses in-memory storage \u2014 if Railway restarts the container, all data is lost. I'm also passing API keys as environment variables but I'm not sure if that's the right way or if there's something more secure. What should I fix first and how?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# BehiqueBot Infrastructure: Storage & Secrets\n\n## The Operator\n\nYou've already identified the real problem: in-memory storage dies on restart. That's not a flaw in your setup \u2014 that's a critical blocker you need to fix *now*, not later.\n\nHere's the hierarchy:\n\n**Immediate (this week):** Add a persistent database. On Railway, you have two realistic options:\n1. **Railway's Postgres add-on** \u2014 simplest. $15/month, managed backups, lives in the same project. Add it with two clicks, get a CONNECTION_STRING in your env. Your code connects to it, boom, you're persistent.\n2. **Supabase** \u2014 if you want something lighter or want to use it elsewhere. Same idea: managed Postgres, connection string, environment variable.\n\nDon't overthink this. Postgres is the right choice for your BehiqueBot data (structured logs, daily archives, idea seeds). Pick Railway Postgres. It takes 20 minutes to wire up.\n\nCode-side change is minimal: swap your in-memory storage for a Postgres client (use `psycopg2` in Python, or async with `asyncpg` if you're feeling modern). Your data models are simple enough \u2014 just dump your current schema into a few tables and you're done.\n\n**After persistence is live:** Then we fix secrets.\n\n---\n\n## The Watchman\n\nEnvironment variables for API keys are *not* wrong \u2014 they're actually the right first step. But Railway's default setup leaks them.\n\nHere's the issue: if you're logging anything (errors, debug output) to console and Railway captures those logs, and your code ever accidentally prints an API key in a traceback, it's readable by anyone with access to your Railway logs. It's not a certainty you'll leak it. It's a timing problem waiting to happen.\n\n**Fix the sequence correctly:**\n\n1. **First:** Get persistent storage working (Operator's problem, not yours yet).\n2. **Second:** Once you're on Postgres, do this:\n   - Keep API keys in Railway environment variables (that part is fine).\n   - Add a `.env.local` file to your `.gitignore` (make sure it's already there).\n   - Never, ever log API keys or sensitive values. Full stop. Add this check: any time you're about to log something that came from an env var, strip it first.\n   - Use Railway's **built-in secrets** feature (Environment \u2192 Private variables). They're not just env vars \u2014 they're encrypted at rest and redacted from logs. Move your API keys there instead of the regular env vars.\n\n3. **Later (not now):** If you grow to multiple environments (staging + production) or need to rotate keys regularly, look at `python-dotenv` for local dev and consider a vault tool. But that's overengineering for where you are now.\n\n**One critical thing:** Make sure your `.gitignore` includes `*.env*` and `secrets/`. Check it now. If you've ever accidentally committed a key file, rotate those keys immediately (delete old OpenAI key in console, generate new one, update Railway).\n\n---\n\n## The Architect\n\nYou're building a system that's supposed to capture every thought Kalani has and make it durable. Losing data on restart breaks that promise.\n\nHere's how to think about it: BehiqueBot is currently a **cache**, not a system. It feels like it works \u2014 messages come in, they get processed, ideas get captured \u2014 but there's no durability contract. The moment Railway restarts, you lose.\n\nRight design for BehiqueBot:\n- **Postgres as single source of truth.** All ideas, all logs, all metadata lives there. The bot just reads/writes to it.\n- **Telegram as the transport layer.** Messages come in via Telegram, you log them, process them, store results. If the bot crashes mid-message, the message is still on Telegram \u2014 you can replay it.\n- **Stateless bot process.** Your bot should be able to restart any time and pick up exactly where it left off because the state lives in the database, not in memory.\n\nThis is important because Kalani's use case is *accountability and memory*. Losing data undermines the entire purpose. Once you nail this, the next phase (you mentioned connecting Notion + Claude-powered check-ins) becomes much easier \u2014 you're just querying a real database instead of hoping memory didn't get wiped.\n\nStart with Postgres on Railway, then design your tables to mirror your current in-memory structure. It's a 1:1 translation.\n\n---\n\n## \ud83d\udd17 The Connector\n\nThree sharper takes emerge when you zoom out:\n\n1. **Persistence and security are the same decision.** You can't do the security fix (API key rotation, encrypted secrets) until you have a database to store key metadata and audit logs. They unlock each other.\n\n2. **Your infrastructure should match your promise.** BehiqueBot's whole value is \"Kalani's thoughts don't disappear.\" Running it on in-memory storage contradicts that. Fix that before adding features. It'll also make you feel more confident shipping it.\n\n3. **Start with Railway Postgres, not a vault or complex auth.** You're solo, you're bootstrapped, and you're learning. Get durable storage + basic secrets hygiene (environment variables + .gitignore) working first. The fancy stuff (key rotation, multi-env setup, audit logs) can wait until you're making money from this or it breaks.\n\n---\n\n## Bottom line\n\nAdd Railway Postgres this week (20 minutes), then move your in-memory storage to Postgres tables. After that's live and tested, move your API keys to Railway's Private variables and do a final `.gitignore` audit. Secrets management can wait; durability cannot.\n"}], "grading": {"eval_id": 2, "run_type": "with_skill", "pass_rate": 1.0, "passed": 5, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": true, "evidence": "Pattern found in response"}, {"text": "Recommends persistent database", "passed": true, "evidence": "Pattern found in response"}, {"text": "Addresses env var security", "passed": true, "evidence": "Pattern found in response"}, {"text": "The Connector activates", "passed": true, "evidence": "Pattern found in response"}, {"text": "Ends with bottom-line action", "passed": true, "evidence": "Pattern found in response"}]}}, {"id": "eval-behiquebot-infra-without_skill", "prompt": "My BehiqueBot is live on Railway. Right now it uses in-memory storage \u2014 if Railway restarts the container, all data is lost. I'm also passing API keys as environment variables but I'm not sure if that's the right way or if there's something more secure. What should I fix first and how?", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# BehiqueBot Infrastructure Assessment\n\n## The Core Problem\n\nYou have two critical issues that compound each other:\n1. **In-memory storage** \u2014 every container restart = complete data loss\n2. **API keys in environment variables** \u2014 exposed and unaudited\n\nThe question isn't really \"which first\" \u2014 they're both urgent. But there's a dependency: **fix secrets management immediately, then build persistence**. Here's why.\n\n---\n\n## Priority 1: Secure Your Secrets (Do This Today)\n\n**Why now:** Environment variables in Railway are convenient but they're visible to anyone with access to your Railway dashboard. More importantly, if you ever hardcode keys in your code by accident, they'll be in git history.\n\n### What's wrong with env vars\n\nRailway stores env vars in plaintext in the dashboard. If someone:\n- Gets your Railway account\n- Accesses your git history with a leaked key\n- Someone with access to the repo reads `.env.local`\n\n...they have your OpenAI API keys.\n\n### What to do instead\n\n**Railway-specific fix (what you should do now):**\n1. Keep API keys in Railway's environment variables (this is still required for runtime)\n2. **Add this layer: use Railway's built-in secret management properly**\n   - Mark sensitive env vars as \"secure\" (Railway feature \u2014 they won't be logged or displayed in the UI)\n   - Never commit `.env` files to git \u2014 add `.env.local` and `.env*.local` to `.gitignore`\n   - Document in your repo that these are required without showing actual values\n\n**Code-level fix (for safety):**\n```python\nimport os\nfrom dotenv import load_dotenv\n\nload_dotenv()  # Loads from .env.local (IGNORED by git)\n\nTELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')\nOPENAI_API_KEY = os.getenv('OPENAI_API_KEY')\n\nif not TELEGRAM_BOT_TOKEN or not OPENAI_API_KEY:\n    raise ValueError(\"Missing required API keys. Check Railway environment variables.\")\n```\n\n**For Railway deployment:**\n- Set secrets in the Railway dashboard under your service settings\n- Mark them as \"secure\" so they don't leak in logs\n- Never log these values anywhere\n- If you ever need to debug, use masked output: `***MASKED_KEY***`\n\n### Immediate action\nCheck your BehiqueBot code right now:\n- Are any API keys hardcoded? Remove them and add to `.gitignore`\n- Is there a `.env` file in git? Delete it and regenerate `.gitignore`\n- Add validation that checks for these at startup\n\n---\n\n## Priority 2: Choose a Database (Do This This Week)\n\nOnce secrets are locked down, you need persistent storage. Your options:\n\n### Option A: PostgreSQL on Railway (Recommended for your setup)\n\n**Why this first:**\n- Railway manages it for you (one less thing to set up)\n- Free tier covers your volume easily (BehiqueBot data is small)\n- Direct Python integration via `psycopg2` or SQLAlchemy\n- Works with your existing Railway deployment\n\n**Setup (rough outline):**\n1. Railway \u2192 Add a database \u2192 PostgreSQL\n2. Railway auto-creates a connection string and adds it to your env vars\n3. In your code:\n```python\nimport psycopg2\nfrom psycopg2.extras import RealDictCursor\n\n# Connection string from Railway env var\ndb_url = os.getenv('DATABASE_URL')\n\ndef store_idea(category, pillar, content):\n    conn = psycopg2.connect(db_url)\n    cur = conn.cursor()\n    cur.execute(\"\"\"\n        INSERT INTO ideas (category, pillar, content, created_at)\n        VALUES (%s, %s, %s, NOW())\n    \"\"\")\n    conn.commit()\n    cur.close()\n    conn.close()\n```\n\n4. Create tables for:\n   - `ideas` \u2014 seed + metadata\n   - `updates` \u2014 living updates per idea\n   - `daily_archives` \u2014 raw logs\n\n**Cost:** Free tier is plenty. ~$7/month if you scale significantly (unlikely).\n\n### Option B: Supabase (PostgreSQL + built-in auth)\n\n**Why consider it:**\n- Same database power as Postgres\n- Comes with auth out of the box (useful when you add users)\n- Real-time capabilities (if you ever want live sync)\n- Generous free tier\n\n**Downside:** Adds another external service. For right now, Railway's Postgres is simpler.\n\n### Option C: MongoDB Atlas (if you like document storage)\n\n**Why maybe not yet:**\n- Good for flexible schemas (you might want to store arbitrary JSON per idea)\n- Adds complexity for now\n- Postgres is more standard for your use case\n\n**Pick: PostgreSQL on Railway.** You can always migrate later if you need document flexibility.\n\n---\n\n## Phased Implementation Plan\n\n### This week (48 hours)\n1. **Secrets lockdown**\n   - Review all code for hardcoded keys\n   - Ensure `.env.local` is gitignored\n   - Add startup validation\n   - Test locally with `.env.local`, test on Railway with secure env vars\n\n2. **Database schema design** (sketch it out, don't code yet)\n   - Tables: `ideas`, `updates`, `daily_archives`\n   - Columns you need: id, content, category, pillar, created_at, updated_at, telegram_message_id (for linking)\n   - Run this locally with PostgreSQL to test before Railway\n\n### Next week\n3. **Migrate from in-memory to database**\n   - Replace your in-memory storage (dict? list?) with database calls\n   - Test locally\n   - Deploy to Railway\n   - Restart container and verify data persists\n\n4. **Add backup strategy**\n   - Daily export of ideas table to JSON (save to a simple object store like AWS S3 or even Railway's filesystem if it's small enough)\n   - This is your safety net if the database breaks\n\n---\n\n## What You're Actually Building\n\nRight now BehiqueBot is:\n- **In-memory:** Everything lives in RAM, dies on restart\n- **Unshielded API keys:** Visible in the dashboard, at risk in git\n\nAfter these fixes:\n- **Persistent:** Data survives restarts, container crashes, deployments\n- **Secure:** Keys are properly isolated, validated at startup\n- **Auditable:** Every idea is timestamped, linked to Telegram messages, can be backed up\n\nThis is the foundation for the next phase (Notion integration, Claude-powered check-ins, memory system).\n\n---\n\n## One More Thing\n\nWhen you implement the database, think about this structure:\n\n```\nideas\n\u251c\u2500\u2500 id (primary key)\n\u251c\u2500\u2500 content (original text)\n\u251c\u2500\u2500 category (CREATIVE, BUSINESS, KNOWLEDGE, PERSONAL, TECHNICAL)\n\u251c\u2500\u2500 pillar (health, wealth, relationships, general)\n\u251c\u2500\u2500 telegram_message_id (link back to the message)\n\u251c\u2500\u2500 created_at\n\u2514\u2500\u2500 updated_at\n\nupdates (linked to ideas)\n\u251c\u2500\u2500 id\n\u251c\u2500\u2500 idea_id (foreign key)\n\u251c\u2500\u2500 update_content\n\u251c\u2500\u2500 updated_at\n\ndaily_archives (for raw logs)\n\u251c\u2500\u2500 date\n\u251c\u2500\u2500 raw_content (JSON dump of all activity that day)\n\u251c\u2500\u2500 created_at\n```\n\nThis structure lets you:\n- Query by category/pillar\n- Link updates to original ideas\n- Reconstruct a full audit trail\n- Export for analysis later\n\n---\n\n## Action Items (In Order)\n\n- [ ] Check your codebase for hardcoded API keys \u2014 remove any, add `.env.local` to `.gitignore`\n- [ ] Add startup validation for required env vars (crash early if missing)\n- [ ] Set up PostgreSQL on Railway\n- [ ] Design the schema above locally\n- [ ] Write the database layer (wrapper functions around psycopg2)\n- [ ] Migrate one piece of your storage at a time (start with storing new ideas)\n- [ ] Test restart: kill the container, restart, verify data still exists\n- [ ] Set up basic daily backup (export to JSON)\n\n**Start with step 1 today.** It's 30 minutes and eliminates your biggest security risk right now.\n"}], "grading": {"eval_id": 2, "run_type": "without_skill", "pass_rate": 0.4, "passed": 2, "total": 5, "expectations": [{"text": "Response has named expert section headers", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Recommends persistent database", "passed": true, "evidence": "Pattern found in response"}, {"text": "Addresses env var security", "passed": true, "evidence": "Pattern found in response"}, {"text": "The Connector activates", "passed": false, "evidence": "Pattern NOT found in response"}, {"text": "Ends with bottom-line action", "passed": false, "evidence": "Pattern NOT found in response"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"skill_name": "professor", "iteration": 1, "configurations": [{"name": "with_skill", "label": "Professor Skill", "evals": [{"eval_id": 0, "eval_name": "ebay-architecture", "pass_rate": 1.0, "passed": 5, "total": 5}, {"eval_id": 1, "eval_name": "n8n-agency", "pass_rate": 1.0, "passed": 5, "total": 5}, {"eval_id": 2, "eval_name": "behiquebot-infra", "pass_rate": 1.0, "passed": 5, "total": 5}], "aggregate": {"pass_rate": 1.0, "pass_rate_pct": "100%", "total_passed": 15, "total_assertions": 15}}, {"name": "without_skill", "label": "Baseline (No Skill)", "evals": [{"eval_id": 0, "eval_name": "ebay-architecture", "pass_rate": 0.4, "passed": 2, "total": 5}, {"eval_id": 1, "eval_name": "n8n-agency", "pass_rate": 0.4, "passed": 2, "total": 5}, {"eval_id": 2, "eval_name": "behiquebot-infra", "pass_rate": 0.4, "passed": 2, "total": 5}], "aggregate": {"pass_rate": 0.4, "pass_rate_pct": "40%", "total_passed": 6, "total_assertions": 15}}], "delta": {"pass_rate": 0.6, "pass_rate_pct": "+60%", "summary": "Professor skill passes 100% of assertions vs 40% baseline \u2014 +60 percentage points improvement"}}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

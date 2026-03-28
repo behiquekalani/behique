@@ -1,0 +1,362 @@
+{
+  "name": "Support Triage",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "labelIds": ["INBOX"],
+          "q": "to:support@behike.shop is:unread"
+        },
+        "options": {
+          "dataPropertyAttachmentsPrefixName": "attachment_"
+        }
+      },
+      "id": "d0e1f2a3-0001-4000-8000-000000000001",
+      "name": "Gmail Trigger - New Support Email",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a support triage AI for Behike, a digital products brand. Classify the support email into exactly one category: REFUND, QUESTION, BUG, or FEEDBACK. Respond with ONLY the category word and a confidence score 0-100. Format: {\"category\": \"REFUND\", \"confidence\": 95, \"summary\": \"Customer wants refund for X because Y\"}"
+            },
+            {
+              "role": "user",
+              "content": "Classify this support email:\n\nFrom: {{ $json.from }}\nSubject: {{ $json.subject }}\nBody: {{ $json.text || $json.snippet }}"
+            }
+          ]
+        },
+        "options": {
+          "response_format": { "type": "json_object" }
+        }
+      },
+      "id": "d0e1f2a3-0002-4000-8000-000000000002",
+      "name": "OpenAI - Classify Email",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "YOUR_OPENAI_CREDENTIAL_ID",
+          "name": "YOUR_OPENAI_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OpenAI classification response\nconst item = $input.first();\nconst raw = item.json.choices?.[0]?.message?.content || '{}';\nlet classification;\n\ntry {\n  classification = JSON.parse(raw);\n} catch (e) {\n  classification = { category: 'QUESTION', confidence: 50, summary: 'Could not parse' };\n}\n\nreturn [{\n  json: {\n    ...item.json,\n    category: classification.category || 'QUESTION',\n    confidence: classification.confidence || 50,\n    summary: classification.summary || 'No summary',\n    originalEmail: {\n      from: $('Gmail Trigger - New Support Email').item.json.from,\n      subject: $('Gmail Trigger - New Support Email').item.json.subject,\n      body: $('Gmail Trigger - New Support Email').item.json.text || $('Gmail Trigger - New Support Email').item.json.snippet,\n      messageId: $('Gmail Trigger - New Support Email').item.json.id\n    }\n  }\n}];"
+      },
+      "id": "d0e1f2a3-0003-4000-8000-000000000003",
+      "name": "Code - Parse Classification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "REFUND",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "refund"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "QUESTION",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "question"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "BUG",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "bug"
+            },
+            {
+              "conditions": {
+                "options": { "caseSensitive": false },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.category }}",
+                    "rightValue": "FEEDBACK",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "feedback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d0e1f2a3-0004-4000-8000-000000000004",
+      "name": "Switch - Route by Category",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@behike.shop",
+        "toEmail": "={{ $json.originalEmail.from }}",
+        "subject": "Re: {{ $json.originalEmail.subject }}",
+        "emailType": "html",
+        "message": "<p>Hi,</p><p>Thanks for reaching out. I received your refund request.</p><p>I process refunds within 48 hours. No questions asked. You'll receive a confirmation once it's processed.</p><p>If there was something wrong with your experience, I'd love to know so I can improve. But no pressure.</p><br><p>— Kalani<br>Behike Support</p>",
+        "options": {}
+      },
+      "id": "d0e1f2a3-0005-4000-8000-000000000005",
+      "name": "Gmail - Refund Auto-Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1120, 100],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@behike.shop",
+        "toEmail": "={{ $json.originalEmail.from }}",
+        "subject": "Re: {{ $json.originalEmail.subject }}",
+        "emailType": "html",
+        "message": "<p>Hi,</p><p>Thanks for your question. I'll get back to you within 24 hours with a detailed answer.</p><p>If it's urgent, you can also check the FAQ at behike.shop/faq.</p><br><p>— Kalani<br>Behike Support</p>",
+        "options": {}
+      },
+      "id": "d0e1f2a3-0006-4000-8000-000000000006",
+      "name": "Gmail - Question Auto-Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1120, 240],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@behike.shop",
+        "toEmail": "={{ $json.originalEmail.from }}",
+        "subject": "Re: {{ $json.originalEmail.subject }}",
+        "emailType": "html",
+        "message": "<p>Hi,</p><p>Thanks for the bug report. That's genuinely helpful.</p><p>I've logged the issue and will investigate within 48 hours. I'll follow up once it's resolved or if I need more details.</p><p>In the meantime, if you need a workaround, reply to this email.</p><br><p>— Kalani<br>Behike Support</p>",
+        "options": {}
+      },
+      "id": "d0e1f2a3-0007-4000-8000-000000000007",
+      "name": "Gmail - Bug Auto-Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1120, 380],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "support@behike.shop",
+        "toEmail": "={{ $json.originalEmail.from }}",
+        "subject": "Re: {{ $json.originalEmail.subject }}",
+        "emailType": "html",
+        "message": "<p>Hi,</p><p>Thanks for taking the time to share this. Feedback from people who actually use the product means everything.</p><p>I read every message personally. This will go into the improvement queue.</p><br><p>— Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "d0e1f2a3-0008-4000-8000-000000000008",
+      "name": "Gmail - Feedback Auto-Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [1120, 520],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "YOUR_NOTION_SUPPORT_DB_ID_HERE",
+        "title": "={{ $json.originalEmail.subject }} — {{ $json.category }}",
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "From", "textValue": "={{ $json.originalEmail.from }}" },
+            { "key": "Category", "selectValue": "={{ $json.category }}" },
+            { "key": "Summary", "textValue": "={{ $json.summary }}" },
+            { "key": "Confidence", "numberValue": "={{ $json.confidence }}" },
+            { "key": "Status", "selectValue": "Open" },
+            { "key": "ReceivedAt", "dateValue": "={{ $now.toISO() }}" }
+          ]
+        }
+      },
+      "id": "d0e1f2a3-0009-4000-8000-000000000009",
+      "name": "Notion - Log Support Ticket",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [1340, 300],
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID",
+          "name": "YOUR_NOTION_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID_HERE",
+        "text": "={{ $json.category === 'REFUND' ? '🚨 REFUND REQUEST' : $json.category === 'BUG' ? '🐛 BUG REPORT' : '📬 Support Ticket' }}\n\nCategory: {{ $json.category }} ({{ $json.confidence }}% confidence)\nFrom: {{ $json.originalEmail.from }}\nSubject: {{ $json.originalEmail.subject }}\n\nSummary: {{ $json.summary }}\n\nAuto-reply sent. Check Notion for full ticket.",
+        "additionalFields": {}
+      },
+      "id": "d0e1f2a3-0010-4000-8000-000000000010",
+      "name": "Telegram - Alert Kalani",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1340, 460],
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "YOUR_TELEGRAM_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger - New Support Email": {
+      "main": [
+        [
+          { "node": "OpenAI - Classify Email", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "OpenAI - Classify Email": {
+      "main": [
+        [
+          { "node": "Code - Parse Classification", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Code - Parse Classification": {
+      "main": [
+        [
+          { "node": "Switch - Route by Category", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Switch - Route by Category": {
+      "refund": [
+        [
+          { "node": "Gmail - Refund Auto-Reply", "type": "main", "index": 0 }
+        ]
+      ],
+      "question": [
+        [
+          { "node": "Gmail - Question Auto-Reply", "type": "main", "index": 0 }
+        ]
+      ],
+      "bug": [
+        [
+          { "node": "Gmail - Bug Auto-Reply", "type": "main", "index": 0 }
+        ]
+      ],
+      "feedback": [
+        [
+          { "node": "Gmail - Feedback Auto-Reply", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Refund Auto-Reply": {
+      "main": [
+        [
+          { "node": "Notion - Log Support Ticket", "type": "main", "index": 0 },
+          { "node": "Telegram - Alert Kalani", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Question Auto-Reply": {
+      "main": [
+        [
+          { "node": "Notion - Log Support Ticket", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Bug Auto-Reply": {
+      "main": [
+        [
+          { "node": "Notion - Log Support Ticket", "type": "main", "index": 0 },
+          { "node": "Telegram - Alert Kalani", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Feedback Auto-Reply": {
+      "main": [
+        [
+          { "node": "Notion - Log Support Ticket", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "support", "automation", "openai"]
+}

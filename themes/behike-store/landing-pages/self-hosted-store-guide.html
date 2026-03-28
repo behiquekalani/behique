@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noai, noimageai">
+    <meta name="description" content="Build a free product store without Shopify. Self-hosted HTML landing pages, Gumroad payments, GitHub Pages or Cloudflare Tunnel hosting. Zero monthly fees.">
+    <title>Self-Hosted Store Guide | Behike</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --black: #000000;
+            --blue: #0A84FF;
+            --cta: #30D158;
+            --light: #F5F5F7;
+            --secondary-bg: #1D1D1F;
+            --gray: #86868B;
+            --font: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--black);
+            color: var(--light);
+            font-family: var(--font);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-up { animation: fadeUp 0.75s ease-out both; }
+        .d1 { animation-delay: 0.05s; }
+        .d2 { animation-delay: 0.15s; }
+        .d3 { animation-delay: 0.25s; }
+        .d4 { animation-delay: 0.35s; }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 16px 24px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(245,245,247,0.07);
+        }
+
+        .nav-logo { font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+
+        .nav-cta {
+            background: var(--cta);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .nav-cta:hover { opacity: 0.85; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 140px 24px 100px;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border: 1px solid rgba(10,132,255,0.35);
+            border-radius: 980px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: clamp(38px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.045em;
+            line-height: 1.02;
+            margin-bottom: 24px;
+            max-width: 820px;
+        }
+
+        .hero h1 span { color: var(--blue); }
+
+        .hero-sub {
+            font-size: clamp(17px, 2.2vw, 21px);
+            color: var(--gray);
+            max-width: 580px;
+            margin-bottom: 16px;
+            line-height: 1.55;
+        }
+
+        .price-badge {
+            display: inline-block;
+            background: rgba(10,132,255,0.12);
+            border: 1px solid rgba(10,132,255,0.25);
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 36px;
+        }
+
+        .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+        .btn-cta {
+            display: inline-block;
+            background: var(--cta);
+            color: #000;
+            padding: 16px 44px;
+            border-radius: 980px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-cta:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 32px rgba(48,209,88,0.28);
+        }
+
+        .hero-note { font-size: 14px; color: var(--gray); }
+
+        /* Math callout */
+        .math-strip {
+            background: rgba(48,209,88,0.07);
+            border: 1px solid rgba(48,209,88,0.18);
+            border-radius: 12px;
+            padding: 20px 28px;
+            max-width: 560px;
+            width: 100%;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .math-strip p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--gray);
+        }
+
+        .math-strip strong { color: var(--cta); }
+
+        /* Problem */
+        .problem-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .problem-inner {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 20px;
+        }
+
+        .problem-inner h2 {
+            font-size: clamp(26px, 4.5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+            margin-bottom: 48px;
+        }
+
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .pain-card {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(245,245,247,0.07);
+            border-radius: 14px;
+            padding: 28px;
+        }
+        .pain-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+        .pain-card p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Inside */
+        .inside-section { padding: 100px 24px; max-width: 980px; margin: 0 auto; }
+
+        .inside-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .inside-sub {
+            text-align: center;
+            color: var(--gray);
+            font-size: 18px;
+            margin-bottom: 56px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(245,245,247,0.07);
+            border-radius: 14px;
+            padding: 28px;
+            transition: border-color 0.3s;
+        }
+        .feature-card:hover { border-color: rgba(10,132,255,0.3); }
+
+        .feature-icon {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--blue);
+            margin-bottom: 12px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Who */
+        .who-section { padding: 100px 24px; max-width: 980px; margin: 0 auto; text-align: center; }
+
+        .who-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 48px;
+        }
+
+        .who-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .who-card { background: var(--secondary-bg); border-radius: 14px; padding: 28px; }
+        .who-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+        .who-card p { font-size: 15px; color: var(--gray); line-height: 1.5; }
+
+        /* Social Proof */
+        .proof-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .proof-inner { max-width: 980px; margin: 0 auto; text-align: center; }
+
+        .proof-inner h2 {
+            font-size: clamp(26px, 4.5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 48px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            text-align: left;
+        }
+
+        .testimonial {
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(245,245,247,0.08);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .testimonial blockquote {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--light);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .testimonial cite {
+            font-size: 14px;
+            color: var(--gray);
+            font-style: normal;
+            font-weight: 500;
+        }
+        .testimonial cite strong {
+            color: var(--light);
+            display: block;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        /* Price + Guarantee */
+        .price-section {
+            padding: 100px 24px;
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .price-section h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 16px;
+        }
+
+        .price-display {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--cta);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin: 24px 0 8px;
+        }
+
+        .price-desc {
+            font-size: 17px;
+            color: var(--gray);
+            margin-bottom: 36px;
+        }
+
+        .guarantee-box {
+            background: var(--secondary-bg);
+            border: 1px solid rgba(48,209,88,0.2);
+            border-radius: 16px;
+            padding: 28px 32px;
+            margin-bottom: 36px;
+            text-align: left;
+        }
+
+        .guarantee-box h3 { font-size: 17px; font-weight: 600; color: var(--cta); margin-bottom: 8px; }
+        .guarantee-box p { font-size: 15px; color: var(--gray); line-height: 1.55; }
+
+        /* Final CTA */
+        .final-section {
+            background: var(--secondary-bg);
+            padding: 100px 24px;
+        }
+
+        .final-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+
+        .final-inner h2 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            margin-bottom: 20px;
+        }
+
+        .final-inner p {
+            font-size: 19px;
+            color: var(--gray);
+            line-height: 1.55;
+            margin-bottom: 36px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--gray);
+            font-size: 13px;
+            border-top: 1px solid rgba(245,245,247,0.07);
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-logo">Behike</div>
+    <a href="#buy" class="nav-cta">Get the Guide &mdash; $4.99</a>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <span class="badge fade-up">Free to Host. Yours to Own.</span>
+    <h1 class="fade-up d1">Build a Free Product Store<br><span>Without Shopify</span></h1>
+    <p class="hero-sub fade-up d2">A self-hosted HTML store with Gumroad payments and GitHub Pages hosting. Sell digital products. Keep every margin. Zero monthly platform fees.</p>
+    <div class="math-strip fade-up d3">
+        <p>Shopify costs <strong>$468/year</strong> before you sell a single product. This setup costs <strong>$0/year</strong>. Every sale after setup goes to you, not the platform.</p>
+    </div>
+    <div class="price-badge fade-up d3">$4.99</div>
+    <div class="hero-actions fade-up d4">
+        <a href="https://behikeai.gumroad.com/l/self-hosted-store-guide" class="btn-cta">Get the Guide</a>
+        <p class="hero-note">Instant PDF download. No subscriptions.</p>
+    </div>
+</section>
+
+<!-- Problem -->
+<div class="problem-section">
+    <div class="problem-inner reveal">
+        <p class="section-label">The Problem</p>
+        <h2>Platforms take the margin. You do the work.</h2>
+        <div class="pain-grid">
+            <div class="pain-card">
+                <h3>Monthly fees before your first sale</h3>
+                <p>Shopify starts at $39/month. Squarespace at $16. Wix at $17. You are paying for infrastructure before you earn anything. A solo creator selling a $10 guide has already lost the first 40-plus sales to platform costs before year one ends.</p>
+            </div>
+            <div class="pain-card">
+                <h3>Platform lock-in with no exit</h3>
+                <p>Your store lives on someone else's servers. Change the pricing model, shut down the service, update the terms. You have no control over your own infrastructure. Self-hosting means your pages are HTML files on your own machine, owned completely.</p>
+            </div>
+            <div class="pain-card">
+                <h3>Template walls and design limits</h3>
+                <p>Free tiers hide the good features behind upgrades. Every pixel you want to customize is a pricing tier. A self-hosted store gives you full design control with no lock-in, no upgrade walls, and no one else's branding in your footer.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What's Inside -->
+<div class="inside-section reveal">
+    <h2>What's Inside</h2>
+    <p class="inside-sub">HTML, CSS, deployment options, and a settings widget. Everything you need to go live.</p>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">Foundation</div>
+            <h3>The full page structure</h3>
+            <p>Nav, hero, PAS section, value stack, FAQ, final CTA. The anatomy of a landing page that converts, with HTML and CSS for each section copied and explained.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">CSS System</div>
+            <h3>CSS variables design system</h3>
+            <p>Six root variables control the entire look. Change background, accent, and text colors in one place. Light mode to dark mode in six lines. The guide explains how to adapt it to any product.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">Payments</div>
+            <h3>Gumroad integration</h3>
+            <p>Why Gumroad instead of direct Stripe. How to connect your product link to the buy button. File delivery, refunds, and licensing, handled without building any backend.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">Hosting</div>
+            <h3>Three deployment paths</h3>
+            <p>GitHub Pages (10 minutes, free CDN), old laptop as home server with Caddy, and Cloudflare Tunnel for instant public access from your own machine. All three paths are covered step by step.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">Widget</div>
+            <h3>Settings widget with 8 themes</h3>
+            <p>A self-contained JavaScript widget with Midnight, Snow, Ocean, Sunset, Forest, Royal, Ember, and Candy themes. Four font sizes. Preferences saved to localStorage. Drop one script tag to enable it.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">Copy</div>
+            <h3>All code included</h3>
+            <p>Every HTML section, CSS rule, and JavaScript snippet is written out fully. No boilerplate, no external dependencies. Copy it, change the product name and link, and you have a working store page.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Who it's for -->
+<div class="who-section reveal">
+    <h2>Who This Is For</h2>
+    <div class="who-grid">
+        <div class="who-card">
+            <h3>Digital product creators</h3>
+            <p>Guides, templates, scripts, PDFs. If you are selling something that delivers via download, this is the cheapest, cleanest way to build the store page that sells it.</p>
+        </div>
+        <div class="who-card">
+            <h3>Solopreneurs watching margins</h3>
+            <p>You are at the stage where $468 a year matters. You want to start selling, not start paying. This setup is viable from your first product and scales without changing the stack.</p>
+        </div>
+        <div class="who-card">
+            <h3>Developers and builders</h3>
+            <p>You can write HTML and CSS, or learn the basics in a day. You want full control over every pixel without the overhead of a framework, a build tool, or a monthly subscription.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Social Proof -->
+<div class="proof-section">
+    <div class="proof-inner reveal">
+        <h2>From Readers</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial">
+                <blockquote>"I had been paying Squarespace $16 a month for eight months before I found this. I migrated everything to GitHub Pages in one afternoon. The guide makes the whole process simple."</blockquote>
+                <cite><strong>Damien R.</strong>Digital template creator</cite>
+            </div>
+            <div class="testimonial">
+                <blockquote>"The Cloudflare Tunnel section is the one I did not know I needed. I have an old laptop running in my home office now that serves my store 24/7. Zero hosting costs. It just works."</blockquote>
+                <cite><strong>Sofia L.</strong>Freelance designer, digital products</cite>
+            </div>
+            <div class="testimonial">
+                <blockquote>"The settings widget alone is worth the price. I added it to all five of my landing pages in an hour. The theme switching looks genuinely professional and visitors notice it."</blockquote>
+                <cite><strong>Ben O.</strong>Solopreneur, educational guides</cite>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Price + Guarantee -->
+<div class="price-section reveal" id="buy">
+    <p class="section-label">Pricing</p>
+    <h2>One purchase. Own your store forever.</h2>
+    <div class="price-display">$4.99</div>
+    <p class="price-desc">Instant PDF download. No subscription. No upsells.</p>
+    <div class="guarantee-box">
+        <h3>30-Day Guarantee</h3>
+        <p>If you follow the guide and do not have a working store page live at the end of it, send a message. Full refund, no questions asked. The risk is zero and the setup cost is less than one month of Shopify.</p>
+    </div>
+    <a href="https://behikeai.gumroad.com/l/self-hosted-store-guide" class="btn-cta">Get the Guide for $4.99</a>
+    <p class="hero-note" style="margin-top:14px;">Delivered immediately via Gumroad.</p>
+</div>
+
+<!-- Final CTA -->
+<div class="final-section">
+    <div class="final-inner reveal">
+        <h2>Own your store. Own your margins.</h2>
+        <p>Three hosting options. A complete HTML and CSS system. Gumroad payments. A settings widget. Everything you need to go from nothing to a live product store at zero monthly cost.</p>
+        <a href="https://behikeai.gumroad.com/l/self-hosted-store-guide" class="btn-cta">Get the Guide for $4.99</a>
+        <p class="hero-note" style="margin-top:14px;">Instant download. 30-day guarantee.</p>
+    </div>
+</div>
+
+<footer>
+    <p>Copyright 2026 Behike. All rights reserved.</p>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

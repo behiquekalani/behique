@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Faceless Creator Blueprint — Behike</title>
+  <meta name="description" content="How to build a content business that earns without showing your face, using your real name, or being on camera. $23.99." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #8E8E93;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a845;
+      --border: rgba(255,255,255,0.08);
+      --card-bg: #111111;
+      --max: 980px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Animations */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+
+    /* NAV */
+    nav {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    nav .logo {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    nav .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    nav .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      max-width: 780px;
+      margin: 0 auto 28px;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero .subhead {
+      font-size: 19px;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .hero-price strong {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-left: 6px;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-2px);
+    }
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTIONS */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(26px, 3.5vw, 38px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-intro {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 640px;
+      line-height: 1.65;
+      margin-bottom: 48px;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .problem-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+    }
+    .problem-card .number {
+      font-size: 40px;
+      font-weight: 800;
+      color: rgba(10, 132, 255, 0.2);
+      line-height: 1;
+      margin-bottom: 16px;
+      font-variant-numeric: tabular-nums;
+    }
+    .problem-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* MODELS GRID */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .model-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      transition: border-color 0.2s;
+    }
+    .model-card:hover { border-color: var(--accent); }
+    .model-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+    .model-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .model-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* CONTENTS */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .appendix-strip {
+      margin-top: 20px;
+      padding: 20px 24px;
+      background: rgba(10, 132, 255, 0.05);
+      border: 1px solid rgba(10, 132, 255, 0.15);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .appendix-strip strong { color: var(--text); }
+
+    /* TESTIMONIALS */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+    }
+    .stars {
+      color: #FFD60A;
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .testimonial-card blockquote {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-style: normal;
+    }
+    .testimonial-card cite {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: normal;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .testimonial-card cite::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #5e5ce6);
+      flex-shrink: 0;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .for-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .for-item .check {
+      color: var(--cta);
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .for-item p { font-size: 15px; line-height: 1.5; }
+
+    /* NOT FOR */
+    .not-for-list { margin-top: 32px; }
+    .not-for-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .not-for-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .not-for-item {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+    .not-for-item::before { content: "x  "; color: #FF453A; }
+
+    /* PRICING */
+    .pricing-box {
+      max-width: 480px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    .pricing-box .product-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .pricing-box .price {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .pricing-box .price-note {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 32px;
+    }
+    .pricing-features li {
+      font-size: 15px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pricing-features li:last-child { border-bottom: none; }
+    .pricing-features li::before {
+      content: "v";
+      color: var(--cta);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .pricing-box .btn-primary {
+      width: 100%;
+      text-align: center;
+      font-size: 17px;
+      padding: 18px 40px;
+    }
+    .guarantee {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+      border-bottom: none;
+    }
+    .final-cta h2 {
+      max-width: 620px;
+      margin: 0 auto 20px;
+    }
+    .final-cta p {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    footer .footer-brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    footer .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    footer .footer-links a {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    footer .footer-links a:hover { color: var(--text); }
+
+    @media (max-width: 600px) {
+      .hero { padding: 70px 0 60px; }
+      section { padding: 60px 0; }
+      .pricing-box { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Behike</a>
+  <a href="#pricing" class="nav-cta">Get the Blueprint</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-label fade-up">Digital Product</div>
+    <h1 class="fade-up delay-1">The most profitable content channels don't have a <span>face</span>. They have a system.</h1>
+    <p class="subhead fade-up delay-2">How to build a content business that earns without showing your face, using your real name, or being on camera.</p>
+    <p class="hero-price fade-up delay-3">One-time payment <strong>$23.99</strong></p>
+    <a href="#pricing" class="btn-primary fade-up delay-4">Get the Blueprint</a>
+    <p class="hero-note fade-up delay-4">Instant PDF download. 30-day guarantee.</p>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <p class="section-label fade-up">The ceiling</p>
+    <h2 class="fade-up">3 reasons personal brands hit a ceiling faceless channels do not</h2>
+    <p class="section-intro fade-up">Identity is overhead. When the business depends on a person being visible, it inherits all the constraints of that person's time, energy, and public image.</p>
+    <div class="problem-grid">
+      <div class="problem-card fade-up delay-1">
+        <div class="number">01</div>
+        <h3>Output scales with presence</h3>
+        <p>A personal brand requires the creator to show up. If you stop appearing, the audience atrophies. The content factory stalls the moment the person stalls.</p>
+      </div>
+      <div class="problem-card fade-up delay-2">
+        <div class="number">02</div>
+        <h3>The channel cannot be sold</h3>
+        <p>A channel built on a face belongs to that face. Buyers in the acquisition market do not want a personality. They want a system. Personal brands are nearly impossible to exit.</p>
+      </div>
+      <div class="problem-card fade-up delay-3">
+        <div class="number">03</div>
+        <h3>Every controversy is brand damage</h3>
+        <p>A single misstep, opinion shift, or personal change becomes a business problem. Faceless channels carry none of that. The topic does not have a bad day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 FACELESS MODELS -->
+<section>
+  <div class="container">
+    <p class="section-label fade-up">The architecture</p>
+    <h2 class="fade-up">The 4 faceless business types</h2>
+    <p class="section-intro fade-up">Each model has a different production overhead, monetization ceiling, and growth curve. The guide covers all four in full operational detail.</p>
+    <div class="models-grid">
+      <div class="model-card fade-up delay-1">
+        <div class="model-icon">&#127897;</div>
+        <h3>Voiceover Channels</h3>
+        <p>AI or human narration over stock footage, animations, or archival imagery. The voice is the identity. The face is never the product.</p>
+      </div>
+      <div class="model-card fade-up delay-2">
+        <div class="model-icon">&#128203;</div>
+        <h3>Compilation Channels</h3>
+        <p>Curated, aggregated, or ranked content with commentary. The editor's judgment is the value. No camera required.</p>
+      </div>
+      <div class="model-card fade-up delay-3">
+        <div class="model-icon">&#129302;</div>
+        <h3>AI Narration Channels</h3>
+        <p>Fully automated audio-visual production. Script, voice, and visuals all generated without a human appearing on screen or speaking.</p>
+      </div>
+      <div class="model-card fade-up delay-4">
+        <div class="model-icon">&#9997;</div>
+        <h3>Written-Only Channels</h3>
+        <p>Blogs, newsletters, and Pinterest operations that compound in search engines over time. No video. No voice. Pure written output.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section>
+  <div class="container">
+    <p class="section-label fade-up">What's inside</p>
+    <h2 class="fade-up">8 chapters. Everything is tactical.</h2>
+    <p class="section-intro fade-up">No philosophy without application. Every chapter ends with a specific action, a tool list, or a workflow you can run the same week.</p>
+    <div class="chapters-grid">
+      <div class="chapter-item fade-up delay-1">
+        <div class="chapter-num">1</div>
+        <div class="chapter-text">
+          <h4>The Faceless Model</h4>
+          <p>Why anonymity is a structural advantage in certain niches and how to identify them.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-2">
+        <div class="chapter-num">2</div>
+        <div class="chapter-text">
+          <h4>Niche and Format Selection</h4>
+          <p>The 3 criteria filter: search volume, monetization ceiling, low-competition entry points.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-1">
+        <div class="chapter-num">3</div>
+        <div class="chapter-text">
+          <h4>The YouTube Faceless System</h4>
+          <p>Channel setup, thumbnail design without a face, AI voiceover tools, batch recording workflow.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-2">
+        <div class="chapter-num">4</div>
+        <div class="chapter-text">
+          <h4>Blog and Pinterest Machine</h4>
+          <p>AI-assisted blogging, Pinterest as a traffic driver, and the affiliate income layer.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-1">
+        <div class="chapter-num">5</div>
+        <div class="chapter-text">
+          <h4>TikTok and Instagram</h4>
+          <p>Text-over-video, screen recordings, B-roll strategy, and voiceover tools for short-form.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-2">
+        <div class="chapter-num">6</div>
+        <div class="chapter-text">
+          <h4>Monetization Stacks</h4>
+          <p>AdSense timelines, affiliate integration, digital product selling, sponsorship outreach.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-1">
+        <div class="chapter-num">7</div>
+        <div class="chapter-text">
+          <h4>The Automation Layer</h4>
+          <p>Scheduling tools, outsourcing low-skill tasks, the content factory that runs without you.</p>
+        </div>
+      </div>
+      <div class="chapter-item fade-up delay-2">
+        <div class="chapter-num">8</div>
+        <div class="chapter-text">
+          <h4>Scaling and Selling</h4>
+          <p>Multiple faceless channels, the acquisition market, and how to build toward an exit.</p>
+        </div>
+      </div>
+    </div>
+    <div class="appendix-strip fade-up">
+      <strong>Appendix included:</strong> AI voiceover tool comparison table with 7 tools rated by use case. Faceless thumbnail design guide with the four-element framework. 30-day batch content calendar with daily actions.
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section>
+  <div class="container">
+    <p class="section-label fade-up">What readers say</p>
+    <h2 class="fade-up">From people who built before reading this</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-up delay-1">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"I had been posting to YouTube for 8 months showing my face and barely hitting 200 subs. Switched to voiceover format in a finance sub-niche after reading Chapter 2. Hit 1,100 subs in the next 90 days. The niche filter alone is worth more than the price."</blockquote>
+        <cite>Marcus T., finance channel operator, Texas</cite>
+      </div>
+      <div class="testimonial-card fade-up delay-2">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"The batch production workflow in Chapter 3 is the only reason my channel stayed consistent after I went back to a full-time job. I produce everything on Sundays now. Five videos a week, all scheduled. The system does not care whether I am tired."</blockquote>
+        <cite>Priya N., history channel creator, UK</cite>
+      </div>
+      <div class="testimonial-card fade-up delay-3">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <blockquote>"Chapter 8 on selling changed how I think about this entire business. I stopped building channels and started building assets. The difference in how you operate is significant. I have two channels under offer right now."</blockquote>
+        <cite>Derek F., content portfolio operator, Canada</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section>
+  <div class="container">
+    <p class="section-label fade-up">Fit check</p>
+    <h2 class="fade-up">Who this is for</h2>
+    <div class="for-list">
+      <div class="for-item fade-up delay-1">
+        <span class="check">&#10003;</span>
+        <p>Creators who want to build a content business without putting their identity on the line</p>
+      </div>
+      <div class="for-item fade-up delay-2">
+        <span class="check">&#10003;</span>
+        <p>People who have tried personal brand content and hit the ceiling of their own time and energy</p>
+      </div>
+      <div class="for-item fade-up delay-1">
+        <span class="check">&#10003;</span>
+        <p>Builders who want to create a system that generates income without requiring their constant presence</p>
+      </div>
+      <div class="for-item fade-up delay-2">
+        <span class="check">&#10003;</span>
+        <p>Anyone who wants to own multiple income-generating content channels and eventually sell them</p>
+      </div>
+      <div class="for-item fade-up delay-1">
+        <span class="check">&#10003;</span>
+        <p>Beginners with zero existing audience who want the most efficient starting path into content monetization</p>
+      </div>
+      <div class="for-item fade-up delay-2">
+        <span class="check">&#10003;</span>
+        <p>Operators who already have one channel and want to build a portfolio without tripling their workload</p>
+      </div>
+    </div>
+    <div class="not-for-list fade-up">
+      <p class="not-for-label">This is not for</p>
+      <div class="not-for-items">
+        <span class="not-for-item">People looking for overnight income with no work</span>
+        <span class="not-for-item">Those who already have a strong personal brand they want to keep</span>
+        <span class="not-for-item">Anyone unwilling to produce content consistently for 90 days</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <p class="section-label fade-up" style="text-align:center;">Get the blueprint</p>
+    <h2 class="fade-up" style="text-align:center; max-width:480px; margin: 0 auto 48px;">One price. Instant access. No subscription.</h2>
+    <div class="pricing-box fade-up">
+      <p class="product-name">The Faceless Creator Blueprint</p>
+      <p class="price">$23.99</p>
+      <p class="price-note">One-time. Instant PDF download.</p>
+      <ul class="pricing-features">
+        <li>Complete 8-chapter guide (5,200+ words)</li>
+        <li>AI voiceover tool comparison (7 tools)</li>
+        <li>Faceless thumbnail design framework</li>
+        <li>30-day batch content calendar</li>
+        <li>3-channel portfolio income model</li>
+        <li>Outsourcing and automation layer breakdown</li>
+        <li>Acquisition market and exit strategy guide</li>
+      </ul>
+      <a href="#" class="btn-primary">Get Instant Access — $23.99</a>
+      <p class="guarantee">30-day money-back guarantee. No questions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2 class="fade-up">The face is optional. The system is not.</h2>
+    <p class="fade-up delay-1">Every week you spend building an identity-dependent channel is a week of compounding you are not doing in a system that runs without you.</p>
+    <a href="#pricing" class="btn-primary fade-up delay-2">Get the Blueprint</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">Behike</span>
+  <div class="footer-links">
+    <a href="privacy.html">Privacy</a>
+    <a href="terms.html">Terms</a>
+    <a href="refund.html">Refund Policy</a>
+    <a href="index.html">Store</a>
+  </div>
+</footer>
+
+<script>
+  // IntersectionObserver for fade-up animations
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

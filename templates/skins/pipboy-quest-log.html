@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUEST LOG — Ceiba Navigator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --panel: #13161d;
+  --panel-hover: #1a1e28;
+  --border: #1e2330;
+  --border-bright: #2a3040;
+  --green: #00ff6a;
+  --green-dim: rgba(0,255,106,0.15);
+  --green-glow: rgba(0,255,106,0.6);
+  --gold: #ffd700;
+  --gold-dim: rgba(255,215,0,0.12);
+  --gold-glow: rgba(255,215,0,0.5);
+  --amber: #ff9f1c;
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0,229,255,0.1);
+  --cyan-glow: rgba(0,229,255,0.4);
+  --red: #ff3b3b;
+  --gray: #4a5060;
+  --text: #d0d4dc;
+  --text-dim: #6a7080;
+  --heading: 'Press Start 2P', monospace;
+  --body: 'VT323', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 1.4rem;
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ===== LAYOUT ===== */
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 2px solid var(--border);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Player Card */
+.player-card {
+  border: 2px solid var(--cyan);
+  background: linear-gradient(135deg, rgba(0,229,255,0.05), transparent);
+  padding: 20px;
+  position: relative;
+}
+
+.player-card::before {
+  content: 'PLAYER';
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: var(--heading);
+  font-size: 9px;
+  color: var(--cyan);
+  letter-spacing: 2px;
+}
+
+.player-name {
+  font-family: var(--heading);
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.player-title {
+  color: var(--cyan);
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.player-level {
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  margin-bottom: 14px;
+}
+
+.player-level span {
+  color: var(--gold);
+  font-family: var(--heading);
+  font-size: 12px;
+}
+
+/* XP Bar */
+.xp-bar-container {
+  position: relative;
+  height: 30px;
+  background: #0a0c10;
+  border: 2px solid var(--border-bright);
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #006644, var(--green));
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3), 0 0 12px var(--green-glow);
+  transition: width 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.xp-bar-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading);
+  font-size: 10px;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  z-index: 2;
+}
+
+/* Stats Panel */
+.stats-panel {
+  border: 2px solid var(--border);
+  padding: 16px;
+  position: relative;
+}
+
+.stats-panel::before {
+  content: 'STATS';
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: var(--heading);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-row:last-child { border-bottom: none; }
+
+.stat-label { color: var(--text-dim); }
+
+.stat-value {
+  color: #fff;
+  font-weight: bold;
+}
+
+.stat-value.gold { color: var(--gold); }
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+
+/* Legend */
+.legend {
+  border: 2px solid var(--border);
+  padding: 16px;
+  position: relative;
+}
+
+.legend::before {
+  content: 'LEGEND';
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  background: var(--panel);
+  padding: 0 8px;
+  font-family: var(--heading);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 1.2rem;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.active-dot { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+.legend-dot.locked-dot { background: var(--gray); }
+.legend-dot.completed-dot { background: var(--gold); box-shadow: 0 0 6px var(--gold-glow); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  padding: 30px 36px;
+  max-width: 900px;
+}
+
+/* Header */
+.quest-log-header {
+  font-family: var(--heading);
+  font-size: 22px;
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(0,229,255,0.2);
+  margin-bottom: 8px;
+  letter-spacing: 3px;
+}
+
+.quest-log-sub {
+  color: var(--text-dim);
+  font-size: 1.3rem;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Quest Tabs */
+.quest-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.quest-tab {
+  font-family: var(--heading);
+  font-size: 9px;
+  padding: 8px 16px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--text-dim);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.quest-tab:hover {
+  border-color: var(--border-bright);
+  color: var(--text);
+}
+
+.quest-tab.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan-dim);
+}
+
+/* Export Button */
+.export-btn {
+  font-family: var(--heading);
+  font-size: 8px;
+  padding: 8px 14px;
+  background: var(--panel);
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  cursor: pointer;
+  letter-spacing: 1px;
+  margin-left: auto;
+  transition: all 0.2s;
+}
+
+.export-btn:hover {
+  box-shadow: 0 0 12px var(--gold-dim);
+  background: var(--gold-dim);
+}
+
+/* Quest Sections */
+.quest-section-title {
+  font-family: var(--heading);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  margin: 28px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quest-section-title:first-child {
+  margin-top: 0;
+}
+
+.quest-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Quest Card */
+.quest-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.quest-card:hover {
+  border-color: var(--border-bright);
+  background: var(--panel-hover);
+}
+
+.quest-card.active-card:hover {
+  border-color: var(--green);
+  box-shadow: 0 0 20px var(--green-dim);
+}
+
+.quest-card.locked-card {
+  opacity: 0.5;
+}
+
+.quest-card.locked-card:hover {
+  opacity: 0.7;
+}
+
+/* Quest Header */
+.quest-header {
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.quest-header-left {
+  flex: 1;
+}
+
+.quest-type-label {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.quest-name {
+  font-family: var(--heading);
+  font-size: 13px;
+  color: #fff;
+  line-height: 1.8;
+}
+
+.quest-reward {
+  font-size: 1.2rem;
+  color: var(--amber);
+  margin-top: 4px;
+}
+
+.quest-reward::before {
+  content: '> ';
+  color: var(--text-dim);
+}
+
+/* Badges */
+.badge {
+  font-family: var(--heading);
+  font-size: 8px;
+  padding: 5px 10px;
+  letter-spacing: 1px;
+  border: 1px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.badge-active {
+  color: var(--green);
+  border-color: var(--green);
+  background: var(--green-dim);
+  animation: badge-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--green-dim);
+  }
+  50% {
+    box-shadow: 0 0 16px var(--green-glow), 0 0 30px var(--green-dim);
+  }
+}
+
+.badge-locked {
+  color: var(--gray);
+  border-color: var(--gray);
+  background: rgba(74,80,96,0.1);
+}
+
+.badge-completed {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+/* Progress Bar */
+.quest-progress-bar {
+  height: 6px;
+  background: #0a0c10;
+}
+
+.quest-progress-fill {
+  height: 100%;
+  width: 0;
+  transition: width 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.active-card .quest-progress-fill {
+  background: linear-gradient(90deg, #004d2a, var(--green));
+  box-shadow: 0 0 8px var(--green-glow);
+}
+
+.locked-card .quest-progress-fill {
+  background: var(--gray);
+}
+
+/* Objectives */
+.quest-objectives {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: rgba(0,0,0,0.2);
+}
+
+.quest-objectives.open {
+  max-height: 600px;
+}
+
+.quest-objectives-inner {
+  padding: 14px 20px 18px;
+}
+
+.objective {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.objective-check {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.objective.done .objective-check {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.objective.done .objective-check::after {
+  content: '✓';
+}
+
+.objective-text {
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+.objective.done .objective-text {
+  text-decoration: line-through;
+  color: var(--text-dim);
+  opacity: 0.6;
+}
+
+.objective.pending .objective-text {
+  color: var(--text);
+}
+
+.quest-progress-label {
+  padding: 0 20px;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  text-align: right;
+  padding-bottom: 2px;
+}
+
+/* Expand indicator */
+.expand-icon {
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+
+.quest-card.expanded .expand-icon {
+  transform: rotate(90deg);
+}
+
+/* ===== COMPLETED QUESTS ===== */
+.completed-section {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 2px solid var(--gold);
+}
+
+.completed-header {
+  font-family: var(--heading);
+  font-size: 13px;
+  color: var(--gold);
+  text-shadow: 0 0 12px var(--gold-glow);
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.completed-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.completed-card {
+  border: 1px solid rgba(255,215,0,0.3);
+  background: linear-gradient(135deg, var(--gold-dim), transparent);
+  padding: 14px 16px;
+}
+
+.completed-card-name {
+  font-family: var(--heading);
+  font-size: 9px;
+  color: var(--gold);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.completed-card-reward {
+  font-size: 1.2rem;
+  color: var(--text-dim);
+}
+
+.completed-card-reward::before {
+  content: '✦ ';
+  color: var(--gold);
+}
+
+/* Footer */
+.footer {
+  margin-top: 48px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+.footer span {
+  color: var(--cyan);
+}
+
+.footer-timestamp {
+  margin-top: 6px;
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    position: static;
+    height: auto;
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+    padding: 20px 16px;
+  }
+
+  .main {
+    padding: 20px 16px;
+  }
+
+  .completed-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-log-header {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 500px) {
+  .quest-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .badge {
+    align-self: flex-start;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="player-card">
+      <div class="player-name" id="playerName"></div>
+      <div class="player-title" id="playerTitle"></div>
+      <div class="player-level" id="playerLevel"></div>
+      <div class="xp-bar-container">
+        <div class="xp-bar-fill" id="xpFill"></div>
+        <div class="xp-bar-text" id="xpText"></div>
+      </div>
+    </div>
+
+    <div class="stats-panel" id="statsPanel"></div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot active-dot"></div> Active Quest</div>
+      <div class="legend-item"><div class="legend-dot locked-dot"></div> Locked Quest</div>
+      <div class="legend-item"><div class="legend-dot completed-dot"></div> Completed</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <h1 class="quest-log-header">QUEST LOG</h1>
+    <p class="quest-log-sub">Track active missions, objectives, and progress toward $100K.</p>
+
+    <div class="quest-tabs">
+      <button class="quest-tab active" data-filter="all">ALL</button>
+      <button class="quest-tab" data-filter="MAIN QUEST">MAIN</button>
+      <button class="quest-tab" data-filter="SIDE QUEST">SIDE</button>
+      <button class="quest-tab" data-filter="FUTURE QUEST">FUTURE</button>
+      <button class="export-btn" id="exportBtn">EXPORT JSON</button>
+    </div>
+
+    <div id="questContainer"></div>
+
+    <div class="completed-section">
+      <h2 class="completed-header">COMPLETED QUESTS</h2>
+      <div class="completed-grid" id="completedGrid"></div>
+    </div>
+
+    <div class="footer">
+      <span>Behique Systems</span> — Ceiba Navigator v1
+      <div class="footer-timestamp">Last updated: 2026-03-16</div>
+    </div>
+  </main>
+
+</div>
+
+<script>
+const DATA = {
+  player: {
+    name: "Kalani",
+    title: "Behique",
+    level: 3,
+    xp: 340,
+    xp_next_level: 500
+  },
+  quests: [
+    {
+      name: "eBay Empire",
+      type: "MAIN QUEST",
+      status: "active",
+      objectives: [
+        { text: "Build listing agent V1", done: true },
+        { text: "List Goodfellas Funko Pops (3 sets)", done: false },
+        { text: "List Hello Kitty cups", done: false },
+        { text: "First sale on eBay", done: false },
+        { text: "Get eBay API keys", done: true },
+        { text: "Build V2 auto-publisher", done: false },
+        { text: "10 listings live", done: false }
+      ],
+      reward: "Revenue stream unlocked"
+    },
+    {
+      name: "The Bridge",
+      type: "MAIN QUEST",
+      status: "active",
+      objectives: [
+        { text: "Set up Comp2 (Cobo) as AI worker", done: true },
+        { text: "Build bridge server", done: true },
+        { text: "Wire Syncthing between machines", done: true },
+        { text: "Build wake.sh/sleep.sh power button", done: false },
+        { text: "Product research engine scoring with real data", done: false }
+      ],
+      reward: "AI cluster online"
+    },
+    {
+      name: "BehiqueBot",
+      type: "SIDE QUEST",
+      status: "active",
+      objectives: [
+        { text: "Deploy bot on Railway", done: true },
+        { text: "Telegram input + classification", done: true },
+        { text: "Notion persistence", done: true },
+        { text: "Ollama-first classification", done: true },
+        { text: "Memory system", done: false },
+        { text: "Claude-powered check-ins", done: false }
+      ],
+      reward: "Accountability AI active"
+    },
+    {
+      name: "The Vault",
+      type: "SIDE QUEST",
+      status: "active",
+      objectives: [
+        { text: "Obsidian vault with wiki links", done: true },
+        { text: "Vault graph scanner", done: true },
+        { text: "vis.js dashboard", done: true },
+        { text: "Graph query layer", done: false },
+        { text: "Session auto-generator", done: false },
+        { text: "Create 35 ghost node files", done: false }
+      ],
+      reward: "Knowledge graph complete"
+    },
+    {
+      name: "Shopify Storefront",
+      type: "FUTURE QUEST",
+      status: "locked",
+      objectives: [
+        { text: "Store exists + logo done", done: true },
+        { text: "Feed eBay winners to Shopify", done: false },
+        { text: "First Shopify sale", done: false }
+      ],
+      reward: "Second revenue channel"
+    },
+    {
+      name: "n8n Agency",
+      type: "FUTURE QUEST",
+      status: "locked",
+      objectives: [
+        { text: "eBay pipeline proven", done: false },
+        { text: "First client outreach", done: false },
+        { text: "First paying client", done: false }
+      ],
+      reward: "Service business launched"
+    }
+  ],
+  completedQuests: [
+    { name: "Ceiba Memory Stack", type: "COMPLETED", reward: "Persistent AI memory" },
+    { name: "Product Research Engine V1", type: "COMPLETED", reward: "61 products scored" },
+    { name: "Trends Scraper", type: "COMPLETED", reward: "35 categories tracked" },
+    { name: "OpenClaw Migration", type: "COMPLETED", reward: "3 bots, 5 skills deployed" }
+  ],
+  stats: {
+    quests_completed: 4,
+    quests_active: 4,
+    tools_built: 12,
+    days_active: 14,
+    revenue: "$0 (first sale incoming)"
+  }
+};
+
+// ===== AUTO-PROGRESS =====
+function calcProgress(quest) {
+  const total = quest.objectives.length;
+  if (total === 0) return 0;
+  const done = quest.objectives.filter(o => o.done).length;
+  return Math.round((done / total) * 100);
+}
+
+// ===== JSON IMPORT =====
+async function loadExternalData() {
+  try {
+    const res = await fetch('quests.json');
+    if (!res.ok) throw new Error('No external JSON');
+    return await res.json();
+  } catch {
+    return null; // fallback to built-in DATA
+  }
+}
+
+// ===== JSON EXPORT =====
+function exportJSON() {
+  const exportData = JSON.parse(JSON.stringify(DATA));
+  // Add computed progress to export for readability
+  exportData.quests.forEach(q => {
+    q.progress = calcProgress(q);
+  });
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'quests.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== RENDER PLAYER =====
+function renderPlayer() {
+  const p = DATA.player;
+  document.getElementById('playerName').textContent = p.name;
+  document.getElementById('playerTitle').textContent = p.title;
+  document.getElementById('playerLevel').innerHTML = `Level <span>${p.level}</span>`;
+  document.getElementById('xpText').textContent = `${p.xp} / ${p.xp_next_level} XP`;
+}
+
+// ===== RENDER STATS =====
+function renderStats() {
+  const panel = document.getElementById('statsPanel');
+  panel.innerHTML = '';
+  const labels = {
+    quests_completed: 'Quests Done',
+    quests_active: 'Active Quests',
+    tools_built: 'Tools Built',
+    days_active: 'Days Active',
+    revenue: 'Revenue'
+  };
+  const colors = {
+    quests_completed: 'gold',
+    quests_active: 'green',
+    revenue: 'red'
+  };
+  for (const [key, val] of Object.entries(DATA.stats)) {
+    const row = document.createElement('div');
+    row.className = 'stat-row';
+    const colorClass = colors[key] || '';
+    row.innerHTML = `
+      <span class="stat-label">${labels[key] || key}</span>
+      <span class="stat-value ${colorClass}">${val}</span>
+    `;
+    panel.appendChild(row);
+  }
+}
+
+// ===== RENDER QUESTS =====
+let currentFilter = 'all';
+
+function renderQuests(filter) {
+  currentFilter = filter || currentFilter;
+  const container = document.getElementById('questContainer');
+  container.innerHTML = '';
+
+  const groups = {
+    'MAIN QUEST': [],
+    'SIDE QUEST': [],
+    'FUTURE QUEST': []
+  };
+
+  DATA.quests.forEach(q => {
+    if (groups[q.type]) groups[q.type].push(q);
+  });
+
+  const sectionLabels = {
+    'MAIN QUEST': 'MAIN QUESTS',
+    'SIDE QUEST': 'SIDE QUESTS',
+    'FUTURE QUEST': 'FUTURE QUESTS'
+  };
+
+  for (const [type, quests] of Object.entries(groups)) {
+    if (quests.length === 0) continue;
+    if (currentFilter !== 'all' && currentFilter !== type) continue;
+
+    const sectionTitle = document.createElement('div');
+    sectionTitle.className = 'quest-section-title';
+    sectionTitle.textContent = sectionLabels[type];
+    container.appendChild(sectionTitle);
+
+    quests.forEach(q => {
+      const progress = calcProgress(q);
+      const card = document.createElement('div');
+      const statusClass = q.status === 'active' ? 'active-card' : q.status === 'locked' ? 'locked-card' : '';
+      card.className = `quest-card ${statusClass}`;
+
+      const badgeClass = q.status === 'active' ? 'badge-active' : q.status === 'locked' ? 'badge-locked' : 'badge-completed';
+
+      card.innerHTML = `
+        <div class="quest-header">
+          <div class="quest-header-left">
+            <div class="quest-type-label">${q.type}</div>
+            <div class="quest-name">${q.name}</div>
+            <div class="quest-reward">${q.reward}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <div class="badge ${badgeClass}">${q.status.toUpperCase()}</div>
+            <div class="expand-icon">▶</div>
+          </div>
+        </div>
+        <div class="quest-progress-label">${progress}%</div>
+        <div class="quest-progress-bar">
+          <div class="quest-progress-fill" data-progress="${progress}"></div>
+        </div>
+        <div class="quest-objectives">
+          <div class="quest-objectives-inner">
+            ${q.objectives.map(o => `
+              <div class="objective ${o.done ? 'done' : 'pending'}">
+                <div class="objective-check"></div>
+                <div class="objective-text">${o.text}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      const header = card.querySelector('.quest-header');
+      const objectives = card.querySelector('.quest-objectives');
+
+      header.addEventListener('click', () => {
+        card.classList.toggle('expanded');
+        objectives.classList.toggle('open');
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  // Animate after render
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.quest-progress-fill').forEach(bar => {
+      bar.style.width = bar.dataset.progress + '%';
+    });
+  });
+}
+
+// ===== RENDER COMPLETED =====
+function renderCompleted() {
+  const grid = document.getElementById('completedGrid');
+  grid.innerHTML = '';
+  DATA.completedQuests.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'completed-card';
+    card.innerHTML = `
+      <div class="completed-card-name">${q.name}</div>
+      <div class="completed-card-reward">${q.reward}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ===== ANIMATE XP =====
+function animateXP() {
+  const pct = (DATA.player.xp / DATA.player.xp_next_level) * 100;
+  document.getElementById('xpFill').style.width = pct + '%';
+}
+
+// ===== TAB HANDLERS =====
+document.querySelectorAll('.quest-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.quest-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderQuests(tab.dataset.filter);
+  });
+});
+
+// ===== EXPORT HANDLER =====
+document.getElementById('exportBtn').addEventListener('click', exportJSON);
+
+// ===== INIT =====
+async function init() {
+  const external = await loadExternalData();
+  if (external) {
+    Object.assign(DATA, external);
+  }
+
+  renderPlayer();
+  renderStats();
+  renderQuests('all');
+  renderCompleted();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(animateXP);
+  });
+}
+
+init();
+</script>
+
+</body>
+</html>

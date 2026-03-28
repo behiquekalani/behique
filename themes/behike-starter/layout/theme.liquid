@@ -1,0 +1,113 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}" dir="{{ settings.text_direction | default: 'ltr' }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0">
+  <meta name="theme-color" content="{{ settings.colors_accent }}">
+  <meta name="robots" content="noai, noimageai">
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  {%- endif -%}
+
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  {% render 'meta-tags' %}
+
+  <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+
+  {{ content_for_header }}
+
+  {%- liquid
+    assign body_font = settings.type_body_font
+    assign heading_font = settings.type_header_font
+  -%}
+
+  {% style %}
+    {{ body_font | font_face: font_display: 'swap' }}
+    {{ heading_font | font_face: font_display: 'swap' }}
+
+    :root {
+      --font-body-family: {{ body_font.family }}, {{ body_font.fallback_families }};
+      --font-body-style: {{ body_font.style }};
+      --font-body-weight: {{ body_font.weight }};
+      --font-heading-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
+      --font-heading-style: {{ heading_font.style }};
+      --font-heading-weight: {{ heading_font.weight }};
+
+      --color-accent: {{ settings.colors_accent }};
+      --color-accent-rgb: {{ settings.colors_accent | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+      --color-background: {{ settings.colors_background }};
+      --color-background-rgb: {{ settings.colors_background | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+      --color-foreground: {{ settings.colors_text }};
+      --color-foreground-rgb: {{ settings.colors_text | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+      --color-secondary-background: {{ settings.colors_secondary_background }};
+
+      --page-width: {{ settings.page_width | default: 1200 }}px;
+      --border-radius-button: {{ settings.border_radius_button | default: 8 }}px;
+      --border-radius-card: {{ settings.border_radius_card | default: 12 }}px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 62.5%;
+    }
+
+    body {
+      font-size: 1.6rem;
+      font-family: var(--font-body-family);
+      font-style: var(--font-body-style);
+      font-weight: var(--font-body-weight);
+      color: var(--color-foreground);
+      background-color: var(--color-background);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: var(--font-heading-family);
+      font-style: var(--font-heading-style);
+      font-weight: var(--font-heading-weight);
+      line-height: 1.2;
+    }
+  {% endstyle %}
+
+  {{ 'behike-starter.css' | asset_url | stylesheet_tag }}
+</head>
+
+<body class="template-{{ template.name }}">
+  <a class="skip-to-content-link visually-hidden" href="#MainContent">
+    {{ "accessibility.skip_to_text" | t }}
+  </a>
+
+  {% sections 'header-group' %}
+
+  <main id="MainContent" class="content-for-layout" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+
+  {% sections 'footer-group' %}
+
+  <script>
+    document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+  </script>
+
+  <!-- (c) 2026 Behike - Starter Theme -->
+</body>
+</html>

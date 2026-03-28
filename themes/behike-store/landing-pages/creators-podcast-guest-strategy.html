@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Creator's Podcast Guest Strategy — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #A1A1A6;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25a348;
+      --border: #1D1D1F;
+      --surface: #0A0A0A;
+      --surface-2: #111111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .nav-price {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+
+    /* HERO */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 780px;
+      margin-bottom: 28px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+    .cta-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-cta {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-cta:hover { background: var(--cta-hover); }
+    .price-note {
+      font-size: 15px;
+      color: var(--text-muted);
+    }
+    .price-note strong {
+      color: var(--text);
+      font-size: 22px;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      padding: 40px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .stat {
+      background: var(--surface);
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* SECTION */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: clamp(26px, 4vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    p {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      max-width: 680px;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    /* WHAT YOU GET */
+    .what-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-top: 40px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .what-item {
+      background: var(--surface);
+      padding: 32px;
+    }
+    .what-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .what-item h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .what-item p {
+      font-size: 15px;
+      margin: 0;
+    }
+
+    /* SECTION PREVIEWS */
+    .preview-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .preview-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .preview-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      padding-top: 3px;
+      letter-spacing: 0.05em;
+    }
+    .preview-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .preview-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* THESIS PULL QUOTE */
+    .pull-quote {
+      background: var(--surface-2);
+      border-left: 3px solid var(--accent);
+      padding: 32px 40px;
+      border-radius: 0 12px 12px 0;
+      margin: 40px 0;
+    }
+    .pull-quote p {
+      font-size: 22px;
+      line-height: 1.45;
+      color: var(--text);
+      max-width: none;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 64px 48px;
+      text-align: center;
+      margin: 80px 0;
+    }
+    .cta-section h2 {
+      max-width: 560px;
+      margin: 0 auto 16px;
+    }
+    .cta-section p {
+      max-width: 480px;
+      margin: 0 auto 40px;
+      color: var(--text-muted);
+    }
+    .cta-price {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      color: var(--text);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .cta-format {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      display: block;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: none;
+      margin: 0;
+    }
+
+    @media (max-width: 640px) {
+      .what-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .preview-item { grid-template-columns: 1fr; }
+      .preview-num { padding-top: 0; }
+      .cta-section { padding: 40px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a class="nav-brand" href="#">Behike</a>
+      <span class="nav-price">Digital Guide — $18.99</span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="container">
+      <span class="hero-label">Creator Strategy</span>
+      <h1>Podcast guesting is the most <em>underrated</em> growth channel for creators.</h1>
+      <p class="hero-sub">A complete system for getting booked on the right shows, delivering talks people remember, and converting listeners into followers, subscribers, and clients.</p>
+      <div class="cta-group">
+        <a href="#buy" class="btn-cta">Get the guide — $18.99</a>
+        <span class="price-note">PDF + instant download</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-number">9</span>
+          <span class="stat-label">complete sections</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">~2,500</span>
+          <span class="stat-label">words of dense strategy</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">50+</span>
+          <span class="stat-label">appearances per year potential</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THESIS -->
+  <section>
+    <div class="container">
+      <p class="section-label">The Core Argument</p>
+      <h2>You are optimizing for reach. The channel you are ignoring builds trust.</h2>
+      <div class="pull-quote">
+        <p>When a host invites you on their podcast, they are extending their audience's trust to you by association. A listener who finishes a 60-minute episode with you already feels like they know you. That feeling converts in ways that algorithmic reach never does.</p>
+      </div>
+      <p>Most creators spend their energy chasing followers. They optimize thumbnails, study the algorithm, and post daily. A smaller group is doing something quieter: appearing on podcasts. One well-executed guest appearance puts you in front of a focused, trust-primed audience. It generates a piece of permanent content that will generate new listeners for years. And it builds a compounding book of social proof that opens bigger and bigger opportunities.</p>
+      <p>This guide is not a collection of tips. It is a system. One you can run weekly, that improves with each iteration, and that eventually runs itself.</p>
+    </div>
+  </section>
+
+  <!-- WHAT YOU GET -->
+  <section>
+    <div class="container">
+      <p class="section-label">What You Get</p>
+      <h2>A complete operating system for podcast guesting.</h2>
+      <div class="what-grid">
+        <div class="what-item">
+          <span class="what-icon">&#9654;</span>
+          <h3>Show Selection Framework</h3>
+          <p>Four criteria for evaluating any podcast before you pitch. Audience alignment beats audience size every time.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128231;</span>
+          <h3>Pitch Email Formula</h3>
+          <p>A proven structure that gets responses from busy hosts. Line-by-line breakdown with the subject line approach that works.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128163;</span>
+          <h3>The 3 Talking Points Method</h3>
+          <p>How to prepare for every interview so you land specific, memorable insights rather than a vague pleasant hour.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128202;</span>
+          <h3>Post-Episode Promotion System</h3>
+          <p>The 72-hour promotion window, content extraction from a single recording, and how to compound reach with no extra effort.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128187;</span>
+          <h3>Email Subscriber Conversion</h3>
+          <p>A dedicated landing page framework for podcast traffic, the right lead magnet type, and how to match your page to each show.</p>
+        </div>
+        <div class="what-item">
+          <span class="what-icon">&#128640;</span>
+          <h3>The Weekly Guest System</h3>
+          <p>A two-hour weekly cadence that produces 50 to 100 appearances per year. Pipeline tracking, pitch iteration, and tier progression.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION PREVIEWS -->
+  <section>
+    <div class="container">
+      <p class="section-label">Section Previews</p>
+      <h2>Nine sections. Each one moves the system forward.</h2>
+      <div class="preview-list">
+        <div class="preview-item">
+          <span class="preview-num">01</span>
+          <div>
+            <div class="preview-title">Why Podcast Guesting Actually Works</div>
+            <p class="preview-desc">The three structural reasons podcast guesting converts better than social media. Starts with borrowed trust and permanence.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">02</span>
+          <div>
+            <div class="preview-title">Identifying the Right Shows</div>
+            <p class="preview-desc">Four evaluation criteria, how to find 30 to 50 target shows at scale, and a tiered pitching approach that builds social proof progressively.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">03</span>
+          <div>
+            <div class="preview-title">The Pitch Email That Gets Responses</div>
+            <p class="preview-desc">Line-by-line structure of a pitch that works. Why most pitches fail and what the three failure modes are. Subject line approach included.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">04</span>
+          <div>
+            <div class="preview-title">The 3 Talking Points Method</div>
+            <p class="preview-desc">What a talking point is versus a topic. How to prepare counterintuitive framings, case studies, and practical takeaways for each one.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">05</span>
+          <div>
+            <div class="preview-title">Insights That Make Listeners Follow You</div>
+            <p class="preview-desc">The difference between information and insight. The one-liner technique. The call to action that does not feel like a call to action.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">06</span>
+          <div>
+            <div class="preview-title">Post-Episode Promotion Strategy</div>
+            <p class="preview-desc">The 72-hour window. How to extract five to eight pieces of content from one recording. The host follow-up note that sustains the relationship.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">07</span>
+          <div>
+            <div class="preview-title">Converting Listeners to Email Subscribers</div>
+            <p class="preview-desc">Dedicated landing page framework for podcast traffic, the lead magnet type that converts podcast listeners specifically, and show-specific personalization.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">08</span>
+          <div>
+            <div class="preview-title">Building a Guest Appearance System</div>
+            <p class="preview-desc">The two-hour weekly cadence. Pipeline tracking structure. How to iterate your pitch based on response rate data.</p>
+          </div>
+        </div>
+        <div class="preview-item">
+          <span class="preview-num">09</span>
+          <div>
+            <div class="preview-title">Building Your Book of Social Proof</div>
+            <p class="preview-desc">The guest page, quoting yourself from host comments, and the tier progression from small shows to major industry podcasts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO THIS IS FOR -->
+  <section>
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2>Creators who are done waiting for the algorithm to work.</h2>
+      <p>This guide is for creators, writers, consultants, and founders who have something worth saying and want a distribution channel that is not dependent on daily posting or platform trends. You do not need a large following. You need a clear point of view and a system for getting it in front of the right audiences.</p>
+      <p>If you are already guesting on podcasts but not converting those appearances into real audience growth, the second half of the guide covers exactly that. The conversion infrastructure, the post-episode promotion system, and the guest appearance pipeline.</p>
+    </div>
+  </section>
+
+  <!-- BUY -->
+  <div class="container" id="buy">
+    <div class="cta-section">
+      <p class="section-label">Get the Guide</p>
+      <h2>The Creator's Podcast Guest Strategy</h2>
+      <p>A complete system for building authority and audience through strategic podcast appearances.</p>
+      <span class="cta-price">$18.99</span>
+      <span class="cta-format">PDF download. 9 sections. ~2,500 words.</span>
+      <div>
+        <a href="#" class="btn-cta">Buy now — $18.99</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>Behike Digital Products &mdash; behike.com</p>
+    </div>
+  </footer>
+
+</body>
+</html>

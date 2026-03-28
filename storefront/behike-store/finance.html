@@ -1,0 +1,2650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>Behike Finance | Personal Finance Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===== THEME SYSTEM ===== */
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface-2: #1a1a1a;
+  --surface-3: #222;
+  --border: #2a2a2a;
+  --border-focus: #444;
+  --text: #e8e8e8;
+  --text-2: #999;
+  --text-3: #666;
+  --accent: #D4A843;
+  --accent-dim: rgba(212, 168, 67, 0.15);
+  --accent-glow: rgba(212, 168, 67, 0.3);
+  --green: #4a9;
+  --green-dim: rgba(68, 170, 153, 0.15);
+  --red: #c55;
+  --red-dim: rgba(204, 85, 85, 0.15);
+  --blue: #5a9cd6;
+  --blue-dim: rgba(90, 156, 214, 0.15);
+  --orange: #d4943a;
+  --orange-dim: rgba(212, 148, 58, 0.15);
+  --purple: #9a7cd6;
+  --purple-dim: rgba(154, 124, 214, 0.15);
+  --teal: #5ab8b8;
+  --teal-dim: rgba(90, 184, 184, 0.15);
+  --pink: #d47a9a;
+  --pink-dim: rgba(212, 122, 154, 0.15);
+  --radius: 12px;
+  --font-size-base: 14px;
+}
+
+/* Theme: Ocean */
+[data-theme="ocean"] {
+  --accent: #4a9cd6;
+  --accent-dim: rgba(74, 156, 214, 0.15);
+  --accent-glow: rgba(74, 156, 214, 0.3);
+}
+/* Theme: Forest */
+[data-theme="forest"] {
+  --accent: #5ab88a;
+  --accent-dim: rgba(90, 184, 138, 0.15);
+  --accent-glow: rgba(90, 184, 138, 0.3);
+}
+/* Theme: Rose */
+[data-theme="rose"] {
+  --accent: #d47a9a;
+  --accent-dim: rgba(212, 122, 154, 0.15);
+  --accent-glow: rgba(212, 122, 154, 0.3);
+}
+/* Theme: Lavender */
+[data-theme="lavender"] {
+  --accent: #9a7cd6;
+  --accent-dim: rgba(154, 124, 214, 0.15);
+  --accent-glow: rgba(154, 124, 214, 0.3);
+}
+/* Theme: Ember */
+[data-theme="ember"] {
+  --accent: #d4643a;
+  --accent-dim: rgba(212, 100, 58, 0.15);
+  --accent-glow: rgba(212, 100, 58, 0.3);
+}
+/* Theme: Mint */
+[data-theme="mint"] {
+  --accent: #5ab8b8;
+  --accent-dim: rgba(90, 184, 184, 0.15);
+  --accent-glow: rgba(90, 184, 184, 0.3);
+}
+/* Theme: Slate */
+[data-theme="slate"] {
+  --accent: #8899aa;
+  --accent-dim: rgba(136, 153, 170, 0.15);
+  --accent-glow: rgba(136, 153, 170, 0.3);
+}
+
+/* Font sizes */
+[data-fontsize="s"] { --font-size-base: 12px; }
+[data-fontsize="m"] { --font-size-base: 14px; }
+[data-fontsize="l"] { --font-size-base: 16px; }
+[data-fontsize="xl"] { --font-size-base: 18px; }
+
+/* ===== RESET & BASE ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+/* ===== HEADER ===== */
+.app-header {
+  padding: 28px 0 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+  font-size: 1.8em;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.app-header h1 span { color: var(--accent); }
+
+.app-header .subtitle {
+  font-size: 0.85em;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 0.78em;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: inherit;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-icon {
+  display: block;
+  font-size: 1.3em;
+  margin-bottom: 2px;
+}
+
+/* ===== PANELS ===== */
+.panel { display: none; padding: 28px 0 60px; animation: fadeIn 0.25s ease; }
+.panel.active { display: block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== COMMON COMPONENTS ===== */
+h2 {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+}
+
+h3 {
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-value {
+  font-size: 1.6em;
+  font-weight: 700;
+}
+
+.stat-card .stat-sub {
+  font-size: 0.72em;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.val-green { color: var(--green); }
+.val-red { color: var(--red); }
+.val-accent { color: var(--accent); }
+.val-blue { color: var(--blue); }
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #0a0a0a;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.btn-primary:hover { opacity: 0.85; color: #0a0a0a; }
+
+.btn-sm { padding: 5px 10px; font-size: 0.78em; }
+
+.btn-danger { border-color: var(--red); color: var(--red); }
+.btn-danger:hover { background: var(--red-dim); }
+
+/* Inputs */
+input, select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 0.9em;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+input[type="number"] { text-align: right; }
+input[type="number"]::-webkit-inner-spin-button { opacity: 0.3; }
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.72em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9em;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface-2); }
+
+.data-table .align-right { text-align: right; }
+
+.data-table .delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.data-table .delete-btn:hover { color: var(--red); background: var(--red-dim); }
+
+/* Form rows */
+.form-row {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 2px;
+}
+
+.form-inline {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.form-inline .form-group {
+  flex: 1;
+  min-width: 100px;
+}
+
+.form-inline .form-group label {
+  display: block;
+  font-size: 0.72em;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 4px;
+}
+
+/* Progress bar */
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--surface-3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  background: var(--accent);
+}
+
+.progress-fill.over { background: var(--red); }
+
+/* Section spacing */
+.section { margin-bottom: 32px; }
+
+/* Month nav */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.month-nav button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.month-nav button:hover { border-color: var(--accent); color: var(--accent); }
+
+.month-nav .month-label {
+  font-size: 1.1em;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
+}
+
+/* Chart containers */
+.chart-bar-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 200px;
+  padding: 0 4px;
+}
+
+.chart-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 36px;
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+  position: relative;
+  min-height: 2px;
+}
+
+.chart-bar.income { background: var(--green); }
+.chart-bar.expense { background: var(--red); opacity: 0.7; }
+
+.chart-bar-label {
+  font-size: 0.65em;
+  color: var(--text-3);
+  margin-top: 6px;
+  text-align: center;
+}
+
+.chart-bar-value {
+  font-size: 0.6em;
+  color: var(--text-2);
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+/* Paired bars */
+.chart-pair {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.chart-pair-bars {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  flex: 1;
+  width: 100%;
+  justify-content: center;
+}
+
+.chart-pair .chart-bar { max-width: 18px; }
+
+/* Pie chart (pure CSS) */
+.pie-container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.pie-chart {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pie-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+}
+
+.pie-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Score gauge */
+.score-gauge {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  position: relative;
+}
+
+.score-gauge::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.score-value {
+  position: relative;
+  z-index: 1;
+  font-size: 2.4em;
+  font-weight: 700;
+}
+
+.score-label {
+  text-align: center;
+  font-size: 0.85em;
+  color: var(--text-2);
+}
+
+/* Breakdown badges */
+.breakdown-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.breakdown-item {
+  flex: 1;
+  min-width: 120px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+
+.breakdown-item .bi-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+.breakdown-item .bi-value {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.breakdown-item .bi-pct {
+  font-size: 0.72em;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+/* Savings goals */
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.goal-item:last-child { border-bottom: none; }
+
+.goal-info { flex: 1; }
+
+.goal-name { font-weight: 500; font-size: 0.9em; }
+
+.goal-amounts {
+  font-size: 0.75em;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+.goal-pct {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Toggle switch */
+.toggle-group {
+  display: flex;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.toggle-opt {
+  padding: 8px 16px;
+  font-size: 0.8em;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text-2);
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.toggle-opt.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Slider */
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.slider-group label {
+  font-size: 0.85em;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.slider-group input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  background: var(--surface-3);
+  height: 4px;
+  border-radius: 2px;
+  border: none;
+  padding: 0;
+}
+
+.slider-group input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.slider-group .slider-val {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 60px;
+  text-align: right;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.timeline-block {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  position: relative;
+}
+
+.timeline-block[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-3);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.65em;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+/* Net worth line chart */
+.line-chart {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.line-chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Subscription flags */
+.flag-unused {
+  display: inline-block;
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--orange-dim);
+  color: var(--orange);
+  font-weight: 500;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-3);
+}
+
+.empty-state .empty-icon {
+  font-size: 2.4em;
+  margin-bottom: 8px;
+}
+
+.empty-state p { font-size: 0.9em; }
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 24px 0 32px;
+  border-top: 1px solid var(--border);
+  font-size: 0.72em;
+  color: var(--text-3);
+}
+
+/* Settings grid */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.settings-item label {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.theme-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.theme-swatch.active { border-color: var(--text); }
+
+.theme-swatch:hover { transform: scale(1.05); }
+
+.theme-swatch span {
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6em;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+/* Checkbox style */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .container { padding: 0 12px; }
+
+  .app-header { padding: 20px 0 14px; }
+  .app-header h1 { font-size: 1.4em; }
+
+  .tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    background: var(--bg);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .tab-btn {
+    padding: 8px 4px;
+    font-size: 0.62em;
+    border-bottom: none;
+    border-top: 2px solid transparent;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .tab-btn.active { border-top-color: var(--accent); border-bottom-color: transparent; }
+
+  .tab-icon { font-size: 1.2em; margin-bottom: 1px; }
+
+  .panel { padding: 20px 0 100px; }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .stat-card { padding: 12px; }
+  .stat-card .stat-value { font-size: 1.2em; }
+
+  .form-inline { flex-direction: column; }
+  .form-inline .form-group { width: 100%; }
+
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .pie-container { flex-direction: column; align-items: center; }
+
+  .breakdown-row { flex-direction: column; }
+
+  h2 { font-size: 1.2em; }
+}
+
+@media (max-width: 480px) {
+  .card-grid { grid-template-columns: 1fr 1fr; }
+  .chart-bar-group { height: 150px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="container">
+    <h1>Behike <span>Finance</span></h1>
+    <div class="subtitle">Your money, your rules. All data stays on your device.</div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="dashboard"><span class="tab-icon">&#9673;</span>Dashboard</button>
+  <button class="tab-btn" data-tab="budget"><span class="tab-icon">&#9638;</span>Budget</button>
+  <button class="tab-btn" data-tab="cashflow"><span class="tab-icon">&#8644;</span>Cash Flow</button>
+  <button class="tab-btn" data-tab="debt"><span class="tab-icon">&#9651;</span>Debt</button>
+  <button class="tab-btn" data-tab="subscriptions"><span class="tab-icon">&#8634;</span>Subs</button>
+  <button class="tab-btn" data-tab="networth"><span class="tab-icon">&#9650;</span>Net Worth</button>
+  <button class="tab-btn" data-tab="reports"><span class="tab-icon">&#9632;</span>Reports</button>
+  <button class="tab-btn" data-tab="settings"><span class="tab-icon">&#9881;</span>Settings</button>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="panel active" id="panel-dashboard">
+  <div class="container">
+    <h2>Financial Overview</h2>
+
+    <div class="card-grid" id="dashCards"></div>
+
+    <div class="card">
+      <h3>Financial Health Score</h3>
+      <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;justify-content:center">
+        <div>
+          <div class="score-gauge" id="healthGauge">
+            <span class="score-value" id="healthScore">--</span>
+          </div>
+          <div class="score-label" id="healthLabel">Loading...</div>
+        </div>
+        <div id="healthBreakdown" style="flex:1;min-width:200px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Income vs Expenses (6 Months)</h3>
+      <div class="chart-bar-group" id="dashChart"></div>
+    </div>
+
+    <div class="card">
+      <h3>Active Savings Goals</h3>
+      <div id="dashGoals"></div>
+    </div>
+
+    <div class="card">
+      <h3>Subscription Burn Rate</h3>
+      <div id="dashSubBurn" style="text-align:center;padding:12px 0;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BUDGET ===== -->
+<div class="panel" id="panel-budget">
+  <div class="container">
+    <h2>Monthly Budget</h2>
+
+    <div class="month-nav">
+      <button onclick="BF.Budget.prevMonth()">&#8592;</button>
+      <span class="month-label" id="budgetMonthLabel"></span>
+      <button onclick="BF.Budget.nextMonth()">&#8594;</button>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="BF.Budget.copyToPrev()">Copy from Last Month</button>
+        <button class="btn btn-sm" onclick="BF.Budget.copyToNext()">Copy to Next Month</button>
+      </div>
+    </div>
+
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table" id="budgetTable">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th class="align-right">Budget</th>
+            <th class="align-right">Actual</th>
+            <th class="align-right">Remaining</th>
+            <th style="width:120px">Usage</th>
+          </tr>
+        </thead>
+        <tbody id="budgetBody"></tbody>
+        <tfoot id="budgetFoot"></tfoot>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>50 / 30 / 20 Breakdown</h3>
+      <div class="breakdown-row" id="budget503020"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CASH FLOW ===== -->
+<div class="panel" id="panel-cashflow">
+  <div class="container">
+    <h2>Cash Flow</h2>
+
+    <div class="card-grid" id="cfSummary"></div>
+
+    <!-- Income -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Income Streams</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.CashFlow.addIncome()">+ Add</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Category</th>
+              <th class="align-right">Amount</th>
+              <th>Frequency</th>
+              <th class="align-right">Monthly</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cfIncomeBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Expenses -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Expenses</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.CashFlow.addExpense()">+ Add</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th class="align-right">Amount</th>
+              <th>Frequency</th>
+              <th>Recurring</th>
+              <th class="align-right">Monthly</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cfExpenseBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>6-Month Projection</h3>
+      <div class="chart-bar-group" id="cfProjection"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DEBT PAYOFF ===== -->
+<div class="panel" id="panel-debt">
+  <div class="container">
+    <h2>Debt Payoff Planner</h2>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Your Debts</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.Debt.addDebt()">+ Add Debt</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="align-right">Balance</th>
+              <th class="align-right">APR %</th>
+              <th class="align-right">Min Payment</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="debtBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="slider-group">
+      <label>Extra Monthly Payment:</label>
+      <input type="range" id="debtExtraSlider" min="0" max="500" step="10" value="0" oninput="BF.Debt.render()">
+      <span class="slider-val" id="debtExtraVal">$0</span>
+    </div>
+
+    <div class="card-grid" style="grid-template-columns:1fr 1fr">
+      <div class="card">
+        <h3 style="color:var(--blue)">Snowball Method</h3>
+        <p style="font-size:0.75em;color:var(--text-3);margin-bottom:12px">Smallest balance first. Psychological wins.</p>
+        <div id="debtSnowball"></div>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--green)">Avalanche Method</h3>
+        <p style="font-size:0.75em;color:var(--text-3);margin-bottom:12px">Highest APR first. Saves the most money.</p>
+        <div id="debtAvalanche"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Payoff Timeline</h3>
+      <div id="debtTimeline"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUBSCRIPTIONS ===== -->
+<div class="panel" id="panel-subscriptions">
+  <div class="container">
+    <h2>Subscriptions</h2>
+
+    <div class="card-grid" id="subSummary"></div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Active Subscriptions</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.Subs.add()">+ Add</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th class="align-right">Cost/mo</th>
+              <th>Billing Date</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="subBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NET WORTH ===== -->
+<div class="panel" id="panel-networth">
+  <div class="container">
+    <h2>Net Worth Tracker</h2>
+
+    <div class="card-grid" id="nwSummary"></div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Assets</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.NetWorth.addAsset()">+ Add</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th class="align-right">Value</th><th></th></tr></thead>
+          <tbody id="nwAssetBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin-bottom:0">Liabilities</h3>
+        <button class="btn btn-sm btn-primary" onclick="BF.NetWorth.addLiability()">+ Add</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th class="align-right">Value</th><th></th></tr></thead>
+          <tbody id="nwLiabBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:16px 0">
+      <button class="btn" onclick="BF.NetWorth.snapshot()">Save Monthly Snapshot</button>
+    </div>
+
+    <div class="card">
+      <h3>Net Worth Over Time</h3>
+      <div id="nwChart"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REPORTS ===== -->
+<div class="panel" id="panel-reports">
+  <div class="container">
+    <h2>Reports &amp; Analytics</h2>
+
+    <div class="card">
+      <h3>Spending by Category</h3>
+      <div class="pie-container" id="reportPie"></div>
+    </div>
+
+    <div class="card">
+      <h3>Income vs Expenses (6 Months)</h3>
+      <div class="chart-bar-group" id="reportBarChart"></div>
+    </div>
+
+    <div class="card">
+      <h3>Savings Rate Over Time</h3>
+      <div class="chart-bar-group" id="reportSavingsRate"></div>
+    </div>
+
+    <div class="card">
+      <h3>Category Month-Over-Month</h3>
+      <div id="reportCatMoM" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="panel" id="panel-settings">
+  <div class="container">
+    <h2>Settings</h2>
+
+    <div class="settings-grid">
+      <div class="card">
+        <h3>Currency</h3>
+        <select id="setCurrency" onchange="BF.Settings.saveCurrency()">
+          <option value="$">USD ($)</option>
+          <option value="EUR">EUR</option>
+          <option value="GBP">GBP</option>
+          <option value="CAD">CAD ($)</option>
+          <option value="AUD">AUD ($)</option>
+          <option value="MXN">MXN ($)</option>
+          <option value="BRL">BRL (R$)</option>
+          <option value="JPY">JPY</option>
+        </select>
+      </div>
+
+      <div class="card">
+        <h3>Font Size</h3>
+        <div class="toggle-group" id="fontSizeToggle">
+          <button class="toggle-opt" data-size="s" onclick="BF.Settings.setFontSize('s')">S</button>
+          <button class="toggle-opt active" data-size="m" onclick="BF.Settings.setFontSize('m')">M</button>
+          <button class="toggle-opt" data-size="l" onclick="BF.Settings.setFontSize('l')">L</button>
+          <button class="toggle-opt" data-size="xl" onclick="BF.Settings.setFontSize('xl')">XL</button>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column:span 2">
+        <h3>Color Theme</h3>
+        <div class="theme-grid" id="themeGrid" style="margin-bottom:24px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Savings Goals</h3>
+        <div id="settingsGoals"></div>
+        <button class="btn btn-sm" style="margin-top:8px" onclick="BF.Settings.addGoal()">+ Add Goal</button>
+      </div>
+
+      <div class="card">
+        <h3>Emergency Fund Target</h3>
+        <div class="form-row">
+          <label>Months of expenses to save</label>
+          <input type="number" id="setEmergencyMonths" value="3" min="1" max="24" onchange="BF.Settings.saveEmergency()">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Export Data</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="BF.Settings.exportCSV()">Export CSV</button>
+          <button class="btn" onclick="document.getElementById('importFile').click()">Import CSV</button>
+          <input type="file" id="importFile" accept=".csv" style="display:none" onchange="BF.Settings.importCSV(event)">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Danger Zone</h3>
+        <button class="btn btn-danger" onclick="BF.Settings.resetAll()">Reset All Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="app-footer">
+  <div class="container">
+    <div>Behike Finance. $14.99. All data stored locally on your device.</div>
+    <div style="margin-top:4px">&copy; 2026 Behike. All rights reserved.</div>
+  </div>
+</div>
+
+<script>
+// ===== BEHIKE FINANCE APP =====
+const BF = {};
+
+// ===== UTILITIES =====
+BF.U = {
+  STORE_KEY: 'behike_finance',
+  currency: '$',
+
+  fmt(n) {
+    if (n == null || isNaN(n)) return this.currency + '0.00';
+    const abs = Math.abs(n);
+    const formatted = abs.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return (n < 0 ? '-' : '') + this.currency + formatted;
+  },
+
+  pct(n) { return (n * 100).toFixed(1) + '%'; },
+
+  monthKey(d) {
+    const dt = d || new Date();
+    return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0');
+  },
+
+  monthLabel(key) {
+    const [y, m] = key.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[parseInt(m) - 1] + ' ' + y;
+  },
+
+  monthShort(key) {
+    const [y, m] = key.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[parseInt(m) - 1];
+  },
+
+  prevMonthKey(key) {
+    let [y, m] = key.split('-').map(Number);
+    m--;
+    if (m < 1) { m = 12; y--; }
+    return y + '-' + String(m).padStart(2, '0');
+  },
+
+  nextMonthKey(key) {
+    let [y, m] = key.split('-').map(Number);
+    m++;
+    if (m > 12) { m = 1; y++; }
+    return y + '-' + String(m).padStart(2, '0');
+  },
+
+  last6Months(fromKey) {
+    const keys = [];
+    let k = fromKey || this.monthKey();
+    for (let i = 0; i < 6; i++) {
+      keys.unshift(k);
+      k = this.prevMonthKey(k);
+    }
+    return keys;
+  },
+
+  toMonthly(amount, freq) {
+    const a = parseFloat(amount) || 0;
+    switch(freq) {
+      case 'weekly': return a * 52 / 12;
+      case 'biweekly': return a * 26 / 12;
+      case 'monthly': return a;
+      case 'quarterly': return a / 3;
+      case 'yearly': return a / 12;
+      case 'one-time': return a;
+      default: return a;
+    }
+  },
+
+  id() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); },
+
+  el(id) { return document.getElementById(id); }
+};
+
+// ===== DATA STORE =====
+BF.Data = {
+  _data: null,
+
+  defaults() {
+    return {
+      settings: {
+        currency: '$',
+        theme: 'gold',
+        fontSize: 'm',
+        emergencyMonths: 3
+      },
+      budget: {},
+      cashflow: { income: [], expenses: [] },
+      debts: [],
+      subscriptions: [],
+      networth: { assets: [], liabilities: [], snapshots: [] },
+      goals: []
+    };
+  },
+
+  load() {
+    try {
+      const raw = localStorage.getItem(BF.U.STORE_KEY);
+      this._data = raw ? JSON.parse(raw) : this.defaults();
+    } catch(e) {
+      this._data = this.defaults();
+    }
+    // ensure all keys exist
+    const d = this.defaults();
+    for (const k in d) {
+      if (!(k in this._data)) this._data[k] = d[k];
+    }
+    if (!this._data.settings) this._data.settings = d.settings;
+    if (!this._data.goals) this._data.goals = [];
+    return this._data;
+  },
+
+  save() {
+    localStorage.setItem(BF.U.STORE_KEY, JSON.stringify(this._data));
+  },
+
+  get() {
+    if (!this._data) this.load();
+    return this._data;
+  }
+};
+
+// ===== BUDGET CATEGORIES =====
+BF.CATEGORIES = [
+  { id: 'housing', name: 'Housing', icon: '\u2302', type: 'need' },
+  { id: 'food', name: 'Food & Groceries', icon: '\u26C5', type: 'need' },
+  { id: 'transport', name: 'Transportation', icon: '\u2708', type: 'need' },
+  { id: 'health', name: 'Health & Insurance', icon: '\u2695', type: 'need' },
+  { id: 'entertainment', name: 'Entertainment', icon: '\u266B', type: 'want' },
+  { id: 'education', name: 'Education', icon: '\u270E', type: 'want' },
+  { id: 'savings', name: 'Savings & Investing', icon: '\u2606', type: 'savings' },
+  { id: 'other', name: 'Other / Misc', icon: '\u2022', type: 'want' }
+];
+
+// ===== TAB SWITCHING =====
+BF.Tabs = {
+  init() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const panel = BF.U.el('panel-' + btn.dataset.tab);
+        if (panel) panel.classList.add('active');
+        BF.refresh();
+      });
+    });
+  }
+};
+
+// ===== BUDGET MODULE =====
+BF.Budget = {
+  currentMonth: BF.U.monthKey(),
+
+  prevMonth() {
+    this.currentMonth = BF.U.prevMonthKey(this.currentMonth);
+    this.render();
+  },
+
+  nextMonth() {
+    this.currentMonth = BF.U.nextMonthKey(this.currentMonth);
+    this.render();
+  },
+
+  getMonth(key) {
+    const data = BF.Data.get();
+    if (!data.budget[key]) {
+      data.budget[key] = {};
+      BF.CATEGORIES.forEach(c => {
+        data.budget[key][c.id] = { budget: 0, actual: 0 };
+      });
+    }
+    return data.budget[key];
+  },
+
+  copyToPrev() {
+    const prev = BF.U.prevMonthKey(this.currentMonth);
+    const src = this.getMonth(prev);
+    const dst = this.getMonth(this.currentMonth);
+    BF.CATEGORIES.forEach(c => {
+      dst[c.id].budget = src[c.id].budget;
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  copyToNext() {
+    const next = BF.U.nextMonthKey(this.currentMonth);
+    const src = this.getMonth(this.currentMonth);
+    const dst = this.getMonth(next);
+    BF.CATEGORIES.forEach(c => {
+      dst[c.id].budget = src[c.id].budget;
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  onInput(catId, field, val) {
+    const month = this.getMonth(this.currentMonth);
+    month[catId][field] = parseFloat(val) || 0;
+    BF.Data.save();
+    this.render();
+  },
+
+  render() {
+    BF.U.el('budgetMonthLabel').textContent = BF.U.monthLabel(this.currentMonth);
+    const month = this.getMonth(this.currentMonth);
+    let totalBudget = 0, totalActual = 0;
+    let needs = 0, wants = 0, savings = 0;
+
+    let html = '';
+    BF.CATEGORIES.forEach(c => {
+      const b = month[c.id].budget;
+      const a = month[c.id].actual;
+      const rem = b - a;
+      const pct = b > 0 ? Math.min((a / b) * 100, 150) : (a > 0 ? 100 : 0);
+      const overBudget = a > b && b > 0;
+      totalBudget += b;
+      totalActual += a;
+
+      if (c.type === 'need') needs += a;
+      else if (c.type === 'want') wants += a;
+      else savings += a;
+
+      html += '<tr>';
+      html += '<td>' + c.icon + ' ' + c.name + '</td>';
+      html += '<td class="align-right"><input type="number" value="' + b + '" style="width:100px" onchange="BF.Budget.onInput(\'' + c.id + '\',\'budget\',this.value)"></td>';
+      html += '<td class="align-right"><input type="number" value="' + a + '" style="width:100px" onchange="BF.Budget.onInput(\'' + c.id + '\',\'actual\',this.value)"></td>';
+      html += '<td class="align-right" style="color:' + (overBudget ? 'var(--red)' : 'var(--green)') + '">' + BF.U.fmt(rem) + '</td>';
+      html += '<td><div class="progress-track"><div class="progress-fill' + (overBudget ? ' over' : '') + '" style="width:' + Math.min(pct, 100) + '%"></div></div></td>';
+      html += '</tr>';
+    });
+
+    BF.U.el('budgetBody').innerHTML = html;
+
+    const totalRem = totalBudget - totalActual;
+    BF.U.el('budgetFoot').innerHTML = '<tr style="font-weight:600"><td>Total</td><td class="align-right">' + BF.U.fmt(totalBudget) + '</td><td class="align-right">' + BF.U.fmt(totalActual) + '</td><td class="align-right" style="color:' + (totalRem < 0 ? 'var(--red)' : 'var(--green)') + '">' + BF.U.fmt(totalRem) + '</td><td></td></tr>';
+
+    // 50/30/20
+    const total = needs + wants + savings;
+    const np = total > 0 ? (needs / total * 100).toFixed(1) : 0;
+    const wp = total > 0 ? (wants / total * 100).toFixed(1) : 0;
+    const sp = total > 0 ? (savings / total * 100).toFixed(1) : 0;
+
+    BF.U.el('budget503020').innerHTML =
+      '<div class="breakdown-item"><div class="bi-label">Needs (50%)</div><div class="bi-value" style="color:var(--blue)">' + BF.U.fmt(needs) + '</div><div class="bi-pct">' + np + '% of spending</div></div>' +
+      '<div class="breakdown-item"><div class="bi-label">Wants (30%)</div><div class="bi-value" style="color:var(--orange)">' + BF.U.fmt(wants) + '</div><div class="bi-pct">' + wp + '% of spending</div></div>' +
+      '<div class="breakdown-item"><div class="bi-label">Savings (20%)</div><div class="bi-value" style="color:var(--green)">' + BF.U.fmt(savings) + '</div><div class="bi-pct">' + sp + '% of spending</div></div>';
+  }
+};
+
+// ===== CASH FLOW MODULE =====
+BF.CashFlow = {
+  addIncome() {
+    const data = BF.Data.get();
+    data.cashflow.income.push({
+      id: BF.U.id(),
+      name: 'New Income',
+      category: 'salary',
+      amount: 0,
+      frequency: 'monthly'
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  addExpense() {
+    const data = BF.Data.get();
+    data.cashflow.expenses.push({
+      id: BF.U.id(),
+      name: 'New Expense',
+      category: 'housing',
+      amount: 0,
+      frequency: 'monthly',
+      recurring: true
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  deleteIncome(id) {
+    const data = BF.Data.get();
+    data.cashflow.income = data.cashflow.income.filter(i => i.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  deleteExpense(id) {
+    const data = BF.Data.get();
+    data.cashflow.expenses = data.cashflow.expenses.filter(e => e.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  updateIncome(id, field, val) {
+    const data = BF.Data.get();
+    const item = data.cashflow.income.find(i => i.id === id);
+    if (item) {
+      if (field === 'amount') item[field] = parseFloat(val) || 0;
+      else item[field] = val;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  updateExpense(id, field, val) {
+    const data = BF.Data.get();
+    const item = data.cashflow.expenses.find(e => e.id === id);
+    if (item) {
+      if (field === 'amount') item[field] = parseFloat(val) || 0;
+      else if (field === 'recurring') item[field] = val;
+      else item[field] = val;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  getMonthlyIncome() {
+    const data = BF.Data.get();
+    return data.cashflow.income.reduce((sum, i) => sum + BF.U.toMonthly(i.amount, i.frequency), 0);
+  },
+
+  getMonthlyExpenses() {
+    const data = BF.Data.get();
+    return data.cashflow.expenses.reduce((sum, e) => sum + BF.U.toMonthly(e.amount, e.frequency), 0);
+  },
+
+  render() {
+    const data = BF.Data.get();
+    const totalIn = this.getMonthlyIncome();
+    const totalOut = this.getMonthlyExpenses();
+    const flow = totalIn - totalOut;
+
+    BF.U.el('cfSummary').innerHTML =
+      '<div class="stat-card"><div class="stat-label">Monthly Income</div><div class="stat-value val-green">' + BF.U.fmt(totalIn) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Monthly Expenses</div><div class="stat-value val-red">' + BF.U.fmt(totalOut) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Monthly Cash Flow</div><div class="stat-value ' + (flow >= 0 ? 'val-accent' : 'val-red') + '">' + BF.U.fmt(flow) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Annual Projection</div><div class="stat-value ' + (flow >= 0 ? 'val-green' : 'val-red') + '">' + BF.U.fmt(flow * 12) + '</div></div>';
+
+    // Income table
+    const freqOpts = '<option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option><option value="one-time">One-time</option>';
+    const catInOpts = '<option value="salary">Salary</option><option value="freelance">Freelance</option><option value="business">Business</option><option value="investment">Investment</option><option value="rental">Rental</option><option value="other">Other</option>';
+    const catExpOpts = BF.CATEGORIES.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
+
+    let incHtml = '';
+    data.cashflow.income.forEach(i => {
+      const monthly = BF.U.toMonthly(i.amount, i.frequency);
+      incHtml += '<tr>';
+      incHtml += '<td><input value="' + (i.name || '') + '" style="width:120px" onchange="BF.CashFlow.updateIncome(\'' + i.id + '\',\'name\',this.value)"></td>';
+      incHtml += '<td><select style="width:100px" onchange="BF.CashFlow.updateIncome(\'' + i.id + '\',\'category\',this.value)">' + catInOpts.replace('value="' + i.category + '"', 'value="' + i.category + '" selected') + '</select></td>';
+      incHtml += '<td class="align-right"><input type="number" value="' + i.amount + '" style="width:90px" onchange="BF.CashFlow.updateIncome(\'' + i.id + '\',\'amount\',this.value)"></td>';
+      incHtml += '<td><select style="width:100px" onchange="BF.CashFlow.updateIncome(\'' + i.id + '\',\'frequency\',this.value)">' + freqOpts.replace('value="' + i.frequency + '"', 'value="' + i.frequency + '" selected') + '</select></td>';
+      incHtml += '<td class="align-right" style="color:var(--green)">' + BF.U.fmt(monthly) + '</td>';
+      incHtml += '<td><button class="delete-btn" onclick="BF.CashFlow.deleteIncome(\'' + i.id + '\')">&times;</button></td>';
+      incHtml += '</tr>';
+    });
+    if (data.cashflow.income.length === 0) {
+      incHtml = '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px">No income sources yet</td></tr>';
+    }
+    BF.U.el('cfIncomeBody').innerHTML = incHtml;
+
+    // Expense table
+    let expHtml = '';
+    data.cashflow.expenses.forEach(e => {
+      const monthly = BF.U.toMonthly(e.amount, e.frequency);
+      expHtml += '<tr>';
+      expHtml += '<td><input value="' + (e.name || '') + '" style="width:120px" onchange="BF.CashFlow.updateExpense(\'' + e.id + '\',\'name\',this.value)"></td>';
+      expHtml += '<td><select style="width:100px" onchange="BF.CashFlow.updateExpense(\'' + e.id + '\',\'category\',this.value)">' + catExpOpts.replace('value="' + e.category + '"', 'value="' + e.category + '" selected') + '</select></td>';
+      expHtml += '<td class="align-right"><input type="number" value="' + e.amount + '" style="width:90px" onchange="BF.CashFlow.updateExpense(\'' + e.id + '\',\'amount\',this.value)"></td>';
+      expHtml += '<td><select style="width:100px" onchange="BF.CashFlow.updateExpense(\'' + e.id + '\',\'frequency\',this.value)">' + freqOpts.replace('value="' + e.frequency + '"', 'value="' + e.frequency + '" selected') + '</select></td>';
+      expHtml += '<td><input type="checkbox" ' + (e.recurring ? 'checked' : '') + ' onchange="BF.CashFlow.updateExpense(\'' + e.id + '\',\'recurring\',this.checked)" style="width:auto"></td>';
+      expHtml += '<td class="align-right" style="color:var(--red)">' + BF.U.fmt(monthly) + '</td>';
+      expHtml += '<td><button class="delete-btn" onclick="BF.CashFlow.deleteExpense(\'' + e.id + '\')">&times;</button></td>';
+      expHtml += '</tr>';
+    });
+    if (data.cashflow.expenses.length === 0) {
+      expHtml = '<tr><td colspan="7" style="text-align:center;color:var(--text-3);padding:16px">No expenses yet</td></tr>';
+    }
+    BF.U.el('cfExpenseBody').innerHTML = expHtml;
+
+    // 6 month projection
+    const months = BF.U.last6Months();
+    const maxVal = Math.max(totalIn, totalOut, 1);
+    let projHtml = '';
+    months.forEach((mk, idx) => {
+      const cumFlow = flow * (idx + 1);
+      const incH = Math.round((totalIn / maxVal) * 160);
+      const expH = Math.round((totalOut / maxVal) * 160);
+      projHtml += '<div class="chart-pair">' +
+        '<div class="chart-bar-value">' + BF.U.fmt(flow) + '</div>' +
+        '<div class="chart-pair-bars">' +
+        '<div class="chart-bar income" style="height:' + incH + 'px" title="Income: ' + BF.U.fmt(totalIn) + '"></div>' +
+        '<div class="chart-bar expense" style="height:' + expH + 'px" title="Expenses: ' + BF.U.fmt(totalOut) + '"></div>' +
+        '</div>' +
+        '<div class="chart-bar-label">' + BF.U.monthShort(mk) + '</div>' +
+        '</div>';
+    });
+    BF.U.el('cfProjection').innerHTML = projHtml;
+  }
+};
+
+// ===== DEBT MODULE =====
+BF.Debt = {
+  addDebt() {
+    const data = BF.Data.get();
+    data.debts.push({
+      id: BF.U.id(),
+      name: 'New Debt',
+      balance: 0,
+      apr: 0,
+      minPayment: 0
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  deleteDebt(id) {
+    const data = BF.Data.get();
+    data.debts = data.debts.filter(d => d.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  updateDebt(id, field, val) {
+    const data = BF.Data.get();
+    const debt = data.debts.find(d => d.id === id);
+    if (debt) {
+      if (field === 'name') debt[field] = val;
+      else debt[field] = parseFloat(val) || 0;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  simulate(debts, extra, method) {
+    if (debts.length === 0) return { months: 0, totalInterest: 0, schedule: [] };
+
+    // Deep copy
+    let dlist = debts.map(d => ({
+      name: d.name,
+      balance: Math.max(d.balance, 0),
+      apr: Math.max(d.apr, 0),
+      minPayment: Math.max(d.minPayment, 0)
+    }));
+
+    // Sort
+    if (method === 'snowball') {
+      dlist.sort((a, b) => a.balance - b.balance);
+    } else {
+      dlist.sort((a, b) => b.apr - a.apr);
+    }
+
+    let months = 0;
+    let totalInterest = 0;
+    const schedule = [];
+    const maxMonths = 600; // 50 year cap
+
+    // Check if minimums cover interest
+    const totalBalance = dlist.reduce((s, d) => s + d.balance, 0);
+    if (totalBalance === 0) return { months: 0, totalInterest: 0, schedule: [] };
+
+    while (dlist.some(d => d.balance > 0.01) && months < maxMonths) {
+      months++;
+      let extraLeft = extra;
+      let monthInterest = 0;
+
+      // Apply interest to all
+      dlist.forEach(d => {
+        if (d.balance > 0) {
+          const interest = d.balance * (d.apr / 100 / 12);
+          d.balance += interest;
+          monthInterest += interest;
+          totalInterest += interest;
+        }
+      });
+
+      // Pay minimums
+      dlist.forEach(d => {
+        if (d.balance > 0) {
+          const payment = Math.min(d.minPayment, d.balance);
+          d.balance -= payment;
+        }
+      });
+
+      // Apply extra to target
+      for (let i = 0; i < dlist.length && extraLeft > 0.01; i++) {
+        if (dlist[i].balance > 0) {
+          const payment = Math.min(extraLeft, dlist[i].balance);
+          dlist[i].balance -= payment;
+          extraLeft -= payment;
+        }
+      }
+
+      const remaining = dlist.reduce((s, d) => s + Math.max(d.balance, 0), 0);
+      schedule.push({ month: months, remaining, interest: monthInterest });
+    }
+
+    return { months, totalInterest, schedule };
+  },
+
+  render() {
+    const data = BF.Data.get();
+    const extra = parseFloat(BF.U.el('debtExtraSlider').value) || 0;
+    BF.U.el('debtExtraVal').textContent = BF.U.fmt(extra);
+
+    // Debt table
+    let html = '';
+    data.debts.forEach(d => {
+      html += '<tr>';
+      html += '<td><input value="' + (d.name || '') + '" style="width:120px" onchange="BF.Debt.updateDebt(\'' + d.id + '\',\'name\',this.value)"></td>';
+      html += '<td class="align-right"><input type="number" value="' + d.balance + '" style="width:100px" onchange="BF.Debt.updateDebt(\'' + d.id + '\',\'balance\',this.value)"></td>';
+      html += '<td class="align-right"><input type="number" value="' + d.apr + '" step="0.1" style="width:70px" onchange="BF.Debt.updateDebt(\'' + d.id + '\',\'apr\',this.value)"></td>';
+      html += '<td class="align-right"><input type="number" value="' + d.minPayment + '" style="width:90px" onchange="BF.Debt.updateDebt(\'' + d.id + '\',\'minPayment\',this.value)"></td>';
+      html += '<td><button class="delete-btn" onclick="BF.Debt.deleteDebt(\'' + d.id + '\')">&times;</button></td>';
+      html += '</tr>';
+    });
+    if (data.debts.length === 0) {
+      html = '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:16px">No debts added. That\'s a good thing.</td></tr>';
+    }
+    BF.U.el('debtBody').innerHTML = html;
+
+    // Simulations
+    const snowball = this.simulate(data.debts, extra, 'snowball');
+    const avalanche = this.simulate(data.debts, extra, 'avalanche');
+
+    const totalDebt = data.debts.reduce((s, d) => s + d.balance, 0);
+
+    const renderResult = (result) => {
+      if (data.debts.length === 0 || totalDebt === 0) return '<div style="color:var(--text-3);font-size:0.85em">Add debts to see projections</div>';
+      const years = Math.floor(result.months / 12);
+      const mos = result.months % 12;
+      let timeStr = '';
+      if (years > 0) timeStr += years + ' year' + (years > 1 ? 's' : '');
+      if (mos > 0) timeStr += (years > 0 ? ', ' : '') + mos + ' month' + (mos > 1 ? 's' : '');
+      if (!timeStr) timeStr = 'Paid off';
+
+      return '<div style="margin-bottom:8px"><span style="font-size:0.78em;color:var(--text-2)">Time to debt-free:</span><br><span style="font-size:1.3em;font-weight:700">' + timeStr + '</span></div>' +
+        '<div><span style="font-size:0.78em;color:var(--text-2)">Total interest paid:</span><br><span style="font-size:1.1em;font-weight:600;color:var(--red)">' + BF.U.fmt(result.totalInterest) + '</span></div>';
+    };
+
+    BF.U.el('debtSnowball').innerHTML = renderResult(snowball);
+    BF.U.el('debtAvalanche').innerHTML = renderResult(avalanche);
+
+    // Timeline visualization
+    if (data.debts.length > 0 && totalDebt > 0) {
+      const best = avalanche.totalInterest <= snowball.totalInterest ? avalanche : snowball;
+      const maxM = Math.max(snowball.months, avalanche.months, 1);
+      const saved = Math.abs(snowball.totalInterest - avalanche.totalInterest);
+
+      let timeHtml = '<div style="font-size:0.78em;color:var(--text-2);margin-bottom:8px">';
+      if (avalanche.totalInterest < snowball.totalInterest) {
+        timeHtml += 'Avalanche saves you ' + BF.U.fmt(saved) + ' in interest.';
+      } else if (snowball.totalInterest < avalanche.totalInterest) {
+        timeHtml += 'Snowball saves you ' + BF.U.fmt(saved) + ' in interest.';
+      } else {
+        timeHtml += 'Both methods cost the same in interest.';
+      }
+      timeHtml += '</div>';
+
+      // Visual blocks
+      const blockCount = Math.min(maxM, 60);
+      const snowColor = 'var(--blue)';
+      const avColor = 'var(--green)';
+
+      timeHtml += '<div style="margin-bottom:4px;font-size:0.7em;color:var(--text-3)">Snowball (' + snowball.months + ' months)</div>';
+      timeHtml += '<div class="timeline">';
+      for (let i = 0; i < blockCount; i++) {
+        const active = i < snowball.months;
+        const remaining = snowball.schedule[i] ? BF.U.fmt(snowball.schedule[i].remaining) : '';
+        timeHtml += '<div class="timeline-block" style="background:' + (active ? snowColor : 'var(--surface-3)') + '" title="Month ' + (i + 1) + ': ' + remaining + '"></div>';
+      }
+      timeHtml += '</div>';
+
+      timeHtml += '<div style="margin:8px 0 4px;font-size:0.7em;color:var(--text-3)">Avalanche (' + avalanche.months + ' months)</div>';
+      timeHtml += '<div class="timeline">';
+      for (let i = 0; i < blockCount; i++) {
+        const active = i < avalanche.months;
+        const remaining = avalanche.schedule[i] ? BF.U.fmt(avalanche.schedule[i].remaining) : '';
+        timeHtml += '<div class="timeline-block" style="background:' + (active ? avColor : 'var(--surface-3)') + '" title="Month ' + (i + 1) + ': ' + remaining + '"></div>';
+      }
+      timeHtml += '</div>';
+
+      BF.U.el('debtTimeline').innerHTML = timeHtml;
+    } else {
+      BF.U.el('debtTimeline').innerHTML = '<div class="empty-state"><p>Add debts to see the timeline</p></div>';
+    }
+  }
+};
+
+// ===== SUBSCRIPTIONS MODULE =====
+BF.Subs = {
+  add() {
+    const data = BF.Data.get();
+    data.subscriptions.push({
+      id: BF.U.id(),
+      name: 'New Subscription',
+      cost: 0,
+      category: 'entertainment',
+      billingDate: 1,
+      unused: false
+    });
+    BF.Data.save();
+    this.render();
+  },
+
+  delete(id) {
+    const data = BF.Data.get();
+    data.subscriptions = data.subscriptions.filter(s => s.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  update(id, field, val) {
+    const data = BF.Data.get();
+    const sub = data.subscriptions.find(s => s.id === id);
+    if (sub) {
+      if (field === 'cost' || field === 'billingDate') sub[field] = parseFloat(val) || 0;
+      else if (field === 'unused') sub[field] = val;
+      else sub[field] = val;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  getMonthly() {
+    return BF.Data.get().subscriptions.reduce((s, sub) => s + (sub.cost || 0), 0);
+  },
+
+  render() {
+    const data = BF.Data.get();
+    const subs = [...data.subscriptions].sort((a, b) => (b.cost || 0) - (a.cost || 0));
+    const monthly = subs.reduce((s, sub) => s + (sub.cost || 0), 0);
+    const yearly = monthly * 12;
+    const unusedCount = subs.filter(s => s.unused).length;
+
+    BF.U.el('subSummary').innerHTML =
+      '<div class="stat-card"><div class="stat-label">Monthly</div><div class="stat-value val-red">' + BF.U.fmt(monthly) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Yearly</div><div class="stat-value val-red">' + BF.U.fmt(yearly) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Active</div><div class="stat-value">' + subs.length + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Flagged Unused</div><div class="stat-value ' + (unusedCount > 0 ? 'val-red' : '') + '">' + unusedCount + '</div></div>';
+
+    const catOpts = '<option value="entertainment">Entertainment</option><option value="productivity">Productivity</option><option value="music">Music</option><option value="streaming">Streaming</option><option value="cloud">Cloud/Storage</option><option value="fitness">Fitness</option><option value="news">News</option><option value="other">Other</option>';
+
+    let html = '';
+    subs.forEach(s => {
+      html += '<tr>';
+      html += '<td><input value="' + (s.name || '') + '" style="width:140px" onchange="BF.Subs.update(\'' + s.id + '\',\'name\',this.value)"></td>';
+      html += '<td><select style="width:100px" onchange="BF.Subs.update(\'' + s.id + '\',\'category\',this.value)">' + catOpts.replace('value="' + s.category + '"', 'value="' + s.category + '" selected') + '</select></td>';
+      html += '<td class="align-right"><input type="number" value="' + (s.cost || 0) + '" step="0.01" style="width:80px" onchange="BF.Subs.update(\'' + s.id + '\',\'cost\',this.value)"></td>';
+      html += '<td><input type="number" value="' + (s.billingDate || 1) + '" min="1" max="31" style="width:50px" onchange="BF.Subs.update(\'' + s.id + '\',\'billingDate\',this.value)"></td>';
+      html += '<td><label class="checkbox-row"><input type="checkbox" ' + (s.unused ? 'checked' : '') + ' onchange="BF.Subs.update(\'' + s.id + '\',\'unused\',this.checked)" style="width:auto"> ' + (s.unused ? '<span class="flag-unused">Consider canceling</span>' : 'Active') + '</label></td>';
+      html += '<td><button class="delete-btn" onclick="BF.Subs.delete(\'' + s.id + '\')">&times;</button></td>';
+      html += '</tr>';
+    });
+    if (subs.length === 0) {
+      html = '<tr><td colspan="6" style="text-align:center;color:var(--text-3);padding:16px">No subscriptions tracked</td></tr>';
+    }
+    BF.U.el('subBody').innerHTML = html;
+  }
+};
+
+// ===== NET WORTH MODULE =====
+BF.NetWorth = {
+  addAsset() {
+    const data = BF.Data.get();
+    data.networth.assets.push({ id: BF.U.id(), name: 'New Asset', value: 0 });
+    BF.Data.save();
+    this.render();
+  },
+
+  addLiability() {
+    const data = BF.Data.get();
+    data.networth.liabilities.push({ id: BF.U.id(), name: 'New Liability', value: 0 });
+    BF.Data.save();
+    this.render();
+  },
+
+  deleteAsset(id) {
+    const data = BF.Data.get();
+    data.networth.assets = data.networth.assets.filter(a => a.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  deleteLiability(id) {
+    const data = BF.Data.get();
+    data.networth.liabilities = data.networth.liabilities.filter(l => l.id !== id);
+    BF.Data.save();
+    this.render();
+  },
+
+  updateAsset(id, field, val) {
+    const data = BF.Data.get();
+    const item = data.networth.assets.find(a => a.id === id);
+    if (item) {
+      if (field === 'value') item[field] = parseFloat(val) || 0;
+      else item[field] = val;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  updateLiability(id, field, val) {
+    const data = BF.Data.get();
+    const item = data.networth.liabilities.find(l => l.id === id);
+    if (item) {
+      if (field === 'value') item[field] = parseFloat(val) || 0;
+      else item[field] = val;
+    }
+    BF.Data.save();
+    this.render();
+  },
+
+  snapshot() {
+    const data = BF.Data.get();
+    const totalAssets = data.networth.assets.reduce((s, a) => s + (a.value || 0), 0);
+    const totalLiab = data.networth.liabilities.reduce((s, l) => s + (l.value || 0), 0);
+    const key = BF.U.monthKey();
+
+    // Replace existing snapshot for this month or add new
+    const existing = data.networth.snapshots.findIndex(s => s.month === key);
+    const snap = { month: key, assets: totalAssets, liabilities: totalLiab, netWorth: totalAssets - totalLiab };
+    if (existing >= 0) {
+      data.networth.snapshots[existing] = snap;
+    } else {
+      data.networth.snapshots.push(snap);
+      data.networth.snapshots.sort((a, b) => a.month.localeCompare(b.month));
+    }
+    BF.Data.save();
+    this.render();
+    alert('Snapshot saved for ' + BF.U.monthLabel(key));
+  },
+
+  render() {
+    const data = BF.Data.get();
+    const totalAssets = data.networth.assets.reduce((s, a) => s + (a.value || 0), 0);
+    const totalLiab = data.networth.liabilities.reduce((s, l) => s + (l.value || 0), 0);
+    const nw = totalAssets - totalLiab;
+
+    BF.U.el('nwSummary').innerHTML =
+      '<div class="stat-card"><div class="stat-label">Total Assets</div><div class="stat-value val-green">' + BF.U.fmt(totalAssets) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Total Liabilities</div><div class="stat-value val-red">' + BF.U.fmt(totalLiab) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value ' + (nw >= 0 ? 'val-accent' : 'val-red') + '">' + BF.U.fmt(nw) + '</div></div>';
+
+    // Assets table
+    let aHtml = '';
+    data.networth.assets.forEach(a => {
+      aHtml += '<tr><td><input value="' + (a.name || '') + '" style="width:160px" onchange="BF.NetWorth.updateAsset(\'' + a.id + '\',\'name\',this.value)"></td>';
+      aHtml += '<td class="align-right"><input type="number" value="' + (a.value || 0) + '" style="width:120px" onchange="BF.NetWorth.updateAsset(\'' + a.id + '\',\'value\',this.value)"></td>';
+      aHtml += '<td><button class="delete-btn" onclick="BF.NetWorth.deleteAsset(\'' + a.id + '\')">&times;</button></td></tr>';
+    });
+    if (data.networth.assets.length === 0) aHtml = '<tr><td colspan="3" style="text-align:center;color:var(--text-3);padding:12px">No assets added</td></tr>';
+    BF.U.el('nwAssetBody').innerHTML = aHtml;
+
+    // Liabilities table
+    let lHtml = '';
+    data.networth.liabilities.forEach(l => {
+      lHtml += '<tr><td><input value="' + (l.name || '') + '" style="width:160px" onchange="BF.NetWorth.updateLiability(\'' + l.id + '\',\'name\',this.value)"></td>';
+      lHtml += '<td class="align-right"><input type="number" value="' + (l.value || 0) + '" style="width:120px" onchange="BF.NetWorth.updateLiability(\'' + l.id + '\',\'value\',this.value)"></td>';
+      lHtml += '<td><button class="delete-btn" onclick="BF.NetWorth.deleteLiability(\'' + l.id + '\')">&times;</button></td></tr>';
+    });
+    if (data.networth.liabilities.length === 0) lHtml = '<tr><td colspan="3" style="text-align:center;color:var(--text-3);padding:12px">No liabilities added</td></tr>';
+    BF.U.el('nwLiabBody').innerHTML = lHtml;
+
+    // Net worth chart (SVG line)
+    const snaps = data.networth.snapshots;
+    if (snaps.length >= 2) {
+      const vals = snaps.map(s => s.netWorth);
+      const minV = Math.min(...vals);
+      const maxV = Math.max(...vals);
+      const range = maxV - minV || 1;
+      const w = 600;
+      const h = 180;
+      const pad = 30;
+
+      let points = snaps.map((s, i) => {
+        const x = pad + (i / (snaps.length - 1)) * (w - 2 * pad);
+        const y = h - pad - ((s.netWorth - minV) / range) * (h - 2 * pad);
+        return x + ',' + y;
+      });
+
+      let svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" class="line-chart-svg" style="max-width:100%;height:auto">';
+      // Grid
+      svg += '<line x1="' + pad + '" y1="' + (h - pad) + '" x2="' + (w - pad) + '" y2="' + (h - pad) + '" stroke="var(--border)" stroke-width="1"/>';
+      // Line
+      svg += '<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="' + points.join(' ') + '"/>';
+      // Points + labels
+      snaps.forEach((s, i) => {
+        const x = pad + (i / (snaps.length - 1)) * (w - 2 * pad);
+        const y = h - pad - ((s.netWorth - minV) / range) * (h - 2 * pad);
+        svg += '<circle cx="' + x + '" cy="' + y + '" r="4" fill="var(--accent)"/>';
+        svg += '<text x="' + x + '" y="' + (h - 8) + '" fill="var(--text-3)" font-size="10" text-anchor="middle">' + BF.U.monthShort(s.month) + '</text>';
+        svg += '<text x="' + x + '" y="' + (y - 10) + '" fill="var(--text-2)" font-size="9" text-anchor="middle">' + BF.U.fmt(s.netWorth) + '</text>';
+      });
+      svg += '</svg>';
+      BF.U.el('nwChart').innerHTML = svg;
+    } else {
+      BF.U.el('nwChart').innerHTML = '<div class="empty-state"><p>Save at least 2 monthly snapshots to see the trend</p></div>';
+    }
+  }
+};
+
+// ===== REPORTS MODULE =====
+BF.Reports = {
+  render() {
+    this.renderPie();
+    this.renderBarChart();
+    this.renderSavingsRate();
+    this.renderCatMoM();
+  },
+
+  getBudgetTotals(monthKey) {
+    const data = BF.Data.get();
+    const month = data.budget[monthKey];
+    if (!month) return { income: 0, expenses: 0, categories: {} };
+
+    let totalExpenses = 0;
+    const categories = {};
+    BF.CATEGORIES.forEach(c => {
+      const actual = month[c.id] ? month[c.id].actual : 0;
+      totalExpenses += actual;
+      categories[c.id] = actual;
+    });
+
+    const income = BF.CashFlow.getMonthlyIncome();
+    return { income, expenses: totalExpenses, categories };
+  },
+
+  renderPie() {
+    const current = BF.U.monthKey();
+    const totals = this.getBudgetTotals(current);
+    const cats = BF.CATEGORIES.filter(c => totals.categories[c.id] > 0);
+    const total = cats.reduce((s, c) => s + totals.categories[c.id], 0);
+
+    if (total === 0) {
+      BF.U.el('reportPie').innerHTML = '<div class="empty-state"><p>Add budget actuals to see category breakdown</p></div>';
+      return;
+    }
+
+    const colors = ['var(--accent)', 'var(--blue)', 'var(--green)', 'var(--red)', 'var(--orange)', 'var(--purple)', 'var(--teal)', 'var(--pink)'];
+    let gradientParts = [];
+    let cumPct = 0;
+
+    cats.forEach((c, i) => {
+      const pct = (totals.categories[c.id] / total) * 100;
+      gradientParts.push(colors[i % colors.length] + ' ' + cumPct + '% ' + (cumPct + pct) + '%');
+      cumPct += pct;
+    });
+
+    let html = '<div class="pie-chart" style="background:conic-gradient(' + gradientParts.join(', ') + ')"></div>';
+    html += '<div class="pie-legend">';
+    cats.forEach((c, i) => {
+      const pct = ((totals.categories[c.id] / total) * 100).toFixed(1);
+      html += '<div class="pie-legend-item"><span class="pie-legend-dot" style="background:' + colors[i % colors.length] + '"></span>' + c.name + ': ' + BF.U.fmt(totals.categories[c.id]) + ' (' + pct + '%)</div>';
+    });
+    html += '</div>';
+    BF.U.el('reportPie').innerHTML = html;
+  },
+
+  renderBarChart() {
+    const months = BF.U.last6Months();
+    const income = BF.CashFlow.getMonthlyIncome();
+    let maxVal = income;
+
+    const monthData = months.map(mk => {
+      const t = this.getBudgetTotals(mk);
+      if (t.expenses > maxVal) maxVal = t.expenses;
+      return { key: mk, income, expenses: t.expenses };
+    });
+
+    if (maxVal === 0) maxVal = 1;
+
+    let html = '';
+    monthData.forEach(md => {
+      const incH = Math.round((md.income / maxVal) * 160);
+      const expH = Math.round((md.expenses / maxVal) * 160);
+      html += '<div class="chart-pair">' +
+        '<div class="chart-pair-bars">' +
+        '<div class="chart-bar income" style="height:' + incH + 'px" title="Income: ' + BF.U.fmt(md.income) + '"></div>' +
+        '<div class="chart-bar expense" style="height:' + expH + 'px" title="Expenses: ' + BF.U.fmt(md.expenses) + '"></div>' +
+        '</div>' +
+        '<div class="chart-bar-label">' + BF.U.monthShort(md.key) + '</div>' +
+        '</div>';
+    });
+    BF.U.el('reportBarChart').innerHTML = html;
+  },
+
+  renderSavingsRate() {
+    const months = BF.U.last6Months();
+    const income = BF.CashFlow.getMonthlyIncome();
+
+    let html = '';
+    months.forEach(mk => {
+      const t = this.getBudgetTotals(mk);
+      const rate = income > 0 ? ((income - t.expenses) / income) : 0;
+      const barH = Math.max(Math.round(Math.abs(rate) * 160), 2);
+      const color = rate >= 0 ? 'var(--green)' : 'var(--red)';
+      html += '<div class="chart-bar-col">' +
+        '<div class="chart-bar-value">' + (rate * 100).toFixed(0) + '%</div>' +
+        '<div class="chart-bar" style="height:' + barH + 'px;background:' + color + '"></div>' +
+        '<div class="chart-bar-label">' + BF.U.monthShort(mk) + '</div>' +
+        '</div>';
+    });
+    BF.U.el('reportSavingsRate').innerHTML = html;
+  },
+
+  renderCatMoM() {
+    const months = BF.U.last6Months().slice(-3); // last 3 months
+    let html = '<table class="data-table"><thead><tr><th>Category</th>';
+    months.forEach(mk => { html += '<th class="align-right">' + BF.U.monthLabel(mk) + '</th>'; });
+    html += '<th class="align-right">Trend</th></tr></thead><tbody>';
+
+    BF.CATEGORIES.forEach(c => {
+      html += '<tr><td>' + c.icon + ' ' + c.name + '</td>';
+      const vals = months.map(mk => {
+        const t = this.getBudgetTotals(mk);
+        return t.categories[c.id] || 0;
+      });
+      vals.forEach(v => { html += '<td class="align-right">' + BF.U.fmt(v) + '</td>'; });
+
+      // Trend
+      const first = vals[0] || 0;
+      const last = vals[vals.length - 1] || 0;
+      const diff = last - first;
+      const arrow = diff > 0 ? '\u2191' : diff < 0 ? '\u2193' : '\u2192';
+      const color = diff > 0 ? 'var(--red)' : diff < 0 ? 'var(--green)' : 'var(--text-3)';
+      html += '<td class="align-right" style="color:' + color + '">' + arrow + ' ' + BF.U.fmt(Math.abs(diff)) + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    BF.U.el('reportCatMoM').innerHTML = html;
+  }
+};
+
+// ===== DASHBOARD MODULE =====
+BF.Dashboard = {
+  render() {
+    const data = BF.Data.get();
+    const income = BF.CashFlow.getMonthlyIncome();
+    const expenses = BF.CashFlow.getMonthlyExpenses();
+    const flow = income - expenses;
+    const totalAssets = data.networth.assets.reduce((s, a) => s + (a.value || 0), 0);
+    const totalLiab = data.networth.liabilities.reduce((s, l) => s + (l.value || 0), 0);
+    const nw = totalAssets - totalLiab;
+    const subBurn = BF.Subs.getMonthly();
+
+    // Summary cards
+    BF.U.el('dashCards').innerHTML =
+      '<div class="stat-card"><div class="stat-label">Monthly Income</div><div class="stat-value val-green">' + BF.U.fmt(income) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Monthly Expenses</div><div class="stat-value val-red">' + BF.U.fmt(expenses) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Cash Flow</div><div class="stat-value ' + (flow >= 0 ? 'val-accent' : 'val-red') + '">' + BF.U.fmt(flow) + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">Net Worth</div><div class="stat-value ' + (nw >= 0 ? 'val-blue' : 'val-red') + '">' + BF.U.fmt(nw) + '</div></div>';
+
+    // Financial Health Score
+    this.renderHealthScore(data, income, expenses, flow, totalLiab);
+
+    // 6-month chart
+    this.render6MonthChart(income);
+
+    // Savings goals
+    this.renderGoals(data);
+
+    // Sub burn
+    BF.U.el('dashSubBurn').innerHTML =
+      '<div style="font-size:1.8em;font-weight:700;color:var(--red)">' + BF.U.fmt(subBurn) + '<span style="font-size:0.4em;color:var(--text-3)">/month</span></div>' +
+      '<div style="font-size:0.85em;color:var(--text-3);margin-top:4px">' + BF.U.fmt(subBurn * 12) + ' per year across ' + data.subscriptions.length + ' subscription' + (data.subscriptions.length !== 1 ? 's' : '') + '</div>';
+  },
+
+  renderHealthScore(data, income, expenses, flow, totalLiab) {
+    let score = 0;
+    const breakdown = [];
+
+    // 1. Savings rate > 20% = 25 pts
+    const savingsRate = income > 0 ? (flow / income) : 0;
+    const savingsPts = savingsRate >= 0.2 ? 25 : Math.round(Math.max(0, savingsRate / 0.2) * 25);
+    score += savingsPts;
+    breakdown.push({ label: 'Savings rate (' + (savingsRate * 100).toFixed(0) + '%)', pts: savingsPts, max: 25, good: savingsRate >= 0.2 });
+
+    // 2. Debt-to-income < 30% = 25 pts
+    const totalDebt = data.debts.reduce((s, d) => s + d.balance, 0);
+    const dti = income > 0 ? (totalDebt / (income * 12)) : 0;
+    const dtiPts = dti <= 0.3 ? 25 : Math.round(Math.max(0, (1 - (dti - 0.3) / 0.7)) * 25);
+    score += Math.max(0, dtiPts);
+    breakdown.push({ label: 'Debt-to-income (' + (dti * 100).toFixed(0) + '%)', pts: Math.max(0, dtiPts), max: 25, good: dti <= 0.3 });
+
+    // 3. Emergency fund (3+ months) = 25 pts
+    const targetMonths = data.settings.emergencyMonths || 3;
+    const savingsGoal = data.goals.find(g => g.name && g.name.toLowerCase().includes('emergency'));
+    const emergencySaved = savingsGoal ? (savingsGoal.current || 0) : 0;
+    const emergencyTarget = expenses * targetMonths;
+    const emergencyRatio = emergencyTarget > 0 ? emergencySaved / emergencyTarget : 0;
+    const emergencyPts = emergencyRatio >= 1 ? 25 : Math.round(emergencyRatio * 25);
+    score += emergencyPts;
+    breakdown.push({ label: 'Emergency fund (' + (emergencyRatio * 100).toFixed(0) + '%)', pts: emergencyPts, max: 25, good: emergencyRatio >= 1 });
+
+    // 4. Positive cash flow = 25 pts
+    const flowPts = flow > 0 ? 25 : (flow === 0 ? 12 : 0);
+    score += flowPts;
+    breakdown.push({ label: 'Positive cash flow', pts: flowPts, max: 25, good: flow > 0 });
+
+    score = Math.min(100, Math.max(0, score));
+
+    // Gauge color
+    let gaugeColor = 'var(--red)';
+    let label = 'Needs Work';
+    if (score >= 80) { gaugeColor = 'var(--green)'; label = 'Excellent'; }
+    else if (score >= 60) { gaugeColor = 'var(--accent)'; label = 'Good'; }
+    else if (score >= 40) { gaugeColor = 'var(--orange)'; label = 'Fair'; }
+
+    const gauge = BF.U.el('healthGauge');
+    gauge.style.background = 'conic-gradient(' + gaugeColor + ' ' + (score * 3.6) + 'deg, var(--surface-3) ' + (score * 3.6) + 'deg)';
+    BF.U.el('healthScore').textContent = score;
+    BF.U.el('healthScore').style.color = gaugeColor;
+    BF.U.el('healthLabel').textContent = label;
+    BF.U.el('healthLabel').style.color = gaugeColor;
+
+    let bHtml = '';
+    breakdown.forEach(b => {
+      bHtml += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">';
+      bHtml += '<span style="font-size:0.85em">' + b.label + '</span>';
+      bHtml += '<span style="font-size:0.85em;font-weight:600;color:' + (b.good ? 'var(--green)' : 'var(--orange)') + '">' + b.pts + '/' + b.max + '</span>';
+      bHtml += '</div>';
+    });
+    BF.U.el('healthBreakdown').innerHTML = bHtml;
+  },
+
+  render6MonthChart(income) {
+    const months = BF.U.last6Months();
+    let maxVal = income;
+
+    const monthData = months.map(mk => {
+      const t = BF.Reports.getBudgetTotals(mk);
+      if (t.expenses > maxVal) maxVal = t.expenses;
+      return { key: mk, income, expenses: t.expenses };
+    });
+
+    if (maxVal === 0) maxVal = 1;
+
+    let html = '';
+    monthData.forEach(md => {
+      const incH = Math.round((md.income / maxVal) * 160);
+      const expH = Math.round((md.expenses / maxVal) * 160);
+      html += '<div class="chart-pair">' +
+        '<div class="chart-pair-bars">' +
+        '<div class="chart-bar income" style="height:' + incH + 'px" title="Income: ' + BF.U.fmt(md.income) + '"></div>' +
+        '<div class="chart-bar expense" style="height:' + expH + 'px" title="Expenses: ' + BF.U.fmt(md.expenses) + '"></div>' +
+        '</div>' +
+        '<div class="chart-bar-label">' + BF.U.monthShort(md.key) + '</div>' +
+        '</div>';
+    });
+    BF.U.el('dashChart').innerHTML = html;
+  },
+
+  renderGoals(data) {
+    if (data.goals.length === 0) {
+      BF.U.el('dashGoals').innerHTML = '<div style="text-align:center;color:var(--text-3);padding:12px;font-size:0.85em">No savings goals set. Add them in Settings.</div>';
+      return;
+    }
+
+    let html = '';
+    data.goals.forEach(g => {
+      const pct = g.target > 0 ? Math.min((g.current / g.target) * 100, 100) : 0;
+      html += '<div class="goal-item">' +
+        '<div class="goal-info">' +
+        '<div class="goal-name">' + g.name + '</div>' +
+        '<div class="goal-amounts">' + BF.U.fmt(g.current) + ' of ' + BF.U.fmt(g.target) + '</div>' +
+        '<div class="progress-track" style="margin-top:6px"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+        '<div class="goal-pct">' + pct.toFixed(0) + '%</div>' +
+        '</div>';
+    });
+    BF.U.el('dashGoals').innerHTML = html;
+  }
+};
+
+// ===== SETTINGS MODULE =====
+BF.Settings = {
+  themes: [
+    { id: 'gold', label: 'Gold', color: '#D4A843' },
+    { id: 'ocean', label: 'Ocean', color: '#4a9cd6' },
+    { id: 'forest', label: 'Forest', color: '#5ab88a' },
+    { id: 'rose', label: 'Rose', color: '#d47a9a' },
+    { id: 'lavender', label: 'Lavender', color: '#9a7cd6' },
+    { id: 'ember', label: 'Ember', color: '#d4643a' },
+    { id: 'mint', label: 'Mint', color: '#5ab8b8' },
+    { id: 'slate', label: 'Slate', color: '#8899aa' }
+  ],
+
+  init() {
+    const data = BF.Data.get();
+
+    // Currency
+    BF.U.currency = data.settings.currency || '$';
+    BF.U.el('setCurrency').value = BF.U.currency;
+
+    // Theme
+    this.applyTheme(data.settings.theme || 'gold');
+    this.renderThemeGrid();
+
+    // Font size
+    this.setFontSize(data.settings.fontSize || 'm', true);
+
+    // Emergency months
+    BF.U.el('setEmergencyMonths').value = data.settings.emergencyMonths || 3;
+
+    // Goals
+    this.renderGoals();
+  },
+
+  renderThemeGrid() {
+    const data = BF.Data.get();
+    const current = data.settings.theme || 'gold';
+    let html = '';
+    this.themes.forEach(t => {
+      html += '<div class="theme-swatch ' + (t.id === current ? 'active' : '') + '" style="background:' + t.color + '" onclick="BF.Settings.setTheme(\'' + t.id + '\')"><span>' + t.label + '</span></div>';
+    });
+    BF.U.el('themeGrid').innerHTML = html;
+  },
+
+  setTheme(id) {
+    const data = BF.Data.get();
+    data.settings.theme = id;
+    BF.Data.save();
+    this.applyTheme(id);
+    this.renderThemeGrid();
+    BF.refresh();
+  },
+
+  applyTheme(id) {
+    if (id === 'gold') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', id);
+    }
+  },
+
+  saveCurrency() {
+    const data = BF.Data.get();
+    const val = BF.U.el('setCurrency').value;
+    data.settings.currency = val;
+    BF.U.currency = val;
+    BF.Data.save();
+    BF.refresh();
+  },
+
+  setFontSize(size, noSave) {
+    document.documentElement.setAttribute('data-fontsize', size);
+    document.querySelectorAll('#fontSizeToggle .toggle-opt').forEach(b => {
+      b.classList.toggle('active', b.dataset.size === size);
+    });
+    if (!noSave) {
+      const data = BF.Data.get();
+      data.settings.fontSize = size;
+      BF.Data.save();
+    }
+  },
+
+  saveEmergency() {
+    const data = BF.Data.get();
+    data.settings.emergencyMonths = parseInt(BF.U.el('setEmergencyMonths').value) || 3;
+    BF.Data.save();
+  },
+
+  addGoal() {
+    const data = BF.Data.get();
+    data.goals.push({ id: BF.U.id(), name: 'New Goal', target: 1000, current: 0 });
+    BF.Data.save();
+    this.renderGoals();
+  },
+
+  deleteGoal(id) {
+    const data = BF.Data.get();
+    data.goals = data.goals.filter(g => g.id !== id);
+    BF.Data.save();
+    this.renderGoals();
+  },
+
+  updateGoal(id, field, val) {
+    const data = BF.Data.get();
+    const goal = data.goals.find(g => g.id === id);
+    if (goal) {
+      if (field === 'name') goal[field] = val;
+      else goal[field] = parseFloat(val) || 0;
+    }
+    BF.Data.save();
+    this.renderGoals();
+  },
+
+  renderGoals() {
+    const data = BF.Data.get();
+    let html = '';
+    data.goals.forEach(g => {
+      html += '<div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">';
+      html += '<input value="' + (g.name || '') + '" style="width:120px;font-size:0.85em" onchange="BF.Settings.updateGoal(\'' + g.id + '\',\'name\',this.value)">';
+      html += '<input type="number" value="' + (g.current || 0) + '" style="width:80px;font-size:0.85em" placeholder="Saved" onchange="BF.Settings.updateGoal(\'' + g.id + '\',\'current\',this.value)">';
+      html += '<span style="color:var(--text-3);font-size:0.75em">of</span>';
+      html += '<input type="number" value="' + (g.target || 0) + '" style="width:80px;font-size:0.85em" placeholder="Target" onchange="BF.Settings.updateGoal(\'' + g.id + '\',\'target\',this.value)">';
+      html += '<button class="delete-btn" onclick="BF.Settings.deleteGoal(\'' + g.id + '\')">&times;</button>';
+      html += '</div>';
+    });
+    if (data.goals.length === 0) html = '<div style="color:var(--text-3);font-size:0.85em">No goals yet</div>';
+    BF.U.el('settingsGoals').innerHTML = html;
+  },
+
+  exportCSV() {
+    const data = BF.Data.get();
+    let csv = 'Section,Field,Value\n';
+
+    // Budget
+    for (const mk in data.budget) {
+      BF.CATEGORIES.forEach(c => {
+        const entry = data.budget[mk][c.id];
+        if (entry) {
+          csv += 'Budget,' + mk + '|' + c.id + '|budget,' + entry.budget + '\n';
+          csv += 'Budget,' + mk + '|' + c.id + '|actual,' + entry.actual + '\n';
+        }
+      });
+    }
+
+    // Cash flow
+    data.cashflow.income.forEach(i => {
+      csv += 'Income,' + i.name + '|' + i.category + '|' + i.frequency + ',' + i.amount + '\n';
+    });
+    data.cashflow.expenses.forEach(e => {
+      csv += 'Expense,' + e.name + '|' + e.category + '|' + e.frequency + '|' + (e.recurring ? '1' : '0') + ',' + e.amount + '\n';
+    });
+
+    // Debts
+    data.debts.forEach(d => {
+      csv += 'Debt,' + d.name + '|' + d.apr + '|' + d.minPayment + ',' + d.balance + '\n';
+    });
+
+    // Subscriptions
+    data.subscriptions.forEach(s => {
+      csv += 'Subscription,' + s.name + '|' + s.category + '|' + s.billingDate + '|' + (s.unused ? '1' : '0') + ',' + s.cost + '\n';
+    });
+
+    // Net worth
+    data.networth.assets.forEach(a => {
+      csv += 'Asset,' + a.name + ',' + a.value + '\n';
+    });
+    data.networth.liabilities.forEach(l => {
+      csv += 'Liability,' + l.name + ',' + l.value + '\n';
+    });
+
+    // Goals
+    data.goals.forEach(g => {
+      csv += 'Goal,' + g.name + '|' + g.target + ',' + g.current + '\n';
+    });
+
+    // Snapshots
+    data.networth.snapshots.forEach(s => {
+      csv += 'Snapshot,' + s.month + '|' + s.assets + '|' + s.liabilities + ',' + s.netWorth + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'behike-finance-' + BF.U.monthKey() + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const lines = e.target.result.split('\n').slice(1); // skip header
+        const data = BF.Data.defaults();
+
+        lines.forEach(line => {
+          if (!line.trim()) return;
+          const parts = line.split(',');
+          const section = parts[0];
+          const field = parts[1];
+          const value = parseFloat(parts[2]) || 0;
+
+          if (section === 'Budget') {
+            const [mk, catId, type] = field.split('|');
+            if (!data.budget[mk]) {
+              data.budget[mk] = {};
+              BF.CATEGORIES.forEach(c => { data.budget[mk][c.id] = { budget: 0, actual: 0 }; });
+            }
+            if (data.budget[mk][catId]) data.budget[mk][catId][type] = value;
+          } else if (section === 'Income') {
+            const [name, category, frequency] = field.split('|');
+            data.cashflow.income.push({ id: BF.U.id(), name, category, amount: value, frequency });
+          } else if (section === 'Expense') {
+            const [name, category, frequency, recurring] = field.split('|');
+            data.cashflow.expenses.push({ id: BF.U.id(), name, category, amount: value, frequency, recurring: recurring === '1' });
+          } else if (section === 'Debt') {
+            const [name, apr, minPayment] = field.split('|');
+            data.debts.push({ id: BF.U.id(), name, balance: value, apr: parseFloat(apr) || 0, minPayment: parseFloat(minPayment) || 0 });
+          } else if (section === 'Subscription') {
+            const [name, category, billingDate, unused] = field.split('|');
+            data.subscriptions.push({ id: BF.U.id(), name, cost: value, category, billingDate: parseInt(billingDate) || 1, unused: unused === '1' });
+          } else if (section === 'Asset') {
+            data.networth.assets.push({ id: BF.U.id(), name: field, value });
+          } else if (section === 'Liability') {
+            data.networth.liabilities.push({ id: BF.U.id(), name: field, value });
+          } else if (section === 'Goal') {
+            const [name, target] = field.split('|');
+            data.goals.push({ id: BF.U.id(), name, target: parseFloat(target) || 0, current: value });
+          } else if (section === 'Snapshot') {
+            const [month, assets, liabilities] = field.split('|');
+            data.networth.snapshots.push({ month, assets: parseFloat(assets) || 0, liabilities: parseFloat(liabilities) || 0, netWorth: value });
+          }
+        });
+
+        // Preserve settings
+        data.settings = BF.Data.get().settings;
+        BF.Data._data = data;
+        BF.Data.save();
+        BF.refresh();
+        alert('Data imported successfully');
+      } catch(err) {
+        alert('Error importing CSV: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  },
+
+  resetAll() {
+    if (confirm('Are you sure you want to delete ALL your financial data? This cannot be undone.')) {
+      if (confirm('Really? This will erase everything. Last chance.')) {
+        BF.Data._data = BF.Data.defaults();
+        BF.Data.save();
+        BF.refresh();
+        BF.Settings.init();
+      }
+    }
+  }
+};
+
+// ===== GLOBAL REFRESH =====
+BF.refresh = function() {
+  // Determine which panel is active
+  const activePanel = document.querySelector('.panel.active');
+  if (!activePanel) return;
+  const id = activePanel.id.replace('panel-', '');
+
+  switch(id) {
+    case 'dashboard': BF.Dashboard.render(); break;
+    case 'budget': BF.Budget.render(); break;
+    case 'cashflow': BF.CashFlow.render(); break;
+    case 'debt': BF.Debt.render(); break;
+    case 'subscriptions': BF.Subs.render(); break;
+    case 'networth': BF.NetWorth.render(); break;
+    case 'reports': BF.Reports.render(); break;
+    case 'settings': BF.Settings.renderGoals(); break;
+  }
+};
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function() {
+  BF.Data.load();
+  BF.Settings.init();
+  BF.Tabs.init();
+  BF.Dashboard.render();
+});
+</script>
+</body>
+</html>

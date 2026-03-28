@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AI Agent Security Guide. Protect your business from prompt injection, data leakage, and agent hijacking. 48 pages. $14.99 one-time.">
+<title>AI Agent Security Guide — Protect Your Business | Behike</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #060609;
+  --surface: #0f0f18;
+  --surface2: #181824;
+  --border: rgba(255,255,255,0.07);
+  --text: #e8e8f2;
+  --muted: rgba(232,232,242,0.5);
+  --accent: #FF453A;
+  --accent2: #FF8C42;
+  --success: #6af79a;
+  --radius: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+/* ── ANIMATIONS ────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,69,58,0.3); }
+  50%       { box-shadow: 0 0 0 8px rgba(255,69,58,0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-animate {
+  animation: fadeUp 0.7s ease both;
+}
+
+.hero-animate-delay-1 { animation-delay: 0.1s; }
+.hero-animate-delay-2 { animation-delay: 0.22s; }
+.hero-animate-delay-3 { animation-delay: 0.34s; }
+.hero-animate-delay-4 { animation-delay: 0.46s; }
+
+/* ── NAV ──────────────────────────────────────────────────────────── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,6,9,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-cta {
+  background: var(--accent);
+  color: white;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.nav-cta:hover { opacity: 0.85; }
+
+/* ── HERO ──────────────────────────────────────────────────────────── */
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 100px 40px 80px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: clamp(36px, 6vw, 62px);
+  font-weight: 800;
+  letter-spacing: -2px;
+  line-height: 1.05;
+  margin-bottom: 24px;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+  animation: pulseRed 2.5s ease infinite;
+}
+
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover { border-color: rgba(255,255,255,0.2); }
+
+.price-note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+/* ── THREAT VISUAL ─────────────────────────────────────────────────── */
+.mockup-wrap {
+  max-width: 900px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.mockup {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.6);
+}
+
+.mockup-bar {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot-red   { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.dot-yellow{ width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; }
+.dot-green { width: 12px; height: 12px; border-radius: 50%; background: #28c840; }
+
+.mockup-title { font-size: 12px; color: var(--muted); margin-left: 8px; font-weight: 500; }
+
+.mockup-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  min-height: 360px;
+}
+
+.mockup-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.threat-item {
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.threat-item.critical {
+  background: rgba(255,69,58,0.08);
+  border: 1px solid rgba(255,69,58,0.25);
+}
+
+.threat-item.warning {
+  background: rgba(255,140,66,0.06);
+  border: 1px solid rgba(255,140,66,0.18);
+  opacity: 0.7;
+}
+
+.threat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.threat-item.critical .threat-dot { background: #FF453A; }
+.threat-item.warning  .threat-dot { background: #FF8C42; }
+
+.threat-label { font-weight: 600; color: var(--text); }
+.threat-sub   { color: var(--muted); font-size: 10px; margin-top: 2px; }
+
+.mockup-main {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mock-log-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.mock-log-entry {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.mock-log-entry.alert {
+  border-color: rgba(255,69,58,0.3);
+  background: rgba(255,69,58,0.04);
+}
+
+.mock-log-entry.blocked {
+  border-color: rgba(106,247,154,0.2);
+  background: rgba(106,247,154,0.03);
+}
+
+.log-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.log-badge.danger  { background: rgba(255,69,58,0.15);  color: #FF453A; }
+.log-badge.safe    { background: rgba(106,247,154,0.12); color: #6af79a; }
+.log-badge.warn    { background: rgba(255,140,66,0.12);  color: #FF8C42; }
+
+.log-text { line-height: 1.5; color: var(--muted); }
+.log-text strong { color: var(--text); }
+
+.mock-checklist {
+  margin-top: auto;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.check-pill {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.check-pill.done   { background: rgba(106,247,154,0.1); color: #6af79a; border: 1px solid rgba(106,247,154,0.2); }
+.check-pill.todo   { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+
+/* ── PAS SECTION ───────────────────────────────────────────────────── */
+.pas {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.pas-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pas-block::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent2));
+}
+
+.pas-paragraph {
+  font-size: 17px;
+  line-height: 1.75;
+  margin-bottom: 18px;
+  color: var(--muted);
+}
+
+.pas-paragraph:last-child { margin-bottom: 0; }
+
+.pas-paragraph strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── CHAPTERS ──────────────────────────────────────────────────────── */
+.features {
+  max-width: 900px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: border-color 0.2s;
+}
+
+.feature-card:hover { border-color: rgba(255,69,58,0.3); }
+
+.feature-icon { font-size: 28px; margin-bottom: 14px; }
+.feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── WHO IT'S FOR ──────────────────────────────────────────────────── */
+.for-section {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.for-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.for-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+
+.for-item:hover { border-color: rgba(255,69,58,0.25); }
+
+.for-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── VALUE STACK ───────────────────────────────────────────────────── */
+.value-section {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.value-table {
+  margin-top: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.value-row:last-child { border-bottom: none; }
+
+.value-row.total {
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.value-row.final {
+  background: rgba(255,69,58,0.06);
+  border-top: 1px solid rgba(255,69,58,0.2);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.value-label { color: var(--muted); }
+.value-row.total .value-label,
+.value-row.final .value-label { color: var(--text); }
+
+.value-price { color: var(--muted); }
+.value-row.total .value-price { color: var(--muted); }
+.value-row.final .value-price { color: var(--accent); font-size: 20px; }
+
+/* ── PRICING ───────────────────────────────────────────────────────── */
+.pricing {
+  max-width: 520px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+  text-align: center;
+}
+
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,69,58,0.3);
+  border-radius: 20px;
+  padding: 48px;
+  margin-top: 40px;
+}
+
+.price-amount {
+  font-size: 64px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  margin-bottom: 4px;
+}
+
+.price-period {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+
+.price-includes {
+  text-align: left;
+  margin-bottom: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.check { color: var(--success); font-size: 16px; }
+
+/* ── FAQ ───────────────────────────────────────────────────────────── */
+.faq {
+  max-width: 640px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border);
+  padding: 20px 0;
+}
+
+.faq-q {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.faq-a {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── FINAL CTA ─────────────────────────────────────────────────────── */
+.final-cta {
+  max-width: 680px;
+  margin: 0 auto 100px;
+  padding: 0 40px;
+  text-align: center;
+}
+
+.final-cta-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,69,58,0.25);
+  border-radius: 20px;
+  padding: 60px 48px;
+}
+
+.final-cta-card h2 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.final-cta-card p {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 36px;
+  line-height: 1.7;
+}
+
+/* ── FOOTER ────────────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+footer a { color: var(--muted); }
+
+/* ── RESPONSIVE ────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  nav { padding: 0 20px; }
+  .hero { padding: 72px 24px 60px; }
+  .mockup-wrap, .features, .pricing, .faq,
+  .pas, .for-section, .value-section, .final-cta { padding: 0 20px; }
+
+  .mockup-body { grid-template-columns: 1fr; }
+  .mockup-sidebar { border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; }
+
+  .pricing-card { padding: 32px 24px; }
+  .pas-block { padding: 28px 24px; }
+  .final-cta-card { padding: 40px 24px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Behike</a>
+  <a href="https://behikeai.gumroad.com/l/ai-security-guide" class="nav-cta" target="_blank">
+    Get the Guide. $14.99
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow hero-animate">Security Guide. PDF. 48 Pages.</div>
+  <h1 class="hero-animate hero-animate-delay-1">
+    Protect Your Business<br><span>Before AI Gets You Hacked.</span>
+  </h1>
+  <p class="hero-sub hero-animate hero-animate-delay-2">
+    AI tools are inside most businesses. Most businesses have no idea what that opens them up to.
+    Prompt injection. Data leakage. Agent hijacking. Supply chain attacks.
+    This guide covers the real threats and exactly how to defend against each one.
+  </p>
+  <div class="hero-actions hero-animate hero-animate-delay-3">
+    <a href="https://behikeai.gumroad.com/l/ai-security-guide" class="btn-primary" target="_blank">
+      Get the Guide. $14.99
+    </a>
+  </div>
+  <p class="price-note hero-animate hero-animate-delay-4">One-time payment. Instant PDF download. 48 pages.</p>
+</section>
+
+<!-- THREAT VISUAL MOCKUP -->
+<div class="mockup-wrap reveal">
+  <div class="mockup">
+    <div class="mockup-bar">
+      <div class="dot-red"></div>
+      <div class="dot-yellow"></div>
+      <div class="dot-green"></div>
+      <div class="mockup-title">AI Security Monitor. behike-agent-stack</div>
+    </div>
+    <div class="mockup-body">
+      <div class="mockup-sidebar">
+        <div style="font-size:10px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px;">Threat Map</div>
+        <div class="threat-item critical">
+          <div class="threat-dot"></div>
+          <div>
+            <div class="threat-label">Prompt Injection</div>
+            <div class="threat-sub">Critical. Active.</div>
+          </div>
+        </div>
+        <div class="threat-item critical">
+          <div class="threat-dot"></div>
+          <div>
+            <div class="threat-label">Data Leakage</div>
+            <div class="threat-sub">Critical. Patch needed.</div>
+          </div>
+        </div>
+        <div class="threat-item warning">
+          <div class="threat-dot"></div>
+          <div>
+            <div class="threat-label">Agent Hijack</div>
+            <div class="threat-sub">High. Mitigated.</div>
+          </div>
+        </div>
+        <div class="threat-item warning">
+          <div class="threat-dot"></div>
+          <div>
+            <div class="threat-label">Supply Chain</div>
+            <div class="threat-sub">Monitor.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-main">
+        <div class="mock-log-label">Security Log</div>
+        <div class="mock-log-entry alert">
+          <span class="log-badge danger">Alert</span>
+          <div class="log-text"><strong>Prompt injection attempt detected.</strong> External input tried to override system instructions via user message field.</div>
+        </div>
+        <div class="mock-log-entry blocked">
+          <span class="log-badge safe">Blocked</span>
+          <div class="log-text"><strong>Data exfiltration blocked.</strong> Agent attempted to surface customer PII in response. Output sanitizer caught it.</div>
+        </div>
+        <div class="mock-log-entry alert">
+          <span class="log-badge warn">Review</span>
+          <div class="log-text"><strong>Unauthorized tool call.</strong> Agent invoked file-write without explicit user approval. Action queued for review.</div>
+        </div>
+        <div class="mock-checklist">
+          <span class="check-pill done">Input validation</span>
+          <span class="check-pill done">Output sanitizer</span>
+          <span class="check-pill done">Approval gate</span>
+          <span class="check-pill todo">Prompt firewall</span>
+          <span class="check-pill todo">Audit log</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAS COPY -->
+<section class="pas reveal">
+  <div class="section-label">The Problem</div>
+  <div class="section-title" style="margin-bottom: 40px;">Most people find out<br>something went wrong<br>only after it's too late.</div>
+  <div class="pas-block">
+    <p class="pas-paragraph">
+      <strong>You're using AI to handle emails, customer data, business decisions.</strong>
+      That's the right move. AI is a real productivity multiplier and the builders who figure it out first win.
+    </p>
+    <p class="pas-paragraph">
+      But every tool you connect is another attack surface.
+      Every prompt you send is a potential vector.
+      Every agent you deploy is making decisions you may not have approved.
+    </p>
+    <p class="pas-paragraph">
+      <strong>48 pages. Five real threats. Exact defense for each.</strong>
+      Written for business owners, not security researchers.
+    </p>
+  </div>
+</section>
+
+<!-- CHAPTERS / FEATURES -->
+<section class="features reveal">
+  <div class="section-label">What's Inside</div>
+  <div class="section-title">Six chapters.<br>Every real threat covered.</div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">01</div>
+      <div class="feature-title">What's Actually Dangerous (and What's Hype)</div>
+      <div class="feature-desc">Cut through the fear and focus on real threats. Not every AI headline is a fire. Know which ones are.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">02</div>
+      <div class="feature-title">Prompt Injection</div>
+      <div class="feature-desc">The number one threat. How it works, how attackers use it, and exactly how to stop it from hitting your system.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">03</div>
+      <div class="feature-title">Data Leakage</div>
+      <div class="feature-desc">What you're accidentally exposing every time you paste customer data into an AI tool, and how to lock it down.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">04</div>
+      <div class="feature-title">Unauthorized AI Actions</div>
+      <div class="feature-desc">When your agent does things you didn't approve. The mechanics, the risk, and how to add an approval layer.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">05</div>
+      <div class="feature-title">Defense Systems</div>
+      <div class="feature-desc">The exact security stack used across 3 machines and 6 agents. Practical. Deployable today. No enterprise budget required.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">A</div>
+      <div class="feature-title">Security Checklist (Appendix)</div>
+      <div class="feature-desc">One-page reference for every AI tool you use. Print it. Post it. Run through it every time you add a new tool.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="for-section reveal">
+  <div class="section-label">Who It's For</div>
+  <div class="section-title" style="margin-bottom: 0;">This guide is for you<br>if any of these land.</div>
+  <div class="for-list">
+    <div class="for-item">
+      <div class="for-icon">💼</div>
+      <div>Business owners using ChatGPT, Claude, or other AI tools in their day-to-day operations.</div>
+    </div>
+    <div class="for-item">
+      <div class="for-icon">🤖</div>
+      <div>Builders who deploy AI agents and want to do it safely, not just fast.</div>
+    </div>
+    <div class="for-item">
+      <div class="for-icon">📰</div>
+      <div>Anyone who's seen the headlines and wants practical answers, not theory from a conference slide deck.</div>
+    </div>
+    <div class="for-item">
+      <div class="for-icon">🔐</div>
+      <div>Solopreneurs handling sensitive client data with AI tools and no dedicated security team.</div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE STACK -->
+<section class="value-section reveal">
+  <div class="section-label">The Value</div>
+  <div class="section-title" style="margin-bottom: 0;">What it's actually worth.</div>
+  <div class="value-table" style="margin-top: 40px;">
+    <div class="value-row">
+      <span class="value-label">5-chapter security system</span>
+      <span class="value-price">$197 value</span>
+    </div>
+    <div class="value-row">
+      <span class="value-label">Real threat breakdowns with examples</span>
+      <span class="value-price">$97 value</span>
+    </div>
+    <div class="value-row">
+      <span class="value-label">Defense checklist (print and post it)</span>
+      <span class="value-price">$27 value</span>
+    </div>
+    <div class="value-row">
+      <span class="value-label">Lifetime updates</span>
+      <span class="value-price">$47 value</span>
+    </div>
+    <div class="value-row total">
+      <span class="value-label">Total value</span>
+      <span class="value-price">$368</span>
+    </div>
+    <div class="value-row final">
+      <span class="value-label">Your price today</span>
+      <span class="value-price">$14.99</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing reveal" id="pricing">
+  <div class="section-label">Pricing</div>
+  <div class="section-title">One price.<br>Keep it forever.</div>
+
+  <div class="pricing-card">
+    <div class="price-amount">$14.99</div>
+    <div class="price-period">One-time. No subscription. All future updates included.</div>
+
+    <div class="price-includes">
+      <div class="price-item"><span class="check">✓</span> AI Agent Security Guide PDF (48 pages)</div>
+      <div class="price-item"><span class="check">✓</span> Chapter 1: What's dangerous vs. hype</div>
+      <div class="price-item"><span class="check">✓</span> Chapter 2: Prompt injection defense</div>
+      <div class="price-item"><span class="check">✓</span> Chapter 3: Data leakage prevention</div>
+      <div class="price-item"><span class="check">✓</span> Chapter 4: Unauthorized action controls</div>
+      <div class="price-item"><span class="check">✓</span> Chapter 5: Full defense system stack</div>
+      <div class="price-item"><span class="check">✓</span> Appendix: Security checklist (1 page, printable)</div>
+      <div class="price-item"><span class="check">✓</span> Lifetime updates as threats evolve</div>
+    </div>
+
+    <a class="btn-primary" href="https://behikeai.gumroad.com/l/ai-security-guide" target="_blank"
+       style="display:block; text-align:center; font-size:16px; padding:16px 32px; animation: pulseRed 2.5s ease infinite;">
+      Get the Guide. $14.99
+    </a>
+    <div style="font-size:12px; color:var(--muted); margin-top:12px; text-align:center;">
+      Instant download after purchase. PDF. Works on any device.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq reveal">
+  <div class="section-label">FAQ</div>
+  <div class="section-title" style="margin-bottom:40px;">Common questions.</div>
+
+  <div class="faq-item">
+    <div class="faq-q">Is this too technical for me?</div>
+    <div class="faq-a">Written for business owners who use AI tools, not security researchers. If you can read an email, you can read this guide. No jargon without explanation.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">What if I only use ChatGPT occasionally?</div>
+    <div class="faq-a">Then Chapter 2 (prompt injection) is exactly what you need. One chapter is worth the price. Occasional use does not mean zero risk.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Does this cover specific tools like Claude, ChatGPT, and Gemini?</div>
+    <div class="faq-a">Yes. All major AI tools covered. The principles are universal, the examples are specific. You'll recognize the tools you're already using.</div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta reveal">
+  <div class="final-cta-card">
+    <h2>Don't wait for a breach<br>to take security seriously.</h2>
+    <p>48 pages. Five real threats. Exact defense for each. $14.99 and you walk away knowing exactly how to protect your business.</p>
+    <a href="https://behikeai.gumroad.com/l/ai-security-guide" class="btn-primary" target="_blank"
+       style="font-size:16px; padding:16px 40px;">
+      Get the Guide. $14.99
+    </a>
+    <p style="margin-top:16px; margin-bottom:0; font-size:13px;">Instant download. Lifetime updates. 30-day Gumroad refund policy.</p>
+  </div>
+</section>
+
+<!-- Quiz CTA -->
+<section style="padding: 40px 24px; max-width: 700px; margin: 0 auto; text-align:center;">
+  <p style="font-size:15px; color:#8e8e93; margin-bottom:16px;">Not sure if you need this guide yet?</p>
+  <a href="quiz-ai-security.html" style="display:inline-block; background:#FF453A; color:#fff; padding:14px 32px; border-radius:980px; font-size:15px; font-weight:600; text-decoration:none;">Take the Free AI Security Risk Quiz</a>
+  <p style="font-size:13px; color:#636366; margin-top:12px;">7 questions. 2 minutes. You'll know your exact risk level.</p>
+</section>
+
+<!-- Cross-sell -->
+<section style="padding: 80px 24px; max-width: 900px; margin: 0 auto;">
+  <p style="text-align:center; font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:#8e8e93; margin-bottom:12px;">Pair it with</p>
+  <h2 style="text-align:center; font-size:28px; font-weight:700; letter-spacing:-0.03em; color:#e8e8e8; margin-bottom:48px;">Secure the whole system</h2>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px;">
+    <a href="ai-employee-guide.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF453A'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Guide</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">AI Employee Guide</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">Build the system this guide protects. 20-chapter blueprint for a 3-machine AI network.</p>
+      <p style="font-size:15px; font-weight:600; color:#FF453A;">$19.99</p>
+    </a>
+    <a href="ai-prompt-cheat-sheet.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF453A'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Reference</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">AI Prompt Cheat Sheet</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">50+ contract prompts including security-aware templates that minimize data exposure.</p>
+      <p style="font-size:15px; font-weight:600; color:#FF453A;">$9.99</p>
+    </a>
+    <a href="behike-method-v2.html" style="text-decoration:none; background:#111; border:1px solid #2a2a2a; border-radius:16px; padding:28px; display:block;" onmouseover="this.style.borderColor='#FF453A'" onmouseout="this.style.borderColor='#2a2a2a'">
+      <p style="font-size:12px; color:#8e8e93; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Guide</p>
+      <p style="font-size:17px; font-weight:600; color:#e8e8e8; margin-bottom:8px;">Behike Method v2</p>
+      <p style="font-size:14px; color:#8e8e93; line-height:1.5; margin-bottom:16px;">The operating system for a one-person AI business. Security starts with good system design.</p>
+      <p style="font-size:15px; font-weight:600; color:#FF453A;">$19.99</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="index.html">Behike</a> &middot; <a href="index.html">All Products</a>
+  </p>
+  <p style="margin-top:8px;">&copy; 2026 Behike</p>
+</footer>
+
+<script>
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

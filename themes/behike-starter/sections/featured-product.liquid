@@ -1,0 +1,75 @@
+<section class="featured-product section-padding">
+  <div class="page-width">
+    <div class="featured-product__grid">
+      <div class="featured-product__image">
+        {%- if section.settings.product != blank -%}
+          {%- assign product = section.settings.product -%}
+          {%- if product.featured_image != blank -%}
+            <img
+              src="{{ product.featured_image | image_url: width: 800 }}"
+              alt="{{ product.featured_image.alt | default: product.title }}"
+              width="800"
+              height="auto"
+              loading="lazy"
+            >
+          {%- endif -%}
+        {%- else -%}
+          {{ "product-1" | placeholder_svg_tag }}
+        {%- endif -%}
+      </div>
+
+      <div class="featured-product__info">
+        {%- if section.settings.product != blank -%}
+          {%- assign product = section.settings.product -%}
+          <h2 class="featured-product__title">{{ product.title }}</h2>
+          <p class="featured-product__price">{{ product.price | money }}</p>
+          <div class="featured-product__description">{{ product.description | truncate: 200 }}</div>
+          <a href="{{ product.url }}" class="button">View Product</a>
+        {%- else -%}
+          <h2 class="featured-product__title">{{ section.settings.heading | default: "Featured Product" }}</h2>
+          <p class="featured-product__price">$49.99</p>
+          <div class="featured-product__description">{{ section.settings.text | default: "Highlight your best-selling or newest product here. Add a compelling description to drive conversions." }}</div>
+          <a href="#" class="button">{{ section.settings.button_label | default: "Shop Now" }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured Product",
+  "tag": "section",
+  "class": "section-featured-product",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading (if no product selected)",
+      "default": "Featured Product"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Description (if no product selected)",
+      "default": "<p>Highlight your best product here with a compelling description.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "Shop Now"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Product"
+    }
+  ]
+}
+{% endschema %}

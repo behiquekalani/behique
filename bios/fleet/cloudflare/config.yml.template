@@ -1,0 +1,93 @@
+# ============================================================
+# Cloudflare Tunnel Configuration Template
+# Machine: Naboria (Windows)
+# Location: C:\behique\cloudflare\config.yml
+# ============================================================
+
+# Tunnel ID - unique identifier assigned when you create the tunnel
+# Get yours with: cloudflared tunnel list
+tunnel: YOUR_TUNNEL_ID_HERE
+
+# Path to the credentials JSON file created during tunnel creation
+# Usually at: C:\Users\YOUR_USERNAME\.cloudflared\YOUR_TUNNEL_ID.json
+credentials-file: C:\Users\YOUR_USERNAME\.cloudflared\YOUR_TUNNEL_ID.json
+
+# Local metrics server for monitoring (optional)
+# Access at http://localhost:2000/metrics for Prometheus-compatible output
+metrics: localhost:2000
+
+# Grace period before shutting down connections when tunnel stops
+# Gives active requests time to finish
+grace-period: 30s
+
+# Log level: debug, info, warn, error, fatal
+# Use debug when troubleshooting, info for production
+loglevel: info
+
+# ============================================================
+# Ingress Rules
+# ============================================================
+# Rules are evaluated top-to-bottom, first match wins.
+# The last rule MUST be a catch-all (no hostname).
+#
+# Each rule maps an external hostname to a local service.
+# Cloudflare handles SSL termination, so local services
+# can run plain HTTP.
+# ============================================================
+
+ingress:
+  # ----------------------------------------------------------
+  # Storefront - Primary domain
+  # ----------------------------------------------------------
+  # behike.co routes to the local storefront server on port 8080
+  - hostname: behike.co
+    service: http://localhost:8080
+    originRequest:
+      # Skip TLS verification for local connections
+      noTLSVerify: true
+      # Connection timeout to the origin (local server)
+      connectTimeout: 10s
+      # Keep-alive timeout
+      keepAliveTimeout: 90s
+
+  # ----------------------------------------------------------
+  # Storefront - Secondary domain
+  # ----------------------------------------------------------
+  # behike.store routes to the same storefront backend
+  - hostname: behike.store
+    service: http://localhost:8080
+    originRequest:
+      noTLSVerify: true
+      connectTimeout: 10s
+      keepAliveTimeout: 90s
+
+  # ----------------------------------------------------------
+  # API / Backend (uncomment when ready)
+  # ----------------------------------------------------------
+  # Example: api.behike.co -> separate backend service
+  # - hostname: api.behike.co
+  #   service: http://localhost:3000
+  #   originRequest:
+  #     noTLSVerify: true
+
+  # ----------------------------------------------------------
+  # Subdomain wildcard (uncomment when ready)
+  # ----------------------------------------------------------
+  # Catches all *.behike.co subdomains not matched above
+  # Requires a wildcard DNS record in Cloudflare
+  # - hostname: "*.behike.co"
+  #   service: http://localhost:8080
+
+  # ----------------------------------------------------------
+  # SSH access (uncomment if you want remote SSH via browser)
+  # ----------------------------------------------------------
+  # Access via: https://ssh.behike.co in Cloudflare Access
+  # - hostname: ssh.behike.co
+  #   service: ssh://localhost:22
+
+  # ----------------------------------------------------------
+  # Catch-all (REQUIRED - must be last)
+  # ----------------------------------------------------------
+  # Any request that doesn't match a hostname above gets a 404.
+  # You can also use http_status:502 or point to a custom error page.
+  - service: http_status:404

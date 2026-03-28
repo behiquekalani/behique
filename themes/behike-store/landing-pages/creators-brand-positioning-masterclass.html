@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator's Brand Positioning Masterclass — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868b;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --border: #1d1d1f;
+      --card: #0a0a0a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      max-width: 800px;
+      margin: 0 auto 24px;
+    }
+    .hero-sub {
+      font-size: clamp(18px, 2.5vw, 22px);
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .price {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .price-note {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 600;
+      padding: 16px 40px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hero-sub-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION BASE */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .section-body {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* PROBLEM */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .problem-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .problem-card.visible { opacity: 1; transform: translateY(0); }
+    .problem-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .problem-card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* CHAPTERS */
+    .chapters-list {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .chapters-list { grid-template-columns: 1fr; } }
+    .chapter-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .chapter-item.visible { opacity: 1; transform: translateY(0); }
+    .chapter-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .chapter-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .chapter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* WHO IT'S FOR */
+    .for-list {
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .for-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      opacity: 0;
+      transform: translateX(-16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .for-item.visible { opacity: 1; transform: translateX(0); }
+    .for-dot {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      background: var(--cta);
+      border-radius: 50%;
+      margin-top: 8px;
+    }
+    .for-item p {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* THESIS */
+    .thesis {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+    .thesis-quote {
+      font-size: clamp(22px, 3.5vw, 32px);
+      font-weight: 600;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      max-width: 740px;
+      border-left: 3px solid var(--accent);
+      padding-left: 28px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .thesis-quote.visible { opacity: 1; transform: translateY(0); }
+
+    /* FINAL CTA */
+    .final-cta {
+      padding: 100px 0;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .final-cta h2 {
+      font-size: clamp(28px, 4.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 680px;
+      margin: 0 auto 20px;
+    }
+    .final-cta p {
+      font-size: 17px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+    .final-cta .price {
+      display: block;
+      margin-bottom: 24px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    footer p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero { padding: 64px 0 56px; }
+      section { padding: 56px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <a href="/" class="nav-brand">Behike</a>
+      <a href="#get-access" class="nav-cta">Get Access — $24.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <span class="hero-label">Behike Masterclass</span>
+      <h1>Creator's Brand Positioning Masterclass</h1>
+      <p class="hero-sub">Most creators stay invisible not because their content is bad, but because no one knows what they stand for. This masterclass fixes that.</p>
+      <div class="price-block">
+        <span class="price">$24.99</span>
+        <span class="price-note">One-time. Yours forever.</span>
+      </div>
+      <a href="#get-access" class="btn-primary">Get Instant Access</a>
+      <p class="hero-sub-note">PDF download. 5,000+ words. 9 chapters.</p>
+    </div>
+  </header>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label">The Real Problem</p>
+      <h2 class="section-title">Content without positioning is just noise.</h2>
+      <p class="section-body">You can post every day, optimize every thumbnail, and follow every growth tactic available. None of it compounds if your positioning is blurry. Your audience cannot recommend what they cannot describe.</p>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <h3>You are forgettable</h3>
+          <p>If someone closes your tab and cannot describe what you do in one sentence, you have a positioning problem, not a content problem.</p>
+        </div>
+        <div class="problem-card">
+          <h3>You compete on price</h3>
+          <p>Without a clear, differentiated position, buyers compare you to everyone else doing something similar. Price becomes the tiebreaker.</p>
+        </div>
+        <div class="problem-card">
+          <h3>You attract the wrong audience</h3>
+          <p>Vague positioning attracts a vague audience. Vague audiences do not convert. They follow for a while and drift away without buying.</p>
+        </div>
+        <div class="problem-card">
+          <h3>You drift without knowing it</h3>
+          <p>Without a written positioning statement, you follow engagement signals and wake up two years later doing something you never intended.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THESIS QUOTE -->
+  <section class="thesis">
+    <div class="container">
+      <p class="thesis-quote">"Positioning is not a tagline. It is the specific combination of perspective, audience, and promise that makes your work distinct from everyone else doing something similar. When it is sharp, you become the only logical choice."</p>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="inside">
+    <div class="container">
+      <p class="section-label">What's Inside</p>
+      <h2 class="section-title">9 chapters. Zero filler.</h2>
+      <p class="section-body">This is a working guide. Every chapter has a specific thesis and practical tools you can apply to your work the same day you read it.</p>
+      <div class="chapters-list">
+        <div class="chapter-item">
+          <div class="chapter-num">1</div>
+          <div class="chapter-text">
+            <h4>What Positioning Actually Means for Creators</h4>
+            <p>Not the marketing textbook version. The version that applies when you are the product.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">2</div>
+          <div class="chapter-text">
+            <h4>The Problem of Crowded Spaces</h4>
+            <p>How to find the perspective gap that existing players are not occupying.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">3</div>
+          <div class="chapter-text">
+            <h4>The Positioning Statement Formula</h4>
+            <p>A working formula designed specifically for creators. Write yours before your next piece of content.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">4</div>
+          <div class="chapter-text">
+            <h4>Communicating Across Every Touchpoint</h4>
+            <p>Bios, titles, emails, products, design. Every surface should say the same thing in a different way.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">5</div>
+          <div class="chapter-text">
+            <h4>Defining Your Unique Angle</h4>
+            <p>Four methods for sharpening from a general area of focus into a defensible, specific position.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">6</div>
+          <div class="chapter-text">
+            <h4>How Positioning Determines Pricing Power</h4>
+            <p>The direct mechanism between how clearly you are positioned and what you can charge.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">7</div>
+          <div class="chapter-text">
+            <h4>Repositioning When You Have Drifted</h4>
+            <p>How to realign content, audience, and public presence without burning what you have built.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">8</div>
+          <div class="chapter-text">
+            <h4>The Long Game of Positioning</h4>
+            <p>How consistency compounds into category ownership over years, not months.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <div class="chapter-num">9</div>
+          <div class="chapter-text">
+            <h4>The Quarterly Positioning Audit</h4>
+            <p>A repeatable five-check system to keep your positioning sharp every 90 days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section id="who">
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2 class="section-title">Specific people. Not everyone.</h2>
+      <p class="section-body">This guide is designed for creators at a specific stage. If you recognize yourself below, it was written for you.</p>
+      <div class="for-list">
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You have been creating content for at least six months and feel like something is not connecting, even when the work is good.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You know your topic but you cannot describe your specific angle in one sentence that makes someone feel it was written for them.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You are trying to launch a product or service and are struggling to explain why someone should choose you over alternatives.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You have drifted away from where you started and want to realign your content and audience with a clear updated direction.</p>
+        </div>
+        <div class="for-item">
+          <div class="for-dot"></div>
+          <p>You want to charge more but cannot justify it because your positioning does not clearly distinguish you from others in your space.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta" id="get-access">
+    <div class="container">
+      <h2>Stop competing in a category. Start owning a position.</h2>
+      <p>One guide. The foundational work most creators skip entirely.</p>
+      <span class="price">$24.99</span>
+      <a href="#" class="btn-primary">Get Instant Access</a>
+      <p style="margin-top: 16px; font-size: 14px; color: var(--muted);">PDF format. Instant download. No subscription.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>Behike &copy; 2026 &nbsp;|&nbsp; <a href="/">behiqueai.com</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger children if it's a grid
+          const children = entry.target.querySelectorAll('[class*="card"], [class*="item"], .thesis-quote');
+          if (children.length > 0) {
+            children.forEach((child, idx) => {
+              setTimeout(() => child.classList.add('visible'), idx * 80);
+            });
+          } else {
+            entry.target.classList.add('visible');
+          }
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    // Observe containers that hold animated children
+    document.querySelectorAll('.problem-grid, .chapters-list, .for-list, .thesis').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Also directly observe standalone animated elements
+    document.querySelectorAll('.thesis-quote').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>

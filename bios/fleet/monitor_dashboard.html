@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fleet Monitor - BIOS</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;color:#e0e0e0;font-family:'JetBrains Mono',monospace;padding:20px;min-height:100vh}
+h1{color:#00ffd5;font-size:1.4rem;margin-bottom:4px}
+.subtitle{color:#555;font-size:.75rem;margin-bottom:20px}
+.refresh-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:.7rem;color:#555}
+.refresh-bar span.live{color:#00ffd5;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:24px}
+.card{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:16px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:#00ffd5}
+.card.offline::before{background:#ff4444}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.machine-name{font-size:1.1rem;font-weight:700;color:#00ffd5}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#00ffd5;display:inline-block;margin-right:6px}
+.status-dot.offline{background:#ff4444}
+.status-text{font-size:.7rem;color:#888}
+.meta-row{display:flex;justify-content:space-between;font-size:.72rem;color:#777;margin-bottom:4px}
+.meta-row .label{color:#555}
+.meta-row .val{color:#ccc}
+.tasks-list{margin-top:10px;padding-top:10px;border-top:1px solid #1a1a1a}
+.tasks-list h3{font-size:.7rem;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.task-tag{display:inline-block;background:#0d2b2b;color:#00ffd5;padding:2px 8px;border-radius:3px;font-size:.65rem;margin:2px}
+.queue-section{margin-top:8px}
+.queue-section h2{font-size:.9rem;color:#00ffd5;margin-bottom:12px}
+.queue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.q-card{background:#111;border:1px solid #1a1a1a;border-radius:6px;padding:14px;text-align:center}
+.q-card .num{font-size:2rem;font-weight:700;color:#00ffd5}
+.q-card .lbl{font-size:.65rem;color:#555;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.q-card.running .num{color:#ffd700}
+.q-card.completed .num{color:#44ff88}
+.health-section{margin-top:20px}
+.health-section h2{font-size:.9rem;color:#00ffd5;margin-bottom:10px}
+.health-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #1a1a1a;font-size:.75rem}
+.health-ok{color:#44ff88}
+.health-warn{color:#ffd700}
+.health-err{color:#ff4444}
+.empty{color:#333;font-size:.7rem;font-style:italic}
+</style>
+</head>
+<body>
+<h1>FLEET MONITOR</h1>
+<p class="subtitle">behique infrastructure / real-time fleet status</p>
+<div class="refresh-bar">
+  <span>Last updated: <span id="lastUpdate">--</span></span>
+  <span class="live">LIVE - 30s refresh</span>
+</div>
+<div class="grid" id="machineGrid"></div>
+<div class="queue-section">
+  <h2>TASK QUEUE</h2>
+  <div class="queue-grid" id="queueGrid">
+    <div class="q-card"><div class="num" id="qPending">-</div><div class="lbl">Pending</div></div>
+    <div class="q-card running"><div class="num" id="qRunning">-</div><div class="lbl">Running</div></div>
+    <div class="q-card completed"><div class="num" id="qCompleted">-</div><div class="lbl">Completed</div></div>
+  </div>
+</div>
+<div class="health-section">
+  <h2>HEALTH CHECKS</h2>
+  <div id="healthList"><p class="empty">No health data available</p></div>
+</div>
+<script>
+const FLEET_URL = '../fleet/fleet.json';
+const QUEUE_DIR = '../fleet/queue/';
+const HEALTH_URL = '../storage/health_check.json';
+
+function ts() { return new Date().toLocaleTimeString('en-US', {hour12:false}); }
+
+function renderMachine(key, m) {
+  const online = m.status === 'active';
+  return `<div class="card ${online?'':'offline'}">
+    <div class="card-header">
+      <span class="machine-name">${m.name}</span>
+      <span class="status-text"><span class="status-dot ${online?'':'offline'}"></span>${online?'ONLINE':'OFFLINE'}</span>
+    </div>
+    <div class="meta-row"><span class="label">IP</span><span class="val">${m.ip}</span></div>
+    <div class="meta-row"><span class="label">Role</span><span class="val">${m.role}</span></div>
+    <div class="meta-row"><span class="label">OS</span><span class="val">${m.os}</span></div>
+    ${m.gpu?`<div class="meta-row"><span class="label">GPU</span><span class="val">${m.gpu}</span></div>`:''}
+    <div class="meta-row"><span class="label">Bridge</span><span class="val">:${m.bridge_port}</span></div>
+    <div class="meta-row"><span class="label">Last Ping</span><span class="val">${ts()}</span></div>
+    <div class="tasks-list">
+      <h3>Active Tasks</h3>
+      ${(m.tasks||[]).map(t=>`<span class="task-tag">${t}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
+async function loadFleet() {
+  try {
+    const r = await fetch(FLEET_URL);
+    const data = await r.json();
+    const grid = document.getElementById('machineGrid');
+    grid.innerHTML = Object.entries(data.fleet).map(([k,v])=>renderMachine(k,v)).join('');
+  } catch(e) {
+    document.getElementById('machineGrid').innerHTML = '<p class="empty">Could not load fleet.json</p>';
+  }
+}
+
+async function loadQueue() {
+  try {
+    const files = ['pending.json','running.json','completed.json'];
+    const counts = {pending:0,running:0,completed:0};
+    for (const f of files) {
+      try {
+        const r = await fetch(QUEUE_DIR + f);
+        const d = await r.json();
+        const key = f.replace('.json','');
+        counts[key] = Array.isArray(d) ? d.length : 0;
+      } catch(e) {}
+    }
+    document.getElementById('qPending').textContent = counts.pending;
+    document.getElementById('qRunning').textContent = counts.running;
+    document.getElementById('qCompleted').textContent = counts.completed;
+  } catch(e) {}
+}
+
+async function loadHealth() {
+  try {
+    const r = await fetch(HEALTH_URL);
+    const data = await r.json();
+    const el = document.getElementById('healthList');
+    if (Array.isArray(data) && data.length) {
+      el.innerHTML = data.map(h => {
+        const cls = h.status==='ok'?'health-ok':h.status==='warn'?'health-warn':'health-err';
+        return `<div class="health-row"><span class="${cls}">[${h.status.toUpperCase()}]</span><span>${h.name||h.check||'--'}</span><span style="color:#555;margin-left:auto">${h.message||''}</span></div>`;
+      }).join('');
+    }
+  } catch(e) {}
+}
+
+async function refresh() {
+  await Promise.all([loadFleet(), loadQueue(), loadHealth()]);
+  document.getElementById('lastUpdate').textContent = ts();
+}
+
+refresh();
+setInterval(refresh, 30000);
+</script>
+</body>
+</html>

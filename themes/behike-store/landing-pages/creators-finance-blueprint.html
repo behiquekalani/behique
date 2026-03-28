@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Creator's Finance Blueprint — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000000;
+      color: #F5F5F7;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+    .fade-in { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* NAV */
+    nav {
+      padding: 20px 0;
+      border-bottom: 1px solid #1a1a1a;
+      position: sticky; top: 0; background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px); z-index: 100;
+    }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .nav-brand { font-size: 15px; font-weight: 600; color: #F5F5F7; text-decoration: none; letter-spacing: 0.02em; }
+    .nav-cta {
+      background: #30D158; color: #000; padding: 9px 20px;
+      border-radius: 980px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* HERO */
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero-badge {
+      display: inline-block; background: #30D15822; color: #30D158;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 980px;
+      border: 1px solid #30D15844; margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px); font-weight: 700;
+      letter-spacing: -0.025em; line-height: 1.08;
+      margin-bottom: 24px; max-width: 800px; margin-left: auto; margin-right: auto;
+    }
+    .hero h1 span { color: #30D158; }
+    .hero-subtitle {
+      font-size: 20px; color: #86868B; max-width: 560px;
+      margin: 0 auto 40px; line-height: 1.5;
+    }
+    .hero-price { font-size: 15px; color: #86868B; margin-bottom: 16px; }
+    .hero-price strong { color: #F5F5F7; font-size: 32px; font-weight: 700; }
+    .cta-primary {
+      display: inline-block; background: #30D158; color: #000;
+      padding: 16px 40px; border-radius: 980px; font-size: 17px;
+      font-weight: 600; text-decoration: none; transition: opacity 0.2s, transform 0.2s;
+    }
+    .cta-primary:hover { opacity: 0.88; transform: scale(1.02); }
+    .hero-note { font-size: 13px; color: #48484A; margin-top: 14px; }
+
+    /* SECTION */
+    .section { padding: 96px 0; }
+    .section-label {
+      font-size: 12px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #30D158; margin-bottom: 16px;
+    }
+    .section h2 {
+      font-size: clamp(28px, 4vw, 44px); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 24px;
+    }
+    .section p { color: #86868B; font-size: 18px; line-height: 1.65; margin-bottom: 18px; max-width: 660px; }
+    .section p strong { color: #F5F5F7; }
+
+    /* PROBLEM CARDS */
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; margin: 64px 0;
+    }
+    .problem-card {
+      background: #0a0a0a; padding: 36px 28px;
+    }
+    .problem-card:first-child { border-radius: 16px 0 0 16px; }
+    .problem-card:last-child { border-radius: 0 16px 16px 0; }
+    .problem-icon { font-size: 28px; margin-bottom: 16px; }
+    .problem-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+    .problem-card p { font-size: 14px; color: #86868B; line-height: 1.55; }
+
+    /* QUOTE */
+    .quote-section {
+      padding: 80px 0; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+    }
+    blockquote {
+      font-size: clamp(22px, 3.5vw, 34px); font-weight: 500;
+      letter-spacing: -0.01em; line-height: 1.3;
+      max-width: 780px; margin: 0 auto; text-align: center;
+      color: #F5F5F7;
+    }
+    blockquote span { color: #30D158; }
+
+    /* TOC */
+    .toc-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2px; margin-top: 48px;
+    }
+    .toc-item {
+      background: #0a0a0a; padding: 28px 32px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .toc-item:nth-child(1) { border-radius: 16px 0 0 0; }
+    .toc-item:nth-child(2) { border-radius: 0 16px 0 0; }
+    .toc-item:nth-last-child(2) { border-radius: 0 0 0 16px; }
+    .toc-item:last-child { border-radius: 0 0 16px 0; }
+    .toc-num {
+      font-size: 13px; font-weight: 700; color: #30D158;
+      min-width: 28px; padding-top: 2px;
+    }
+    .toc-text h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .toc-text p { font-size: 14px; color: #86868B; line-height: 1.5; }
+
+    /* THREE ACCOUNTS */
+    .accounts-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; margin-top: 48px;
+    }
+    .account-card {
+      background: #0a0a0a; padding: 36px 28px; text-align: center;
+    }
+    .account-card:first-child { border-radius: 16px 0 0 16px; }
+    .account-card:last-child { border-radius: 0 16px 16px 0; }
+    .account-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; margin: 0 auto 16px;
+    }
+    .account-num.operating { background: #0A84FF22; color: #0A84FF; border: 1px solid #0A84FF44; }
+    .account-num.tax { background: #FF9F0A22; color: #FF9F0A; border: 1px solid #FF9F0A44; }
+    .account-num.savings { background: #30D15822; color: #30D158; border: 1px solid #30D15844; }
+    .account-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+    .account-card p { font-size: 14px; color: #86868B; line-height: 1.55; }
+
+    /* TIMELINE */
+    .action-list { margin-top: 48px; display: flex; flex-direction: column; gap: 2px; }
+    .action-item {
+      background: #0a0a0a; padding: 28px 32px;
+      display: grid; grid-template-columns: 100px 1fr; gap: 24px; align-items: start;
+    }
+    .action-item:first-child { border-radius: 16px 16px 0 0; }
+    .action-item:last-child { border-radius: 0 0 16px 16px; }
+    .action-step {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #30D158; padding-top: 2px;
+    }
+    .action-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .action-body p { font-size: 14px; color: #86868B; line-height: 1.5; }
+
+    /* CTA SECTION */
+    .cta-section {
+      padding: 100px 0; text-align: center;
+      background: linear-gradient(180deg, #000 0%, #000d04 100%);
+    }
+    .cta-section h2 {
+      font-size: clamp(30px, 4.5vw, 52px); font-weight: 700;
+      letter-spacing: -0.02em; margin-bottom: 20px;
+    }
+    .cta-section p { font-size: 18px; color: #86868B; max-width: 520px; margin: 0 auto 40px; }
+    .price-display { margin-bottom: 32px; }
+    .price-display .amount {
+      font-size: 56px; font-weight: 700; color: #F5F5F7; letter-spacing: -0.03em;
+    }
+    .price-display .currency { font-size: 28px; color: #86868B; vertical-align: super; }
+    .guarantee { font-size: 13px; color: #48484A; margin-top: 16px; }
+
+    footer { padding: 40px 0; border-top: 1px solid #1a1a1a; text-align: center; }
+    footer p { font-size: 13px; color: #48484A; }
+    footer a { color: #86868B; text-decoration: none; }
+
+    @media (max-width: 700px) {
+      .problem-grid, .accounts-row { grid-template-columns: 1fr; }
+      .problem-card, .account-card { border-radius: 0; }
+      .problem-card:first-child, .account-card:first-child { border-radius: 16px 16px 0 0; }
+      .problem-card:last-child, .account-card:last-child { border-radius: 0 0 16px 16px; }
+      .toc-grid { grid-template-columns: 1fr; }
+      .toc-item { border-radius: 0; }
+      .toc-item:first-child { border-radius: 16px 16px 0 0; }
+      .toc-item:last-child { border-radius: 0 0 16px 16px; }
+      .action-item { grid-template-columns: 1fr; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="/" class="nav-brand">Behike</a>
+    <a href="https://behike.gumroad.com" class="nav-cta">Get it now — $19.99</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="fade-in">
+      <div class="hero-badge">Digital Product</div>
+      <h1>The Creator's<br><span>Finance Blueprint</span></h1>
+      <p class="hero-subtitle">Personal finance for people who do not get a paycheck. The systems that protect a creator's business when income is irregular.</p>
+      <p class="hero-price"><strong>$19.99</strong> &nbsp; one-time, instant download</p>
+      <a href="https://behike.gumroad.com" class="cta-primary">Get the Finance Blueprint</a>
+      <p class="hero-note">PDF. Read anywhere. No subscription.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">The real problem</p>
+      <h2>Standard financial advice assumes you have a salary</h2>
+      <p>Every budgeting system, every retirement guide, every tax walkthrough was built for someone who knows what they will make next month. <strong>You do not know that.</strong></p>
+      <p>You owe quarterly taxes that no one withholds. Your income swings between feast and famine. The standard advice fails you not because it is wrong, but because it was written for someone else.</p>
+    </div>
+
+    <div class="problem-grid fade-in">
+      <div class="problem-card">
+        <div class="problem-icon">&#9889;</div>
+        <h3>Irregular income</h3>
+        <p>Traditional budgets break when the input changes every month. You need a system built for variability, not stability.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">&#128196;</div>
+        <h3>Tax surprise</h3>
+        <p>No employer withholds taxes. Quarterly estimated payments are your responsibility. Many creators discover this the hard way in April.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">&#128275;</div>
+        <h3>No employer safety net</h3>
+        <p>No matching 401(k). No employer health coverage. No paid sick leave. Your financial infrastructure has to be entirely self-built.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-section">
+  <div class="container">
+    <blockquote class="fade-in">
+      "Every creator who burns out financially does so not because they did not make enough money, but because they did not build <span>the systems to hold onto it.</span>"
+    </blockquote>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">What's inside</p>
+      <h2>Eight chapters. The complete financial system.</h2>
+      <p>From solving the irregular income problem to knowing when to form an LLC, this is the financial foundation every creator needs to build once.</p>
+    </div>
+
+    <div class="toc-grid fade-in">
+      <div class="toc-item">
+        <div class="toc-num">01</div>
+        <div class="toc-text">
+          <h3>The Irregular Income Problem</h3>
+          <p>Why traditional budgeting fails creators and the baseline income concept that fixes it.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">02</div>
+        <div class="toc-text">
+          <h3>The Three-Account System</h3>
+          <p>Operating, tax, and personal savings. The structural separation that prevents financial disasters.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">03</div>
+        <div class="toc-text">
+          <h3>Quarterly Tax Estimation</h3>
+          <p>How estimated taxes work, the two safe harbor methods, and every deduction creators consistently miss.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">04</div>
+        <div class="toc-text">
+          <h3>The Emergency Fund Math</h3>
+          <p>Why the 3-6 month rule does not apply to you and the correct calculation for your risk profile.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">05</div>
+        <div class="toc-text">
+          <h3>Investing on Irregular Income</h3>
+          <p>Solo 401(k), SEP-IRA, Roth IRA, and percentage-based investing that scales with variable income.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">06</div>
+        <div class="toc-text">
+          <h3>Business vs. Personal Separation</h3>
+          <p>Why mixing money creates three separate problems and the exact setup to prevent all three.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">07</div>
+        <div class="toc-text">
+          <h3>When to Form an LLC</h3>
+          <p>The income thresholds, liability triggers, S-corporation election math, and how to find the right accountant.</p>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">08</div>
+        <div class="toc-text">
+          <h3>Practical Financial Habits</h3>
+          <p>Weekly money dates, monthly reviews, annual tax prep in December, and insurance decisions most creators defer too long.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="border-top: 1px solid #1a1a1a;">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">Core system</p>
+      <h2>The three-account system</h2>
+      <p>The most common creator financial disaster is simple: spending money that was already owed in taxes. Three accounts, three purposes, zero confusion about what is actually yours to spend.</p>
+    </div>
+
+    <div class="accounts-row fade-in">
+      <div class="account-card">
+        <div class="account-num operating">1</div>
+        <h3>Operating Account</h3>
+        <p>All revenue enters here. All business expenses paid from here. Your salary transfers out from here. Maintain a 1-2 month buffer.</p>
+      </div>
+      <div class="account-card">
+        <div class="account-num tax">2</div>
+        <h3>Tax Account</h3>
+        <p>25-30% of every deposit, transferred the same day revenue arrives. Not accessible for anything else. Quarterly payments come from here.</p>
+      </div>
+      <div class="account-card">
+        <div class="account-num savings">3</div>
+        <h3>Personal Savings</h3>
+        <p>Your emergency fund, short-term goals, and investment staging area. Funded automatically through a fixed transfer from your personal account.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="border-top: 1px solid #1a1a1a;">
+  <div class="container">
+    <div class="fade-in">
+      <p class="section-label">Build order</p>
+      <h2>The sequence that protects you as you grow</h2>
+      <p>Financial stability is not built all at once. It is built in a specific order. These are the priorities, in order.</p>
+    </div>
+
+    <div class="action-list fade-in">
+      <div class="action-item">
+        <div class="action-step">First</div>
+        <div class="action-body">
+          <h3>One-month cash buffer</h3>
+          <p>Before anything else. This prevents a slow month from creating debt. The most urgent priority for any creator without it.</p>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-step">Second</div>
+        <div class="action-body">
+          <h3>Three-account structure</h3>
+          <p>The structural separation that prevents tax money from being spent on living expenses. Set it up before the tax account matters.</p>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-step">Third</div>
+        <div class="action-body">
+          <h3>6-9 month emergency fund</h3>
+          <p>Built over 12-18 months via automated transfer. Based on essential expenses (rent, utilities, groceries, minimums), not total lifestyle spending.</p>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-step">Fourth</div>
+        <div class="action-body">
+          <h3>Retirement account</h3>
+          <p>Roth IRA first for most creators. Solo 401(k) when income justifies it. Percentage-based, not fixed-amount. Scales with your income automatically.</p>
+        </div>
+      </div>
+      <div class="action-item">
+        <div class="action-step">When income crosses $30K</div>
+        <div class="action-body">
+          <h3>LLC formation + accountant</h3>
+          <p>Liability protection becomes meaningful and a specialist CPA saves more than they cost. Do not rush this step; do not skip it indefinitely.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="container">
+    <div class="fade-in">
+      <h2>Build the foundation once</h2>
+      <p>The financial system that protects your creative business runs in the background for every year after you set it up.</p>
+      <div class="price-display">
+        <span class="currency">$</span>
+        <span class="amount">19.99</span>
+      </div>
+      <a href="https://behike.gumroad.com" class="cta-primary">Get The Creator's Finance Blueprint</a>
+      <p class="guarantee">PDF. Instant download. One-time payment.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>
+      &copy; 2026 <a href="/">Behike</a>.
+      Built for creators who build to own, not rent.
+    </p>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

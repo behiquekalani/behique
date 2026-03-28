@@ -1,0 +1,111 @@
+<section class="bundle-deals section-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="bundle-deals__heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="bundle-deals__grid">
+      {%- for block in section.blocks -%}
+        <div class="bundle-card" {{ block.shopify_attributes }}>
+          {%- if block.settings.badge != blank -%}
+            <span class="bundle-card__badge">{{ block.settings.badge }}</span>
+          {%- endif -%}
+
+          <h3 class="bundle-card__title">{{ block.settings.title }}</h3>
+
+          <ul class="bundle-card__items">
+            {%- assign items = block.settings.items | split: '|' -%}
+            {%- for item in items -%}
+              <li>{{ item | strip }}</li>
+            {%- endfor -%}
+          </ul>
+
+          <div class="bundle-card__prices">
+            <span class="bundle-card__price">{{ block.settings.price }}</span>
+            {%- if block.settings.compare_price != blank -%}
+              <span class="bundle-card__original-price">{{ block.settings.compare_price }}</span>
+            {%- endif -%}
+          </div>
+
+          <a href="{{ block.settings.button_link }}" class="button">
+            {{ block.settings.button_label | default: "Add to Cart" }}
+          </a>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bundle Deals",
+  "tag": "section",
+  "class": "section-bundle-deals",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Bundle & Save"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "bundle",
+      "name": "Bundle",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Bundle name",
+          "default": "Starter Bundle"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge text",
+          "default": "Save 20%"
+        },
+        {
+          "type": "text",
+          "id": "items",
+          "label": "Items (separate with |)",
+          "default": "Product A | Product B | Product C"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Bundle price",
+          "default": "$149"
+        },
+        {
+          "type": "text",
+          "id": "compare_price",
+          "label": "Compare at price",
+          "default": "$189"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Add to Cart"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle Deals",
+      "blocks": [
+        { "type": "bundle", "settings": { "title": "Essential Kit", "badge": "Save 15%", "items": "Core Product | Accessory A | Carry Case", "price": "$129", "compare_price": "$152" } },
+        { "type": "bundle", "settings": { "title": "Complete Collection", "badge": "Save 25%", "items": "Core Product | Accessory A | Accessory B | Premium Case | Cleaning Kit", "price": "$249", "compare_price": "$332" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

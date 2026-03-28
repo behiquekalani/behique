@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEHIKE</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#111;font-family:'Press Start 2P',monospace;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center}
+
+/* CRT TV Frame - textured bezel */
+.tv{width:92vw;max-width:960px;height:82vh;position:relative;perspective:800px}
+.tv-outer{width:100%;height:100%;background:linear-gradient(160deg,#9e9688 0%,#7d7568 30%,#6b6358 60%,#5a5348 100%);border-radius:36px;padding:8px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.9),inset 0 1px 2px rgba(255,255,255,0.15)}
+.tv-outer::before{content:'';position:absolute;inset:0;border-radius:36px;background:url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='rgba(0,0,0,0.08)'/%3E%3C/svg%3E");pointer-events:none}
+.tv-inner{width:100%;height:100%;background:linear-gradient(160deg,#5a5348,#4a4338);border-radius:30px;padding:24px;position:relative}
+.tv-screen{width:100%;height:100%;border-radius:16px;overflow:hidden;background:#0a0a0a;position:relative;border:3px solid #2a2a2a;box-shadow:inset 0 0 40px rgba(0,0,0,0.5)}
+
+/* Screen glow */
+.tv-screen::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(255,255,255,0.02) 0%,transparent 70%);pointer-events:none;z-index:5}
+
+/* VHS effects */
+.vhs-scanlines{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 1px,rgba(0,0,0,0.12) 1px,rgba(0,0,0,0.12) 2px);z-index:30;pointer-events:none}
+.vhs-tracking{position:absolute;left:0;right:0;height:60px;background:linear-gradient(transparent,rgba(255,255,255,0.04),rgba(0,0,0,0.1),transparent);z-index:31;pointer-events:none;animation:tracking 3s ease-in-out infinite}
+.vhs-noise{position:absolute;inset:0;z-index:29;pointer-events:none;opacity:0.03;mix-blend-mode:overlay}
+@keyframes tracking{0%{top:-60px}100%{top:calc(100% + 60px)}}
+
+/* Rainbow noise canvas */
+canvas#noise{position:absolute;inset:0;width:100%;height:100%;z-index:28;pointer-events:none;opacity:0.04}
+
+/* Enter screen */
+#enter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:40;background:#d4d0c8;cursor:pointer;transition:opacity 0.3s}
+#enter.gone{opacity:0;pointer-events:none}
+#enter h1{font-size:clamp(28px,7vw,64px);color:#111;letter-spacing:12px;margin-bottom:48px;position:relative}
+#enter h1::after{content:'BEHIKE';position:absolute;left:3px;top:2px;color:rgba(0,0,0,0.06);z-index:-1}
+#enter .start{font-size:13px;color:#444;animation:blink 1.2s step-end infinite;letter-spacing:4px}
+#enter .start::before{content:'> '}
+#enter .copy{position:absolute;bottom:24px;font-size:8px;color:#aaa;letter-spacing:3px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Glitch on enter */
+@keyframes glitch-enter{0%{transform:translate(0)}10%{transform:translate(-3px,2px)}20%{transform:translate(3px,-1px)}30%{transform:translate(-1px,3px)}40%{transform:translate(2px,-2px)}50%{transform:translate(0)}100%{transform:translate(0)}}
+.glitching{animation:glitch-enter 0.4s ease-out}
+
+/* Main menu */
+#menu{position:absolute;inset:0;display:none;z-index:35;background:#d4d0c8}
+#menu.active{display:flex;flex-direction:column}
+.menu-top{padding:16px 20px;border-bottom:2px solid #b8b4ac;display:flex;justify-content:space-between;align-items:center;background:#ccc8c0}
+.menu-top h2{font-size:13px;color:#222;letter-spacing:4px}
+.menu-top .dots{display:flex;gap:6px}
+.menu-top .dot{width:10px;height:10px;border-radius:50%;border:1px solid #999}
+.menu-top .dot:nth-child(1){background:#e74c3c}
+.menu-top .dot:nth-child(2){background:#f1c40f}
+.menu-top .dot:nth-child(3){background:#2ecc71}
+
+/* Media panel with real noise */
+.media-box{position:absolute;top:48px;right:0;width:48%;height:38%;border-left:2px solid #b8b4ac;border-bottom:2px solid #b8b4ac;overflow:hidden;background:#222}
+.media-box canvas{width:100%;height:100%}
+.media-box .label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;color:rgba(0,220,220,0.5);letter-spacing:6px;mix-blend-mode:screen;text-shadow:0 0 20px rgba(0,220,220,0.3)}
+
+/* Menu grid */
+.menu-grid{display:flex;flex-wrap:wrap;padding:24px;gap:20px;justify-content:center;align-content:center;flex:1}
+.m-item{width:120px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform 0.15s}
+.m-item:hover{transform:scale(1.15)}
+.m-item:active{transform:scale(0.95)}
+
+/* 3D cubes with hover tilt */
+.cube-wrap{width:70px;height:70px;perspective:300px;margin-bottom:10px}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:autospin 8s linear infinite;transition:transform 0.3s}
+.m-item:hover .cube{animation-play-state:paused;transform:rotateY(35deg) rotateX(-20deg)}
+.cube div{position:absolute;width:70px;height:70px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;backface-visibility:visible}
+.cube .f{transform:translateZ(35px)}.cube .b{transform:rotateY(180deg) translateZ(35px)}
+.cube .l{transform:rotateY(-90deg) translateZ(35px)}.cube .r{transform:rotateY(90deg) translateZ(35px)}
+.cube .t{transform:rotateX(90deg) translateZ(35px)}.cube .u{transform:rotateX(-90deg) translateZ(35px)}
+@keyframes autospin{0%{transform:rotateY(0) rotateX(8deg)}100%{transform:rotateY(360deg) rotateX(8deg)}}
+
+.c-teal div{background:rgba(0,140,140,0.85);border:1px solid rgba(0,180,180,0.4)}
+.c-orange div{background:rgba(230,120,0,0.9);border:1px solid rgba(255,160,40,0.4)}
+.c-red div{background:rgba(200,30,30,0.9);color:#fff;border:1px solid rgba(255,60,60,0.3)}
+.c-dark div{background:rgba(50,50,50,0.95);color:#777;border:1px solid rgba(80,80,80,0.4)}
+.c-purple div{background:rgba(110,20,200,0.9);color:#ddd;border:1px solid rgba(140,60,220,0.4)}
+.c-cyan div{background:rgba(0,190,210,0.9);border:1px solid rgba(40,220,240,0.4)}
+
+.m-label{font-size:9px;letter-spacing:2px;color:#555}
+.m-item:nth-child(1) .m-label{color:teal}
+.m-item:nth-child(2) .m-label{color:#e07800}
+.m-item:nth-child(3) .m-label{color:#c41e1e}
+.m-item:nth-child(4) .m-label{color:#666}
+.m-item:nth-child(5) .m-label{color:#7020c0}
+.m-item:nth-child(6) .m-label{color:#00b8c8}
+
+/* Corner decorations */
+.corner{position:absolute;font-size:28px;opacity:0.12;z-index:2;animation:float-corner 6s ease-in-out infinite}
+.corner.tl{top:52px;left:8px;animation-delay:0s}
+.corner.tr{top:52px;right:8px;animation-delay:1.5s}
+.corner.bl{bottom:30px;left:8px;animation-delay:3s}
+.corner.br{bottom:30px;right:8px;animation-delay:4.5s}
+@keyframes float-corner{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+
+.menu-foot{padding:10px;text-align:center;border-top:2px solid #b8b4ac;font-size:7px;color:#999;letter-spacing:2px;background:#c8c4bc}
+.menu-foot a{color:#777;text-decoration:none;margin:0 6px}
+
+/* Shop */
+#shop{position:absolute;inset:0;display:none;flex-direction:column;z-index:35;background:#fafafa;overflow-y:auto}
+#shop.active{display:flex}
+.s-top{padding:20px;text-align:center;border-bottom:2px solid #e0e0e0;background:#fff;position:sticky;top:0;z-index:2}
+.s-top h2{font-size:20px;color:#111;margin-bottom:4px}
+.s-top p{font-size:9px;color:#888;letter-spacing:3px}
+.s-back{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:9px;color:#111;cursor:pointer;padding:6px 12px;border:2px solid #111}
+.s-back:hover{background:#111;color:#fff}
+.s-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0}
+.s-card{border:1px solid #eee;padding:16px;text-align:center;cursor:pointer;transition:all 0.15s}
+.s-card:hover{background:#f0f0f0;transform:scale(1.02)}
+.s-card .s-img{height:100px;background:#f0f0f0;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#ddd;border-radius:4px}
+.s-card h3{font-size:8px;color:#222;margin-bottom:4px;letter-spacing:1px;line-height:1.4}
+.s-card .sp{font-size:11px;color:#111;font-weight:bold}
+
+@media(max-width:600px){.tv{width:96vw;height:88vh}.tv-outer{border-radius:24px;padding:6px}.tv-inner{padding:16px;border-radius:20px}.m-item{width:90px}.cube-wrap{width:50px;height:50px}.cube div{width:50px;height:50px}.cube .f{transform:translateZ(25px)}.cube .b{transform:rotateY(180deg) translateZ(25px)}.cube .l{transform:rotateY(-90deg) translateZ(25px)}.cube .r{transform:rotateY(90deg) translateZ(25px)}.cube .t{transform:rotateX(90deg) translateZ(25px)}.cube .u{transform:rotateX(-90deg) translateZ(25px)}.media-box{display:none}.corner{display:none}}
+</style>
+</head>
+<body>
+<div class="tv"><div class="tv-outer"><div class="tv-inner"><div class="tv-screen">
+<div class="vhs-scanlines"></div>
+<div class="vhs-tracking"></div>
+<canvas id="noise"></canvas>
+
+<div id="enter" onclick="enterSite()">
+<h1>BEHIKE</h1>
+<div class="start">PRESS START</div>
+<div class="copy">&copy; 2026 BEHIKE</div>
+</div>
+
+<div id="menu">
+<div class="menu-top"><h2>BEHIKE</h2><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+<div class="media-box"><canvas id="media-noise"></canvas><div class="label">MEDIA</div></div>
+<div class="corner tl">&#9760;</div><div class="corner tr">&#9883;</div><div class="corner bl">&#9733;</div><div class="corner br">&#9731;</div>
+<div class="menu-grid">
+<div class="m-item" onclick="showShop()"><div class="cube-wrap"><div class="cube c-teal"><div class="f"></div><div class="b"></div><div class="l"></div><div class="r"></div><div class="t"></div><div class="u"></div></div></div><div class="m-label">SHOP</div></div>
+<div class="m-item" onclick="go('https://behike.gumroad.com')"><div class="cube-wrap"><div class="cube c-orange"><div class="f">B</div><div class="b">B</div><div class="l">B</div><div class="r">B</div><div class="t">B</div><div class="u">B</div></div></div><div class="m-label">GUMROAD</div></div>
+<div class="m-item" onclick="go('../behike-co/')"><div class="cube-wrap"><div class="cube c-red"><div class="f">?</div><div class="b">?</div><div class="l">?</div><div class="r">?</div><div class="t">?</div><div class="u">?</div></div></div><div class="m-label">ABOUT</div></div>
+<div class="m-item" onclick="go('mailto:hello@behike.co')"><div class="cube-wrap"><div class="cube c-dark"><div class="f">@</div><div class="b">@</div><div class="l">@</div><div class="r">@</div><div class="t">@</div><div class="u">@</div></div></div><div class="m-label">CONTACT</div></div>
+<div class="m-item" onclick="go('https://instagram.com/behikeai')"><div class="cube-wrap"><div class="cube c-purple"><div class="f">IG</div><div class="b">IG</div><div class="l">IG</div><div class="r">IG</div><div class="t">IG</div><div class="u">IG</div></div></div><div class="m-label">SOCIAL</div></div>
+<div class="m-item" onclick="go('index.html')"><div class="cube-wrap"><div class="cube c-cyan"><div class="f">&#x2192;</div><div class="b">&#x2192;</div><div class="l">&#x2192;</div><div class="r">&#x2192;</div><div class="t">&#x2192;</div><div class="u">&#x2192;</div></div></div><div class="m-label">CLEAN</div></div>
+</div>
+<div class="menu-foot">&copy; 2026 BEHIKE &middot; <a href="../behike-co/privacy.html">Privacy</a><a href="../behike-co/terms.html">Terms</a> &middot; Built in Puerto Rico</div>
+</div>
+
+<div id="shop">
+<div class="s-top"><div class="s-back" onclick="backMenu()">&lt; BACK</div><h2>DON'T SLEEP ON IT</h2><p>DIGITAL PRODUCTS FOR BUILDERS</p></div>
+<div class="s-grid" id="sg"></div>
+</div>
+</div></div></div></div>
+
+<script>
+// Rainbow noise
+function drawNoise(canvas,opacity){const ctx=canvas.getContext('2d');canvas.width=canvas.offsetWidth/4;canvas.height=canvas.offsetHeight/4;ctx.imageSmoothingEnabled=false;function frame(){const img=ctx.createImageData(canvas.width,canvas.height);for(let i=0;i<img.data.length;i+=4){const v=Math.random()*255;img.data[i]=v*Math.random();img.data[i+1]=v*Math.random();img.data[i+2]=v*Math.random();img.data[i+3]=opacity}ctx.putImageData(img,0,0);requestAnimationFrame(frame)}frame()}
+setTimeout(()=>{drawNoise(document.getElementById('noise'),8);const mc=document.getElementById('media-noise');if(mc)drawNoise(mc,60)},100);
+
+// Click sound
+const audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+function clickSound(){const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=800;o.type='square';g.gain.value=0.05;o.start();g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.1);o.stop(audioCtx.currentTime+0.1)}
+
+function enterSite(){clickSound();const el=document.getElementById('enter');el.classList.add('glitching');setTimeout(()=>{el.classList.add('gone');document.getElementById('menu').classList.add('active')},400)}
+function showShop(){clickSound();document.getElementById('menu').classList.remove('active');document.getElementById('shop').classList.add('active');loadP()}
+function backMenu(){clickSound();document.getElementById('shop').classList.remove('active');document.getElementById('menu').classList.add('active')}
+function go(u){clickSound();setTimeout(()=>window.open(u,'_blank'),150)}
+function loadP(){fetch('../products.json').then(r=>r.json()).then(ps=>{const g=document.getElementById('sg');if(g.children.length)return;ps.forEach(p=>{const c=document.createElement('div');c.className='s-card';c.innerHTML=`<div class="s-img">${(p.category||'').charAt(0).toUpperCase()}</div><h3>${p.title.toUpperCase()}</h3><div class="sp">${p.price>0?'$'+p.price:'FREE'}</div>`;c.onclick=()=>{clickSound();window.open(p.gumroad_url||'#','_blank')};g.appendChild(c)})}).catch(()=>{})}
+</script>
+</body>
+</html>

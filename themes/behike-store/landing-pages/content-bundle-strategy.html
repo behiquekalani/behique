@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Content Bundle Strategy — Behike</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --muted: #86868B;
+      --card: #111111;
+      --border: #1D1D1F;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #25A244;
+      --max: 980px;
+      --radius: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* NAV */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+    }
+
+    nav .inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-cta {
+      background: var(--cta);
+      color: #000;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 9px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .nav-cta:hover { background: var(--cta-hover); }
+
+    /* HERO */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(10, 132, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(10, 132, 255, 0.25);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin-bottom: 22px;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero-sub {
+      font-size: 20px;
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
+
+    .price-block {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .price-individual {
+      font-size: 15px;
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    .price-main {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .price-save {
+      background: rgba(48, 209, 88, 0.12);
+      color: var(--cta);
+      border: 1px solid rgba(48, 209, 88, 0.2);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 16px 40px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: -0.01em;
+    }
+
+    .cta-btn:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SECTION SHARED */
+    section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 56px;
+    }
+
+    /* PSYCHOLOGY CARDS */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(10, 132, 255, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .card h3 {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* CHAPTERS */
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .chapter-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .chapter-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .chapter-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 28px;
+      margin-top: 2px;
+    }
+
+    .chapter-text h4 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .chapter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* MATH SECTION */
+    .math-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px;
+    }
+
+    .math-compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 24px;
+      align-items: center;
+      margin-top: 40px;
+    }
+
+    .math-col {
+      background: #0A0A0A;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .math-col.bundle-col {
+      border-color: rgba(48, 209, 88, 0.3);
+      background: rgba(48, 209, 88, 0.04);
+    }
+
+    .math-col-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .math-col.bundle-col .math-col-label { color: var(--cta); }
+
+    .math-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .math-row:last-child { border-bottom: none; }
+
+    .math-row .val {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .math-total {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .math-total-label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .math-total-val {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--cta);
+    }
+
+    .math-vs {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .math-lift {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .math-lift strong {
+      display: block;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--cta);
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    /* PERSONAS */
+    .personas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .persona-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .persona-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .persona-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .persona-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .persona-tag {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      background: rgba(10, 132, 255, 0.1);
+      border: 1px solid rgba(10, 132, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 2px; }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .faq-q {
+      width: 100%;
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 22px 24px;
+      text-align: left;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      transition: background 0.15s;
+      letter-spacing: -0.01em;
+    }
+
+    .faq-q:hover { background: #161616; }
+
+    .faq-icon {
+      font-size: 20px;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+
+    .faq-a {
+      background: #0A0A0A;
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      padding: 0 24px;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 400px;
+      padding: 20px 24px;
+    }
+
+    .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+    /* FINAL CTA */
+    .final-cta {
+      text-align: center;
+      padding: 100px 0;
+    }
+
+    .final-cta h2 {
+      font-size: clamp(32px, 5vw, 50px);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .final-cta p {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .final-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .math-compare { grid-template-columns: 1fr; }
+      .math-vs { display: none; }
+      .math-section { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="inner">
+      <a class="nav-brand" href="/index.html">Behike</a>
+      <a class="nav-cta" href="https://behikeai.gumroad.com/l/content-bundle-strategy" target="_blank" rel="noopener">Get it — $17.99</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" style="border-top: none;">
+    <div class="container">
+      <div class="hero-badge">Digital Product Strategy</div>
+      <h1>Sell more with <span>less products.</span><br>The bundle strategy.</h1>
+      <p class="hero-sub">The complete system for packaging, pricing, and launching digital product bundles that convert at 2-3x the rate of individual products.</p>
+
+      <div class="price-block">
+        <span class="price-individual">$34+ in individual guides</span>
+        <span class="price-main">$17.99</span>
+        <span class="price-save">Save 47%</span>
+      </div>
+
+      <a class="cta-btn" href="https://behikeai.gumroad.com/l/content-bundle-strategy" target="_blank" rel="noopener">
+        Get The Content Bundle Strategy
+      </a>
+      <p class="hero-note">Instant PDF download. 3,500+ words. Real pricing models and revenue math.</p>
+    </div>
+  </section>
+
+  <!-- PSYCHOLOGY -->
+  <section id="psychology">
+    <div class="container">
+      <p class="section-label">Bundle Psychology</p>
+      <h2 class="section-title">Three reasons bundles outperform single products</h2>
+      <p class="section-sub">This is not about discounting. It is about how buyers make decisions, and how a bundle removes the friction a single product cannot.</p>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-icon">&#9875;</div>
+          <h3>The Anchor Effect</h3>
+          <p>A single product asks buyers to build value from scratch. A bundle gives them a reference point. The brain switches from "is this worth $17" to "is $37 better than $51." That is a much easier yes.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9650;</div>
+          <h3>The Completeness Effect</h3>
+          <p>Single products leave a question open: do I need anything else? A well-designed bundle eliminates that uncertainty. It says: this is the full system. That closed loop is worth a real premium.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9670;</div>
+          <h3>Decision Simplification</h3>
+          <p>Three separate product pages mean three separate decisions. One bundle page collapses that into one. Fewer decisions means less friction. Less friction means higher conversion. The math works every time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS -->
+  <section id="chapters">
+    <div class="container">
+      <p class="section-label">What Is Inside</p>
+      <h2 class="section-title">10 chapters. One complete system.</h2>
+      <p class="section-sub">Every section builds on the last. By the end you have a full bundle architecture ready to launch.</p>
+
+      <div class="chapters-grid">
+        <div class="chapter-item">
+          <span class="chapter-num">01</span>
+          <div class="chapter-text">
+            <h4>Why Bundles Convert Better</h4>
+            <p>Anchoring, completeness effect, loss aversion, decision simplification. The full psychology.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">02</span>
+          <div class="chapter-text">
+            <h4>The Bundle Formula</h4>
+            <p>Three-layer structure, correct product count, right price ranges, and the math behind each tier.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">03</span>
+          <div class="chapter-text">
+            <h4>Designing Bundles That Make Sense</h4>
+            <p>The logical progression test. The complete system angle. What to never include.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">04</span>
+          <div class="chapter-text">
+            <h4>Naming and Positioning</h4>
+            <p>The framework: [Outcome] + [Timeframe] + [Mechanism]. Real naming examples you can model.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">05</span>
+          <div class="chapter-text">
+            <h4>The Bundle Landing Page</h4>
+            <p>Section-by-section structure. What bundle pages must do that single-product pages cannot.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">06</span>
+          <div class="chapter-text">
+            <h4>Seasonal vs. Evergreen Bundles</h4>
+            <p>When to run limited-time offers versus keeping a permanent bundle. The hybrid approach.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">07</span>
+          <div class="chapter-text">
+            <h4>Platform Strategy</h4>
+            <p>Gumroad bundles, affiliate activation, cross-platform decisions, where to concentrate traffic.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">08</span>
+          <div class="chapter-text">
+            <h4>Email Strategy for Bundle Launches</h4>
+            <p>The 5-email launch sequence. Subject lines, timing, what each email does.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">09</span>
+          <div class="chapter-text">
+            <h4>The Upsell Architecture</h4>
+            <p>The 4-level architecture. How the bundle feeds a service offer. The passive upsell that runs automatically.</p>
+          </div>
+        </div>
+        <div class="chapter-item">
+          <span class="chapter-num">10</span>
+          <div class="chapter-text">
+            <h4>The Bundle Math</h4>
+            <p>Real revenue calculations. Conversion rate expectations. A 90-day income model you can adapt.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATH PREVIEW -->
+  <section id="math">
+    <div class="container">
+      <p class="section-label">Revenue Math</p>
+      <h2 class="section-title">Same traffic. Different architecture.</h2>
+      <p class="section-sub">This is the calculation that makes the case for building a bundle. Same 1,000 visitors. Two completely different outcomes.</p>
+
+      <div class="math-section">
+        <div class="math-compare">
+          <div class="math-col">
+            <div class="math-col-label">Individual Products</div>
+            <div class="math-row">
+              <span>1,000 visitors split across 3 pages</span>
+            </div>
+            <div class="math-row">
+              <span>2% avg conversion</span>
+              <span class="val">~20 sales</span>
+            </div>
+            <div class="math-row">
+              <span>Price per product</span>
+              <span class="val">$17</span>
+            </div>
+            <div class="math-total">
+              <span class="math-total-label">Monthly revenue</span>
+              <span class="math-total-val" style="color: var(--muted);">$340</span>
+            </div>
+          </div>
+
+          <div class="math-vs">vs</div>
+
+          <div class="math-col bundle-col">
+            <div class="math-col-label">Bundle Page</div>
+            <div class="math-row">
+              <span>1,000 visitors on one page</span>
+            </div>
+            <div class="math-row">
+              <span>2.5% conversion (anchor effect)</span>
+              <span class="val">25 sales</span>
+            </div>
+            <div class="math-row">
+              <span>Bundle price</span>
+              <span class="val">$37</span>
+            </div>
+            <div class="math-total">
+              <span class="math-total-label">Monthly revenue</span>
+              <span class="math-total-val">$925</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="math-lift">
+          <strong>2.7x</strong>
+          revenue lift from the same traffic. No ads. No new content. Just structure.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERSONAS -->
+  <section id="personas">
+    <div class="container">
+      <p class="section-label">Who This Is For</p>
+      <h2 class="section-title">Three types of creators who need this</h2>
+      <p class="section-sub">This guide is not for everyone. It is for the creator who already has products or is building them and wants a higher-converting revenue structure.</p>
+
+      <div class="personas-grid">
+        <div class="persona-card">
+          <div class="persona-title">The single-product creator</div>
+          <p class="persona-desc">You launched one digital product. It sells occasionally. You are not sure what to build next or how to increase revenue without starting from scratch. The bundle architecture gives you the next move without requiring new content.</p>
+          <span class="persona-tag">Has 1-2 products</span>
+        </div>
+        <div class="persona-card">
+          <div class="persona-title">The creator with scattered products</div>
+          <p class="persona-desc">You have three to five products that sell independently but do not connect. You have not packaged them because you were not sure how. This guide gives you the design criteria to identify which ones belong together and how to frame them as a system.</p>
+          <span class="persona-tag">Has 3-5 products</span>
+        </div>
+        <div class="persona-card">
+          <div class="persona-title">The solopreneur building from zero</div>
+          <p class="persona-desc">You are planning your product suite and want to build it with the right architecture from the start. Rather than creating individual products and hoping they stack, you want to design the bundle first and build backward. This guide is the blueprint.</p>
+          <span class="persona-tag">Building the foundation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <p class="section-label">FAQ</p>
+      <h2 class="section-title">Honest answers</h2>
+      <p class="section-sub" style="margin-bottom: 40px;">The questions worth asking before you decide.</p>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            I only have one product. Is this still relevant?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            Yes, with one condition. The guide will tell you what the other two products in your bundle should be. If you are building from one product, the bundle design chapter helps you plan your next two products with the architecture in mind from the start, rather than creating them and retrofitting a bundle later.
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Is this specific to Gumroad or does it work on other platforms?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            The strategy works on any platform. Chapter 7 covers Gumroad specifically because it is the most common platform for solopreneurs selling digital products under $200, but the bundle formula, landing page structure, email sequence, and revenue math apply regardless of where you sell.
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What if my products do not seem to go together?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            That is the right question to be asking. Chapter 3 covers the logical progression test and the common mistake of forcing products together because you own them rather than because they belong together. If your products genuinely do not connect, the guide will tell you that directly, and give you the criteria for designing a bundle that does.
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            I have no audience yet. Is a bundle strategy premature?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            No. If anything, starting with a bundle architecture means you build the right products from day one rather than creating a scattered catalog. The email sequence in Chapter 8 also works for small lists. 100 subscribers who trust you convert better than 1,000 who do not. The bundle strategy scales down to small audiences.
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How long is the guide and what format?
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-a">
+            3,500 to 4,500 words across 10 focused chapters. PDF format, instant download. It is written to be read in one sitting, with specific frameworks, real pricing examples, and a 90-day revenue model you can adapt to your situation. No filler, no padding.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final-cta" style="border-top: 1px solid var(--border);">
+    <div class="container">
+      <h2>The bundle is the missing structure.<br>Build it once.</h2>
+      <p>A complete playbook for packaging, pricing, launching, and scaling digital product bundles. Everything covered in one guide at a price that does not require a decision committee.</p>
+
+      <div class="final-price-row">
+        <span class="price-individual">$34+ individual</span>
+        <span class="price-main">$17.99</span>
+        <span class="price-save">Today only</span>
+      </div>
+
+      <a class="cta-btn" href="https://behikeai.gumroad.com/l/content-bundle-strategy" target="_blank" rel="noopener">
+        Get The Content Bundle Strategy — $17.99
+      </a>
+      <p class="hero-note" style="margin-top: 18px;">Instant PDF download. No subscription. Yours forever.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 <a href="/index.html">Behike</a> &nbsp;|&nbsp; <a href="https://behikeai.gumroad.com" target="_blank">Gumroad Store</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for card animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const siblings = el.parentElement.querySelectorAll('.card, .chapter-item, .persona-card');
+          const idx = Array.from(siblings).indexOf(el);
+          setTimeout(() => el.classList.add('visible'), idx * 80);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card, .chapter-item, .persona-card').forEach(el => observer.observe(el));
+
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+  </script>
+
+</body>
+</html>

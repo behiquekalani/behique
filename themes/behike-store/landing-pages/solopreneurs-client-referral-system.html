@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Solopreneur's Client Referral System — Behike</title>
+  <meta name="description" content="A referral engine for solo operators. Turn satisfied clients into steady introductions without awkward asks or transactional incentive programs. $17.99.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #000000;
+      --text: #F5F5F7;
+      --text-muted: #86868B;
+      --accent: #0A84FF;
+      --cta: #30D158;
+      --cta-hover: #34C759;
+      --border: #1D1D1F;
+      --card-bg: #0A0A0A;
+      --card-border: #1D1D1F;
+      --max-width: 980px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+    .fade-up.delay-4 { transition-delay: 0.4s; }
+    .fade-up.delay-5 { transition-delay: 0.5s; }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: "";
+      position: absolute;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse at center, rgba(48, 209, 88, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 760px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow::before {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    .hero-title span {
+      color: var(--cta);
+    }
+
+    .hero-sub {
+      font-size: 20px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin-bottom: 48px;
+    }
+
+    .hero-price {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .hero-price strong {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      margin-right: 4px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--cta);
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--cta-hover);
+      transform: translateY(-1px);
+    }
+
+    .hero-meta {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* PROBLEM */
+    #problem {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 700px;
+    }
+
+    .section-body {
+      font-size: 18px;
+      line-height: 1.65;
+      color: var(--text-muted);
+      max-width: 640px;
+    }
+
+    .section-body p + p {
+      margin-top: 20px;
+    }
+
+    .failure-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 56px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .failure-item {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .failure-item:last-child {
+      border-bottom: none;
+    }
+
+    .failure-cause {
+      padding: 24px 28px;
+      border-right: 1px solid var(--border);
+      background: var(--card-bg);
+    }
+
+    .failure-cause span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .failure-cause strong {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .failure-desc {
+      padding: 24px 28px;
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 640px) {
+      .failure-item { grid-template-columns: 1fr; }
+      .failure-cause { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+
+    /* SOLUTION */
+    #solution {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .component-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px 24px;
+    }
+
+    .component-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cta);
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .component-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .component-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .math-block {
+      margin-top: 60px;
+      background: linear-gradient(135deg, rgba(48, 209, 88, 0.07), rgba(48, 209, 88, 0.02));
+      border: 1px solid rgba(48, 209, 88, 0.18);
+      border-radius: 20px;
+      padding: 40px 44px;
+    }
+
+    .math-block h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    .math-block p {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 580px;
+    }
+
+    /* TOC */
+    #toc {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .toc-part {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+
+    .toc-part-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cta);
+      margin-bottom: 12px;
+    }
+
+    .toc-part h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .toc-part ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toc-part ul li {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.4;
+    }
+
+    .toc-part ul li::before {
+      content: "/";
+      position: absolute;
+      left: 0;
+      color: var(--cta);
+      opacity: 0.6;
+    }
+
+    /* CTA FINAL */
+    #cta-final {
+      padding: 120px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    #cta-final .section-title {
+      margin: 0 auto 20px;
+      text-align: center;
+    }
+
+    #cta-final .section-body {
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+
+    .price-block {
+      margin-bottom: 32px;
+    }
+
+    .price-block .price-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .price-block .price-amount {
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    .price-block .price-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-eyebrow fade-up">Behike Digital Products</div>
+        <h1 class="hero-title fade-up delay-1">
+          The Solopreneur's<br><span>Client Referral</span><br>System
+        </h1>
+        <p class="hero-sub fade-up delay-2">
+          One satisfied client should become five. Most solopreneurs know referrals matter and still don't have a system for them. This guide builds the five-component referral engine that runs without awkward asks or transactional incentive programs.
+        </p>
+        <div class="hero-price fade-up delay-3">
+          <strong>$17.99</strong> one-time. Instant PDF download.
+        </div>
+        <a href="#" class="btn-primary fade-up delay-3">Get the System</a>
+        <p class="hero-meta fade-up delay-4">20 chapters. 8 parts. Built for solo operators.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label fade-up">Why Referrals Don't Happen</p>
+      <h2 class="section-title fade-up delay-1">You're treating referrals as one-off asks. They're a system failure, not a relationship failure.</h2>
+      <div class="section-body fade-up delay-2">
+        <p>Most solopreneurs know they should be building a referral pipeline. Most aren't. The problem is almost never the quality of their work. It's five specific system failures that kill referrals before they happen.</p>
+      </div>
+      <div class="failure-list fade-up delay-2">
+        <div class="failure-item">
+          <div class="failure-cause">
+            <span>Failure 01</span>
+            <strong>Wrong timing</strong>
+          </div>
+          <div class="failure-desc">Asking before results are clear, or after the relationship has gone cold. The window closes fast. Most solopreneurs miss it every time.</div>
+        </div>
+        <div class="failure-item">
+          <div class="failure-cause">
+            <span>Failure 02</span>
+            <strong>No concrete action</strong>
+          </div>
+          <div class="failure-desc">"Let me know if you think of anyone" is not a request. Without something specific to do, intention evaporates. The client meant to refer you and never did.</div>
+        </div>
+        <div class="failure-item">
+          <div class="failure-cause">
+            <span>Failure 03</span>
+            <strong>Wrong framing</strong>
+          </div>
+          <div class="failure-desc">The ask is framed around your pipeline needs instead of the referred person's benefit. This turns endorsement into favor. People don't refer enthusiastically when it feels transactional.</div>
+        </div>
+        <div class="failure-item">
+          <div class="failure-cause">
+            <span>Failure 04</span>
+            <strong>No follow-up</strong>
+          </div>
+          <div class="failure-desc">Client says they know someone. You say great. Nothing happens. No follow-up because you don't want to seem pushy. The referral dies in the gap between intention and action.</div>
+        </div>
+        <div class="failure-item">
+          <div class="failure-cause">
+            <span>Failure 05</span>
+            <strong>No close loop</strong>
+          </div>
+          <div class="failure-desc">Introduction made. Project won. The referring client hears nothing. No reinforcement. The behavior that produced the referral is never rewarded.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="container">
+      <p class="section-label fade-up">The Five Components</p>
+      <h2 class="section-title fade-up delay-1">A referral system addresses all five failures by design.</h2>
+      <p class="section-body fade-up delay-2">An ask is uncomfortable and easy to avoid. A system runs. Each component removes a failure mode. Together they produce referrals that feel natural to everyone involved.</p>
+      <div class="components-grid">
+        <div class="component-card fade-up">
+          <p class="component-num">01</p>
+          <h3>Referral Window</h3>
+          <p>The three high-leverage moments in the client lifecycle when referrals are most likely. The moments to never ask.</p>
+        </div>
+        <div class="component-card fade-up delay-1">
+          <p class="component-num">02</p>
+          <h3>The Easy Ask</h3>
+          <p>A low-pressure script that is specific, warm, and direct. The written version for clients who prefer email.</p>
+        </div>
+        <div class="component-card fade-up delay-2">
+          <p class="component-num">03</p>
+          <h3>Referral Kit</h3>
+          <p>The one-sentence description, problem statement, and template introduction email that removes all friction from referring.</p>
+        </div>
+        <div class="component-card fade-up delay-3">
+          <p class="component-num">04</p>
+          <h3>Follow-Up Protocol</h3>
+          <p>A three-stage process for capturing, converting, and closing referral conversations. The lightweight CRM you actually need.</p>
+        </div>
+        <div class="component-card fade-up delay-4">
+          <p class="component-num">05</p>
+          <h3>Close Loop</h3>
+          <p>The message that reinforces referral behavior after an outcome. Exactly what to say when it converts and when it doesn't.</p>
+        </div>
+      </div>
+      <div class="math-block fade-up delay-2">
+        <h3>What one client into five actually looks like</h3>
+        <p>Client A refers Client B at project close. You deliver excellent work. Client B refers Clients C and D. Client A, hearing that Client B is happy, refers Client E. That is five clients from one, across 18 months, from a system that runs the same way every time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOC -->
+  <section id="toc">
+    <div class="container">
+      <p class="section-label fade-up">What's Inside</p>
+      <h2 class="section-title fade-up delay-1">20 chapters. No filler.</h2>
+      <p class="section-body fade-up delay-2">Eight parts that build the system from foundation to flywheel. Every chapter is specific to solo operators, not agencies or B2C businesses.</p>
+      <div class="toc-grid">
+        <div class="toc-part fade-up">
+          <p class="toc-part-label">Parts 1 + 2</p>
+          <h3>Foundation + Referral Window</h3>
+          <ul>
+            <li>Why most referral attempts fail</li>
+            <li>The referral-ready client</li>
+            <li>What you're actually building</li>
+            <li>When to ask (the three windows)</li>
+            <li>The off-limits moments</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-1">
+          <p class="toc-part-label">Parts 3 + 4</p>
+          <h3>The Ask + The Kit</h3>
+          <ul>
+            <li>How to ask without it feeling like an ask</li>
+            <li>The written ask template</li>
+            <li>Making it concrete</li>
+            <li>The intro template your clients can actually use</li>
+            <li>Distributing the referral kit</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-2">
+          <p class="toc-part-label">Parts 5 + 6</p>
+          <h3>Follow-Up + Close Loop</h3>
+          <ul>
+            <li>Capturing referral conversations</li>
+            <li>The two-week follow-up</li>
+            <li>The CRM you actually need</li>
+            <li>Why you must close the loop</li>
+            <li>Incentive structures that don't cheapen the relationship</li>
+          </ul>
+        </div>
+        <div class="toc-part fade-up delay-3">
+          <p class="toc-part-label">Parts 7 + 8</p>
+          <h3>Scale + Failure Modes</h3>
+          <ul>
+            <li>From clients to connectors</li>
+            <li>The referral flywheel</li>
+            <li>Positioning for referrability</li>
+            <li>The annual referral review</li>
+            <li>Five common system failures and fixes</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="cta-final">
+    <div class="container">
+      <p class="section-label fade-up">Get It Now</p>
+      <h2 class="section-title fade-up delay-1">Stop relying on word-of-mouth. Build the system that produces it.</h2>
+      <p class="section-body fade-up delay-2">A referral system is not a feature of a successful service business. It is the foundation. Every week without one is pipeline you are leaving on the table.</p>
+      <div class="price-block fade-up delay-3">
+        <p class="price-label">One-time price</p>
+        <div class="price-amount">$17.99</div>
+        <p class="price-sub">PDF download. No subscription. Yours permanently.</p>
+      </div>
+      <a href="#" class="btn-primary fade-up delay-4">Get the System — $17.99</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>Behike &mdash; <a href="/index.html">behike.com</a> &mdash; Built by Kalani Andre Gomez Padin</p>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!--
+  MINIMAL STORE THEME
+  A clean, minimal e-commerce theme inspired by Apple Store and Muji aesthetics.
+
+  SHOPIFY LIQUID CONVERSION GUIDE:
+  =========================================
+  1. Rename this file to theme.liquid or split into sections/
+  2. Replace product cards with {% for product in collections.frontpage.products %}
+  3. Replace image placeholders with {{ product.featured_image | img_url: '400x' }}
+  4. Replace prices with {{ product.price | money }}
+  5. Replace "Add to Cart" buttons with Shopify AJAX cart API calls
+  6. Replace navigation with {% for link in linklists.main-menu.links %}
+  7. Replace footer links with {% for link in linklists.footer.links %}
+  8. Replace newsletter form action with Shopify customer endpoint
+  9. Move CSS custom properties into theme settings via settings_schema.json
+  10. Cart icon badge: {{ cart.item_count }}
+  =========================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimal Store</title>
+  <style>
+    /* ============================================
+       CSS Custom Properties - Edit these to rebrand
+       ============================================ */
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #1a1a1a;
+      --color-text-secondary: #666666;
+      --color-accent: #000000;
+      --color-border: #e5e5e5;
+      --color-bg-subtle: #fafafa;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --max-width: 1200px;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --transition: 0.3s ease;
+    }
+
+    /* Reset */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* Container */
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--spacing-md); }
+
+    /* ============================================
+       Navigation
+       ============================================ */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .nav .container {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav__logo {
+      font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em;
+    }
+    .nav__links { display: flex; gap: var(--spacing-md); list-style: none; }
+    .nav__links a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .nav__links a:hover { color: var(--color-text); }
+    .nav__cart {
+      position: relative; background: none; border: none;
+      font-size: 1rem; color: var(--color-text);
+    }
+    .nav__cart-count {
+      position: absolute; top: -6px; right: -10px;
+      background: var(--color-accent); color: #fff;
+      font-size: 0.625rem; width: 16px; height: 16px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .nav__mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; }
+
+    /* ============================================
+       Hero
+       ============================================ */
+    .hero {
+      padding: var(--spacing-xl) 0;
+      text-align: center;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .hero__subtitle {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);
+    }
+    .hero__title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300; letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: var(--spacing-md);
+    }
+    .hero__description {
+      color: var(--color-text-secondary);
+      max-width: 480px; margin: 0 auto var(--spacing-md);
+      font-size: 1.0625rem;
+    }
+    .btn {
+      display: inline-block; padding: 0.875rem 2.5rem;
+      background: var(--color-accent); color: #fff;
+      font-size: 0.8125rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      border: 1px solid var(--color-accent);
+      transition: all var(--transition);
+    }
+    .btn:hover { background: transparent; color: var(--color-accent); }
+    .btn--outline {
+      background: transparent; color: var(--color-accent);
+    }
+    .btn--outline:hover { background: var(--color-accent); color: #fff; }
+
+    /* ============================================
+       Products
+       ============================================ */
+    .products { padding: var(--spacing-xl) 0; }
+    .section-header {
+      text-align: center; margin-bottom: var(--spacing-lg);
+    }
+    .section-header h2 {
+      font-size: 1.75rem; font-weight: 300; letter-spacing: -0.02em;
+    }
+    .section-header p {
+      color: var(--color-text-secondary); margin-top: var(--spacing-xs);
+    }
+    .products__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .product-card {
+      border: 1px solid var(--color-border);
+      transition: border-color var(--transition);
+    }
+    .product-card:hover { border-color: var(--color-accent); }
+    .product-card__image {
+      aspect-ratio: 1; background: var(--color-bg-subtle);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .product-card__info { padding: var(--spacing-sm); }
+    .product-card__name {
+      font-size: 0.9375rem; font-weight: 400; margin-bottom: var(--spacing-xs);
+    }
+    .product-card__price {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm);
+    }
+    .product-card__btn {
+      width: 100%; padding: 0.75rem;
+      background: transparent; border: 1px solid var(--color-border);
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--color-text); transition: all var(--transition);
+    }
+    .product-card__btn:hover {
+      background: var(--color-accent); color: #fff; border-color: var(--color-accent);
+    }
+
+    /* ============================================
+       About
+       ============================================ */
+    .about {
+      padding: var(--spacing-xl) 0;
+      border-top: 1px solid var(--color-border);
+    }
+    .about__inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);
+      align-items: center;
+    }
+    .about__image {
+      aspect-ratio: 4/3; background: var(--color-bg-subtle);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-secondary); font-size: 0.875rem;
+    }
+    .about__content h2 {
+      font-size: 1.75rem; font-weight: 300; margin-bottom: var(--spacing-sm);
+    }
+    .about__content p {
+      color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);
+      line-height: 1.8;
+    }
+
+    /* ============================================
+       Testimonials
+       ============================================ */
+    .testimonials {
+      padding: var(--spacing-xl) 0;
+      background: var(--color-bg-subtle);
+    }
+    .testimonials__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-md);
+    }
+    .testimonial {
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+    .testimonial__text {
+      font-size: 0.9375rem; line-height: 1.8;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-sm);
+    }
+    .testimonial__author { font-size: 0.8125rem; font-weight: 500; }
+    .testimonial__role { font-size: 0.75rem; color: var(--color-text-secondary); }
+
+    /* ============================================
+       Footer
+       ============================================ */
+    .footer {
+      padding: var(--spacing-lg) 0 var(--spacing-md);
+      border-top: 1px solid var(--color-border);
+    }
+    .footer__grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.5fr;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+    .footer__brand p {
+      color: var(--color-text-secondary);
+      font-size: 0.875rem; margin-top: var(--spacing-xs);
+    }
+    .footer h4 {
+      font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.1em; margin-bottom: var(--spacing-sm);
+    }
+    .footer ul { list-style: none; }
+    .footer ul li { margin-bottom: var(--spacing-xs); }
+    .footer ul a {
+      font-size: 0.875rem; color: var(--color-text-secondary);
+      transition: color var(--transition);
+    }
+    .footer ul a:hover { color: var(--color-text); }
+    .footer__newsletter-form {
+      display: flex; gap: 0; margin-top: var(--spacing-xs);
+    }
+    .footer__newsletter-form input {
+      flex: 1; padding: 0.625rem 0.75rem;
+      border: 1px solid var(--color-border); border-right: none;
+      font-size: 0.875rem; outline: none;
+      font-family: var(--font-body);
+    }
+    .footer__newsletter-form button {
+      padding: 0.625rem 1rem;
+      background: var(--color-accent); color: #fff;
+      border: 1px solid var(--color-accent);
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .footer__social { display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-sm); }
+    .footer__social a {
+      width: 32px; height: 32px;
+      border: 1px solid var(--color-border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: var(--color-text-secondary);
+      transition: all var(--transition);
+    }
+    .footer__social a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .footer__bottom {
+      text-align: center; padding-top: var(--spacing-md);
+      border-top: 1px solid var(--color-border);
+      font-size: 0.75rem; color: var(--color-text-secondary);
+    }
+
+    /* ============================================
+       Responsive
+       ============================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .nav__mobile-toggle { display: block; }
+      .about__inner { grid-template-columns: 1fr; }
+      .footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .footer__grid { grid-template-columns: 1fr; }
+      .hero__title { font-size: 1.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">STORE</a>
+      <ul class="nav__links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+        <li><a href="#footer">Contact</a></li>
+      </ul>
+      <button class="nav__cart" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="nav__cart-count">0</span>
+      </button>
+      <button class="nav__mobile-toggle" aria-label="Menu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero__subtitle">New Collection</p>
+      <h1 class="hero__title">Designed for<br>everyday simplicity</h1>
+      <p class="hero__description">Carefully crafted products that bring clarity and calm to your daily routine. Less noise, more intention.</p>
+      <a href="#products" class="btn">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <section class="products" id="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Featured Products</h2>
+        <p>Our most loved essentials</p>
+      </div>
+      <div class="products__grid">
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Essential Tee</h3>
+            <p class="product-card__price">$48.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Ceramic Mug</h3>
+            <p class="product-card__price">$24.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Linen Notebook</h3>
+            <p class="product-card__price">$18.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-card__image">360 x 360</div>
+          <div class="product-card__info">
+            <h3 class="product-card__name">Wool Scarf</h3>
+            <p class="product-card__price">$65.00</p>
+            <button class="product-card__btn">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about__inner">
+        <div class="about__image">800 x 600</div>
+        <div class="about__content">
+          <h2>Our Story</h2>
+          <p>We started with a simple belief. The things you use every day should be beautiful, functional, and made to last. No excess. No compromise.</p>
+          <p>Every product in our collection is designed in-house and produced in small batches by skilled artisans. We choose quality over quantity, always.</p>
+          <a href="#" class="btn btn--outline">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <h2>What People Say</h2>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testimonial">
+          <p class="testimonial__text">"The quality is incredible. I have bought from dozens of online stores, and nothing compares to the attention to detail here. Every item feels intentional."</p>
+          <p class="testimonial__author">Sarah M.</p>
+          <p class="testimonial__role">Verified Buyer</p>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__text">"Finally, a brand that understands minimalism is not about having less. It is about having the right things. My entire home feels different now."</p>
+          <p class="testimonial__author">James K.</p>
+          <p class="testimonial__role">Verified Buyer</p>
+        </div>
+        <div class="testimonial">
+          <p class="testimonial__text">"I ordered the linen notebook and came back for three more. Simple, well made, and exactly what I needed. Nothing unnecessary."</p>
+          <p class="testimonial__author">Ana R.</p>
+          <p class="testimonial__role">Verified Buyer</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <h3>STORE</h3>
+          <p>Designed for everyday simplicity. Crafted with care, built to last.</p>
+          <div class="footer__social">
+            <a href="#" aria-label="Instagram">IG</a>
+            <a href="#" aria-label="Twitter">TW</a>
+            <a href="#" aria-label="Pinterest">PI</a>
+          </div>
+        </div>
+        <div>
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="#">All Products</a></li>
+            <li><a href="#">New Arrivals</a></li>
+            <li><a href="#">Best Sellers</a></li>
+            <li><a href="#">Gift Cards</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Info</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Newsletter</h4>
+          <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-xs);">Get updates on new products and exclusive offers.</p>
+          <form class="footer__newsletter-form" onsubmit="return false;">
+            <input type="email" placeholder="your@email.com" aria-label="Email address">
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 Store. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

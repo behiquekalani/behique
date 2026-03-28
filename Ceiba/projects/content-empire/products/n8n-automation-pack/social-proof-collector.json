@@ -1,0 +1,196 @@
+{
+  "name": "Social Proof Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gumroad-purchase",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "f6a7b8c9-0001-4000-8000-000000000001",
+      "name": "Webhook - Gumroad Purchase",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "notes": "Configure this URL in Gumroad: Settings > Advanced > Ping"
+    },
+    {
+      "parameters": {
+        "unit": "days",
+        "amount": 3
+      },
+      "id": "f6a7b8c9-0002-4000-8000-000000000002",
+      "name": "Wait - 3 Days After Purchase",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hello@behike.shop",
+        "toEmail": "={{ $('Webhook - Gumroad Purchase').item.json.email }}",
+        "subject": "Quick question about your purchase",
+        "emailType": "html",
+        "message": "<p>Hey {{ $('Webhook - Gumroad Purchase').item.json.full_name || 'there' }},</p><p>You grabbed <strong>{{ $('Webhook - Gumroad Purchase').item.json.product_name }}</strong> a few days ago.</p><p>I want to ask you something and I promise it'll take 60 seconds:</p><p><strong>What's one thing you've already applied or plan to apply from it?</strong></p><p>That's it. Just reply to this email.</p><p>I read every reply. And if you've found value, I might share your story (with your permission) to help other people decide.</p><p>If you haven't opened it yet, no pressure. It's yours forever.</p><br><p>— Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "f6a7b8c9-0003-4000-8000-000000000003",
+      "name": "Gmail - Send Testimonial Request",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "YOUR_GMAIL_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "application": "YOUR_AIRTABLE_BASE_ID_HERE",
+        "table": "TestimonialOutreach",
+        "options": {},
+        "fields": {
+          "fieldMappingsUi": {
+            "fieldMappings": [
+              { "fieldId": "CustomerName", "fieldValue": "={{ $('Webhook - Gumroad Purchase').item.json.full_name }}" },
+              { "fieldId": "CustomerEmail", "fieldValue": "={{ $('Webhook - Gumroad Purchase').item.json.email }}" },
+              { "fieldId": "Product", "fieldValue": "={{ $('Webhook - Gumroad Purchase').item.json.product_name }}" },
+              { "fieldId": "PurchaseDate", "fieldValue": "={{ $('Webhook - Gumroad Purchase').item.json.sale_timestamp }}" },
+              { "fieldId": "OutreachDate", "fieldValue": "={{ $now.toISO() }}" },
+              { "fieldId": "Status", "fieldValue": "Email Sent" }
+            ]
+          }
+        }
+      },
+      "id": "f6a7b8c9-0004-4000-8000-000000000004",
+      "name": "Airtable - Log Outreach",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "YOUR_AIRTABLE_CREDENTIAL_ID",
+          "name": "YOUR_AIRTABLE_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f6a7b8c9-0005-4000-8000-000000000005",
+      "name": "IF - Reply Detected?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 300],
+      "notes": "Connect a Gmail trigger checking for replies to save testimonials automatically. This IF node handles the reply-detection branch."
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "YOUR_NOTION_TESTIMONIALS_DB_ID_HERE",
+        "title": "={{ $('Webhook - Gumroad Purchase').item.json.full_name }} — {{ $('Webhook - Gumroad Purchase').item.json.product_name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "CustomerEmail",
+              "textValue": "={{ $('Webhook - Gumroad Purchase').item.json.email }}"
+            },
+            {
+              "key": "Product",
+              "textValue": "={{ $('Webhook - Gumroad Purchase').item.json.product_name }}"
+            },
+            {
+              "key": "Status",
+              "selectValue": "Raw - Needs Review"
+            },
+            {
+              "key": "CollectedDate",
+              "dateValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "id": "f6a7b8c9-0006-4000-8000-000000000006",
+      "name": "Notion - Save Testimonial",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [1340, 200],
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID",
+          "name": "YOUR_NOTION_CREDENTIAL_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Gumroad Purchase": {
+      "main": [
+        [
+          { "node": "Wait - 3 Days After Purchase", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Wait - 3 Days After Purchase": {
+      "main": [
+        [
+          { "node": "Gmail - Send Testimonial Request", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Gmail - Send Testimonial Request": {
+      "main": [
+        [
+          { "node": "Airtable - Log Outreach", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Airtable - Log Outreach": {
+      "main": [
+        [
+          { "node": "IF - Reply Detected?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "IF - Reply Detected?": {
+      "main": [
+        [
+          { "node": "Notion - Save Testimonial", "type": "main", "index": 0 }
+        ],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": ["behike", "social-proof", "testimonials", "gumroad"]
+}

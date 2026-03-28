@@ -1,0 +1,274 @@
+{
+  "name": "Lead Magnet Auto-Delivery",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-magnet-delivery",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890001",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "webhookId": "lead-magnet-delivery-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.lead_magnet || $json.body.formResponse?.answers?.find(a => a.field?.ref === 'lead_magnet')?.text }}",
+              "operation": "equals",
+              "value2": "ai-guide"
+            }
+          ]
+        }
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890002",
+      "name": "Which Lead Magnet",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.convertkit.com/v3/forms/YOUR_FORM_ID_HERE/subscribe",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"YOUR_CONVERTKIT_API_KEY_HERE\",\n  \"email\": \"{{ $json.body.email || $json.body.formResponse?.answers?.find(a => a.field?.type === 'email')?.email }}\",\n  \"tags\": [\"lead-magnet-ai-guide\"]\n}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890003",
+      "name": "ConvertKit Tag AI Guide",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.convertkit.com/v3/forms/YOUR_FORM_ID_HERE/subscribe",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"api_key\": \"YOUR_CONVERTKIT_API_KEY_HERE\",\n  \"email\": \"{{ $json.body.email || $json.body.formResponse?.answers?.find(a => a.field?.type === 'email')?.email }}\",\n  \"tags\": [\"lead-magnet-checklist\"]\n}",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890004",
+      "name": "ConvertKit Tag Checklist",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 440]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook Trigger').item.json.body.email }}",
+        "subject": "Your AI Employee Guide is ready",
+        "emailType": "html",
+        "message": "=<p>Hey,</p>\n<p>Here's your download link:</p>\n<p><a href=\"https://drive.google.com/YOUR_AI_GUIDE_FILE_ID_HERE\">Download the AI Employee Guide</a></p>\n<p>This is a direct Google Drive link. It'll work immediately.</p>\n<p>If you have any questions, reply to this email.</p>\n<br>\n<p>Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890005",
+      "name": "Gmail AI Guide",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [900, 160],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-cred-1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook Trigger').item.json.body.email }}",
+        "subject": "Your AI Safety Checklist is ready",
+        "emailType": "html",
+        "message": "=<p>Hey,</p>\n<p>Here's your download link:</p>\n<p><a href=\"https://drive.google.com/YOUR_CHECKLIST_FILE_ID_HERE\">Download the AI Safety Checklist</a></p>\n<p>This is a direct Google Drive link. It'll work immediately.</p>\n<p>If you have any questions, reply to this email.</p>\n<br>\n<p>Kalani<br>Behike</p>",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890006",
+      "name": "Gmail Checklist",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [900, 440],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gmail-cred-1",
+          "name": "Gmail OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "YOUR_AIRTABLE_BASE_ID_HERE",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "Subscribers",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $('Webhook Trigger').item.json.body.email }}",
+            "Lead Magnet": "={{ $('Webhook Trigger').item.json.body.lead_magnet }}",
+            "Timestamp": "={{ $now.toISO() }}",
+            "Status": "Delivered"
+          }
+        },
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890007",
+      "name": "Log to Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [1120, 300],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "airtable-cred-1",
+          "name": "Airtable Personal Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"delivered\" }"
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890008",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Which Lead Magnet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which Lead Magnet": {
+      "main": [
+        [
+          {
+            "node": "ConvertKit Tag AI Guide",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ConvertKit Tag Checklist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConvertKit Tag AI Guide": {
+      "main": [
+        [
+          {
+            "node": "Gmail AI Guide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConvertKit Tag Checklist": {
+      "main": [
+        [
+          {
+            "node": "Gmail Checklist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail AI Guide": {
+      "main": [
+        [
+          {
+            "node": "Log to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Checklist": {
+      "main": [
+        [
+          {
+            "node": "Log to Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Airtable": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "leads",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    },
+    {
+      "name": "email",
+      "createdAt": "2026-03-22T00:00:00.000Z",
+      "updatedAt": "2026-03-22T00:00:00.000Z"
+    }
+  ]
+}
