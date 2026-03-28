@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noai, noimageai">
+<title>BEHIKE - Sprint Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --blue: #0A84FF;
+    --light: #F5F5F7;
+    --secondary-bg: #1D1D1F;
+    --gray: #86868B;
+    --nav-bg: rgba(0,0,0,0.8);
+    --card-bg: rgba(29,29,31,0.6);
+    --border: rgba(245,245,247,0.08);
+    --green: #34C759;
+    --orange: #FF9F43;
+    --red: #FF453A;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--black);
+    color: var(--light);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* VHS Scanline Overlay */
+  #scanlines {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 10000;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    opacity: 0.5;
+  }
+
+  #vhs-warm {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+    background: radial-gradient(ellipse at center, transparent 60%, rgba(120,80,40,0.04) 100%);
+  }
+
+  /* Navigation */
+  nav {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 9000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    color: var(--light); text-decoration: none; letter-spacing: 0.04em;
+  }
+
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--gray); text-decoration: none;
+    font-size: 14px; font-weight: 500; letter-spacing: 0.02em; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--light); }
+
+  /* Sections */
+  section {
+    padding: 100px 40px 60px;
+    max-width: 1000px; margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--blue); margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 42px; font-weight: 700;
+    color: var(--light); margin-bottom: 16px; line-height: 1.15;
+  }
+
+  .section-subtitle {
+    font-size: 17px; color: var(--gray);
+    max-width: 600px; margin-bottom: 40px;
+  }
+
+  /* Hero */
+  #hero {
+    min-height: 50vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding-top: 56px;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 10vw, 80px);
+    font-weight: 900; color: var(--light);
+    letter-spacing: 0.06em; line-height: 1; margin-bottom: 12px;
+    animation: subtle-glitch 8s infinite;
+  }
+
+  @keyframes subtle-glitch {
+    0%, 95%, 100% { text-shadow: none; transform: translate(0); }
+    96% { text-shadow: -2px 0 rgba(255,0,80,0.4), 2px 0 rgba(0,255,200,0.4); transform: translate(-1px, 0); }
+    97% { text-shadow: 2px 0 rgba(255,0,80,0.4), -2px 0 rgba(0,255,200,0.4); transform: translate(1px, 0); }
+    98% { text-shadow: -1px 0 rgba(255,0,80,0.3), 1px 0 rgba(0,255,200,0.3); transform: translate(0); }
+  }
+
+  .hero-subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--gray); font-weight: 400; letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+
+  .hero-date {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px; color: var(--blue); letter-spacing: 0.06em;
+  }
+
+  /* Stats Row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 48px;
+  }
+
+  .stat-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; text-align: center;
+    transition: transform 0.2s, border-color 0.3s;
+  }
+
+  .stat-card:hover { transform: translateY(-2px); border-color: rgba(245,245,247,0.15); }
+
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 36px; font-weight: 700; color: var(--light);
+    line-height: 1;
+  }
+
+  .stat-number.green { color: var(--green); }
+  .stat-number.orange { color: var(--orange); }
+  .stat-number.blue { color: var(--blue); }
+
+  .stat-label {
+    font-size: 12px; color: var(--gray); text-transform: uppercase;
+    letter-spacing: 0.08em; margin-top: 8px;
+  }
+
+  /* Task List */
+  .task-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .task-item {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: transform 0.15s, border-color 0.2s;
+    user-select: none;
+  }
+
+  .task-item:hover { transform: translateX(4px); border-color: rgba(245,245,247,0.15); }
+  .task-item.done { opacity: 0.5; }
+  .task-item.done .task-text { text-decoration: line-through; }
+
+  .task-check {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--gray); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+    font-size: 14px; color: transparent;
+  }
+
+  .task-item.done .task-check {
+    background: var(--green); border-color: var(--green); color: #fff;
+  }
+
+  .task-text { font-size: 16px; color: var(--light); flex: 1; }
+
+  .task-tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 4px 10px; border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .tag-kalani { background: rgba(255,159,67,0.15); color: var(--orange); }
+  .tag-ceiba { background: rgba(10,132,255,0.15); color: var(--blue); }
+  .tag-done { background: rgba(52,199,89,0.15); color: var(--green); }
+
+  /* Live Products */
+  .product-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .product-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+    transition: transform 0.2s, border-color 0.3s;
+  }
+
+  .product-card:hover { transform: translateY(-2px); border-color: rgba(245,245,247,0.15); }
+
+  .product-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+
+  .product-name { font-size: 18px; font-weight: 600; color: var(--light); }
+
+  .badge {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; padding: 4px 10px; border-radius: 6px;
+  }
+
+  .badge-live { background: rgba(52,199,89,0.15); color: var(--green); }
+  .badge-ready { background: rgba(255,159,67,0.15); color: var(--orange); }
+
+  .product-price { font-size: 14px; color: var(--gray); margin-bottom: 12px; }
+
+  .product-link {
+    font-size: 13px; color: var(--blue); text-decoration: none;
+    font-weight: 500; transition: opacity 0.2s;
+  }
+
+  .product-link:hover { opacity: 0.7; }
+
+  /* Progress Bar */
+  .progress-wrap {
+    background: rgba(255,255,255,0.06); border-radius: 8px;
+    height: 8px; margin-bottom: 8px; overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%; border-radius: 8px;
+    background: linear-gradient(90deg, var(--blue), var(--green));
+    transition: width 0.6s ease;
+  }
+
+  .progress-label {
+    font-size: 13px; color: var(--gray); text-align: right;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 40px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  .footer-tagline { font-size: 14px; color: var(--gray); margin-bottom: 12px; }
+  .footer-copy { font-size: 12px; color: rgba(134,134,139,0.5); }
+
+  /* Fade In */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  /* Mobile */
+  .nav-toggle {
+    display: none; background: none; border: none;
+    color: var(--light); font-size: 24px; cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none; position: absolute; top: 56px; left: 0; width: 100%;
+      flex-direction: column; background: var(--nav-bg);
+      backdrop-filter: blur(20px); padding: 20px 40px; gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-links.open { display: flex; }
+    .nav-toggle { display: block; }
+    section { padding: 60px 16px 40px; }
+    .section-title { font-size: 28px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div id="scanlines"></div>
+<div id="vhs-warm"></div>
+
+<nav>
+  <a href="#hero" class="nav-brand">Behike</a>
+  <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+  <ul class="nav-links">
+    <li><a href="#sprint" onclick="closeNav()">Sprint</a></li>
+    <li><a href="#products" onclick="closeNav()">Products</a></li>
+    <li><a href="#queue" onclick="closeNav()">Queue</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <h1 class="hero-title">BEHIKE</h1>
+  <p class="hero-subtitle">Sprint Dashboard</p>
+  <div class="hero-date" id="current-date"></div>
+</section>
+
+<!-- STATS -->
+<section id="stats" style="padding-top: 0;">
+  <div class="stats-row fade-in">
+    <div class="stat-card">
+      <div class="stat-number green" id="stat-live">3</div>
+      <div class="stat-label">Live on Gumroad</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number orange" id="stat-ready">15</div>
+      <div class="stat-label">Ready to List</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number blue" id="stat-total">18</div>
+      <div class="stat-label">Total Products</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="stat-revenue">$0</div>
+      <div class="stat-label">Revenue</div>
+    </div>
+  </div>
+
+  <div class="fade-in">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar" style="width: 17%;"></div>
+    </div>
+    <div class="progress-label"><span id="progress-text">3 of 18 listed</span></div>
+  </div>
+</section>
+
+<!-- SPRINT TASKS -->
+<section id="sprint">
+  <div class="fade-in">
+    <div class="section-label">Current Sprint</div>
+    <h2 class="section-title">What Needs to Happen</h2>
+    <p class="section-subtitle">Check off tasks as you go. Progress saves locally.</p>
+  </div>
+
+  <div class="task-list fade-in" id="task-list">
+    <div class="task-item" data-task="gumroad-15" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">List remaining 15 products on Gumroad</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+    <div class="task-item" data-task="instagram" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">Create @behikeai Instagram account</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+    <div class="task-item" data-task="covers" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">Make polished covers (Canva or DALL-E)</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+    <div class="task-item" data-task="dns" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">Configure DNS for behike.co</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+    <div class="task-item" data-task="email" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">Set up professional email</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+    <div class="task-item" data-task="ig-posts" onclick="toggleTask(this)">
+      <div class="task-check">&#10003;</div>
+      <span class="task-text">Start posting (2000+ posts ready)</span>
+      <span class="task-tag tag-kalani">Kalani</span>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE PRODUCTS -->
+<section id="products">
+  <div class="fade-in">
+    <div class="section-label">Gumroad</div>
+    <h2 class="section-title">Products</h2>
+    <p class="section-subtitle">3 live. 15 packaged and ready to upload. Discount code: BEHIKE10</p>
+  </div>
+
+  <div class="product-grid fade-in">
+    <div class="product-card">
+      <div class="product-header">
+        <span class="product-name">Starter Pack</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="product-price">Free</div>
+      <a class="product-link" href="https://behike.gumroad.com/l/starter" target="_blank">behike.gumroad.com/l/starter</a>
+    </div>
+    <div class="product-card">
+      <div class="product-header">
+        <span class="product-name">Ecommerce Blueprint</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="product-price">$19.99</div>
+      <a class="product-link" href="https://behike.gumroad.com/l/ecommerce" target="_blank">behike.gumroad.com/l/ecommerce</a>
+    </div>
+    <div class="product-card">
+      <div class="product-header">
+        <span class="product-name">Behike OS</span>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="product-price">$97</div>
+      <a class="product-link" href="https://behike.gumroad.com/l/behike-os" target="_blank">behike.gumroad.com/l/behike-os</a>
+    </div>
+  </div>
+</section>
+
+<!-- UPLOAD QUEUE -->
+<section id="queue">
+  <div class="fade-in">
+    <div class="section-label">Upload Queue</div>
+    <h2 class="section-title">Ready to List</h2>
+    <p class="section-subtitle">Each folder has PDF + cover + thumbnail + GUMROAD_INFO.txt</p>
+  </div>
+
+  <div class="task-list fade-in" id="queue-list">
+    <!-- Populated by JS from product list -->
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p class="footer-tagline">Built from Puerto Rico with 3 computers and zero subscriptions.</p>
+  <p class="footer-copy">&copy; 2026 Behike. All rights reserved.</p>
+</footer>
+
+<script>
+// ── Nav ──
+function closeNav() { document.querySelector('.nav-links').classList.remove('open'); }
+
+// ── Date ──
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+// ── Scroll Animations ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ── Task Toggle (with localStorage) ──
+const STORAGE_KEY = 'behike-sprint-tasks';
+
+function loadTasks() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+
+function saveTasks(tasks) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function toggleTask(el) {
+  el.classList.toggle('done');
+  const tasks = loadTasks();
+  const key = el.dataset.task;
+  tasks[key] = el.classList.contains('done');
+  saveTasks(tasks);
+  updateStats();
+}
+
+function restoreTasks() {
+  const tasks = loadTasks();
+  document.querySelectorAll('.task-item[data-task]').forEach(el => {
+    if (tasks[el.dataset.task]) el.classList.add('done');
+  });
+}
+
+// ── Upload Queue ──
+const readyProducts = [
+  { name: 'AI Chatbot Guide', price: '$12' },
+  { name: 'AI Employee Guide', price: '$19' },
+  { name: 'AI Freelancer Guide', price: '$14' },
+  { name: 'Budget Template', price: '$7' },
+  { name: 'Claude Code Course', price: '$29' },
+  { name: 'Content Machine', price: '$9' },
+  { name: 'Custom GPT Builder', price: '$14' },
+  { name: 'Gig Worker Playbook', price: '$12' },
+  { name: 'Prompt Library', price: '$9' },
+  { name: 'Reel Cash Machine', price: '$14' },
+  { name: 'Resume Builder', price: '$7' },
+  { name: 'Shopify Theme Bundle', price: '$39' },
+  { name: 'Side Hustle Finder', price: '$9' },
+  { name: 'Solopreneur OS', price: '$14' },
+  { name: 'Voice Bible', price: '$12' },
+];
+
+function renderQueue() {
+  const list = document.getElementById('queue-list');
+  const tasks = loadTasks();
+  readyProducts.forEach((p, i) => {
+    const key = 'queue-' + i;
+    const done = tasks[key] ? 'done' : '';
+    list.innerHTML += `
+      <div class="task-item ${done}" data-task="${key}" onclick="toggleTask(this)">
+        <div class="task-check">&#10003;</div>
+        <span class="task-text">${p.name}</span>
+        <span class="task-tag tag-kalani" style="font-size:12px; background:none; color:var(--gray);">${p.price}</span>
+      </div>`;
+  });
+}
+
+// ── Stats Update ──
+function updateStats() {
+  const tasks = loadTasks();
+  let queued = 0;
+  readyProducts.forEach((_, i) => { if (tasks['queue-' + i]) queued++; });
+  const live = 3 + queued;
+  const ready = 15 - queued;
+
+  document.getElementById('stat-live').textContent = live;
+  document.getElementById('stat-ready').textContent = ready;
+  const pct = Math.round((live / 18) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = live + ' of 18 listed';
+}
+
+// ── Init ──
+renderQueue();
+restoreTasks();
+updateStats();
+
+// ── Settings Widget (themes) ──
+(function() {
+  const themes = {
+    midnight: { name: 'Midnight', icon: '\u{1F319}', black: '#000000', accent: '#0A84FF', light: '#F5F5F7', secondaryBg: '#1D1D1F', gray: '#86868B', navBg: 'rgba(0,0,0,0.8)', cardBg: 'rgba(29,29,31,0.6)', border: 'rgba(245,245,247,0.08)' },
+    snow: { name: 'Snow', icon: '\u2600\uFE0F', black: '#FFFFFF', accent: '#0066CC', light: '#1D1D1F', secondaryBg: '#F5F5F7', gray: '#6E6E73', navBg: 'rgba(255,255,255,0.85)', cardBg: 'rgba(245,245,247,0.8)', border: 'rgba(0,0,0,0.08)' },
+    ocean: { name: 'Ocean', icon: '\u{1F30A}', black: '#0A1628', accent: '#00D4AA', light: '#E0F7F0', secondaryBg: '#112240', gray: '#8892B0', navBg: 'rgba(10,22,40,0.9)', cardBg: 'rgba(17,34,64,0.7)', border: 'rgba(0,212,170,0.12)' },
+    sunset: { name: 'Sunset', icon: '\u{1F305}', black: '#1A0A1E', accent: '#FF6B6B', light: '#FFF0EC', secondaryBg: '#2D1233', gray: '#B08EA8', navBg: 'rgba(26,10,30,0.9)', cardBg: 'rgba(45,18,51,0.7)', border: 'rgba(255,107,107,0.12)' },
+    forest: { name: 'Forest', icon: '\u{1F33F}', black: '#0B1A0B', accent: '#4ADE80', light: '#E8F5E8', secondaryBg: '#132613', gray: '#7DA67D', navBg: 'rgba(11,26,11,0.9)', cardBg: 'rgba(19,38,19,0.7)', border: 'rgba(74,222,128,0.12)' },
+    royal: { name: 'Royal', icon: '\u{1F451}', black: '#0D0A1A', accent: '#A78BFA', light: '#EDE9FE', secondaryBg: '#1E1635', gray: '#9B8EC4', navBg: 'rgba(13,10,26,0.9)', cardBg: 'rgba(30,22,53,0.7)', border: 'rgba(167,139,250,0.12)' },
+    ember: { name: 'Ember', icon: '\u{1F525}', black: '#1A0C00', accent: '#FF9F43', light: '#FFF4E6', secondaryBg: '#2D1800', gray: '#C4956D', navBg: 'rgba(26,12,0,0.9)', cardBg: 'rgba(45,24,0,0.7)', border: 'rgba(255,159,67,0.12)' },
+    candy: { name: 'Candy', icon: '\u{1F36C}', black: '#FFF0F5', accent: '#FF1493', light: '#2D0A1E', secondaryBg: '#FFE0EB', gray: '#9B5072', navBg: 'rgba(255,240,245,0.9)', cardBg: 'rgba(255,224,235,0.7)', border: 'rgba(255,20,147,0.12)' },
+  };
+
+  const fontSizes = { small: { label: 'S', scale: 0.85 }, medium: { label: 'M', scale: 1.0 }, large: { label: 'L', scale: 1.15 }, xl: { label: 'XL', scale: 1.3 } };
+
+  const savedTheme = localStorage.getItem('behike-theme') || 'midnight';
+  const savedSize = localStorage.getItem('behike-fontsize') || 'medium';
+
+  function applyTheme(key) {
+    const t = themes[key]; if (!t) return;
+    const r = document.documentElement.style;
+    r.setProperty('--black', t.black); r.setProperty('--blue', t.accent);
+    r.setProperty('--light', t.light); r.setProperty('--secondary-bg', t.secondaryBg);
+    r.setProperty('--gray', t.gray); r.setProperty('--nav-bg', t.navBg);
+    r.setProperty('--card-bg', t.cardBg); r.setProperty('--border', t.border);
+    document.body.style.background = t.black;
+    document.body.style.color = t.light;
+    const nav = document.querySelector('nav');
+    if (nav) { nav.style.background = t.navBg; nav.style.borderBottomColor = t.border; }
+    document.querySelectorAll('.task-item, .product-card, .stat-card').forEach(el => {
+      el.style.background = t.cardBg; el.style.borderColor = t.border;
+    });
+    document.querySelectorAll('.section-label, .product-link').forEach(el => { el.style.color = t.accent; });
+    document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
+    const ad = document.querySelector(`.theme-dot[data-theme="${key}"]`);
+    if (ad) ad.classList.add('active');
+    localStorage.setItem('behike-theme', key);
+  }
+
+  function applyFontSize(key) {
+    const s = fontSizes[key]; if (!s) return;
+    document.documentElement.style.fontSize = (16 * s.scale) + 'px';
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    const ab = document.querySelector(`.size-btn[data-size="${key}"]`);
+    if (ab) ab.classList.add('active');
+    localStorage.setItem('behike-fontsize', key);
+  }
+
+  function createWidget() {
+    const widget = document.createElement('div');
+    widget.id = 'behike-settings';
+    widget.innerHTML = `
+      <style>
+        #behike-settings-toggle { position:fixed;bottom:24px;right:24px;z-index:9999;width:48px;height:48px;border-radius:50%;background:var(--blue,#0A84FF);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:transform 0.2s,box-shadow 0.2s; }
+        #behike-settings-toggle:hover { transform:scale(1.1);box-shadow:0 6px 28px rgba(0,0,0,0.5); }
+        #behike-settings-panel { position:fixed;bottom:84px;right:24px;z-index:9998;background:rgba(20,20,20,0.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:16px;padding:20px;width:280px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 8px 40px rgba(0,0,0,0.6);display:none;animation:slideUp 0.25s ease-out; }
+        @keyframes slideUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        #behike-settings-panel.open { display:block; }
+        .settings-title { font-size:13px;font-weight:600;color:#F5F5F7;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px; }
+        .settings-section { margin-bottom:16px; }
+        .settings-label { font-size:11px;color:#86868B;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px; }
+        .theme-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:8px; }
+        .theme-dot { width:100%;aspect-ratio:1;border-radius:10px;border:2px solid transparent;cursor:pointer;transition:transform 0.15s,border-color 0.15s;display:flex;align-items:center;justify-content:center;font-size:16px;position:relative; }
+        .theme-dot:hover { transform:scale(1.1); }
+        .theme-dot.active { border-color:#F5F5F7; }
+        .theme-dot::after { content:attr(data-name);position:absolute;bottom:-16px;font-size:9px;color:#86868B;white-space:nowrap; }
+        .size-row { display:flex;gap:8px; }
+        .size-btn { flex:1;padding:8px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#F5F5F7;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s,border-color 0.15s; }
+        .size-btn:hover { background:rgba(255,255,255,0.08); }
+        .size-btn.active { background:var(--blue,#0A84FF);border-color:var(--blue,#0A84FF);color:#fff; }
+      </style>
+      <button id="behike-settings-toggle" aria-label="Settings">\u2699\uFE0F</button>
+      <div id="behike-settings-panel">
+        <div class="settings-title">Settings</div>
+        <div class="settings-section">
+          <div class="settings-label">Theme</div>
+          <div class="theme-grid">
+            ${Object.entries(themes).map(([key, t]) =>
+              `<div class="theme-dot" data-theme="${key}" data-name="${t.name}" style="background:${t.black};box-shadow:inset 0 0 0 4px ${t.accent};" title="${t.name}">${t.icon}</div>`
+            ).join('')}
+          </div>
+        </div>
+        <div class="settings-section" style="margin-top:28px;">
+          <div class="settings-label">Font Size</div>
+          <div class="size-row">
+            ${Object.entries(fontSizes).map(([key, s]) =>
+              `<button class="size-btn" data-size="${key}">${s.label}</button>`
+            ).join('')}
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(widget);
+
+    document.getElementById('behike-settings-toggle').addEventListener('click', () => {
+      document.getElementById('behike-settings-panel').classList.toggle('open');
+    });
+    document.addEventListener('click', (e) => {
+      const panel = document.getElementById('behike-settings-panel');
+      const toggle = document.getElementById('behike-settings-toggle');
+      if (panel && toggle && !panel.contains(e.target) && !toggle.contains(e.target)) panel.classList.remove('open');
+    });
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+      dot.addEventListener('click', (e) => { e.stopPropagation(); applyTheme(dot.dataset.theme); });
+    });
+    document.querySelectorAll('.size-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => { e.stopPropagation(); applyFontSize(btn.dataset.size); });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    createWidget();
+    applyTheme(savedTheme);
+    applyFontSize(savedSize);
+  });
+})();
+</script>
+
+</body>
+</html>
