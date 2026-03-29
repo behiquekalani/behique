@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Innova Barber Studio | Morovis, PR | EST 2018</title>
+  <meta name="description" content="Innova Barber Studio en Morovis, Puerto Rico. 20+ a&ntilde;os de experiencia. Fades, color fantas&iacute;a, dise&ntilde;os custom. 5.0 estrellas en Booksy. Reserva tu cita.">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta property="og:title" content="Innova Barber Studio | Morovis, PR">
+  <meta property="og:description" content="20+ a&ntilde;os cortando pelo. Fades de precisi&oacute;n, color fantas&iacute;a, dise&ntilde;os custom. 5.0 estrellas. Reserva en Booksy.">
+  <meta property="og:image" content="./images/hero.jpeg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/jpeg" href="./images/logo.jpeg">
+  <link rel="apple-touch-icon" href="./images/logo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #222222;
+      --text: #f0f0f0;
+      --text-dim: #888888;
+      --accent: #c8ff00;
+      --accent-glow: rgba(200, 255, 0, 0.15);
+      --purple: #8b5cf6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* === CUSTOM BUNNY CURSOR === */
+    .bunny-cursor {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease;
+      filter: drop-shadow(0 0 6px var(--accent));
+    }
+
+    .bunny-cursor.clicking {
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    /* === NAV === */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; }
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: var(--text-dim); text-decoration: none; font-size: 13px;
+      font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-cta {
+      background: var(--accent); color: #000; padding: 10px 24px;
+      border-radius: 6px; text-decoration: none; font-weight: 700;
+      font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .nav-cta:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-1px); }
+
+    /* === HERO === */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 120px 24px 80px; position: relative; overflow: hidden;
+    }
+
+    .hero::before {
+      content: ''; position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 60% 40%, var(--accent-glow) 0%, transparent 50%),
+                  radial-gradient(circle at 30% 70%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+      animation: heroGlow 8s ease-in-out infinite alternate;
+    }
+
+    @keyframes heroGlow {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(2%, -2%); }
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+
+    .hero-tag {
+      font-size: 13px; font-weight: 600; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 24px;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .hero-tag::before, .hero-tag::after { content: ''; width: 24px; height: 1px; background: var(--accent); }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 12vw, 120px);
+      line-height: 0.9; letter-spacing: 4px; margin-bottom: 24px;
+    }
+    h1 .accent { color: var(--accent); }
+
+    .hero-sub { font-size: 18px; color: var(--text-dim); font-weight: 300; max-width: 500px; margin: 0 auto 40px; }
+
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--accent); color: #000; padding: 16px 40px;
+      border-radius: 8px; text-decoration: none; font-weight: 700;
+      font-size: 15px; letter-spacing: 1px; text-transform: uppercase;
+      transition: all 0.3s;
+    }
+    .hero-cta:hover { box-shadow: 0 0 30px var(--accent-glow); transform: translateY(-2px); }
+    .hero-cta svg { width: 18px; height: 18px; transition: transform 0.3s; }
+    .hero-cta:hover svg { transform: translateX(4px); }
+
+    /* === SECTIONS === */
+    section { padding: 100px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag { font-size: 12px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px, 6vw, 56px); letter-spacing: 2px; margin-bottom: 16px; }
+    .section-desc { color: var(--text-dim); font-size: 16px; max-width: 500px; margin-bottom: 48px; }
+
+    /* === SERVICES === */
+    #servicios { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+    .service-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px; transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .service-card:hover { border-color: #333; transform: translateY(-2px); }
+    .service-icon { font-size: 28px; margin-bottom: 16px; }
+    .service-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; margin-bottom: 8px; }
+    .service-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 16px; }
+    .service-price { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--accent); }
+    .service-price .from { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dim); font-weight: 400; }
+
+    /* === GALLERY === */
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; grid-auto-rows: 280px; }
+    .gallery-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .gallery-item:hover { border-color: #333; transform: scale(1.01); }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* === ABOUT === */
+    .quote-section {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    /* === LOCATION === */
+    .location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .location-info { display: flex; flex-direction: column; gap: 24px; }
+    .info-item { display: flex; align-items: flex-start; gap: 16px; }
+    .info-icon {
+      width: 44px; height: 44px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 18px;
+    }
+    .info-label { font-size: 12px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    .info-value { font-size: 16px; font-weight: 500; }
+    .info-value a { color: var(--accent); text-decoration: none; }
+
+    .map-placeholder {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+      color: var(--text-dim); font-size: 14px; flex-direction: column; gap: 8px;
+    }
+
+    /* === FOOTER === */
+    footer { padding: 40px 24px; border-top: 1px solid var(--border); text-align: center; }
+    .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; margin-bottom: 12px; }
+    .footer-logo span { color: var(--accent); }
+    .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; }
+    .footer-links a { color: var(--text-dim); text-decoration: none; font-size: 20px; transition: color 0.3s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-copy { font-size: 12px; color: var(--text-dim); }
+
+    /* === FLOAT BOOK === */
+    .book-float {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--accent); color: #000; width: 56px; height: 56px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; text-decoration: none; box-shadow: 0 4px 20px var(--accent-glow);
+      z-index: 99; transition: all 0.3s;
+    }
+    .book-float:hover { transform: scale(1.1); box-shadow: 0 4px 30px var(--accent-glow), 0 0 60px var(--accent-glow); }
+
+    /* === REDUCED MOTION === */
+    @media (prefers-reduced-motion: reduce) {
+      .bunny-cursor { display: none; }
+      * { cursor: auto; transition: none !important; animation: none !important; }
+    }
+
+    /* === MOBILE === */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .mobile-menu-btn { display: flex; }
+      .services-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 200px; }
+      .gallery-item:nth-child(1) { grid-row: span 1; }
+      .gallery-item[style*="grid-column: span 2"] { grid-column: span 1; }
+      .location-grid { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr !important; }
+      .hero { min-height: 90vh; }
+      .bunny-cursor { display: none; }
+      * { cursor: auto; }
+      .logo { font-size: 22px; letter-spacing: 2px; }
+    }
+
+    .mobile-menu-btn {
+      display: none; background: none; border: none; color: var(--text);
+      font-size: 24px; padding: 4px 8px; cursor: none;
+    }
+
+    .mobile-nav {
+      display: none; position: fixed; top: 60px; left: 0; right: 0;
+      background: rgba(10,10,10,0.98); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border); z-index: 99; padding: 16px 24px;
+    }
+    .mobile-nav.open { display: block; }
+    .mobile-nav a {
+      display: block; padding: 12px 0; color: var(--text-dim); text-decoration: none;
+      font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+      border-bottom: 1px solid var(--border); transition: color 0.3s;
+    }
+    .mobile-nav a:hover { color: var(--accent); }
+    .mobile-nav a:last-child { border-bottom: none; }
+
+    /* === BUILT BY === */
+    .built-by { font-size: 11px; color: #444; margin-top: 12px; }
+    .built-by a { color: var(--accent); text-decoration: none; opacity: 0.6; transition: opacity 0.3s; }
+    .built-by a:hover { opacity: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- BUNNY CURSOR -->
+  <svg class="bunny-cursor" id="bunnyCursor" aria-hidden="true" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M35 55 C35 25, 25 5, 30 2 C35 -1, 42 15, 42 45" stroke="#c8ff00" stroke-width="3" fill="rgba(200,255,0,0.1)"/>
+    <path d="M65 55 C65 25, 75 5, 70 2 C65 -1, 58 15, 58 45" stroke="#c8ff00" stroke-width="3" fill="rgba(200,255,0,0.1)"/>
+    <ellipse cx="50" cy="72" rx="28" ry="26" stroke="#c8ff00" stroke-width="3" fill="rgba(10,10,10,0.8)"/>
+    <line x1="38" y1="65" x2="38" y2="71" stroke="#c8ff00" stroke-width="2.5"/>
+    <line x1="35" y1="68" x2="41" y2="68" stroke="#c8ff00" stroke-width="2.5"/>
+    <line x1="62" y1="65" x2="62" y2="71" stroke="#c8ff00" stroke-width="2.5"/>
+    <line x1="59" y1="68" x2="65" y2="68" stroke="#c8ff00" stroke-width="2.5"/>
+    <ellipse cx="50" cy="80" rx="5" ry="3.5" fill="#c8ff00"/>
+  </svg>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-inner">
+      <div class="logo">INNOVA <span>BARBER STUDIO</span></div>
+      <ul class="nav-links">
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#galeria">Galer&iacute;a</a></li>
+        <li><a href="#ubicacion">Ubicaci&oacute;n</a></li>
+      </ul>
+      <a href="https://booksy.com/en-us/51293_luis-anexis-innova-barber_barber-shop_107016_morovis" class="nav-cta" target="_blank" rel="noopener noreferrer">Reservar</a>
+      <button class="mobile-menu-btn" onclick="document.getElementById('mobileNav').classList.toggle('open')" aria-label="Men&uacute;">&#9776;</button>
+    </div>
+  </nav>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#servicios" onclick="this.parentElement.classList.remove('open')">Servicios</a>
+    <a href="#sobre" onclick="this.parentElement.classList.remove('open')">Sobre</a>
+    <a href="#galeria" onclick="this.parentElement.classList.remove('open')">Galer&iacute;a</a>
+    <a href="#ubicacion" onclick="this.parentElement.classList.remove('open')">Ubicaci&oacute;n</a>
+    <a href="https://booksy.com/en-us/51293_luis-anexis-innova-barber_barber-shop_107016_morovis" target="_blank" rel="noopener noreferrer">Reservar</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">EST. 2018 &bull; Morovis, PR</div>
+      <h1>INNOVA<br><span class="accent">BARBER STUDIO</span></h1>
+      <p class="hero-sub">Donde el estilo se encuentra con la precisi&oacute;n. Tu look, nuestra obsesi&oacute;n.</p>
+      <a href="https://booksy.com/en-us/51293_luis-anexis-innova-barber_barber-shop_107016_morovis" class="hero-cta" target="_blank" rel="noopener noreferrer">
+        Reserva Tu Cita
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="servicios">
+    <div class="section-inner">
+      <div class="section-tag">Lo Que Hacemos</div>
+      <h2 class="section-title">SERVICIOS</h2>
+      <p class="section-desc">Cada corte es una obra. Precisi&oacute;n, estilo y atenci&oacute;n al detalle.<br><span style="font-size:12px;color:var(--accent);">Overtime despu&eacute;s de las 5pm &bull; Emergencia los domingos</span></p>
+
+      <div class="services-grid">
+        <div class="service-card fade-in">
+          <div class="service-icon">&#9986;</div>
+          <div class="service-name">CORTE</div>
+          <div class="service-desc">Corte personalizado con acabado limpio. 45 minutos de precisi&oacute;n total.</div>
+          <div class="service-price"><span class="from">desde </span>$25</div>
+        </div>
+
+        <div class="service-card fade-in">
+          <div class="service-icon">&#128136;</div>
+          <div class="service-name">CORTE + BARBA</div>
+          <div class="service-desc">El combo cl&aacute;sico. Corte y barba con acabado impecable. 45 min.</div>
+          <div class="service-price"><span class="from">desde </span>$30</div>
+        </div>
+
+        <div class="service-card fade-in">
+          <div class="service-icon">&#127775;</div>
+          <div class="service-name">COLOR PLATINADO</div>
+          <div class="service-desc">Transformaci&oacute;n completa. Platinado profesional con cuidado del cabello. 5 horas.</div>
+          <div class="service-price"><span class="from">desde </span>$125</div>
+        </div>
+
+        <div class="service-card fade-in">
+          <div class="service-icon">&#127912;</div>
+          <div class="service-name">FUSI&Oacute;N DE COLORES</div>
+          <div class="service-desc">Arte en tu cabeza. Combinaci&oacute;n de colores custom para un look &uacute;nico. 6 horas.</div>
+          <div class="service-price"><span class="from">desde </span>$150</div>
+        </div>
+
+        <div class="service-card fade-in">
+          <div class="service-icon">&#128165;</div>
+          <div class="service-name">COLOR FANTAS&Iacute;A</div>
+          <div class="service-desc">Colores vibrantes, bold, sin l&iacute;mites. Tu pelo, tu expresi&oacute;n. 4 horas.</div>
+          <div class="service-price"><span class="from">desde </span>$100</div>
+        </div>
+
+        <div class="service-card fade-in">
+          <div class="service-icon">&#129508;</div>
+          <div class="service-name">HIGHLIGHTS</div>
+          <div class="service-desc">Mechas y highlights profesionales. Dimensi&oacute;n y estilo. 4 horas.</div>
+          <div class="service-price"><span class="from">desde </span>$100</div>
+        </div>
+
+        <div class="service-card fade-in" style="border-color:#333;">
+          <div class="service-icon">&#9201;</div>
+          <div class="service-name">OVERTIME (5PM+)</div>
+          <div class="service-desc">Corte $35 &bull; Corte + Barba $40. Despu&eacute;s de las 5pm, martes a s&aacute;bado.</div>
+          <div class="service-price" style="color:var(--purple);"><span class="from">desde </span>$35</div>
+        </div>
+
+        <div class="service-card fade-in" style="border-color:#333;">
+          <div class="service-icon">&#128680;</div>
+          <div class="service-name">EMERGENCIA DOMINGO</div>
+          <div class="service-desc">Servicio de emergencia los domingos. Reserva con anticipaci&oacute;n.</div>
+          <div class="service-price" style="color:#ff4444;"><span class="from">desde </span>$100</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="sobre" class="quote-section">
+    <div class="section-inner about-grid" style="display:grid;grid-template-columns:1fr 1.2fr;gap:48px;align-items:center;text-align:left;">
+      <div style="aspect-ratio:3/4;background:var(--bg);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+        <img src="images/hero.jpeg" alt="Luis Anexis" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div>
+        <div class="section-tag">El Barbero</div>
+        <h2 class="section-title">LUIS ANEXIS</h2>
+        <p style="color:var(--text-dim);font-size:16px;margin-bottom:20px;">20+ a&ntilde;os cortando pelo. No cursos de YouTube. No certificados de fin de semana. A&ntilde;os reales, en silla real, con clientes reales.</p>
+        <p style="color:var(--text-dim);font-size:16px;margin-bottom:20px;">Fades de precisi&oacute;n. Color fantas&iacute;a. Dise&ntilde;os custom. Si lo puedes imaginar, lo puede cortar.</p>
+        <p style="color:var(--text-dim);font-size:16px;margin-bottom:32px;">186 rese&ntilde;as en Booksy. Todas 5 estrellas. Cero marketing. Puro boca a boca. La calidad no necesita publicidad.</p>
+        <div style="display:flex;gap:32px;">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);">20+</div>
+            <div style="font-size:12px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;">A&ntilde;os</div>
+          </div>
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);">5.0</div>
+            <div style="font-size:12px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;">Estrellas</div>
+          </div>
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);">186+</div>
+            <div style="font-size:12px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;">Rese&ntilde;as</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="galeria">
+    <div class="section-inner">
+      <div class="section-tag">Nuestro Trabajo</div>
+      <h2 class="section-title">GALER&Iacute;A</h2>
+      <p class="section-desc">Cada fade cuenta una historia. Aqu&iacute; van las nuestras.</p>
+
+      <div class="gallery-grid">
+        <div class="gallery-item fade-in" style="grid-row:span 2;">
+          <img src="images/work-1.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-2.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-3.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-4.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-5.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in" style="grid-column:span 2;">
+          <img src="images/work-6.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-7.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-8.jpeg" alt="Innova Barber trabajo">
+        </div>
+        <div class="gallery-item fade-in">
+          <img src="images/work-9.jpeg" alt="Innova Barber trabajo">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="ubicacion">
+    <div class="section-inner">
+      <div class="section-tag">Donde Estamos</div>
+      <h2 class="section-title">UBICACI&Oacute;N</h2>
+      <p class="section-desc">Vis&iacute;tanos. Tu pr&oacute;ximo corte est&aacute; a una cita de distancia.</p>
+
+      <div class="location-grid">
+        <div class="location-info">
+          <div class="info-item">
+            <div class="info-icon">&#128205;</div>
+            <div>
+              <div class="info-label">Direcci&oacute;n</div>
+              <div class="info-value">PR-633, KM 3.8, Barahona<br>Morovis, PR 00687</div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">&#128222;</div>
+            <div>
+              <div class="info-label">Tel&eacute;fono</div>
+              <div class="info-value"><a href="tel:+17874508408">(787) 450-8408</a></div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">&#128338;</div>
+            <div>
+              <div class="info-label">Horario</div>
+              <div class="info-value">
+                Mar - Vie: 9:00am - 6:00pm<br>
+                S&aacute;bado: 9:00am - 9:00pm<br>
+                Dom - Lun: Cerrado
+              </div>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">&#128247;</div>
+            <div>
+              <div class="info-label">Instagram</div>
+              <div class="info-value"><a href="https://instagram.com/innovabarberpr" target="_blank" rel="noopener noreferrer">@innovabarberpr</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-placeholder">
+          <span style="font-size:32px">&#127758;</span>
+          Mapa va aqu&iacute;<br>
+          <span style="font-size:11px">Google Maps embed</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">INNOVA <span>BARBER STUDIO</span></div>
+    <div class="footer-links">
+      <a href="https://instagram.com/innovabarberpr" target="_blank" rel="noopener noreferrer" title="Instagram">&#128247;</a>
+      <a href="tel:+17874508408" title="Llamar">&#128222;</a>
+      <a href="https://booksy.com/en-us/51293_luis-anexis-innova-barber_barber-shop_107016_morovis" target="_blank" rel="noopener noreferrer" title="Reservar">&#128197;</a>
+    </div>
+    <p class="footer-copy">&copy; 2026 Innova Barber Studio. Todos los derechos reservados.</p>
+    <p class="built-by">Hecho por <a href="https://behike.gumroad.com" target="_blank" rel="noopener noreferrer">Behike</a></p>
+  </footer>
+
+  <!-- FLOATING BOOK BUTTON -->
+  <a href="https://booksy.com/en-us/51293_luis-anexis-innova-barber_barber-shop_107016_morovis" class="book-float" target="_blank" rel="noopener noreferrer" title="Reservar">&#128197;</a>
+
+  <script>
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Bunny cursor (desktop only)
+    const bunny = document.getElementById('bunnyCursor');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!isMobile && !prefersReduced && bunny) {
+      let mouseX = 0, mouseY = 0, bunnyX = 0, bunnyY = 0;
+
+      document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+      document.addEventListener('mousedown', () => bunny.classList.add('clicking'));
+      document.addEventListener('mouseup', () => bunny.classList.remove('clicking'));
+
+      function animateBunny() {
+        bunnyX += (mouseX - bunnyX) * 0.15;
+        bunnyY += (mouseY - bunnyY) * 0.15;
+        bunny.style.left = bunnyX + 'px';
+        bunny.style.top = bunnyY + 'px';
+        requestAnimationFrame(animateBunny);
+      }
+      animateBunny();
+    }
+  </script>
+
+</body>
+</html>
