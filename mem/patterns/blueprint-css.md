@@ -42,7 +42,7 @@ body {
 ## Print Rules (CRITICAL)
 ```css
 @media print {
-  color-adjust: exact;
+  print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
   /* DO NOT add background: #fff here. EVER. */
 }

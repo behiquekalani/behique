@@ -50,8 +50,9 @@ machines:
 sync:
   method: syncthing
   shared_folders:
-    - mem/          # Memory system synced across all machines
-    - READY-TO-SELL/gumroad-ready/  # Product files accessible everywhere
+    - mem/                              # Memory system synced across all machines
+    - READY-TO-SELL/products-organized/  # Product folders (PDF+cover+thumb+info)
+    - READY-TO-SELL/gumroad-ready/       # Final ZIPs and PDFs for upload
   sync_interval: realtime
   conflict_resolution: newest-wins
 

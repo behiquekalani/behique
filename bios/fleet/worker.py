@@ -310,8 +310,23 @@ def execute_custom(params, logger):
     if not command:
         return {"error": "No command provided"}
 
-    # Safety: block dangerous patterns
-    dangerous = ["rm -rf /", "format ", "del /s", "mkfs", "> /dev/"]
+    # Safety: allowlist of permitted command prefixes
+    import shlex
+    allowed_prefixes = [
+        "python3", "python", "git", "ls", "cat", "echo",
+        "pip", "npm", "node", "curl", "wget",
+    ]
+    try:
+        cmd_parts = shlex.split(command)
+    except ValueError as e:
+        return {"error": f"Invalid command syntax: {e}"}
+
+    if not cmd_parts or cmd_parts[0] not in allowed_prefixes:
+        return {"error": f"Command '{cmd_parts[0] if cmd_parts else ''}' not in allowlist: {allowed_prefixes}"}
+
+    # Block dangerous patterns as second layer
+    dangerous = ["rm -rf", "format ", "del /s", "mkfs", "> /dev/", "sudo ",
+                  "chmod 777", "eval ", "exec(", "| sh", "| bash"]
     for d in dangerous:
         if d in command.lower():
             return {"error": f"Blocked dangerous command pattern: {d}"}
@@ -321,8 +336,8 @@ def execute_custom(params, logger):
 
     logger.info(f"Running custom command: {command}")
     result = subprocess.run(
-        command,
-        shell=True,
+        cmd_parts,
+        shell=False,
         capture_output=True,
         text=True,
         timeout=timeout,

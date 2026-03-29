@@ -66,29 +66,56 @@ def get_last_modified(filepath):
 
 
 def check_primer_staleness():
-    """Check if primer.md is older than STALE_HOURS."""
+    """Check if primer.md is older than STALE_HOURS (uses file mtime for accuracy)."""
     print(cyan("\n[1] Primer Staleness"))
-    last_mod = get_last_modified(PRIMER)
+    # Use actual file modification time for precision, YAML date as fallback
+    try:
+        mtime = datetime.fromtimestamp(PRIMER.stat().st_mtime)
+    except OSError:
+        mtime = None
+
+    yaml_date = get_last_modified(PRIMER)
+    last_mod = mtime or yaml_date
+
     if not last_mod:
-        print(yellow("  WARN: No last_modified date in primer.md"))
+        print(yellow("  WARN: Cannot determine primer.md modification time"))
         return False
 
     age = datetime.now() - last_mod
     if age > timedelta(hours=STALE_HOURS):
-        print(yellow(f"  STALE: primer.md last modified {last_mod.date()} ({age.days} days ago)"))
+        print(yellow(f"  STALE: primer.md last modified {last_mod.strftime('%Y-%m-%d %H:%M')} ({age.days}d {age.seconds // 3600}h ago)"))
         return False
 
-    print(green(f"  FRESH: primer.md modified {last_mod.date()}"))
+    print(green(f"  FRESH: primer.md modified {last_mod.strftime('%Y-%m-%d %H:%M')}"))
     return True
 
 
-def extract_graph_projects():
-    """Get all project IDs from context_graph.md."""
+def extract_graph_node_ids():
+    """Get all node IDs from context_graph.md."""
     try:
         content = GRAPH.read_text()
-        return set(re.findall(r'id:\s*(project-\S+)', content))
+        return set(re.findall(r'id:\s*(\S+)', content))
     except Exception:
         return set()
+
+
+def extract_graph_node_names():
+    """Get description fields from graph nodes for fuzzy matching against status items."""
+    names = {}
+    try:
+        content = GRAPH.read_text()
+        current_id = None
+        for line in content.split('\n'):
+            id_match = re.search(r'id:\s*(\S+)', line)
+            desc_match = re.search(r'description:\s*"(.+)"', line)
+            if id_match:
+                current_id = id_match.group(1)
+            elif desc_match and current_id:
+                names[current_id] = desc_match.group(1).lower()
+                current_id = None
+    except Exception:
+        pass
+    return names
 
 
 def extract_status_items():
@@ -111,45 +138,99 @@ def extract_status_items():
 
 
 def check_graph_status_sync():
-    """Verify graph projects exist in status tracker."""
+    """Verify graph projects and status tracker are in sync."""
     print(cyan("\n[2] Graph-Status Sync"))
-    graph_projects = extract_graph_projects()
+    graph_ids = extract_graph_node_ids()
+    graph_names = extract_graph_node_names()
     status_items = extract_status_items()
 
-    if not graph_projects:
-        print(yellow("  WARN: No projects found in context_graph.md"))
+    if not graph_ids:
+        print(yellow("  WARN: No nodes found in context_graph.md"))
         return True
 
-    # Check for active status items not in graph
-    active_statuses = {k for k, v in status_items.items() if v in ('active', 'todo')}
-
     issues = 0
-    if not active_statuses:
-        print(yellow("  WARN: No active items in status.md"))
 
-    print(green(f"  Graph projects: {len(graph_projects)}"))
-    print(green(f"  Status items: {len(status_items)}"))
+    # Check: active/todo status items should have a related graph node
+    active_items = {k for k, v in status_items.items() if v in ('active', 'todo')}
+    graph_descriptions = set(graph_names.values())
+
+    for item_name in active_items:
+        item_lower = item_name.lower()
+        # Fuzzy match: check if any graph node description contains key words from the status item
+        found = any(
+            word in desc for desc in graph_descriptions
+            for word in item_lower.split() if len(word) > 3
+        )
+        if not found:
+            print(yellow(f"  MISSING NODE: status item '{item_name}' has no matching graph node"))
+            issues += 1
+
+    # Check: active graph projects should have a related status item
+    project_ids = {nid for nid in graph_ids if nid.startswith('project-')}
+    status_lower = {k.lower() for k in status_items.keys()}
+
+    for pid in project_ids:
+        desc = graph_names.get(pid, "")
+        # Check if any status item mentions words from the project description
+        found = any(
+            word in s for s in status_lower
+            for word in desc.split() if len(word) > 3
+        )
+        if not found:
+            print(yellow(f"  MISSING STATUS: graph project '{pid}' has no matching status item"))
+            issues += 1
+
+    print(f"  Graph nodes: {len(graph_ids)}")
+    print(f"  Status items: {len(status_items)}")
 
     if issues == 0:
         print(green("  SYNC: No mismatches detected"))
+    else:
+        print(yellow(f"  SYNC: {issues} mismatch(es) found"))
     return issues == 0
 
 
 def check_orphan_nodes():
-    """Find nodes with zero links in context_graph."""
+    """Find nodes with no connections (neither outgoing nor incoming links)."""
     print(cyan("\n[3] Orphan Detection"))
     try:
         content = GRAPH.read_text()
-        # Find nodes
-        nodes = re.findall(r'id:\s*(\S+)', content)
-        # Find all link references
-        links_raw = re.findall(r'links:\s*\[([^\]]+)\]', content)
-        all_linked = set()
-        for link_str in links_raw:
-            refs = [r.strip() for r in link_str.split(',')]
-            all_linked.update(refs)
 
-        orphans = [n for n in nodes if n not in all_linked]
+        # Parse each node's ID and its outgoing links
+        node_links = {}
+        current_id = None
+        for line in content.split('\n'):
+            id_match = re.search(r'id:\s*(\S+)', line)
+            links_match = re.search(r'links:\s*\[([^\]]+)\]', line)
+            if id_match:
+                current_id = id_match.group(1)
+                node_links[current_id] = set()
+            elif links_match and current_id:
+                refs = [r.strip() for r in links_match.group(1).split(',')]
+                node_links[current_id] = set(refs)
+
+        # Build incoming links set
+        incoming = set()
+        for node_id, links in node_links.items():
+            for target in links:
+                incoming.add(target)
+
+        # A node is orphan if it has ZERO outgoing links AND ZERO incoming links
+        orphans = []
+        for node_id, links in node_links.items():
+            has_outgoing = len(links) > 0
+            has_incoming = node_id in incoming
+            if not has_outgoing and not has_incoming:
+                orphans.append(node_id)
+
+        # Also check for weakly connected: only incoming OR only outgoing (warn, not error)
+        weak = []
+        for node_id, links in node_links.items():
+            has_outgoing = len(links) > 0
+            has_incoming = node_id in incoming
+            if has_outgoing != has_incoming:  # XOR - one but not both
+                direction = "outgoing only" if has_outgoing else "incoming only"
+                weak.append((node_id, direction))
 
         if orphans:
             print(yellow(f"  ORPHANS ({len(orphans)}):"))
@@ -157,6 +238,11 @@ def check_orphan_nodes():
                 print(yellow(f"    - {o}"))
         else:
             print(green("  No orphan nodes"))
+
+        if weak:
+            print(dim(f"  WEAK ({len(weak)} one-direction only):"))
+            for w, direction in weak:
+                print(dim(f"    - {w} ({direction})"))
 
         return len(orphans) == 0
     except Exception as e:
@@ -188,6 +274,48 @@ def check_pattern_files():
     except Exception as e:
         print(red(f"  ERROR: {e}"))
         return False
+
+
+def check_primer_graph_contradictions():
+    """Check for contradictions between primer.md and context_graph.md."""
+    print(cyan("\n[3.5] Primer-Graph Contradictions"))
+    try:
+        primer_content = PRIMER.read_text().lower()
+        graph_content = GRAPH.read_text()
+
+        issues = 0
+
+        # Extract graph project statuses
+        current_id = None
+        graph_statuses = {}
+        for line in graph_content.split('\n'):
+            id_match = re.search(r'id:\s*(\S+)', line)
+            status_match = re.search(r'status:\s*(\w+)', line)
+            if id_match:
+                current_id = id_match.group(1)
+            elif status_match and current_id:
+                graph_statuses[current_id] = status_match.group(1)
+                current_id = None
+
+        # Check: if primer mentions something as active/blocker but graph says backlog/archived
+        for node_id, status in graph_statuses.items():
+            # Extract a readable name from the node ID
+            readable = node_id.replace('project-', '').replace('product-', '').replace('-', ' ')
+            if status in ('backlog', 'archived') and readable in primer_content:
+                # Check if primer treats it as active
+                # Look for the name near words like "active", "working", "current", "now"
+                active_pattern = rf'(?:active|working|current|now|blocker).*{re.escape(readable)}'
+                reverse_pattern = rf'{re.escape(readable)}.*(?:active|working|current|now|blocker)'
+                if re.search(active_pattern, primer_content) or re.search(reverse_pattern, primer_content):
+                    print(yellow(f"  CONFLICT: '{readable}' is {status} in graph but appears active in primer"))
+                    issues += 1
+
+        if issues == 0:
+            print(green("  No contradictions detected"))
+        return issues == 0
+    except Exception as e:
+        print(red(f"  ERROR: {e}"))
+        return True  # Don't block on errors
 
 
 def calculate_session_weight():
@@ -243,7 +371,8 @@ def git_checkpoint(message="mem: session checkpoint"):
     """Quick git add + commit."""
     print(cyan("\n[GIT] Checkpoint"))
     try:
-        subprocess.run(['git', 'add', '-A'], cwd=REPO, check=True)
+        # Only stage mem/ files and known safe paths, not everything
+        subprocess.run(['git', 'add', 'mem/', 'primer.md', 'CLAUDE.md', 'dashboards/', 'Ceiba/'], cwd=REPO, check=True)
         result = subprocess.run(
             ['git', 'commit', '-m', message],
             capture_output=True, text=True, cwd=REPO
@@ -304,11 +433,12 @@ def update_verifier_results(results):
 - Pattern files: {"ALL OK" if results.get("patterns_ok") else "MISSING"}
 - Session weight: {results.get("weight", 0)}"""
 
+        # Replace only the Last Run Results section (stop at next ## or end of file)
         content = re.sub(
-            r'## Last Run Results.*',
-            new_results,
+            r'## Last Run Results\n(?:(?!^## ).)*',
+            new_results + "\n",
             content,
-            flags=re.DOTALL
+            flags=re.DOTALL | re.MULTILINE
         )
         content = re.sub(
             r'last_run:\s*\d{4}-\d{2}-\d{2}',
@@ -356,7 +486,7 @@ def main():
     results["sync_ok"] = check_graph_status_sync()
     results["no_orphans"] = check_orphan_nodes()
     results["patterns_ok"] = check_pattern_files()
-    results["no_contradictions"] = True  # Manual check for now
+    results["no_contradictions"] = check_primer_graph_contradictions()
     results["weight"] = calculate_session_weight()
 
     if not verify_only:

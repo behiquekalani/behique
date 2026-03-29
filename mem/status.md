@@ -1,8 +1,8 @@
 ---
 purpose: Project and idea tracker with auto-sort rules
 last_modified: 2026-03-28
-total_items: 18
-active: 5
+total_items: 19
+active: 6
 todo: 5
 backlog: 5
 archived: 3
@@ -49,6 +49,14 @@ items:
     context_weight: 1
     owner: ceiba
     notes: "Solfeggio frequencies working. JS fix applied."
+
+  - name: "BehiqueBot on Telegram/Discord"
+    status: active
+    last_modified: 2026-03-16
+    priority: 8
+    context_weight: 1
+    owner: naboria
+    notes: "Telegram bot on Railway, Discord bot on Naboria. Running."
 
   - name: "Sprint dashboard (VHS kanban)"
     status: active

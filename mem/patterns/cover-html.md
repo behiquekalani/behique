@@ -45,6 +45,7 @@ last_verified: 2026-03-28
     justify-content: center;
     padding: 60px 80px;
     overflow: hidden;
+    position: relative;
   }
   .quote { font-size: 18px; color: #888; font-style: italic; margin-bottom: 20px; }
   .pain { text-decoration: line-through; color: #666; font-size: 16px; margin: 4px 0; }
@@ -57,9 +58,9 @@ last_verified: 2026-03-28
 </head>
 <body>
   <div class="quote">"Pain point quote"</div>
-  <div class="pain">~~Old way that doesn't work~~</div>
-  <div class="pain">~~Another old way~~</div>
-  <div class="pain">~~Third old way~~</div>
+  <div class="pain">Old way that doesn't work</div>
+  <div class="pain">Another old way</div>
+  <div class="pain">Third old way</div>
   <div class="title">PRODUCT TITLE</div>
   <div class="cyan-line"></div>
   <div class="modules">

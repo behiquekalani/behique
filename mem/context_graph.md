@@ -2,8 +2,8 @@
 layer: L2-cache
 purpose: Bidirectional map of all entities and their relationships
 last_modified: 2026-03-28
-node_count: 28
-edge_count: 45
+node_count: 30
+edge_count: 52
 ---
 
 # Context Graph
@@ -48,8 +48,8 @@ nodes:
   - id: project-behiquebot
     type: project
     status: active
-    description: "Telegram bot live on Railway"
-    links: [tool-railway, tool-telegram]
+    description: "Telegram bot live on Railway, Discord bot on Naboria"
+    links: [tool-railway, tool-telegram, machine-naboria]
 
   - id: project-polymarket
     type: project
@@ -74,6 +74,20 @@ nodes:
     status: todo
     description: "YouTube scripts, blog posts, content pipeline"
     links: [project-youtube, project-instagram, pattern-copywriting-voice]
+
+  - id: project-sprint-dashboard
+    type: project
+    status: active
+    priority: 7
+    description: "Sprint dashboard VHS kanban board"
+    links: [tool-claude-code, person-kalani]
+
+  - id: project-dns-config
+    type: project
+    status: todo
+    priority: 8
+    description: "Configure DNS for behike.store domain"
+    links: [person-kalani, machine-naboria]
 
   # === PRODUCTS (grouped) ===
   - id: product-blueprints
@@ -185,4 +199,4 @@ nodes:
     type: person
     role: founder
     description: "Kalani Andre Gomez Padin - builder, ADHD, INFJ, PR"
-    links: [project-gumroad-store, project-ceiba-v2, machine-ceiba, tool-claude-code, project-bios, project-polymarket, project-ai-agent-service, project-lumina]
+    links: [project-gumroad-store, project-ceiba-v2, machine-ceiba, tool-claude-code, project-bios, project-polymarket, project-ai-agent-service, project-lumina, project-sprint-dashboard, project-dns-config]
