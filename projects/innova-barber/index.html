@@ -184,14 +184,15 @@
     .service-price .from { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-dim); font-weight: 400; }
 
     /* === GALLERY === */
-    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; grid-auto-rows: 280px; }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .gallery-item {
       background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-      overflow: hidden; display: flex; align-items: center; justify-content: center;
-      transition: all 0.3s;
+      overflow: hidden; aspect-ratio: 1; transition: all 0.3s;
     }
+    .gallery-item.tall { aspect-ratio: auto; grid-row: span 2; }
+    .gallery-item.wide { grid-column: span 2; aspect-ratio: 2/1; }
     .gallery-item:hover { border-color: #333; transform: scale(1.01); }
-    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 
     /* === ABOUT === */
     .quote-section {
@@ -446,32 +447,23 @@
       <p class="section-desc">Cada fade cuenta una historia. Aqu&iacute; van las nuestras.</p>
 
       <div class="gallery-grid">
-        <div class="gallery-item fade-in" style="grid-row:span 2;">
-          <img src="images/work-1.jpeg" alt="Innova Barber trabajo">
+        <div class="gallery-item tall fade-in">
+          <img src="images/work-1.jpeg" alt="Corte con dise&ntilde;o">
         </div>
         <div class="gallery-item fade-in">
-          <img src="images/work-2.jpeg" alt="Innova Barber trabajo">
+          <img src="images/work-2.jpeg" alt="Color y estilo">
         </div>
         <div class="gallery-item fade-in">
-          <img src="images/work-3.jpeg" alt="Innova Barber trabajo">
+          <img src="images/work-3.jpeg" alt="Fade de precisi&oacute;n">
         </div>
         <div class="gallery-item fade-in">
-          <img src="images/work-4.jpeg" alt="Innova Barber trabajo">
+          <img src="images/work-4.jpeg" alt="Trabajo de color">
         </div>
         <div class="gallery-item fade-in">
-          <img src="images/work-5.jpeg" alt="Innova Barber trabajo">
-        </div>
-        <div class="gallery-item fade-in" style="grid-column:span 2;">
-          <img src="images/work-6.jpeg" alt="Innova Barber trabajo">
+          <img src="images/work-5.jpeg" alt="Estilo premium">
         </div>
         <div class="gallery-item fade-in">
-          <img src="images/work-7.jpeg" alt="Innova Barber trabajo">
-        </div>
-        <div class="gallery-item fade-in">
-          <img src="images/work-8.jpeg" alt="Innova Barber trabajo">
-        </div>
-        <div class="gallery-item fade-in">
-          <img src="images/work-9.jpeg" alt="Innova Barber trabajo">
+          <img src="images/work-6.jpeg" alt="Fade limpio">
         </div>
       </div>
     </div>
@@ -556,24 +548,24 @@
 
     // Bunny cursor (desktop only)
     const bunny = document.getElementById('bunnyCursor');
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (!isMobile && !prefersReduced && bunny) {
-      let mouseX = 0, mouseY = 0, bunnyX = 0, bunnyY = 0;
-
-      document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-      document.addEventListener('mousedown', () => bunny.classList.add('clicking'));
-      document.addEventListener('mouseup', () => bunny.classList.remove('clicking'));
-
-      function animateBunny() {
-        bunnyX += (mouseX - bunnyX) * 0.15;
-        bunnyY += (mouseY - bunnyY) * 0.15;
-        bunny.style.left = bunnyX + 'px';
-        bunny.style.top = bunnyY + 'px';
-        requestAnimationFrame(animateBunny);
-      }
-      animateBunny();
+    if (bunny && window.innerWidth > 768) {
+      var mx = -100, my = -100, bx = -100, by = -100, moved = false;
+      bunny.style.opacity = '0';
+      document.onmousemove = function(e) {
+        mx = e.clientX; my = e.clientY;
+        if (!moved) { moved = true; bx = mx; by = my; bunny.style.opacity = '1'; }
+      };
+      document.onmousedown = function() { bunny.classList.add('clicking'); };
+      document.onmouseup = function() { bunny.classList.remove('clicking'); };
+      (function loop() {
+        if (moved) {
+          bx += (mx - bx) * 0.15;
+          by += (my - by) * 0.15;
+          bunny.style.left = bx + 'px';
+          bunny.style.top = by + 'px';
+        }
+        requestAnimationFrame(loop);
+      })();
     }
   </script>
 
