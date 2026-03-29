@@ -153,6 +153,7 @@ canvas#particles{position:absolute;inset:0;width:100%;height:100%}
     <div class="sb-tabs">
       <div class="sb-tab active" data-pane="breathe">Breathe</div>
       <div class="sb-tab" data-pane="sound">Sound</div>
+      <div class="sb-tab" data-pane="freq">Hz</div>
       <div class="sb-tab" data-pane="light">Light</div>
       <div class="sb-tab" data-pane="focus">Focus</div>
       <div class="sb-tab" data-pane="sleep">Sleep</div>
@@ -207,6 +208,30 @@ canvas#particles{position:absolute;inset:0;width:100%;height:100%}
       <div class="sb-section">
         <h3>Master Volume</h3>
         <input type="range" class="snd-slider" id="master-vol" min="0" max="100" value="50" style="width:100%">
+      </div>
+    </div>
+
+    <!-- Frequency pane -->
+    <div class="sb-pane" id="pane-freq">
+      <div class="sb-section">
+        <h3>Solfeggio Frequencies</h3>
+        <div class="snd-row"><label>528 Hz</label><input type="range" class="snd-slider" data-freq="528" min="0" max="100" value="0"><div class="snd-toggle" data-freq="528"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Love / DNA repair / miracle tone</div>
+        <div class="snd-row"><label>432 Hz</label><input type="range" class="snd-slider" data-freq="432" min="0" max="100" value="0"><div class="snd-toggle" data-freq="432"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Deep relaxation / natural tuning</div>
+        <div class="snd-row"><label>396 Hz</label><input type="range" class="snd-slider" data-freq="396" min="0" max="100" value="0"><div class="snd-toggle" data-freq="396"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Liberation / release fear and guilt</div>
+        <div class="snd-row"><label>741 Hz</label><input type="range" class="snd-slider" data-freq="741" min="0" max="100" value="0"><div class="snd-toggle" data-freq="741"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Intuition / problem solving</div>
+        <div class="snd-row"><label>852 Hz</label><input type="range" class="snd-slider" data-freq="852" min="0" max="100" value="0"><div class="snd-toggle" data-freq="852"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Spiritual awakening / third eye</div>
+      </div>
+      <div class="sb-section">
+        <h3>Noise Colors</h3>
+        <div class="snd-row"><label>Brown</label><input type="range" class="snd-slider" data-noise="brown" min="0" max="100" value="0"><div class="snd-toggle" data-noise="brown"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Deep rumble / thunder / best for ADHD focus</div>
+        <div class="snd-row"><label>Pink</label><input type="range" class="snd-slider" data-noise="pink" min="0" max="100" value="0"><div class="snd-toggle" data-noise="pink"></div></div>
+        <div style="font-size:9px;color:var(--dim);margin:-6px 0 10px 0">Balanced / rain-like / best for sleep</div>
       </div>
     </div>
 
@@ -306,6 +331,25 @@ function initAudio(){
   sounds.cafe=makeNoise('pink',0);
   sounds.white=makeNoise('white',0);
   sounds.binaural=makeBinaural(200,240,0);
+  /* Solfeggio frequencies */
+  sounds.freq528=makeFreq(528,0);
+  sounds.freq432=makeFreq(432,0);
+  sounds.freq396=makeFreq(396,0);
+  sounds.freq741=makeFreq(741,0);
+  sounds.freq852=makeFreq(852,0);
+  /* Noise colors */
+  sounds.noiseBrown=makeNoise('brown',0);
+  sounds.noisePink=makeNoise('pink',0);
+}
+function makeFreq(hz,vol){
+  var o=audioCtx.createOscillator();o.type='sine';o.frequency.value=hz;
+  /* Add gentle harmonics for warmth */
+  var o2=audioCtx.createOscillator();o2.type='sine';o2.frequency.value=hz*2;
+  var g=audioCtx.createGain();g.gain.value=vol;
+  var g2=audioCtx.createGain();g2.gain.value=vol*0.15;
+  o.connect(g);o2.connect(g2);g.connect(masterGain);g2.connect(masterGain);
+  o.start();o2.start();
+  return{gain:g,gain2:g2,freq:hz};
 }
 function makeNoise(type,vol){
   var N=audioCtx.sampleRate*2,buf=audioCtx.createBuffer(1,N,audioCtx.sampleRate),d=buf.getChannelData(0),b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
@@ -337,6 +381,49 @@ document.querySelectorAll('.snd-slider[data-snd]').forEach(function(s){
   });
 });
 document.getElementById('master-vol').addEventListener('input',function(){if(masterGain)masterGain.gain.setTargetAtTime(this.value/100,audioCtx.currentTime,0.1);});
+
+/* Frequency toggles */
+document.querySelectorAll('.snd-toggle[data-freq]').forEach(function(t){
+  t.addEventListener('click',function(){
+    initAudio();t.classList.toggle('on');
+    var hz=t.dataset.freq;var key='freq'+hz;
+    var slider=document.querySelector('.snd-slider[data-freq="'+hz+'"]');
+    if(sounds[key]&&audioCtx){
+      var vol=t.classList.contains('on')?(slider?slider.value/100*0.15:0.1):0;
+      sounds[key].gain.gain.setTargetAtTime(vol,audioCtx.currentTime,0.3);
+      if(sounds[key].gain2)sounds[key].gain2.gain.setTargetAtTime(vol*0.15,audioCtx.currentTime,0.3);
+    }
+  });
+});
+document.querySelectorAll('.snd-slider[data-freq]').forEach(function(s){
+  s.addEventListener('input',function(){
+    var hz=s.dataset.freq;var key='freq'+hz;
+    var t=document.querySelector('.snd-toggle[data-freq="'+hz+'"]');
+    if(sounds[key]&&audioCtx&&t&&t.classList.contains('on')){
+      sounds[key].gain.gain.setTargetAtTime(s.value/100*0.15,audioCtx.currentTime,0.1);
+      if(sounds[key].gain2)sounds[key].gain2.gain.setTargetAtTime(s.value/100*0.15*0.15,audioCtx.currentTime,0.1);
+    }
+  });
+});
+
+/* Noise color toggles */
+document.querySelectorAll('.snd-toggle[data-noise]').forEach(function(t){
+  t.addEventListener('click',function(){
+    initAudio();t.classList.toggle('on');
+    var type=t.dataset.noise;var key='noise'+type.charAt(0).toUpperCase()+type.slice(1);
+    var slider=document.querySelector('.snd-slider[data-noise="'+type+'"]');
+    if(sounds[key]&&audioCtx){
+      sounds[key].gain.gain.setTargetAtTime(t.classList.contains('on')?(slider?slider.value/100*0.4:0.2):0,audioCtx.currentTime,0.3);
+    }
+  });
+});
+document.querySelectorAll('.snd-slider[data-noise]').forEach(function(s){
+  s.addEventListener('input',function(){
+    var type=s.dataset.noise;var key='noise'+type.charAt(0).toUpperCase()+type.slice(1);
+    var t=document.querySelector('.snd-toggle[data-noise="'+type+'"]');
+    if(sounds[key]&&audioCtx&&t&&t.classList.contains('on'))sounds[key].gain.gain.setTargetAtTime(s.value/100*0.4,audioCtx.currentTime,0.1);
+  });
+});
 
 /* === BREATHING === */
 var PATS={box:{i:4,hi:4,e:4,ho:4},relax:{i:4,hi:7,e:8,ho:0},energy:{i:2,hi:1,e:4,ho:0},calm:{i:6,hi:0,e:6,ho:0},wim:{i:1,hi:0,e:1,ho:0},custom:{i:4,hi:4,e:4,ho:4}};

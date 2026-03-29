@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Sprint</title>
+<style>
+/* VHS */
+body::after{content:"";position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(rgba(255,255,255,0.02) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+.vhs-line{position:fixed;top:-2px;left:0;width:100%;height:2px;background:rgba(255,255,255,0.08);pointer-events:none;z-index:10000;animation:tracking 8s linear infinite}
+@keyframes tracking{0%{transform:translateY(0)}100%{transform:translateY(100vh)}}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a08;color:#e8e0c8;font-family:Georgia,'Times New Roman',serif;min-height:100vh;padding:20px}
+
+.header{text-align:center;padding:16px 0 20px}
+.header h1{font-size:28px;font-weight:700;letter-spacing:4px;color:#ffc857}
+.header .date{font-size:11px;color:#5a5040;margin-top:6px;letter-spacing:1px}
+
+/* 3 columns */
+.board{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;max-width:1200px;margin:0 auto;padding:0 8px}
+.column{background:#12120e;border:1px solid #2a2820;border-radius:12px;padding:16px;min-height:400px}
+.col-header{font-size:12px;letter-spacing:2px;text-transform:uppercase;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #2a2820;display:flex;justify-content:space-between;align-items:center}
+.col-header .count{font-size:11px;background:#1e1e18;padding:2px 8px;border-radius:8px}
+.col-todo .col-header{color:#ffc857}
+.col-doing .col-header{color:#00D4FF}
+.col-done .col-header{color:#00e88f}
+
+/* Task cards */
+.task-card{background:#1a1a14;border:1px solid #2a2820;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;position:relative}
+.task-card:hover{border-color:#3a3830}
+.task-card .task-name{font-size:13px;line-height:1.4;margin-bottom:4px}
+.task-card .task-meta{font-size:10px;color:#5a5040;font-family:-apple-system,sans-serif}
+.task-card .task-phase{font-size:9px;color:#7a7060;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.task-card .task-actions{display:flex;gap:6px;margin-top:8px}
+.task-btn{padding:4px 10px;border:1px solid #2a2820;border-radius:6px;font-size:9px;cursor:pointer;background:transparent;font-family:Georgia,serif;transition:all .2s}
+.task-btn:hover{border-color:#5a5040}
+.task-btn.start{color:#00D4FF;border-color:rgba(0,212,255,0.3)}
+.task-btn.start:hover{background:rgba(0,212,255,0.1)}
+.task-btn.finish{color:#00e88f;border-color:rgba(0,232,143,0.3)}
+.task-btn.finish:hover{background:rgba(0,232,143,0.1)}
+.task-btn.undo{color:#ffc857;border-color:rgba(255,200,87,0.3)}
+.task-btn.undo:hover{background:rgba(255,200,87,0.1)}
+
+/* Done cards are dimmer */
+.col-done .task-card{opacity:0.6}
+.col-done .task-card .task-name{text-decoration:line-through}
+
+/* Progress */
+.progress-bar{max-width:1200px;margin:0 auto 20px;padding:0 8px}
+.prog-track{height:6px;background:#1a1a14;border-radius:3px;border:1px solid #2a2820}
+.prog-fill{height:100%;background:linear-gradient(90deg,#ffc857,#00e88f);border-radius:3px;transition:width .3s}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:#5a5040;margin-bottom:6px}
+
+.footer{text-align:center;padding:20px 0;font-size:10px;color:#3a3830;letter-spacing:2px}
+
+@media(max-width:768px){.board{grid-template-columns:1fr;gap:12px}}
+</style>
+</head>
+<body>
+<div class="vhs-line"></div>
+
+<div class="header">
+<h1>B E H I K E</h1>
+<div class="date" id="date"></div>
+</div>
+
+<div class="progress-bar">
+<div class="prog-label"><span>Sprint Progress</span><span id="pct">0%</span></div>
+<div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="board">
+<div class="column col-todo">
+<div class="col-header">To Do <span class="count" id="todo-count">0</span></div>
+<div id="todo-list"></div>
+</div>
+<div class="column col-doing">
+<div class="col-header">In Progress <span class="count" id="doing-count">0</span></div>
+<div id="doing-list"></div>
+</div>
+<div class="column col-done">
+<div class="col-header">Done <span class="count" id="done-count">0</span></div>
+<div id="done-list"></div>
+</div>
+</div>
+
+<div class="footer">BEHIKE / BUILT IN PUERTO RICO</div>
+
+<script>
+var TASKS=[
+// Phase 1: List Blueprints
+{id:'bp-youtube',name:'YouTube Blueprint ($19.99)',phase:'List Blueprints',file:'products-organized/youtube/'},
+{id:'bp-newsletter',name:'Newsletter Blueprint ($19.99)',phase:'List Blueprints',file:'products-organized/newsletter/'},
+{id:'bp-crypto',name:'Crypto Investor Blueprint ($19.99)',phase:'List Blueprints',file:'products-organized/crypto/'},
+{id:'bp-etsy',name:'Etsy Seller Blueprint ($19.99)',phase:'List Blueprints',file:'products-organized/etsy/'},
+{id:'bp-podcast',name:'Podcast Blueprint ($19.99)',phase:'List Blueprints',file:'products-organized/podcast/'},
+{id:'bp-ecom-es',name:'E-Commerce ES ($19.99)',phase:'List Blueprints',file:'products-organized/ecommerce-es/'},
+{id:'bp-free-es',name:'Freelancer ES ($19.99)',phase:'List Blueprints',file:'products-organized/freelancer-es/'},
+{id:'bp-cc-es',name:'Content Creator ES ($19.99)',phase:'List Blueprints',file:'products-organized/creator-es/'},
+{id:'bp-bundle',name:'Blueprint Bundle ($49)',phase:'List Blueprints',file:'gumroad-ready/behike-blueprint-bundle.zip'},
+{id:'bp-voice',name:'Voice Bible ($16.99)',phase:'List Blueprints',file:'products-organized/voice-bible/'},
+// Phase 2: List Tutorials
+{id:'tut-first',name:'First Dollar Guide ($4.99)',phase:'List Tutorials',file:'gumroad-ready/first-dollar-guide.pdf'},
+{id:'tut-gumroad',name:'Gumroad AI Guide ($9.99)',phase:'List Tutorials',file:'products-organized/gumroad-ai-guide/'},
+{id:'tut-offline',name:'Offline AI Content ($9.99)',phase:'List Tutorials',file:'products-organized/ai-offline-content/'},
+{id:'tut-social',name:'AI Social Media ($9.99)',phase:'List Tutorials',file:'products-organized/ai-social-media/'},
+{id:'tut-claude',name:'Claude Code for Builders ($9.99)',phase:'List Tutorials',file:'products-organized/claude-code-builders/'},
+{id:'tut-cowork',name:'Claude Cowork ($9.99)',phase:'List Tutorials',file:'products-organized/claude-cowork/'},
+// Phase 3: Other
+{id:'ig-create',name:'Create @behikeai Instagram',phase:'Setup'},
+{id:'ig-bio',name:'Set bio + link in bio',phase:'Setup'},
+{id:'dns-co',name:'Point behike.co to Cloudflare',phase:'DNS'},
+{id:'dns-store',name:'Point behike.store to Cloudflare',phase:'DNS'},
+{id:'email',name:'Set up pro email',phase:'Setup'},
+{id:'yt-100',name:'Record: 100 Products video',phase:'Content',file:'youtube-scripts/how-i-built-100-products-with-ai.md'},
+{id:'yt-cowork',name:'Record: Cowork 3 Use Cases',phase:'Content',file:'youtube-scripts/claude-cowork-3-use-cases.md'},
+{id:'share-ig',name:'First Instagram post',phase:'Share'},
+{id:'share-tg',name:'Share in Telegram groups',phase:'Share'},
+{id:'share-pr',name:'Share in PR communities',phase:'Share'},
+];
+
+// State: 'todo', 'doing', 'done'
+var state={};
+
+function loadState(){
+  try{state=JSON.parse(localStorage.getItem('sprint-kanban')||'{}');}catch(e){state={}}
+  // Pre-mark completed blueprints
+  var done=['bp-freelancer','bp-content','bp-ai-agency','bp-dropshipping','bp-saas','bp-coaching','bp-consulting'];
+  done.forEach(function(id){if(!state[id])state[id]='done'});
+}
+
+function saveState(){localStorage.setItem('sprint-kanban',JSON.stringify(state))}
+
+function getState(id){return state[id]||'todo'}
+
+function renderCard(t){
+  var s=getState(t.id);
+  var actions='';
+  if(s==='todo') actions='<button class="task-btn start" onclick="moveTask(\''+t.id+'\',\'doing\')">Start</button><button class="task-btn finish" onclick="moveTask(\''+t.id+'\',\'done\')">Done</button>';
+  else if(s==='doing') actions='<button class="task-btn finish" onclick="moveTask(\''+t.id+'\',\'done\')">Finish</button><button class="task-btn undo" onclick="moveTask(\''+t.id+'\',\'todo\')">Back</button>';
+  else actions='<button class="task-btn undo" onclick="moveTask(\''+t.id+'\',\'todo\')">Undo</button>';
+
+  return '<div class="task-card" data-id="'+t.id+'">'+
+    '<div class="task-phase">'+t.phase+'</div>'+
+    '<div class="task-name">'+t.name+'</div>'+
+    (t.file?'<div class="task-meta">'+t.file+'</div>':'')+
+    '<div class="task-actions">'+actions+'</div></div>';
+}
+
+function render(){
+  var todo='',doing='',done='';
+  var tc=0,dc=0,fc=0;
+  TASKS.forEach(function(t){
+    var s=getState(t.id);
+    if(s==='todo'){todo+=renderCard(t);tc++}
+    else if(s==='doing'){doing+=renderCard(t);dc++}
+    else{done+=renderCard(t);fc++}
+  });
+  document.getElementById('todo-list').innerHTML=todo;
+  document.getElementById('doing-list').innerHTML=doing;
+  document.getElementById('done-list').innerHTML=done;
+  document.getElementById('todo-count').textContent=tc;
+  document.getElementById('doing-count').textContent=dc;
+  document.getElementById('done-count').textContent=fc;
+  var pct=Math.round(fc/TASKS.length*100);
+  document.getElementById('pct').textContent=pct+'%';
+  document.getElementById('prog-fill').style.width=pct+'%';
+}
+
+window.moveTask=function(id,to){
+  state[id]=to;
+  saveState();
+  render();
+};
+
+document.getElementById('date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+loadState();
+render();
+</script>
+</body>
+</html>

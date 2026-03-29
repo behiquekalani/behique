@@ -369,3 +369,84 @@ Tags: music, product, web-app, simplicity
 - **Plan at:** `Ceiba/projects/DISCORD_SERVER_PLAN.md`
 - **Effort:** Quick (10 min to create)
 - **Priority:** After first 10+ downloads. No point having a server with 0 people.
+
+---
+
+## Lumina App Improvements (from Gemini session)
+- **Status:** FUTURE
+- **What:** Fix particle animation (drawPts truncated), add glassmorphism to breathing ring, add custom breathing pattern input, improve Solfeggio frequency UI
+- **Source:** Ceiba/inbox/paste-1.md
+- **Effort:** Quick (JS fixes + CSS tweaks)
+
+---
+
+## Brand Armor - Name Verification SaaS
+- **Status:** FUTURE (capstone project potential)
+- **What:** One-stop brand name validator. Type a name, get instant results on domain availability, social handles, app store conflicts, and trademark status. Tiered pricing: Scout (free), Founder ($99), Enterprise ($499+). Uses Claude Agent for USPTO search, Supabase backend, React frontend.
+- **Key insight:** Don't say "Safe" or "Risk" (legal liability). Use "Search Matches Found" / "Naming Congestion". Connect-to-Attorney button for upsell, not DIY legal advice.
+- **Tech:** Supabase (not Firebase), Claude Agent SDK, BrowserBase for agent browsing, Namecheap API for domain claiming, Stripe for payments
+- **Source:** Ceiba/inbox/paste-2.md (full Gemini conversation with architecture, React code, SQL schema, admin dashboard)
+- **Effort:** Heavy (full SaaS build, multiple APIs, legal considerations)
+- **Revenue:** $99-$499 per verification + lead gen to attorneys
+
+---
+
+## Meditation App (Personal Use + Product)
+- **Status:** FUTURE
+- **What:** Simple meditation timer with recorded inhale/exhale voice, customizable bell sounds, 528Hz and other solfeggio frequencies, brown/pink/white noise, nature sounds. Timer with completion notification. Free meditation mode for just listening.
+- **Key features:** Record own voice for inhale/exhale cues, set meditation duration, bell at start/end/intervals, mix frequencies with nature sounds, minimal UI
+- **Source:** Previous session conversation
+- **Effort:** Medium (Lumina already has 80% of the audio engine)
+
+
+---
+
+## Discord-Controlled Content Pipeline (replaces BehiqueBot)
+- **Status:** NEXT (after Gumroad sprint)
+- **What:** Discord server where Kalani drops videos/content into channels, bots handle the rest. Pipeline: upload to Discord > resize/format > caption > schedule > post to IG/TikTok/YouTube. Claude has access to Discord via bot.
+- **Why better than Telegram bot:** Discord has channels (organize by type), roles (permissions), file uploads, webhook integrations, and Kalani already wants a community server. One server for control + community.
+- **Existing pieces:** auto_content_pipeline.py, ghost_writer.py, reel pipeline, instagram publisher, tiktok publisher, youtube publisher, scheduling daemon
+- **Missing:** Discord bot, format/resize automation, cross-platform posting from Discord trigger
+- **Naboria:** Online 24/7, not hosting website yet. Should run the Discord bot + content pipeline.
+- **Cobo:** Can run free-tier AI content generation (rotate Gemini/Grok/ChatGPT free prompts for batch content)
+- **Effort:** Medium (Discord bot + webhook to existing pipeline)
+
+---
+
+## Free-Tier AI Content Farm (Cobo + Naboria)
+- **Status:** NEXT (after Gumroad sprint)
+- **What:** Use Cobo and Naboria to batch-generate content using free tiers of Gemini, Grok, ChatGPT. Each machine on its own IP, rotating between services, generating captions, descriptions, social posts, email sequences.
+- **How:** Python scripts with rate limiting, rotating between APIs, saving output to shared folder (Syncthing). Naboria generates, Ceiba reviews, Discord bot distributes.
+- **Effort:** Medium (API wrappers + rate limiting + scheduling)
+
+
+---
+
+## AI Ad Agency / UGC Service
+- **Status:** FUTURE
+- **What:** Create AI-generated video ads for businesses using tools like NanoBanana2, HeyGen, etc. Could also do AI UGC (user-generated content style ads). Could even use face-swap to create multiple "personas" for A/B testing different presenters.
+- **Revenue:** $500-$2,000 per ad for businesses. Recurring if they need monthly content.
+- **Pairs with:** AI Agency Blueprint (sell the blueprint AND the service)
+- **Effort:** Medium (learn the tools, build a portfolio of 3 demo ads, then outreach)
+
+
+---
+
+## Instagram DM Funnel ("Comment X to get Y")
+- **Status:** NEXT (after listings + Instagram created)
+- **What:** Post Reels about Claude features (skills, hooks, cowork). CTA: "Comment SKILLS to get the free guide." ManyChat or manual DM sends them a link. Collect email in exchange for file. Upsell to paid products.
+- **Content ideas:** "What are Claude Skills?", "3 things Claude Cowork can do", "How I built 100 products", "Free blueprint in DMs"
+- **Funnel:** Comment > DM > email capture > free file > email sequence > upsell to $19.99 blueprint or $97 OS
+- **Giveaway idea:** "Follow + comment to win the full Blueprint Bundle ($49 value)"
+- **Tools needed:** Instagram account, ManyChat (or manual), email service (Kit/Beehiiv), content ready
+- **Effort:** Quick once Instagram is live
+
+
+---
+
+## "AI Cured My Depression" Video + BehiqueBot as Product
+- **Status:** NEXT (high priority content)
+- **What:** Personal story video about how building with AI pulled Kalani out of depression. Raw, honest, not a tutorial. The hook that drives everything else.
+- **BehiqueBot angle:** Rebrand as a trendy accountability/wellness bot. "The AI that checks on you." Sell access or make it free for virality. Could be a Telegram bot, Discord bot, or web app.
+- **Revenue:** The video drives traffic to everything. The bot could be freemium ($0 free, $4.99/mo premium with ADHD features).
+

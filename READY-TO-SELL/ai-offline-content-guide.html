@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Content Creation Without the Cloud</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px 40px; }
+  .header { text-align: center; padding: 20px 0; }
+  .header h1 { font-size: 28px; font-weight: 600; letter-spacing: 0.02em; color: var(--white); }
+  .header .subtitle { font-size: 15px; font-weight: 300; color: var(--gray); margin-top: 8px; max-width: 560px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 16px auto; }
+  .header .tagline { font-size: 11px; color: var(--gray); letter-spacing: 0.15em; text-transform: uppercase; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap); break-inside: avoid; }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .fill-line[data-placeholder]::before { content: attr(data-placeholder); color: #333; font-size: 14px; font-style: italic; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; break-inside: avoid; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+  .pill.active { border-color: var(--cyan); color: var(--cyan); }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+  table.clean td.dim { color: var(--gray); }
+  .highlight { color: var(--cyan); }
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+  .code-block { background: #0d0d12; border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #ccc; line-height: 1.9; overflow-x: auto; margin: 16px 0; }
+  .code-block .comment { color: #555; }
+  .code-block .cmd { color: var(--cyan); }
+  .note { background: rgba(0, 212, 255, 0.05); border-left: 3px solid var(--cyan); padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 14px; color: var(--gray); }
+  .note strong { color: var(--white); }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+  
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>AI Content Creation Without the Cloud</h1>
+    <div class="line"></div>
+    <p class="subtitle">Build your entire content operation on your own hardware. No subscriptions. No limits.</p>
+    <p style="font-size: 13px; color: #444; margin-top: 16px; max-width: 540px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic;">Print this or open in a PDF editor. Fill in the dotted lines. Check the boxes. Build your offline content stack step by step.</p>
+  </div>
+
+  <!-- MODULE 01: WHY GO OFFLINE -->
+  <div class="module">
+    <div class="module-number">01 -- Why Go Offline</div>
+    <h2 class="module-title">Why Go Offline</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Privacy</div>
+        <h4>Your Data Stays Yours</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Every prompt you send to ChatGPT, Midjourney, or Claude goes to their servers. They log it. They may train on it. Your client work, your ideas, your strategy -- all stored on someone else's machine. Local models run on YOUR hardware. Nothing leaves your network.</p>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">No Subscriptions</div>
+        <h4>Pay Once, Run Forever</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">ChatGPT Plus: $20/mo. Midjourney: $30/mo. Claude Pro: $20/mo. That is $840/year just for access -- and they can change pricing, add limits, or shut down any time. A local setup costs $0/mo after the initial hardware investment.</p>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">No Rate Limits</div>
+        <h4>Generate Without Waiting</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Cloud services throttle you. 40 messages per 3 hours. 200 images per day. Local tools run as fast as your hardware allows. Need 500 product descriptions at 2 AM? No one is going to stop you.</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Works Offline</div>
+        <h4>No Internet Required</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Traveling. Power outage with a laptop battery. Airplane. Rural area with bad signal. Your content production does not stop because your WiFi did.</p>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Full Control</div>
+        <h4>Your Models, Your Rules</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Fine-tune on your own writing style. Remove safety filters for creative work. Choose exactly which model version to use. No sudden model downgrades because the provider decided to save costs.</p>
+      </div>
+    </div>
+
+    <div class="label">Your Top 3 Reasons for Going Offline</div>
+    <div class="fill-line" data-placeholder="e.g., Client NDA requires local processing"></div>
+    <div class="fill-line" data-placeholder="e.g., I spend $70/mo on AI subscriptions"></div>
+    <div class="fill-line" data-placeholder="e.g., I need to batch-generate content overnight"></div>
+
+    <hr class="section-divider">
+
+    <div class="label">Monthly Cloud Spend You Will Eliminate</div>
+    <table class="clean">
+      <thead><tr><th>Service</th><th>Monthly Cost</th><th>Replace With</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">ChatGPT Plus / Claude Pro</td><td class="dim">$____/mo</td><td class="dim">Ollama + local LLM</td></tr>
+        <tr><td class="dim">Midjourney / DALL-E</td><td class="dim">$____/mo</td><td class="dim">Stable Diffusion / FLUX</td></tr>
+        <tr><td class="dim">Jasper / Copy.ai / other</td><td class="dim">$____/mo</td><td class="dim">Local LLM + templates</td></tr>
+        <tr><td class="dim">ElevenLabs / other TTS</td><td class="dim">$____/mo</td><td class="dim">Kokoro / Piper TTS</td></tr>
+        <tr><td style="color: var(--cyan); font-weight: 600;">Total Monthly Savings</td><td style="color: var(--cyan); font-weight: 600;">$____/mo</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MODULE 02: LOCAL LLM SETUP -->
+  <div class="module">
+    <div class="module-number">02 -- Local LLM Setup</div>
+    <h2 class="module-title">Local LLM Setup</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Recommended</div>
+        <h4>Ollama</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">One-command install. Run any open model. macOS, Linux, Windows. The fastest way to get a local LLM running.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Install from ollama.com</li>
+          <li>Run: ollama pull llama3.1</li>
+          <li>Chat: ollama run llama3.1</li>
+          <li>API runs at localhost:11434</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">GUI Option</div>
+        <h4>LM Studio</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Visual interface for downloading and running models. Great for beginners. Built-in model browser. OpenAI-compatible API server.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Download from lmstudio.ai</li>
+          <li>Browse models in-app</li>
+          <li>One-click download + run</li>
+          <li>Local API for integrations</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Advanced</div>
+        <h4>llama.cpp</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Raw C++ inference engine. Maximum performance. Supports GGUF quantized models. What Ollama is built on top of.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Clone from GitHub</li>
+          <li>Build with make or cmake</li>
+          <li>Download GGUF model files</li>
+          <li>Full control over parameters</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <span class="comment"># Quick Ollama setup (macOS/Linux)</span><br>
+      <span class="cmd">curl -fsSL https://ollama.com/install.sh | sh</span><br>
+      <span class="cmd">ollama pull llama3.1:8b</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Fast, good for drafts (4.7GB)</span><br>
+      <span class="cmd">ollama pull llama3.1:70b</span>&nbsp;&nbsp;&nbsp;<span class="comment"># High quality, needs 40GB+ RAM</span><br>
+      <span class="cmd">ollama pull mistral</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Great for short-form content</span><br>
+      <span class="cmd">ollama pull qwen2.5:14b</span>&nbsp;&nbsp;&nbsp;<span class="comment"># Strong multilingual support</span><br>
+      <span class="cmd">ollama pull deepseek-r1:8b</span>&nbsp;<span class="comment"># Reasoning + planning tasks</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Which Model for Which Task</div>
+    <table class="clean">
+      <thead><tr><th>Task</th><th>Recommended Model</th><th>Min RAM</th><th>Speed</th></tr></thead>
+      <tbody>
+        <tr><td>Social media captions</td><td>Mistral 7B / Llama 3.1 8B</td><td>8 GB</td><td>Fast</td></tr>
+        <tr><td>Blog posts / articles</td><td>Llama 3.1 70B / Qwen 2.5 32B</td><td>40 GB</td><td>Medium</td></tr>
+        <tr><td>Email sequences</td><td>Mistral 7B / Llama 3.1 8B</td><td>8 GB</td><td>Fast</td></tr>
+        <tr><td>Product descriptions</td><td>Llama 3.1 8B / Qwen 2.5 14B</td><td>16 GB</td><td>Fast</td></tr>
+        <tr><td>Scripts / storytelling</td><td>Llama 3.1 70B / Command-R</td><td>40 GB</td><td>Slow</td></tr>
+        <tr><td>Code / automation</td><td>DeepSeek Coder / Qwen 2.5 Coder</td><td>16 GB</td><td>Medium</td></tr>
+        <tr><td>Translation</td><td>Qwen 2.5 14B+ / NLLB</td><td>16 GB</td><td>Medium</td></tr>
+        <tr><td>Summarization</td><td>Mistral 7B / Phi-3</td><td>8 GB</td><td>Fast</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <div class="label">Your Local LLM Configuration</div>
+    <div class="fill-line" data-placeholder="Tool chosen: e.g., Ollama"></div>
+    <div class="fill-line" data-placeholder="Primary model: e.g., llama3.1:8b"></div>
+    <div class="fill-line" data-placeholder="Secondary model: e.g., mistral for quick drafts"></div>
+    <div class="fill-line" data-placeholder="Available RAM: e.g., 16 GB"></div>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>Ollama / LM Studio installed</li>
+      <li>At least one model downloaded and tested</li>
+      <li>API endpoint working (localhost:11434 or 1234)</li>
+      <li>Generated test content successfully</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 03: IMAGE GENERATION LOCALLY -->
+  <div class="module">
+    <div class="module-number">03 -- Image Generation</div>
+    <h2 class="module-title">Image Generation Locally</h2>
+
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Most Popular</div>
+        <h4>Stable Diffusion (AUTOMATIC1111)</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">The standard for local image generation. Massive model ecosystem. Extensions for everything -- inpainting, upscaling, ControlNet.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Clone AUTOMATIC1111 webui from GitHub</li>
+          <li>Install Python 3.10 + requirements</li>
+          <li>Download SD 1.5 or SDXL checkpoint</li>
+          <li>Launch: python launch.py</li>
+          <li>Access UI at localhost:7860</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Latest Tech</div>
+        <h4>FLUX</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Next-gen image model from Black Forest Labs. Better text rendering in images. More coherent compositions. Rapidly becoming the new standard.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>FLUX.1 Dev (open weight, 12GB VRAM)</li>
+          <li>FLUX.1 Schnell (fast, 8GB VRAM)</li>
+          <li>Run through ComfyUI or Forge</li>
+          <li>Best text-in-image of any local model</li>
+          <li>Download from HuggingFace</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Node-Based</div>
+        <h4>ComfyUI</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Visual node editor for image generation workflows. Build complex pipelines. Reusable workflows. The power-user choice.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Clone from GitHub</li>
+          <li>Install: pip install -r requirements.txt</li>
+          <li>Drag-and-drop workflow files</li>
+          <li>Supports SD, SDXL, FLUX, all models</li>
+          <li>Save workflows as JSON templates</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>GPU Required:</strong> Local image generation needs a dedicated GPU. NVIDIA RTX 3060 (12GB VRAM) is the minimum for comfortable use. AMD GPUs work but with less community support. Apple Silicon Macs (M1/M2/M3) work well with optimized builds.
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Best Models for Content Creation</div>
+    <table class="clean">
+      <thead><tr><th>Content Type</th><th>Best Model</th><th>VRAM Needed</th><th>Quality</th></tr></thead>
+      <tbody>
+        <tr><td>Product photos</td><td>FLUX.1 Dev / SDXL</td><td>12 GB</td><td>Excellent</td></tr>
+        <tr><td>Social media graphics</td><td>FLUX.1 Schnell</td><td>8 GB</td><td>Good+</td></tr>
+        <tr><td>Blog header images</td><td>SDXL + ControlNet</td><td>10 GB</td><td>Excellent</td></tr>
+        <tr><td>Thumbnails</td><td>FLUX.1 (text rendering)</td><td>12 GB</td><td>Best</td></tr>
+        <tr><td>Brand illustrations</td><td>SDXL + custom LoRA</td><td>10 GB</td><td>Excellent</td></tr>
+        <tr><td>Background removal</td><td>RMBG / SAM</td><td>4 GB</td><td>Excellent</td></tr>
+        <tr><td>Upscaling</td><td>Real-ESRGAN / 4x-UltraSharp</td><td>4 GB</td><td>Excellent</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider">
+
+    <div class="label">Your Image Generation Setup</div>
+    <div class="fill-line" data-placeholder="UI chosen: e.g., ComfyUI"></div>
+    <div class="fill-line" data-placeholder="Primary model: e.g., FLUX.1 Schnell"></div>
+    <div class="fill-line" data-placeholder="GPU: e.g., RTX 3060 12GB / M2 Pro 16GB"></div>
+    <div class="fill-line" data-placeholder="Content types you will generate: e.g., thumbnails, product shots"></div>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>ComfyUI or AUTOMATIC1111 installed</li>
+      <li>At least one checkpoint model downloaded</li>
+      <li>Generated first test image successfully</li>
+      <li>Saved a reusable workflow/preset for your content style</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 04: VIDEO CREATION TOOLS -->
+  <div class="module">
+    <div class="module-number">04 -- Video Creation</div>
+    <h2 class="module-title">Video Creation Tools</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Editing</div>
+        <h4>CapCut (Free Tier)</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Desktop app with auto-captions, templates, effects. Best for social media video. Free tier covers 90% of content creator needs.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Auto-captions (multi-language)</li>
+          <li>Background removal</li>
+          <li>Speed ramping and transitions</li>
+          <li>Text templates and effects</li>
+          <li>Direct export to social platforms</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Professional</div>
+        <h4>DaVinci Resolve (Free)</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Hollywood-grade editing, color grading, audio, and VFX. Completely free. The most powerful free video editor that exists.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Professional color grading (Resolve = industry standard)</li>
+          <li>Fairlight audio suite built-in</li>
+          <li>Fusion for motion graphics</li>
+          <li>No watermarks, no time limits</li>
+          <li>4K export, no restrictions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">AI Video</div>
+        <h4>Kling / Runway (Hybrid)</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">AI video generation is still cloud-dependent for quality results. Use free tiers strategically. Local alternatives are emerging but not production-ready yet.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Kling: free daily generations</li>
+          <li>Use for B-roll, transitions, intros</li>
+          <li>Combine with local editing</li>
+          <li>Watch for open-source alternatives (CogVideo, Mochi)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Voice / TTS</div>
+        <h4>Local Text-to-Speech</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7;">Generate voiceovers locally with near-studio quality. No per-character costs. No monthly limits. Clone voices with just seconds of audio.</p>
+        <hr class="section-divider" style="margin: 20px 0;">
+        <ul class="checklist">
+          <li>Kokoro TTS: natural voices, 82M params, fast</li>
+          <li>Piper TTS: lightweight, runs on Raspberry Pi</li>
+          <li>F5-TTS: voice cloning with 5-sec sample</li>
+          <li>All run 100% locally, no API needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <span class="comment"># Install Kokoro TTS (Python)</span><br>
+      <span class="cmd">pip install kokoro-onnx soundfile</span><br><br>
+      <span class="comment"># Install Piper TTS (standalone binary)</span><br>
+      <span class="cmd">pip install piper-tts</span><br>
+      <span class="cmd">echo "Your content goes here" | piper --model en_US-lessac-medium --output_file voice.wav</span>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Your Video Production Stack</div>
+    <div class="fill-line" data-placeholder="Editor: e.g., CapCut for social, DaVinci for long-form"></div>
+    <div class="fill-line" data-placeholder="TTS tool: e.g., Kokoro for English, Piper for batch"></div>
+    <div class="fill-line" data-placeholder="Video types: e.g., Reels, YouTube tutorials, product demos"></div>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>Primary video editor installed</li>
+      <li>Local TTS tool installed and tested</li>
+      <li>Generated a test voiceover</li>
+      <li>Created one complete video with local tools only</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 05: CONTENT WRITING PIPELINE -->
+  <div class="module">
+    <div class="module-number">05 -- Content Writing Pipeline</div>
+    <h2 class="module-title">Content Writing Pipeline</h2>
+
+    <div class="h-flow" style="margin-bottom: 32px; justify-content: center;">
+      <div class="step">Voice Bible</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">System Prompt</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Local LLM Draft</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Human Edit</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Publish</div>
+    </div>
+
+    <div class="inner-card" style="margin-bottom: 32px;">
+      <div class="label" style="color: var(--cyan);">Voice Bible Integration</div>
+      <h4>Make Your LLM Sound Like You</h4>
+      <p style="color: var(--gray); font-size: 14px; line-height: 1.7; margin-bottom: 16px;">The biggest problem with AI content: it sounds like AI. The fix is a voice bible -- a document that captures your tone, vocabulary, sentence patterns, and personality. Feed this to your local LLM as a system prompt and every draft comes out sounding like you wrote it.</p>
+      <div class="label">Your Voice Bible Elements</div>
+      <div class="fill-line" data-placeholder="Tone: e.g., direct, slightly irreverent, technical but accessible"></div>
+      <div class="fill-line" data-placeholder="Words you always use: e.g., 'ship it', 'real talk', 'zero fluff'"></div>
+      <div class="fill-line" data-placeholder="Words you never use: e.g., 'utilize', 'synergy', 'game-changer'"></div>
+      <div class="fill-line" data-placeholder="Sentence style: e.g., short. Punchy. Occasional long sentence for emphasis."></div>
+      <div class="fill-line" data-placeholder="Example of your best writing (link or paste):"></div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">System Prompt Template</div>
+        <div class="code-block" style="margin: 0;">
+          <span class="comment"># Save this as voice-system.txt</span><br><br>
+          You are a content writer for [BRAND].<br>
+          Tone: [YOUR TONE]<br>
+          Always: [YOUR PATTERNS]<br>
+          Never: [YOUR ANTI-PATTERNS]<br>
+          Audience: [TARGET READER]<br><br>
+          Write like a real person, not a<br>
+          marketing department. Short paragraphs.<br>
+          No fluff. Every sentence earns its place.
+        </div>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Batch Generation Script</div>
+        <div class="code-block" style="margin: 0;">
+          <span class="comment"># batch_content.py</span><br>
+          <span class="cmd">import</span> requests, json<br><br>
+          topics = [<br>
+          &nbsp;&nbsp;"Topic 1", "Topic 2", "Topic 3"<br>
+          ]<br><br>
+          <span class="cmd">for</span> topic <span class="cmd">in</span> topics:<br>
+          &nbsp;&nbsp;resp = requests.post(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"http://localhost:11434/api/generate",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;json={"model": "llama3.1",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"prompt": f"Write about {topic}",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"system": open("voice.txt").read()}<br>
+          &nbsp;&nbsp;)<br>
+          &nbsp;&nbsp;<span class="comment"># save to file...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="label">Content Types You Will Batch Generate</div>
+    <table class="clean">
+      <thead><tr><th>Content Type</th><th>Frequency</th><th>Model</th><th>Template Saved?</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">Social media captions</td><td class="dim">____/week</td><td class="dim">____________</td><td class="dim">Y / N</td></tr>
+        <tr><td class="dim">Blog posts</td><td class="dim">____/week</td><td class="dim">____________</td><td class="dim">Y / N</td></tr>
+        <tr><td class="dim">Email newsletters</td><td class="dim">____/week</td><td class="dim">____________</td><td class="dim">Y / N</td></tr>
+        <tr><td class="dim">Product descriptions</td><td class="dim">____/week</td><td class="dim">____________</td><td class="dim">Y / N</td></tr>
+        <tr><td class="dim">Video scripts</td><td class="dim">____/week</td><td class="dim">____________</td><td class="dim">Y / N</td></tr>
+      </tbody>
+    </table>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>Voice bible document created</li>
+      <li>System prompt template saved locally</li>
+      <li>Tested LLM output with your voice settings</li>
+      <li>Batch generation script working</li>
+      <li>Content review/edit workflow defined</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 06: SOCIAL MEDIA GRAPHICS -->
+  <div class="module">
+    <div class="module-number">06 -- Social Media Graphics</div>
+    <h2 class="module-title">Social Media Graphics</h2>
+
+    <div class="h-flow" style="margin-bottom: 32px; justify-content: center;">
+      <div class="step">AI Image (Local)</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Canva Template</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Brand Elements</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Export Batch</div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Free Tier Strategy</div>
+        <h4>Canva (Free) + Local AI</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7; margin-bottom: 16px;">Canva free tier gives you templates, text tools, and basic design. Generate your images locally with Stable Diffusion or FLUX, upload them to Canva, apply your brand template. Best of both worlds -- $0 total cost.</p>
+        <ul class="checklist">
+          <li>Create 5 base templates (carousel, quote, promo, tip, story)</li>
+          <li>Set brand colors and fonts once</li>
+          <li>Generate background images locally</li>
+          <li>Upload and swap into templates</li>
+          <li>Batch export all sizes</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Template System</div>
+        <h4>Build Once, Use Forever</h4>
+        <p style="color: var(--gray); font-size: 14px; line-height: 1.7; margin-bottom: 16px;">Create a set of reusable templates. Every new post is just swapping text and the AI-generated image. This turns 30-minute design sessions into 5-minute assembly.</p>
+        <div class="label">Your Template Inventory</div>
+        <div class="fill-line" data-placeholder="Template 1: e.g., Carousel (10 slides, tips format)"></div>
+        <div class="fill-line" data-placeholder="Template 2: e.g., Quote card (centered text, dark bg)"></div>
+        <div class="fill-line" data-placeholder="Template 3: e.g., Before/After comparison"></div>
+        <div class="fill-line" data-placeholder="Template 4: e.g., Product showcase"></div>
+        <div class="fill-line" data-placeholder="Template 5: e.g., Story announcement"></div>
+      </div>
+    </div>
+
+    <div class="label">Brand Consistency Checklist</div>
+    <div class="grid-2" style="margin-bottom: 24px;">
+      <div>
+        <div class="fill-line" data-placeholder="Primary brand color: e.g., #00D4FF"></div>
+        <div class="fill-line" data-placeholder="Secondary color: e.g., #1a1a2e"></div>
+        <div class="fill-line" data-placeholder="Heading font: e.g., Inter Bold"></div>
+        <div class="fill-line" data-placeholder="Body font: e.g., Inter Regular"></div>
+      </div>
+      <div>
+        <div class="fill-line" data-placeholder="Logo placement: e.g., bottom-right corner"></div>
+        <div class="fill-line" data-placeholder="Image style: e.g., dark, minimal, tech-focused"></div>
+        <div class="fill-line" data-placeholder="SD/FLUX prompt prefix: e.g., 'minimalist dark tech'"></div>
+        <div class="fill-line" data-placeholder="Platforms: e.g., Instagram, Twitter, LinkedIn"></div>
+      </div>
+    </div>
+
+    <div class="label">Platform Sizes Reference</div>
+    <table class="clean">
+      <thead><tr><th>Platform</th><th>Post Size</th><th>Story Size</th><th>Profile</th></tr></thead>
+      <tbody>
+        <tr><td>Instagram</td><td>1080 x 1080</td><td>1080 x 1920</td><td>320 x 320</td></tr>
+        <tr><td>Twitter / X</td><td>1200 x 675</td><td>--</td><td>400 x 400</td></tr>
+        <tr><td>LinkedIn</td><td>1200 x 627</td><td>--</td><td>400 x 400</td></tr>
+        <tr><td>YouTube</td><td>1280 x 720 (thumb)</td><td>--</td><td>800 x 800</td></tr>
+        <tr><td>Facebook</td><td>1200 x 630</td><td>1080 x 1920</td><td>170 x 170</td></tr>
+      </tbody>
+    </table>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>5 base templates created in Canva</li>
+      <li>Brand colors and fonts documented</li>
+      <li>AI image prompt prefix established</li>
+      <li>Test batch: generated 5 graphics in under 30 minutes</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 07: AUTOMATION SCRIPTS -->
+  <div class="module">
+    <div class="module-number">07 -- Automation Scripts</div>
+    <h2 class="module-title">Automation Scripts</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Batch Text Generation</div>
+        <div class="code-block" style="margin: 0;">
+          <span class="comment"># generate_batch.py</span><br>
+          <span class="comment"># Generate multiple content pieces overnight</span><br><br>
+          <span class="cmd">import</span> requests, json, os<br>
+          <span class="cmd">from</span> datetime <span class="cmd">import</span> datetime<br><br>
+          OLLAMA = "http://localhost:11434/api/generate"<br>
+          MODEL = "llama3.1"<br>
+          SYSTEM = open("voice-system.txt").read()<br>
+          OUT = f"output/{datetime.now():%Y-%m-%d}"<br>
+          os.makedirs(OUT, exist_ok=True)<br><br>
+          prompts = [<br>
+          &nbsp;&nbsp;{"file": "caption_1.txt",<br>
+          &nbsp;&nbsp;&nbsp;"prompt": "Write an IG caption about..."},<br>
+          &nbsp;&nbsp;{"file": "blog_draft.md",<br>
+          &nbsp;&nbsp;&nbsp;"prompt": "Write a 500-word post about..."},<br>
+          &nbsp;&nbsp;{"file": "email_1.txt",<br>
+          &nbsp;&nbsp;&nbsp;"prompt": "Write a newsletter about..."},<br>
+          ]<br><br>
+          <span class="cmd">for</span> p <span class="cmd">in</span> prompts:<br>
+          &nbsp;&nbsp;r = requests.post(OLLAMA, json={<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"model": MODEL,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"prompt": p["prompt"],<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"system": SYSTEM,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;"stream": False<br>
+          &nbsp;&nbsp;})<br>
+          &nbsp;&nbsp;text = r.json()["response"]<br>
+          &nbsp;&nbsp;open(f"{OUT}/{p['file']}", "w").write(text)<br>
+          &nbsp;&nbsp;print(f"Done: {p['file']}")
+        </div>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Batch Image Generation</div>
+        <div class="code-block" style="margin: 0;">
+          <span class="comment"># generate_images.py</span><br>
+          <span class="comment"># Batch generate images via ComfyUI API</span><br><br>
+          <span class="cmd">import</span> requests, json, time<br><br>
+          COMFY = "http://127.0.0.1:8188"<br><br>
+          <span class="comment"># Load your saved workflow</span><br>
+          workflow = json.load(<br>
+          &nbsp;&nbsp;open("my_workflow.json"))<br><br>
+          prompts = [<br>
+          &nbsp;&nbsp;"minimalist dark product photo, phone",<br>
+          &nbsp;&nbsp;"tech office, moody lighting, wide",<br>
+          &nbsp;&nbsp;"abstract gradient, purple blue dark",<br>
+          ]<br><br>
+          <span class="cmd">for</span> i, prompt <span class="cmd">in</span> enumerate(prompts):<br>
+          &nbsp;&nbsp;<span class="comment"># Update prompt node</span><br>
+          &nbsp;&nbsp;workflow["6"]["inputs"]["text"] = prompt<br>
+          &nbsp;&nbsp;r = requests.post(<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;f"{COMFY}/prompt",<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;json={"prompt": workflow})<br>
+          &nbsp;&nbsp;print(f"Queued: {i+1}/{len(prompts)}")<br>
+          &nbsp;&nbsp;time.sleep(2)
+        </div>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-bottom: 32px;">
+      <div class="label" style="color: var(--cyan);">File Organization Script</div>
+      <div class="code-block" style="margin: 0;">
+        <span class="comment"># organize_content.py -- sort generated files into platform folders</span><br><br>
+        <span class="cmd">import</span> os, shutil<br>
+        <span class="cmd">from</span> pathlib <span class="cmd">import</span> Path<br><br>
+        CONTENT_DIR = Path("output/2025-01-15")  <span class="comment"># today's output</span><br>
+        PLATFORMS = {"ig": "instagram", "tw": "twitter", "li": "linkedin", "yt": "youtube", "fb": "facebook"}<br><br>
+        <span class="cmd">for</span> file <span class="cmd">in</span> CONTENT_DIR.iterdir():<br>
+        &nbsp;&nbsp;prefix = file.stem.split("_")[0]<br>
+        &nbsp;&nbsp;<span class="cmd">if</span> prefix <span class="cmd">in</span> PLATFORMS:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;dest = CONTENT_DIR / PLATFORMS[prefix]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;dest.mkdir(exist_ok=True)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;shutil.move(str(file), str(dest / file.name))<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;print(f"Moved {file.name} -> {PLATFORMS[prefix]}/")
+      </div>
+    </div>
+
+    <div class="label">Your Automation Schedule</div>
+    <table class="clean">
+      <thead><tr><th>Script</th><th>Runs</th><th>Output</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="dim">Batch text generation</td><td class="dim">________ (e.g., Sunday night)</td><td class="dim">________ files</td><td class="dim">Set up / Not yet</td></tr>
+        <tr><td class="dim">Batch image generation</td><td class="dim">________ (e.g., Monday AM)</td><td class="dim">________ images</td><td class="dim">Set up / Not yet</td></tr>
+        <tr><td class="dim">File organization</td><td class="dim">________ (e.g., after generation)</td><td class="dim">Sorted folders</td><td class="dim">Set up / Not yet</td></tr>
+        <tr><td class="dim">Scheduling / posting</td><td class="dim">________ (e.g., manual / cron)</td><td class="dim">Published content</td><td class="dim">Set up / Not yet</td></tr>
+      </tbody>
+    </table>
+
+    <ul class="checklist" style="margin-top: 24px;">
+      <li>Batch text generation script saved and tested</li>
+      <li>Batch image generation script saved and tested</li>
+      <li>File organization system in place</li>
+      <li>Cron job or manual schedule defined</li>
+      <li>Full pipeline tested end-to-end</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 08: THE COMPLETE OFFLINE STACK -->
+  <div class="module">
+    <div class="module-number">08 -- The Complete Offline Stack</div>
+    <h2 class="module-title">The Complete Offline Stack</h2>
+
+    <div class="label" style="margin-bottom: 20px;">Recommended Hardware</div>
+    <div class="grid-3" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Budget Build (~$600)</div>
+        <h4>Starter Stack</h4>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 14px; line-height: 2;">
+          16 GB RAM<br>
+          NVIDIA RTX 3060 12GB (used)<br>
+          Any modern CPU (i5/Ryzen 5+)<br>
+          500GB SSD
+        </p>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 13px;">Runs: 7B text models fast, SDXL images, TTS. Covers social media content for one brand.</p>
+      </div>
+      <div class="inner-card" style="border-color: var(--cyan);">
+        <div class="label" style="color: var(--cyan);">Sweet Spot (~$1,200)</div>
+        <h4>Creator Stack</h4>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 14px; line-height: 2;">
+          32 GB RAM<br>
+          NVIDIA RTX 4070 Ti 16GB<br>
+          Modern CPU (i7/Ryzen 7+)<br>
+          1TB NVMe SSD
+        </p>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 13px;">Runs: 14B-32B text models, FLUX images, batch generation. Handles a full content operation.</p>
+      </div>
+      <div class="inner-card">
+        <div class="label" style="color: var(--cyan);">Max Performance (~$2,500+)</div>
+        <h4>Studio Stack</h4>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 14px; line-height: 2;">
+          64 GB RAM<br>
+          NVIDIA RTX 4090 24GB<br>
+          High-end CPU (i9/Ryzen 9)<br>
+          2TB NVMe SSD
+        </p>
+        <hr class="section-divider" style="margin: 16px 0;">
+        <p style="color: var(--gray); font-size: 13px;">Runs: 70B text models, multiple models simultaneously, video workflows. Agency-level production.</p>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Apple Silicon Alternative:</strong> MacBook Pro M2/M3/M4 with 24-36GB unified memory handles both text and image generation well. No separate GPU needed. The M-series chips run GGUF models efficiently through Metal acceleration. Great option if you want a laptop that does everything.
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Total Cost Breakdown: Offline vs. Cloud</div>
+    <table class="clean">
+      <thead><tr><th>Item</th><th>Cloud (Monthly)</th><th>Cloud (Yearly)</th><th>Local (One-Time)</th></tr></thead>
+      <tbody>
+        <tr><td>Text AI (ChatGPT/Claude)</td><td>$20/mo</td><td>$240</td><td>$0 (Ollama)</td></tr>
+        <tr><td>Image AI (Midjourney)</td><td>$30/mo</td><td>$360</td><td>$0 (SD/FLUX)</td></tr>
+        <tr><td>Voice AI (ElevenLabs)</td><td>$22/mo</td><td>$264</td><td>$0 (Kokoro/Piper)</td></tr>
+        <tr><td>Writing tools (Jasper/Copy)</td><td>$49/mo</td><td>$588</td><td>$0 (local LLM)</td></tr>
+        <tr><td>Video editing</td><td>$0-23/mo</td><td>$0-276</td><td>$0 (DaVinci/CapCut)</td></tr>
+        <tr><td>Hardware (Creator Stack)</td><td>--</td><td>--</td><td>~$1,200</td></tr>
+        <tr style="border-top: 2px solid var(--cyan);">
+          <td style="color: var(--cyan); font-weight: 600;">Total</td>
+          <td style="color: var(--cyan); font-weight: 600;">$121+/mo</td>
+          <td style="color: var(--cyan); font-weight: 600;">$1,452+/yr</td>
+          <td style="color: var(--cyan); font-weight: 600;">~$1,200 once</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="color: var(--gray); font-size: 13px; margin-top: 12px; text-align: center;">The hardware pays for itself in under 10 months. After that, your content production costs $0/month forever.</p>
+
+    <hr class="section-divider">
+
+    <div class="label">Your Complete Stack Summary</div>
+    <div class="grid-2">
+      <div>
+        <div class="fill-line" data-placeholder="Hardware: e.g., RTX 4070 Ti / M3 MacBook Pro"></div>
+        <div class="fill-line" data-placeholder="Text LLM: e.g., Ollama + Llama 3.1 8B"></div>
+        <div class="fill-line" data-placeholder="Image Gen: e.g., ComfyUI + FLUX.1 Schnell"></div>
+        <div class="fill-line" data-placeholder="TTS: e.g., Kokoro for voiceovers"></div>
+      </div>
+      <div>
+        <div class="fill-line" data-placeholder="Video Editor: e.g., DaVinci Resolve"></div>
+        <div class="fill-line" data-placeholder="Graphics: e.g., Canva Free + local images"></div>
+        <div class="fill-line" data-placeholder="Automation: e.g., Python batch scripts + cron"></div>
+        <div class="fill-line" data-placeholder="Monthly cost after setup: $____"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <div class="label">Final Checklist -- Your Offline Content Stack</div>
+    <ul class="checklist">
+      <li>Local LLM installed and generating text</li>
+      <li>Image generation tool installed and producing images</li>
+      <li>TTS tool installed and creating voiceovers</li>
+      <li>Video editor installed and tested</li>
+      <li>Voice bible created and loaded as system prompt</li>
+      <li>Canva templates created with brand consistency</li>
+      <li>Batch generation scripts working</li>
+      <li>File organization system in place</li>
+      <li>Full pipeline tested: text + image + voice + video = published content</li>
+      <li>Monthly cloud subscriptions cancelled</li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>BEHIKE.CO</strong><br>
+    Built in Puerto Rico
+  </div>
+
+</div>
+</body>
+</html>

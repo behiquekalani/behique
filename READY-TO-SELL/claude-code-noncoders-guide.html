@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code for Non-Coders</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --card: #111116;
+    --border: #1a1a22;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 48px;
+    --gap: 32px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 20px 40px; }
+
+  /* HEADER */
+  .header { text-align: center; padding: 20px 0 16px; }
+  .header h1 { font-size: 36px; font-weight: 200; letter-spacing: 0.3em; color: var(--white); margin-right: -0.3em; }
+  .header .subtitle { font-size: 15px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 6px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto; }
+  .header .line { width: 60px; height: 1px; background: var(--cyan); margin: 14px auto; }
+
+  /* LESSONS */
+  .lesson { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap); break-inside: avoid; }
+  .lesson-number { font-size: 11px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 10px; }
+  .lesson-title { font-size: 30px; font-weight: 700; color: var(--white); margin-bottom: 8px; line-height: 1.2; }
+  .lesson-desc { font-size: 15px; color: var(--gray); margin-bottom: 32px; line-height: 1.7; }
+
+  /* LABELS */
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li { font-size: 15px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 16px; height: 16px; min-width: 16px; border: 2px solid var(--cyan); border-radius: 3px; }
+
+  /* INNER CARDS */
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 24px; break-inside: avoid; margin-bottom: 16px; }
+  .inner-card h4 { font-size: 16px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+
+  /* PROMPT BOXES */
+  .prompt-box { background: rgba(0, 212, 255, 0.04); border: 1px solid rgba(0, 212, 255, 0.15); border-radius: 10px; padding: 20px 24px; margin: 16px 0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #ccc; line-height: 1.7; white-space: pre-wrap; }
+  .prompt-label { font-size: 10px; font-weight: 700; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; }
+
+  /* TIP BOXES */
+  .tip-box { background: rgba(0, 212, 255, 0.06); border-left: 3px solid var(--cyan); border-radius: 0 10px 10px 0; padding: 16px 20px; margin: 16px 0; }
+  .tip-box .tip-label { font-size: 10px; font-weight: 700; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 4px; }
+  .tip-box p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+
+  /* WHAT TO EXPECT */
+  .expect-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+  .expect-label { font-size: 10px; font-weight: 700; color: #A78BFA; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; }
+  .expect-box p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+  /* EXERCISE */
+  .exercise { background: rgba(0, 212, 255, 0.03); border: 1px dashed rgba(0, 212, 255, 0.25); border-radius: 12px; padding: 24px; margin: 20px 0; }
+  .exercise-label { font-size: 10px; font-weight: 700; color: var(--cyan); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; }
+  .exercise p, .exercise li { font-size: 14px; color: var(--white); line-height: 1.7; }
+  .exercise ol, .exercise ul { padding-left: 20px; }
+  .exercise li { margin-bottom: 4px; }
+
+  /* STEP LIST */
+  .step-list { counter-reset: steps; list-style: none; }
+  .step-list li { font-size: 15px; line-height: 1.8; color: var(--white); padding: 8px 0; padding-left: 36px; position: relative; }
+  .step-list li::before { counter-increment: steps; content: counter(steps); position: absolute; left: 0; top: 8px; width: 24px; height: 24px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 50%; font-size: 12px; font-weight: 600; color: var(--cyan); display: flex; align-items: center; justify-content: center; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>CLAUDE CODE FOR NON-CODERS</h1>
+    <div class="line"></div>
+    <p class="subtitle">You type. It builds. No coding required.</p>
+  </div>
+
+  <!-- LESSON 01 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 01</div>
+    <h2 class="lesson-title">What Is Claude Code?</h2>
+    <p class="lesson-desc">Imagine you could text a really smart friend who can build things for you. You say what you want in plain English. They do it. That is Claude Code. It lives inside a simple window on your computer. You type what you want. It creates it. Websites, documents, organized files, budgets, apps. You never have to learn how any of it works. You just have to say what you need.</p>
+
+    <div class="inner-card">
+      <h4>How it works, in 30 seconds</h4>
+      <p style="font-size:14px; color:var(--gray); line-height:1.7;">You open a window on your computer. You type a sentence like "create a budget tracker for me." Claude Code reads your request, builds the thing, and shows it to you. If you like it, you say yes. If you want changes, you say what to change. That is the entire process.</p>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>What you do NOT need to know</h4>
+      <ul style="font-size:14px; color:var(--gray); line-height:2; padding-left:20px;">
+        <li>You do not need to know how to code</li>
+        <li>You do not need to understand programming languages</li>
+        <li>You do not need a computer science degree</li>
+        <li>You do not need to have used a terminal before</li>
+        <li>You do not need to know what a terminal even is</li>
+      </ul>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">THINK OF IT THIS WAY</div>
+      <p>Regular Claude chat is like texting a smart friend. Claude Code is like having that smart friend sit down at your computer and actually do things for you. It can create files, organize folders, build websites, and make tools. All you do is describe what you want.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <p>Think of three things on your computer that annoy you. Maybe your Downloads folder is a mess. Maybe you need a budget. Maybe you wish you had a simple website. Write them down. By the end of this guide, you will know how to ask Claude Code to do all three.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I understand that Claude Code lets me type requests in plain English</li>
+      <li>I understand it can build things, organize files, and create documents</li>
+      <li>I know I do not need any coding knowledge to use it</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 02 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 02</div>
+    <h2 class="lesson-title">Installing It</h2>
+    <p class="lesson-desc">This takes about 5 minutes. You need to do two things: install a small helper program, then install Claude Code itself. Here is every single click and keystroke.</p>
+
+    <div class="inner-card">
+      <h4>Part 1: Install the helper program</h4>
+      <p style="font-size:14px; color:var(--gray); line-height:1.7; margin-bottom:12px;">Claude Code needs a small helper program called Node.js to run. Think of it like needing a power outlet before you can plug in a lamp. You install it once and never think about it again.</p>
+      <ol class="step-list">
+        <li>Open your web browser (Safari, Chrome, whatever you use)</li>
+        <li>Go to <strong style="color:var(--cyan);">nodejs.org</strong></li>
+        <li>You will see a big green button that says "Download." Click it</li>
+        <li>A file will download. Double-click it to open it</li>
+        <li>Click "Continue" on every screen until it says "Install." Click "Install"</li>
+        <li>Enter your computer password if it asks. Click "Install Software"</li>
+        <li>When it says "The installation was successful," click "Close"</li>
+      </ol>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Part 2: Install Claude Code</h4>
+      <ol class="step-list">
+        <li><strong>Open Terminal.</strong> On a Mac: press Command + Space, type "Terminal", press Enter. On Windows: press the Windows key, type "Terminal", press Enter</li>
+        <li>You will see a window with a blinking cursor. This is where you type. Do not be intimidated. You are going to type one single line and never need to come back here for setup again</li>
+        <li>Type this exactly (or copy and paste it):</li>
+      </ol>
+      <div class="prompt-label">TYPE THIS</div>
+      <div class="prompt-box">npm install -g @anthropic-ai/claude-code</div>
+      <ol class="step-list" start="4" style="counter-reset: steps 3;">
+        <li>Press Enter. Wait about 30 seconds. You will see text scrolling. That is normal. It is installing</li>
+        <li>When it stops and you see the blinking cursor again, it is done</li>
+      </ol>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Part 3: Open Claude Code for the first time</h4>
+      <ol class="step-list">
+        <li>In that same window, type <strong style="color:var(--cyan);">claude</strong> and press Enter</li>
+        <li>It will ask you to log in. Follow the link it gives you. Sign in with your Anthropic account (or create one)</li>
+        <li>Once you are logged in, you will see a prompt where you can start typing requests. That is it. You are in</li>
+      </ol>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">IF SOMETHING GOES WRONG</div>
+      <p>If you see any error messages, close the Terminal window completely. Open a new one. Try the install command again. 99% of the time, this fixes it. If it still does not work, go to claude.ai and ask Claude chat "I tried to install Claude Code and got this error" and paste the error message. It will help you fix it.</p>
+    </div>
+
+    <div class="expect-box">
+      <div class="expect-label">WHAT TO EXPECT</div>
+      <p>After installation, every time you want to use Claude Code, you just open Terminal and type <strong style="color:var(--cyan);">claude</strong>. That is the only thing you need to remember.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <p>Install Claude Code right now using the steps above. Open Terminal, type <strong style="color:var(--cyan);">claude</strong>, and log in. Once you see the prompt, type "hello" and press Enter. Claude will respond. You just had your first conversation.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I installed the helper program from nodejs.org</li>
+      <li>I opened Terminal and ran the install command</li>
+      <li>I typed "claude" and logged in</li>
+      <li>I had my first conversation</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 03 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 03</div>
+    <h2 class="lesson-title">Your First Conversation</h2>
+    <p class="lesson-desc">You are going to build a real website in the next 2 minutes. No, really. You are going to type one sentence, watch Claude Code work, and then open a website that you made.</p>
+
+    <div class="inner-card">
+      <h4>What to do</h4>
+      <ol class="step-list">
+        <li>Open Terminal. Type <strong style="color:var(--cyan);">claude</strong> and press Enter</li>
+        <li>Type this request exactly:</li>
+      </ol>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Create a simple shopping list website. It should have a text box where I can type items, a button to add them to the list, and a button next to each item to remove it. Make it look clean and modern with a dark background.</div>
+      <ol class="step-list" start="3" style="counter-reset: steps 2;">
+        <li>Press Enter. Watch what happens. Claude Code will start writing the code for your website. You will see it working in real time</li>
+        <li>It will ask you to approve creating a file. Type <strong style="color:var(--cyan);">y</strong> (for yes) and press Enter</li>
+        <li>When it is done, it will tell you it created a file. It might say something like "I created shopping-list.html"</li>
+        <li>Find that file on your computer and double-click it. It will open in your web browser. That is your website</li>
+      </ol>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Understanding approve and reject</h4>
+      <p style="font-size:14px; color:var(--gray); line-height:1.7;">Sometimes Claude Code will ask for your permission before it does something, like creating a file or changing a file. This is a safety feature. You have three options:</p>
+      <ul style="font-size:14px; color:var(--gray); line-height:2.2; padding-left:20px; margin-top:8px;">
+        <li><strong style="color:var(--white);">y (yes)</strong> - Go ahead, do it</li>
+        <li><strong style="color:var(--white);">n (no)</strong> - Do not do that</li>
+        <li><strong style="color:var(--white);">Type a message</strong> - If you want to explain what to change instead</li>
+      </ul>
+    </div>
+
+    <div class="expect-box">
+      <div class="expect-label">WHAT TO EXPECT</div>
+      <p>The whole thing takes about 30 seconds. Claude Code will create one file. When you open it in your browser, you will see a working shopping list. You can add items. You can remove them. You just built a website by typing one sentence.</p>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">WANT TO CHANGE SOMETHING?</div>
+      <p>After it finishes, just tell it what to change. "Make the background blue instead." "Add a counter that shows how many items are on the list." "Make the text bigger." You talk to it the same way you would talk to a person.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <ol>
+        <li>Build the shopping list website using the prompt above</li>
+        <li>After it is done, ask Claude Code to add a feature: "Add a button that marks items as bought with a strikethrough"</li>
+        <li>Open the updated file and test it</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I built my first website using Claude Code</li>
+      <li>I understand what "approve" and "reject" mean</li>
+      <li>I asked Claude Code to make a change and it worked</li>
+      <li>I opened the website in my browser and tested it</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 04 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 04</div>
+    <h2 class="lesson-title">Organizing Your Files</h2>
+    <p class="lesson-desc">Your Downloads folder is a mess. You have hundreds of files with names like "IMG_4382.jpg" and "Document (3).pdf." Claude Code can fix all of this in seconds.</p>
+
+    <div class="inner-card">
+      <h4>Clean up your Downloads folder</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Look at my Downloads folder. Organize all the files into subfolders by type. Put images in a folder called Images, PDFs in a folder called Documents, videos in a folder called Videos, and everything else in a folder called Other. Do not delete anything.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will look through your Downloads folder, create the subfolders, and move every file into the right place. It will show you what it plans to do before it does it, and ask for your approval. Check the plan, say yes, and your folder will be organized in seconds.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Rename photos by date</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Look at all the photos in my Downloads/Images folder. Rename each one using the date it was taken, in this format: 2024-03-15-photo-1.jpg, 2024-03-15-photo-2.jpg, and so on. If you cannot find the date, use today's date.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will read the date information stored inside each photo, then rename them all in order. You will go from "IMG_4382.jpg" to "2024-03-15-photo-1.jpg" which is actually useful and searchable.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Find specific files</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Find every PDF file on my computer. List them all with their full location and file size. Sort the list by size, biggest first.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will search your entire computer and give you a list of every PDF, showing you where each one lives and how big it is. This is incredibly useful for finding that one document you downloaded months ago and forgot about.</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">IMPORTANT</div>
+      <p>Always include "Do not delete anything" in your request when organizing files. Claude Code will ask for permission before moving files, but adding this to your request makes sure nothing gets lost.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <ol>
+        <li>Ask Claude Code to organize your Downloads folder using the prompt above</li>
+        <li>After it is done, ask it: "How many files of each type did you find in my Downloads folder?"</li>
+        <li>Then ask it to find a specific file: "Find any file on my Desktop with the word 'invoice' in the name"</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I organized my Downloads folder by file type</li>
+      <li>I understand how to rename files in bulk</li>
+      <li>I know how to search for files across my computer</li>
+      <li>I always include "Do not delete anything" in my requests</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 05 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 05</div>
+    <h2 class="lesson-title">Writing and Editing</h2>
+    <p class="lesson-desc">Claude Code can write, rewrite, summarize, and translate almost anything. Emails, documents, summaries of long files. Here are the prompts that save the most time.</p>
+
+    <div class="inner-card">
+      <h4>Write a professional email</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Write a professional email declining a meeting invitation. The meeting is about Q3 budget planning. I cannot attend because I have a scheduling conflict. Suggest rescheduling to next week. Keep the tone polite but not overly formal. Save it as a file called email-draft.txt</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will write the email and save it as a text file on your computer. You can open the file, copy the text, and paste it into your email. If the tone is not right, just say "make it more casual" or "make it shorter."</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Summarize a long document</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Read the file on my Desktop called report.pdf. Give me a summary in 5 bullet points. Focus on the key findings and any action items. Save the summary as report-summary.txt on my Desktop.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will read the entire document and pull out the most important points. No more spending 45 minutes reading a 50-page report. You get the key information in 30 seconds.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Translate a document</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Read the file on my Desktop called letter.txt. Translate it from English to Spanish. Keep the same formatting and tone. Save the translated version as letter-spanish.txt on my Desktop.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will translate the entire document while keeping the original structure and tone intact. It works with dozens of languages. Just change "Spanish" to whatever language you need.</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">POWER MOVE</div>
+      <p>You can combine these. "Read every PDF on my Desktop, summarize each one in 3 bullet points, and save all the summaries in one file called all-summaries.txt." Claude Code handles the whole thing.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <ol>
+        <li>Ask Claude Code to write a thank-you email to a client. Give it details about the project</li>
+        <li>After it writes the email, say "make it shorter and more direct"</li>
+        <li>Then ask it to translate the final version to another language</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I used Claude Code to write an email</li>
+      <li>I know how to ask it to summarize documents</li>
+      <li>I know how to ask it to translate text</li>
+      <li>I understand I can chain multiple requests together</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 06 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 06</div>
+    <h2 class="lesson-title">Spreadsheets and Data</h2>
+    <p class="lesson-desc">You do not need to learn Excel formulas. You do not need to understand pivot tables. You tell Claude Code what you want to know about your data, and it figures it out.</p>
+
+    <div class="inner-card">
+      <h4>Create a budget tracker</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Create a personal budget tracker as an HTML file. I want to be able to add expenses with a category (food, transport, entertainment, bills, other), an amount, and a date. It should show me a running total, a breakdown by category, and a simple bar chart showing how much I spend in each category. Dark theme. Make it look modern.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will build you a fully working budget tracker that runs in your web browser. You can add expenses, see your totals, and view a chart of your spending. All from one sentence.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Analyze a spreadsheet</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Read the file on my Desktop called expenses.csv. Tell me: my total spending, my top 3 expense categories, which month I spent the most, and the average amount per transaction. Then create a simple HTML page with charts showing this data.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will open your spreadsheet, crunch all the numbers, answer your questions, and then build a visual dashboard with charts. You just turned raw data into insights without opening a spreadsheet program.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Create a chart from data</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">I have these monthly sales numbers: January 12000, February 15000, March 11000, April 18000, May 22000, June 19000. Create a beautiful line chart showing this data. Include the trend. Save it as an HTML file I can open in my browser.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will create a clean, professional chart that you can open in your browser, take a screenshot of, or include in a presentation. No chart software needed.</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">TIP</div>
+      <p>You can feed Claude Code any spreadsheet file. Just tell it where the file is and what you want to know. "Which customer placed the most orders?" "What day of the week do I get the most sales?" "Are there any duplicate entries?" It handles it all.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <ol>
+        <li>Create the budget tracker using the prompt above</li>
+        <li>Add 5 fake expenses to test it</li>
+        <li>Then ask Claude Code: "Add a feature that lets me set a monthly budget limit and shows a warning when I am close to it"</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I created a budget tracker without writing any code</li>
+      <li>I know how to ask Claude Code to analyze spreadsheet data</li>
+      <li>I know how to create charts from numbers</li>
+      <li>I understand I can ask follow-up questions about my data</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 07 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 07</div>
+    <h2 class="lesson-title">Building Simple Tools</h2>
+    <p class="lesson-desc">This is where it gets fun. You can build real tools that you actually use every day. Not toys. Actual useful things. All by describing what you want.</p>
+
+    <div class="inner-card">
+      <h4>A timer and stopwatch</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Create a timer app as an HTML file. I want: a countdown timer where I type in minutes and it counts down with an alarm sound when done, a stopwatch that counts up with start/stop/reset buttons, and a Pomodoro mode (25 minutes work, 5 minutes break, repeating). Dark theme, big numbers I can see from across the room.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will build a fully working timer app. Open it in your browser, and you have a professional timer with multiple modes. Bookmark it. You will use it every day.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>A daily habit tracker</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Create a daily habit tracker as an HTML file. I want to be able to add habits I want to track (like "exercise", "read", "meditate"). Each day I can check off which habits I completed. It should show my current streak for each habit and a weekly view of my progress. Save the data so it remembers when I come back. Dark theme, clean design.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>You will get a habit tracker that saves your progress right in your browser. Add your habits, check them off each day, and watch your streaks grow. No app download needed. No subscription. It just works.</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>A simple portfolio website</h4>
+      <div class="prompt-label">COPY AND PASTE THIS</div>
+      <div class="prompt-box">Create a personal portfolio website as an HTML file. My name is [YOUR NAME]. I am a [YOUR JOB/TITLE]. Include sections for: About Me, My Work (with space for 4 projects, each with a title, description, and placeholder image), Skills, and Contact. Dark, modern design. Make it look professional enough to send to a potential client or employer.</div>
+
+      <div class="expect-box" style="margin-top:16px;">
+        <div class="expect-label">WHAT TO EXPECT</div>
+        <p>Claude Code will build a complete portfolio website. Fill in your details, replace the placeholder images with your own, and you have a professional web presence. You can host it for free using services like Netlify or GitHub Pages (ask Claude Code how to do that too).</p>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      <div class="tip-label">THE POSSIBILITIES ARE ENDLESS</div>
+      <p>Other things people have built: recipe organizers, workout loggers, flashcard study tools, wedding planning checklists, inventory trackers, daily journal apps, calorie counters, and to-do lists with categories. If you can describe it, Claude Code can build it.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <ol>
+        <li>Build the habit tracker using the prompt above</li>
+        <li>Add 3 habits you actually want to track</li>
+        <li>Then ask Claude Code to add a feature you want. Maybe "add a motivational quote that changes every day" or "add a monthly calendar view"</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I built a working tool using Claude Code</li>
+      <li>I added custom features by describing what I wanted</li>
+      <li>I understand that I can build real, useful tools with plain English</li>
+      <li>I have ideas for tools I want to build next</li>
+    </ul>
+  </div>
+
+  <!-- LESSON 08 ================================================ -->
+  <div class="lesson">
+    <div class="lesson-number">LESSON 08</div>
+    <h2 class="lesson-title">Tips and Tricks</h2>
+    <p class="lesson-desc">After using Claude Code for a while, you start to notice what works best. Here is everything I have learned about getting the best results.</p>
+
+    <div class="inner-card">
+      <h4>How to give better instructions</h4>
+      <div class="grid-2">
+        <div>
+          <p style="font-size:12px; color:#ff6432; font-weight:600; letter-spacing:0.1em; margin-bottom:8px;">VAGUE (WORSE RESULTS)</p>
+          <ul style="font-size:14px; color:var(--gray); line-height:2; padding-left:16px;">
+            <li>"Make me a website"</li>
+            <li>"Organize my stuff"</li>
+            <li>"Help with my data"</li>
+            <li>"Write something for work"</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-size:12px; color:#34D399; font-weight:600; letter-spacing:0.1em; margin-bottom:8px;">SPECIFIC (BETTER RESULTS)</p>
+          <ul style="font-size:14px; color:var(--gray); line-height:2; padding-left:16px;">
+            <li>"Make a recipe website with search and categories"</li>
+            <li>"Organize my Downloads folder by file type into subfolders"</li>
+            <li>"Read expenses.csv and tell me my top spending category"</li>
+            <li>"Write a 3-paragraph email declining a project offer politely"</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tip-box" style="margin-top:16px;">
+        <div class="tip-label">THE FORMULA</div>
+        <p>Good instructions follow this pattern: <strong style="color:var(--white);">What</strong> you want + <strong style="color:var(--white);">how</strong> it should look or work + <strong style="color:var(--white);">where</strong> to save it. Example: "Create a to-do list (what) with categories, due dates, and priority levels (how) and save it as todo.html on my Desktop (where)."</p>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>What to do when it makes a mistake</h4>
+      <p style="font-size:14px; color:var(--gray); line-height:1.7; margin-bottom:12px;">Claude Code is not perfect. Sometimes it misunderstands what you want. Here is how to handle it:</p>
+      <ol class="step-list">
+        <li><strong style="color:var(--white);">Be specific about what is wrong.</strong> Do not say "that is not right." Say "the chart is showing the wrong months" or "the button should be on the left side, not the right"</li>
+        <li><strong style="color:var(--white);">Ask it to undo.</strong> Say "undo that last change" or "go back to how it was before"</li>
+        <li><strong style="color:var(--white);">Start fresh if needed.</strong> If things get messy, say "let us start over. Here is what I want from scratch" and describe it again more clearly</li>
+        <li><strong style="color:var(--white);">Say no.</strong> When it asks for approval and the plan does not look right, say no and explain what you want instead</li>
+      </ol>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>When to use Claude Code vs regular Claude chat</h4>
+      <div class="grid-2" style="margin-top:12px;">
+        <div style="background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.15); border-radius:10px; padding:20px;">
+          <p style="font-size:13px; color:var(--cyan); font-weight:600; margin-bottom:8px;">USE CLAUDE CODE WHEN</p>
+          <ul style="font-size:14px; color:var(--gray); line-height:2; padding-left:16px;">
+            <li>You need to create or edit files</li>
+            <li>You want to build something (website, tool, app)</li>
+            <li>You need to organize files on your computer</li>
+            <li>You want to analyze files or spreadsheets</li>
+            <li>You are working on a multi-step project</li>
+          </ul>
+        </div>
+        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:20px;">
+          <p style="font-size:13px; color:var(--gray); font-weight:600; margin-bottom:8px;">USE REGULAR CLAUDE CHAT WHEN</p>
+          <ul style="font-size:14px; color:var(--gray); line-height:2; padding-left:16px;">
+            <li>You just need a quick answer</li>
+            <li>You want to brainstorm ideas</li>
+            <li>You need help writing text (without saving to a file)</li>
+            <li>You want to have a conversation or get advice</li>
+            <li>You are on your phone</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="inner-card" style="margin-top:16px;">
+      <h4>Five tricks that make everything better</h4>
+      <ol class="step-list">
+        <li><strong style="color:var(--white);">Say "dark theme" or "modern design."</strong> Claude Code defaults to basic-looking results. Adding these words makes everything look 10 times better</li>
+        <li><strong style="color:var(--white);">Say "save the data" or "remember my entries."</strong> If you are building a tool like a tracker, this makes it keep your data between sessions</li>
+        <li><strong style="color:var(--white);">Ask for changes one at a time.</strong> Instead of listing 10 changes, ask for them one by one. You get better results and can approve each one</li>
+        <li><strong style="color:var(--white);">End with "save it as [name].html on my Desktop."</strong> This way you always know where your files end up</li>
+        <li><strong style="color:var(--white);">Build on what you have.</strong> Once Claude Code makes something, you can keep improving it. "Add a search bar." "Change the colors." "Add a print button." Each conversation can build on the last</li>
+      </ol>
+    </div>
+
+    <hr class="section-divider">
+    <div class="exercise">
+      <div class="exercise-label">TRY THIS</div>
+      <p>Think of something you need right now. Not from this guide. Something personal. Maybe a meal planner. A gift ideas list. A workout tracker. A study schedule. Describe it to Claude Code using the formula: <strong style="color:var(--white);">what</strong> + <strong style="color:var(--white);">how</strong> + <strong style="color:var(--white);">where</strong>. Build it. Then add one feature to make it better.</p>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label">LESSON CHECKLIST</div>
+    <ul class="checklist">
+      <li>I know the formula for giving good instructions</li>
+      <li>I know what to do when Claude Code makes a mistake</li>
+      <li>I understand when to use Claude Code vs regular Claude chat</li>
+      <li>I built something completely on my own from my own idea</li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>BEHIKE.CO</strong><br>
+    Built in Puerto Rico
+  </div>
+
+</div>
+</body>
+</html>

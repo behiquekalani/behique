@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Social Media Automation</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --card: #111116;
+    --border: #1e1e28;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --cyan-mid: rgba(0, 212, 255, 0.4);
+    --radius: 16px;
+    --card-pad: 60px;
+    --gap: 40px;
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px 40px; }
+  .header { text-align: center; padding: 20px 0; }
+  .header h1 { font-size: 32px; font-weight: 200; letter-spacing: 0.3em; color: var(--white); margin-right: -0.3em; }
+  .header .subtitle { font-size: 17px; font-weight: 300; font-style: italic; color: var(--gray); margin-top: 8px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 16px auto; }
+  .header .how-to { font-size: 14px; color: #555; margin-top: 16px; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.7; font-style: italic; }
+  .module { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--card-pad); margin-bottom: var(--gap); break-inside: avoid; }
+  .module-number { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 12px; }
+  .module-title { font-size: 36px; font-weight: 700; color: var(--white); margin-bottom: 40px; line-height: 1.2; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); margin-bottom: 8px; font-weight: 600; }
+  .label-cyan { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); margin-bottom: 8px; font-weight: 700; }
+  .fill-line { border-bottom: 1px dotted var(--gray); min-height: 32px; margin-bottom: 16px; }
+  .fill-line[data-placeholder]::before { content: attr(data-placeholder); color: #333; font-size: 14px; font-style: italic; }
+  .section-divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .checklist { list-style: none; }
+  .checklist li { font-size: 16px; line-height: 2.2; display: flex; align-items: center; gap: 12px; color: var(--white); }
+  .checklist li::before { content: ''; display: inline-block; width: 18px; height: 18px; min-width: 18px; border: 2px solid var(--cyan); border-radius: 3px; }
+  .inner-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 28px; break-inside: avoid; }
+  .inner-card .label { margin-bottom: 12px; }
+  .inner-card h4 { font-size: 18px; font-weight: 600; color: var(--white); margin-bottom: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 10px; }
+  .pill { display: inline-block; padding: 8px 20px; border: 1px solid var(--border); border-radius: 100px; font-size: 14px; color: var(--gray); background: transparent; }
+  .h-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; }
+  .h-flow .step { background: rgba(0, 212, 255, 0.08); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; padding: 14px 22px; font-size: 14px; font-weight: 600; color: var(--white); white-space: nowrap; }
+  .h-flow .arrow { color: var(--cyan); font-size: 20px; padding: 0 8px; font-weight: 300; }
+  table.clean { width: 100%; border-collapse: collapse; }
+  table.clean th, table.clean td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
+  table.clean th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--gray); font-weight: 600; }
+  table.clean td { color: var(--white); }
+  .prompt-box { background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 12px; padding: 24px; margin-bottom: 20px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.8; color: var(--gray); white-space: pre-wrap; }
+  .prompt-box .prompt-label { font-family: var(--font); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 12px; display: block; }
+  .kpi-card { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
+  .kpi-card .kpi-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--cyan); font-weight: 700; margin-bottom: 16px; }
+  .kpi-card .kpi-value { font-size: 28px; font-weight: 200; color: var(--gray); border-bottom: 1px dotted var(--gray); padding-bottom: 8px; margin-bottom: 12px; }
+  .kpi-card .kpi-desc { font-size: 13px; color: var(--gray); line-height: 1.5; }
+  .footer { text-align: center; padding: 16px 0 0; color: var(--gray); font-size: 12px; line-height: 1.8; }
+  .footer strong { color: var(--white); font-weight: 600; letter-spacing: 0.2em; font-size: 13px; }
+  
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>AI Social Media Automation</h1>
+    <p class="subtitle">Post less. Grow more. Let AI handle the repetitive work.</p>
+    <div class="line"></div>
+    <p class="how-to">How to use: Print this or open in GoodNotes. Fill in dotted lines, check boxes, and build your entire social media automation system before posting a single thing manually again.</p>
+  </div>
+
+  <!-- MODULE 01: THE AUTOMATION STACK -->
+  <div class="module">
+    <div class="module-number">01 -- The Automation Stack</div>
+    <h2 class="module-title">The Automation Stack</h2>
+
+    <div class="label">Your Primary Platform</div>
+    <div class="fill-line" data-placeholder="e.g. Instagram, TikTok, LinkedIn, Twitter/X"></div>
+    <div class="label">Secondary Platforms</div>
+    <div class="fill-line" data-placeholder="e.g. Pinterest, YouTube Shorts, Facebook"></div>
+    <div class="label">Your Content Type</div>
+    <div class="fill-line" data-placeholder="e.g. Educational carousels, short-form video, threads"></div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Tool Comparison: Automation Platforms</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Tool</th><th>Best For</th><th>Price</th><th>Key Feature</th></tr>
+      <tr><td>n8n (self-hosted)</td><td>Custom workflows, API chains</td><td>Free / $20+/mo cloud</td><td>Unlimited nodes, full control</td></tr>
+      <tr><td>Make (Integromat)</td><td>Visual multi-step automations</td><td>Free / $9+/mo</td><td>1000+ integrations, easy setup</td></tr>
+      <tr><td>Buffer</td><td>Simple scheduling + analytics</td><td>Free / $6+/mo</td><td>Clean UI, link-in-bio</td></tr>
+      <tr><td>Later</td><td>Instagram-first visual planning</td><td>Free / $25+/mo</td><td>Visual calendar, Linkin.bio</td></tr>
+      <tr><td>Publer</td><td>Multi-platform bulk scheduling</td><td>Free / $12+/mo</td><td>Auto-schedule, RSS feeds</td></tr>
+      <tr><td>Custom Scripts (Python)</td><td>Full control, unique workflows</td><td>Free</td><td>API access, no limits</td></tr>
+    </table>
+
+    <div class="grid-3">
+      <div class="inner-card">
+        <div class="label-cyan">Scheduling Layer</div>
+        <h4>When to Post</h4>
+        <div class="label" style="margin-top: 12px;">Tool Chosen</div>
+        <div class="fill-line" data-placeholder="Buffer / Later / Publer"></div>
+        <ul class="checklist">
+          <li>Account connected</li>
+          <li>Posting times configured</li>
+          <li>Auto-schedule enabled</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Automation Layer</div>
+        <h4>What Triggers What</h4>
+        <div class="label" style="margin-top: 12px;">Tool Chosen</div>
+        <div class="fill-line" data-placeholder="n8n / Make / Zapier"></div>
+        <ul class="checklist">
+          <li>RSS-to-social workflow built</li>
+          <li>Content repurpose workflow</li>
+          <li>Engagement notification alerts</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">AI Layer</div>
+        <h4>What Creates Content</h4>
+        <div class="label" style="margin-top: 12px;">Tool Chosen</div>
+        <div class="fill-line" data-placeholder="ChatGPT / Claude / Gemini"></div>
+        <ul class="checklist">
+          <li>Caption generation prompt saved</li>
+          <li>Image generation workflow set</li>
+          <li>Hashtag research automated</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Your Stack (Fill In)</div>
+    <div class="h-flow" style="margin-top: 16px;">
+      <div class="step">AI writes caption</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">AI generates image</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Queue in scheduler</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Auto-post</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Track analytics</div>
+    </div>
+  </div>
+
+  <!-- MODULE 02: CONTENT CALENDAR SYSTEM -->
+  <div class="module">
+    <div class="module-number">02 -- Content Calendar System</div>
+    <h2 class="module-title">Content Calendar System</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Your Niche / Industry</div>
+        <div class="fill-line" data-placeholder="e.g. Fitness coaching, SaaS, ecommerce"></div>
+        <div class="label">Target Audience</div>
+        <div class="fill-line" data-placeholder="e.g. Solopreneurs aged 25-40 who want to grow online"></div>
+        <div class="label">Content Goal</div>
+        <div class="fill-line" data-placeholder="e.g. Drive traffic to Gumroad, build email list"></div>
+      </div>
+      <div>
+        <div class="label">Posts Per Week</div>
+        <div class="fill-line" data-placeholder="e.g. 5 feed posts, 7 stories, 3 reels"></div>
+        <div class="label">Batch Creation Day</div>
+        <div class="fill-line" data-placeholder="e.g. Every Sunday, 2-hour block"></div>
+        <div class="label">Review / Approve Day</div>
+        <div class="fill-line" data-placeholder="e.g. Monday morning, 30 min"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Content Pillars (Pick 3-5 Topics You Rotate)</div>
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label-cyan">Pillar 1</div>
+        <div class="fill-line" data-placeholder="e.g. Tips & tutorials"></div>
+        <div class="label" style="margin-top: 8px;">Post Types</div>
+        <div class="fill-line" data-placeholder="Carousel, how-to reel"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Pillar 2</div>
+        <div class="fill-line" data-placeholder="e.g. Behind the scenes"></div>
+        <div class="label" style="margin-top: 8px;">Post Types</div>
+        <div class="fill-line" data-placeholder="Story, casual reel"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Pillar 3</div>
+        <div class="fill-line" data-placeholder="e.g. Social proof / results"></div>
+        <div class="label" style="margin-top: 8px;">Post Types</div>
+        <div class="fill-line" data-placeholder="Screenshot, testimonial post"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Pillar 4</div>
+        <div class="fill-line" data-placeholder="e.g. Product promotion"></div>
+        <div class="label" style="margin-top: 8px;">Post Types</div>
+        <div class="fill-line" data-placeholder="CTA post, limited offer reel"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Weekly Calendar Template</div>
+    <table class="clean">
+      <tr><th>Day</th><th>Pillar</th><th>Format</th><th>Topic / Hook</th><th>Status</th></tr>
+      <tr><td>Monday</td><td style="color: var(--gray);">Tips</td><td style="color: var(--gray);">Carousel</td><td><div class="fill-line" style="margin:0;" data-placeholder="5 tools that save 3 hours/day"></div></td><td style="color: var(--gray);">Drafted / Scheduled / Posted</td></tr>
+      <tr><td>Tuesday</td><td style="color: var(--gray);">BTS</td><td style="color: var(--gray);">Story</td><td><div class="fill-line" style="margin:0;" data-placeholder="My morning workflow walkthrough"></div></td><td style="color: var(--gray);"></td></tr>
+      <tr><td>Wednesday</td><td style="color: var(--gray);">Proof</td><td style="color: var(--gray);">Post</td><td><div class="fill-line" style="margin:0;" data-placeholder="Client result screenshot + breakdown"></div></td><td style="color: var(--gray);"></td></tr>
+      <tr><td>Thursday</td><td style="color: var(--gray);">Tips</td><td style="color: var(--gray);">Reel</td><td><div class="fill-line" style="margin:0;" data-placeholder="How I automate Instagram in 30 min/week"></div></td><td style="color: var(--gray);"></td></tr>
+      <tr><td>Friday</td><td style="color: var(--gray);">Promo</td><td style="color: var(--gray);">CTA Post</td><td><div class="fill-line" style="margin:0;" data-placeholder="New guide just dropped - link in bio"></div></td><td style="color: var(--gray);"></td></tr>
+      <tr><td>Saturday</td><td style="color: var(--gray);">Engage</td><td style="color: var(--gray);">Poll/Question</td><td><div class="fill-line" style="margin:0;" data-placeholder="What's your biggest content struggle?"></div></td><td style="color: var(--gray);"></td></tr>
+      <tr><td>Sunday</td><td style="color: var(--gray);">Batch</td><td style="color: var(--gray);">--</td><td style="color: var(--gray);">Create next week's content</td><td style="color: var(--gray);"></td></tr>
+    </table>
+
+    <hr class="section-divider">
+    <div class="prompt-box"><span class="prompt-label">AI Prompt: Generate Monthly Calendar</span>You are a social media strategist. Create a 30-day content calendar for a [YOUR NICHE] brand.
+
+Target audience: [YOUR AUDIENCE]
+Platforms: [YOUR PLATFORMS]
+Content pillars: [PILLAR 1], [PILLAR 2], [PILLAR 3], [PILLAR 4]
+Posts per week: [NUMBER]
+Content goal: [YOUR GOAL]
+
+For each day, provide:
+- Content pillar
+- Post format (carousel, reel, story, static post, thread)
+- Hook / headline (attention-grabbing first line)
+- CTA (what the viewer should do next)
+- Best posting time for the platform
+
+Make Monday a strong educational post. Make Friday promotional. Leave Sunday as batch creation day.</div>
+  </div>
+
+  <!-- MODULE 03: AI CAPTION WRITING -->
+  <div class="module">
+    <div class="module-number">03 -- AI Caption Writing</div>
+    <h2 class="module-title">AI Caption Writing</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Your Brand Voice</div>
+        <div class="fill-line" data-placeholder="e.g. Direct, slightly irreverent, data-driven"></div>
+        <div class="label">Tone Keywords</div>
+        <div class="fill-line" data-placeholder="e.g. Confident, casual, no fluff, builder energy"></div>
+      </div>
+      <div>
+        <div class="label">Words You Always Use</div>
+        <div class="fill-line" data-placeholder="e.g. system, automate, build, ship, stack"></div>
+        <div class="label">Words You Never Use</div>
+        <div class="fill-line" data-placeholder="e.g. hustle, grind, boss babe, passive income"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Platform-Specific Prompt Templates</div>
+
+    <div class="prompt-box"><span class="prompt-label">Instagram Caption Prompt</span>Write an Instagram caption for a [FORMAT: carousel/reel/static post] about [TOPIC].
+
+Brand voice: [YOUR VOICE DESCRIPTION]
+Target audience: [YOUR AUDIENCE]
+Content pillar: [WHICH PILLAR]
+Goal: [engagement/traffic/sales]
+
+Structure:
+- Hook (first line that stops the scroll - under 10 words)
+- Value (3-5 lines of insight, tip, or story)
+- CTA (ask a question or direct to link in bio)
+- Hashtag block (separate from caption, 15-20 relevant hashtags)
+
+Tone: Write like a smart friend giving advice, not a brand. No emojis in the hook. Max 2 emojis total.</div>
+
+    <div class="prompt-box"><span class="prompt-label">Twitter/X Thread Prompt</span>Write a Twitter/X thread (8-12 tweets) about [TOPIC].
+
+Brand voice: [YOUR VOICE DESCRIPTION]
+Goal: [followers/engagement/link clicks]
+
+Structure:
+- Tweet 1: Bold claim or counterintuitive insight (under 240 chars, no hashtags)
+- Tweets 2-10: One idea per tweet. Use line breaks. No filler.
+- Tweet 11: Summary or key takeaway
+- Tweet 12: CTA + plug (link, product, follow)
+
+Rules: No thread-bro energy. No "Here's the thing." Start tweet 1 with the insight, not a setup.</div>
+
+    <div class="prompt-box"><span class="prompt-label">LinkedIn Post Prompt</span>Write a LinkedIn post about [TOPIC] from the perspective of a [YOUR ROLE].
+
+Brand voice: [YOUR VOICE DESCRIPTION]
+Goal: [thought leadership/leads/engagement]
+
+Structure:
+- Hook: First line that creates curiosity (this is what shows before "see more")
+- Story or insight: 5-8 short paragraphs (1-2 sentences each)
+- Lesson or framework: What the reader should take away
+- CTA: Question that invites comments
+
+Rules: Write in first person. Use line breaks between every sentence. No hashtags in the body. Add 3-5 hashtags at the very end.</div>
+
+    <div class="prompt-box"><span class="prompt-label">TikTok Script Prompt</span>Write a TikTok script (30-60 seconds) about [TOPIC].
+
+Brand voice: [YOUR VOICE DESCRIPTION]
+Target audience: [YOUR AUDIENCE]
+Format: [talking head / screen recording / voiceover + B-roll]
+
+Structure:
+- Hook (first 3 seconds): Question or bold statement that stops the swipe
+- Setup (5 seconds): Quick context
+- Content (20-40 seconds): The meat - tips, demo, or story
+- CTA (5 seconds): Follow, comment, or check link in bio
+
+Rules: Write for spoken word, not written. Short sentences. Conversational. Include [PAUSE] markers where emphasis matters.</div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Voice Consistency Checklist</div>
+    <ul class="checklist">
+      <li>Voice guide document created and saved</li>
+      <li>3 example posts that match my voice collected</li>
+      <li>Voice guide pasted into every AI prompt as context</li>
+      <li>AI outputs edited for voice before scheduling</li>
+      <li>Monthly voice audit: do posts still sound like me?</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 04: AI IMAGE GENERATION -->
+  <div class="module">
+    <div class="module-number">04 -- AI Image Generation For Posts</div>
+    <h2 class="module-title">AI Image Generation for Posts</h2>
+
+    <div class="label-cyan">Tool Comparison: When to Use Which</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Tool</th><th>Best For</th><th>Speed</th><th>Cost</th><th>Quality</th></tr>
+      <tr><td>Canva AI (Magic Design)</td><td>Branded templates, carousels, stories</td><td>Instant</td><td>$13/mo (Pro)</td><td>High (template-based)</td></tr>
+      <tr><td>DALL-E 3 (ChatGPT)</td><td>Unique images, concepts, illustrations</td><td>10-30s</td><td>Included w/ Plus</td><td>High</td></tr>
+      <tr><td>Midjourney</td><td>Aesthetic, artistic, photography-style</td><td>30-60s</td><td>$10+/mo</td><td>Highest</td></tr>
+      <tr><td>Stable Diffusion (local)</td><td>Bulk generation, full control, no limits</td><td>5-30s</td><td>Free (GPU needed)</td><td>Medium-High</td></tr>
+      <tr><td>Ideogram</td><td>Text in images, logos, typography</td><td>15-30s</td><td>Free / $8+/mo</td><td>High</td></tr>
+      <tr><td>Leonardo AI</td><td>Consistent brand imagery, fine-tuned models</td><td>10-30s</td><td>Free / $12+/mo</td><td>High</td></tr>
+    </table>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Your Primary Image Tool</div>
+        <div class="fill-line" data-placeholder="e.g. DALL-E 3 for concepts, Canva for branded posts"></div>
+        <div class="label">Your Visual Style</div>
+        <div class="fill-line" data-placeholder="e.g. Minimal, dark backgrounds, clean typography"></div>
+        <div class="label">Brand Colors</div>
+        <div class="fill-line" data-placeholder="e.g. #0a0a0f background, #00D4FF accent, white text"></div>
+      </div>
+      <div>
+        <div class="label">Image Sizes Needed</div>
+        <div class="fill-line" data-placeholder="e.g. 1080x1080 feed, 1080x1920 story, 1280x720 cover"></div>
+        <div class="label">Stock Photo Backup</div>
+        <div class="fill-line" data-placeholder="e.g. Unsplash, Pexels, own photography"></div>
+        <div class="label">Images Per Week</div>
+        <div class="fill-line" data-placeholder="e.g. 10 feed images, 5 story backgrounds"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="prompt-box"><span class="prompt-label">AI Image Prompt Template (DALL-E / Midjourney)</span>Create a [STYLE: minimal/editorial/3D/flat illustration] image for a social media post about [TOPIC].
+
+Visual requirements:
+- Aspect ratio: [1:1 for feed / 9:16 for story / 16:9 for cover]
+- Color palette: [YOUR BRAND COLORS]
+- Mood: [professional/energetic/calm/bold]
+- Must include: [specific elements]
+- Must NOT include: [text, hands, faces - whatever you want to avoid]
+- Background: [solid color / gradient / blurred / environmental]
+
+Style reference: Think Apple product photography meets tech startup marketing.</div>
+
+    <div class="prompt-box"><span class="prompt-label">Canva Batch Workflow</span>1. Create brand template in Canva (your colors, fonts, logo placement)
+2. Duplicate template for each post in the week
+3. Use Magic Design to generate layout variations
+4. Swap in AI-generated images or stock photos
+5. Export all at once (File > Download > Select pages > PNG)
+
+Pro tip: Save 5-10 "base layouts" as templates. Swap content weekly.
+This turns 2 hours of design into 15 minutes of swapping.</div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Image Creation Checklist</div>
+    <ul class="checklist">
+      <li>Brand template created in Canva</li>
+      <li>5+ base layouts saved</li>
+      <li>AI image prompt library built (10+ prompts)</li>
+      <li>Consistent visual style documented</li>
+      <li>Batch export workflow tested</li>
+      <li>Image naming convention set (date-platform-topic)</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 05: SHORT-FORM VIDEO PIPELINE -->
+  <div class="module">
+    <div class="module-number">05 -- Short-Form Video Pipeline</div>
+    <h2 class="module-title">Short-Form Video Pipeline</h2>
+
+    <div class="h-flow" style="margin-bottom: 32px;">
+      <div class="step">AI writes script</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Record / screen capture</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Edit in CapCut</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Auto-caption</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Batch export</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step">Schedule</div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Video Format</div>
+        <div class="fill-line" data-placeholder="e.g. Talking head, screen recording, voiceover + B-roll"></div>
+        <div class="label">Recording Tool</div>
+        <div class="fill-line" data-placeholder="e.g. iPhone, OBS, Loom, screen capture"></div>
+        <div class="label">Editing Tool</div>
+        <div class="fill-line" data-placeholder="e.g. CapCut (desktop), DaVinci Resolve, Premiere"></div>
+      </div>
+      <div>
+        <div class="label">Videos Per Week</div>
+        <div class="fill-line" data-placeholder="e.g. 3 Reels, 2 TikToks, 1 YouTube Short"></div>
+        <div class="label">Average Length</div>
+        <div class="fill-line" data-placeholder="e.g. 30-60 seconds"></div>
+        <div class="label">Batch Recording Day</div>
+        <div class="fill-line" data-placeholder="e.g. Wednesday afternoon, record 5 videos"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="prompt-box"><span class="prompt-label">AI Video Script Prompt</span>Write [NUMBER] short-form video scripts (30-60 seconds each) for [PLATFORM: TikTok/Reels/Shorts].
+
+Niche: [YOUR NICHE]
+Target audience: [YOUR AUDIENCE]
+Brand voice: [YOUR VOICE]
+Format: [talking head / screen recording / voiceover]
+
+For each script provide:
+1. HOOK (first 3 seconds - must stop the scroll)
+2. SETUP (5 seconds - quick context)
+3. CONTENT (20-40 seconds - the value)
+4. CTA (5 seconds - what to do next)
+5. TEXT OVERLAY suggestions (what text appears on screen)
+6. B-ROLL suggestions (what footage to show)
+
+Rules: Write for spoken word. Short sentences. Include [PAUSE] and [CUT] markers. Make each script standalone - don't reference the others.</div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">CapCut Editing Workflow</div>
+    <div class="grid-3">
+      <div class="inner-card">
+        <div class="label-cyan">Step 1: Import</div>
+        <h4>Raw Footage</h4>
+        <ul class="checklist">
+          <li>Import all clips for the week</li>
+          <li>Trim dead space and mistakes</li>
+          <li>Arrange in sequence</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Step 2: Edit</div>
+        <h4>Polish</h4>
+        <ul class="checklist">
+          <li>Add auto-captions (CapCut AI)</li>
+          <li>Style captions to brand colors</li>
+          <li>Add transitions between cuts</li>
+          <li>Insert B-roll or screen recordings</li>
+          <li>Add background music (royalty-free)</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Step 3: Export</div>
+        <h4>Batch Publish</h4>
+        <ul class="checklist">
+          <li>Export all videos at once</li>
+          <li>1080x1920 resolution, 30fps</li>
+          <li>Name: date-platform-topic</li>
+          <li>Upload to scheduler</li>
+          <li>Add captions + hashtags</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Video Pipeline Checklist</div>
+    <ul class="checklist">
+      <li>5+ video scripts generated with AI</li>
+      <li>Recording setup tested (lighting, audio, framing)</li>
+      <li>CapCut template created with brand fonts/colors</li>
+      <li>Auto-caption style saved</li>
+      <li>Batch export workflow tested</li>
+      <li>Videos scheduled for the week</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 06: HASHTAG AND SEO STRATEGY -->
+  <div class="module">
+    <div class="module-number">06 -- Hashtag and SEO Strategy</div>
+    <h2 class="module-title">Hashtag and SEO Strategy</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Your Niche Keywords</div>
+        <div class="fill-line" data-placeholder="e.g. AI automation, solopreneur, digital products"></div>
+        <div class="label">Competitor Accounts to Study</div>
+        <div class="fill-line" data-placeholder="e.g. @account1, @account2, @account3"></div>
+      </div>
+      <div>
+        <div class="label">Branded Hashtag</div>
+        <div class="fill-line" data-placeholder="e.g. #BehikeMethod #YourBrandName"></div>
+        <div class="label">Hashtag Research Tool</div>
+        <div class="fill-line" data-placeholder="e.g. AI prompt, Hashtagify, Later, manual research"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Platform-Specific SEO Rules</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Platform</th><th>Hashtag Count</th><th>SEO Focus</th><th>Key Ranking Signal</th></tr>
+      <tr><td>Instagram</td><td>15-20 (mix sizes)</td><td>Captions, alt text, hashtags</td><td>Saves + shares</td></tr>
+      <tr><td>TikTok</td><td>3-5 (trending + niche)</td><td>Caption text, on-screen text, audio</td><td>Watch time + replays</td></tr>
+      <tr><td>Twitter/X</td><td>1-2 max</td><td>Keywords in tweet body</td><td>Engagement velocity</td></tr>
+      <tr><td>LinkedIn</td><td>3-5 at the end</td><td>Keywords in first 2 lines</td><td>Dwell time + comments</td></tr>
+      <tr><td>YouTube Shorts</td><td>5-8 in description</td><td>Title, description, tags</td><td>Click-through rate</td></tr>
+      <tr><td>Pinterest</td><td>N/A (use keywords)</td><td>Pin title, description, board names</td><td>Saves + click-throughs</td></tr>
+    </table>
+
+    <div class="prompt-box"><span class="prompt-label">AI Prompt: Hashtag Research</span>Generate 30 hashtags for a [PLATFORM] post about [TOPIC] in the [NICHE] space.
+
+Organize into 3 groups:
+1. HIGH VOLUME (500K+ posts) - 5 hashtags for reach
+2. MEDIUM VOLUME (50K-500K posts) - 15 hashtags for discovery
+3. LOW VOLUME / NICHE (under 50K posts) - 10 hashtags for targeted engagement
+
+Rules:
+- No banned or flagged hashtags
+- Include 1 branded hashtag: [YOUR BRANDED HASHTAG]
+- Mix English and [OTHER LANGUAGE if bilingual audience]
+- Avoid generic hashtags like #love #instagood
+- Each hashtag must be directly relevant to the post topic</div>
+
+    <div class="prompt-box"><span class="prompt-label">AI Prompt: Trending Topic Detection</span>What are the top 10 trending topics in the [YOUR NICHE] space right now?
+
+For each topic provide:
+1. The trend (what people are talking about)
+2. Why it's trending (news, meme, controversy, seasonal)
+3. A content angle I can use for [YOUR PLATFORM]
+4. A hook for a post about this trend
+5. Relevance score (1-10) to my niche: [YOUR NICHE]
+
+Only include trends from the last 7 days. Skip anything political or controversial unless it directly relates to my niche.</div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Hashtag Bank (Save Your Go-To Sets)</div>
+    <div class="grid-3">
+      <div class="inner-card">
+        <div class="label-cyan">Set A: Educational Posts</div>
+        <div class="fill-line" data-placeholder="#hashtag1 #hashtag2 #hashtag3..."></div>
+        <div class="fill-line" data-placeholder="(continue)"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Set B: Behind the Scenes</div>
+        <div class="fill-line" data-placeholder="#hashtag1 #hashtag2 #hashtag3..."></div>
+        <div class="fill-line" data-placeholder="(continue)"></div>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Set C: Product / Promo</div>
+        <div class="fill-line" data-placeholder="#hashtag1 #hashtag2 #hashtag3..."></div>
+        <div class="fill-line" data-placeholder="(continue)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 07: SCHEDULING AND AUTO-POSTING -->
+  <div class="module">
+    <div class="module-number">07 -- Scheduling and Auto-Posting</div>
+    <h2 class="module-title">Scheduling and Auto-Posting</h2>
+
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div>
+        <div class="label">Scheduling Tool</div>
+        <div class="fill-line" data-placeholder="e.g. Buffer, Later, Publer, n8n"></div>
+        <div class="label">Automation Tool</div>
+        <div class="fill-line" data-placeholder="e.g. n8n, Make, Zapier"></div>
+      </div>
+      <div>
+        <div class="label">Best Posting Times (Your Audience)</div>
+        <div class="fill-line" data-placeholder="e.g. IG: 9am & 6pm EST / TT: 11am & 7pm EST"></div>
+        <div class="label">Auto-Post Enabled?</div>
+        <div class="fill-line" data-placeholder="Yes / No (some platforms need manual publish)"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Automation Workflows to Build</div>
+    <div class="grid-2" style="margin-bottom: 32px;">
+      <div class="inner-card">
+        <div class="label-cyan">Workflow 1: RSS to Social</div>
+        <h4>Auto-share new content</h4>
+        <div class="h-flow" style="margin: 16px 0;">
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">New blog/podcast</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">n8n detects RSS</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">AI writes caption</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Posts to X + LinkedIn</div>
+        </div>
+        <ul class="checklist">
+          <li>RSS feed URL configured</li>
+          <li>Caption prompt template saved in n8n</li>
+          <li>Platform API keys connected</li>
+          <li>Test post sent successfully</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Workflow 2: Content Repurposing</div>
+        <h4>One piece, many platforms</h4>
+        <div class="h-flow" style="margin: 16px 0;">
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Long-form content</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">AI extracts quotes</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Formats per platform</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Queues in scheduler</div>
+        </div>
+        <ul class="checklist">
+          <li>Input source defined (blog, video, newsletter)</li>
+          <li>AI prompt for each platform saved</li>
+          <li>Output format per platform configured</li>
+          <li>Workflow tested end-to-end</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="inner-card">
+        <div class="label-cyan">Workflow 3: Evergreen Recycler</div>
+        <h4>Re-share top performers</h4>
+        <div class="h-flow" style="margin: 16px 0;">
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Top posts list</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">AI rewrites caption</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Re-schedule</div>
+        </div>
+        <ul class="checklist">
+          <li>Top 20 evergreen posts identified</li>
+          <li>Rewrite prompts saved</li>
+          <li>Recycling schedule set (every 6-8 weeks)</li>
+          <li>Tracking to avoid duplicate fatigue</li>
+        </ul>
+      </div>
+      <div class="inner-card">
+        <div class="label-cyan">Workflow 4: Engagement Alerts</div>
+        <h4>Never miss a conversation</h4>
+        <div class="h-flow" style="margin: 16px 0;">
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">New comment/DM</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">n8n webhook</div>
+          <div class="arrow">&rarr;</div>
+          <div class="step" style="font-size: 12px; padding: 10px 16px;">Slack/Telegram alert</div>
+        </div>
+        <ul class="checklist">
+          <li>Webhook configured for each platform</li>
+          <li>Alert channel set up (Slack/Telegram/Email)</li>
+          <li>Priority filter: only high-engagement alerts</li>
+          <li>Response time target set</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Scheduling Checklist</div>
+    <ul class="checklist">
+      <li>All platforms connected to scheduling tool</li>
+      <li>Optimal posting times researched and set</li>
+      <li>At least 1 automation workflow live</li>
+      <li>RSS-to-social tested</li>
+      <li>Content repurpose workflow tested</li>
+      <li>Evergreen posts identified and queued</li>
+      <li>Engagement alerts configured</li>
+    </ul>
+  </div>
+
+  <!-- MODULE 08: ANALYTICS AND ITERATION -->
+  <div class="module">
+    <div class="module-number">08 -- Analytics and Iteration</div>
+    <h2 class="module-title">Analytics and Iteration</h2>
+
+    <div class="label-cyan">Key Metrics to Track Per Platform</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Metric</th><th>What It Tells You</th><th>Good Benchmark</th><th>Your Number</th></tr>
+      <tr><td>Engagement Rate</td><td>How much your audience cares</td><td>3-6% (Instagram)</td><td><div class="fill-line" style="margin:0;" data-placeholder="___%"></div></td></tr>
+      <tr><td>Reach / Impressions</td><td>How far content travels</td><td>Growing month over month</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/week"></div></td></tr>
+      <tr><td>Saves</td><td>Content worth revisiting</td><td>1-3% of reach</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/post"></div></td></tr>
+      <tr><td>Shares</td><td>Content worth spreading</td><td>0.5-2% of reach</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/post"></div></td></tr>
+      <tr><td>Profile Visits</td><td>Curiosity generated</td><td>Increasing trend</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/week"></div></td></tr>
+      <tr><td>Link Clicks</td><td>Traffic driven</td><td>1-3% CTR</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/week"></div></td></tr>
+      <tr><td>Follower Growth</td><td>Audience building velocity</td><td>1-5% per month</td><td><div class="fill-line" style="margin:0;" data-placeholder="___/month"></div></td></tr>
+    </table>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Weekly Review Template</div>
+    <div class="grid-4" style="margin-bottom: 32px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Top Post This Week</div>
+        <div class="kpi-value" style="font-size: 16px;"><div class="fill-line" style="margin:0;" data-placeholder="Post title / topic"></div></div>
+        <div class="kpi-desc">Why it worked:</div>
+        <div class="fill-line" data-placeholder="e.g. Strong hook, trending topic, great image"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Worst Post This Week</div>
+        <div class="kpi-value" style="font-size: 16px;"><div class="fill-line" style="margin:0;" data-placeholder="Post title / topic"></div></div>
+        <div class="kpi-desc">Why it flopped:</div>
+        <div class="fill-line" data-placeholder="e.g. Weak hook, wrong time, boring image"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">New Followers</div>
+        <div class="kpi-value"><div class="fill-line" style="margin:0;" data-placeholder="___"></div></div>
+        <div class="kpi-desc">Source:</div>
+        <div class="fill-line" data-placeholder="Reels / Explore / Direct"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Revenue from Social</div>
+        <div class="kpi-value"><div class="fill-line" style="margin:0;" data-placeholder="$___"></div></div>
+        <div class="kpi-desc">Path:</div>
+        <div class="fill-line" data-placeholder="Bio link > Product page > Sale"></div>
+      </div>
+    </div>
+
+    <hr class="section-divider">
+    <div class="prompt-box"><span class="prompt-label">AI Prompt: Weekly Analytics Review</span>Analyze my social media performance for this week:
+
+Platform: [PLATFORM]
+Posts published: [NUMBER]
+Top post: [DESCRIBE - topic, format, engagement]
+Worst post: [DESCRIBE - topic, format, engagement]
+Follower change: [+/- NUMBER]
+Total engagement rate: [PERCENTAGE]
+Link clicks: [NUMBER]
+
+Based on this data:
+1. What content type performed best and why?
+2. What should I double down on next week?
+3. What should I stop doing or change?
+4. Suggest 3 content ideas based on what worked
+5. What posting time drove the most engagement?
+
+Be specific and actionable. No generic advice.</div>
+
+    <div class="prompt-box"><span class="prompt-label">AI Prompt: A/B Test Generator</span>I want to A/B test my [PLATFORM] content to improve [METRIC: engagement/reach/clicks].
+
+Current baseline: [YOUR CURRENT METRIC]
+Content type: [FORMAT: carousel/reel/static/thread]
+Niche: [YOUR NICHE]
+
+Generate 3 A/B test ideas:
+For each test provide:
+1. Variable being tested (hook, image style, posting time, caption length, CTA type)
+2. Version A (control - what I'm doing now)
+3. Version B (variation - what to try)
+4. How to measure the winner
+5. How many posts needed for a valid test (minimum sample size)
+6. What to do after you find a winner</div>
+
+    <hr class="section-divider">
+    <div class="label-cyan">Monthly Growth Tracker</div>
+    <table class="clean" style="margin-bottom: 32px;">
+      <tr><th>Month</th><th>Followers</th><th>Avg Engagement</th><th>Best Format</th><th>Revenue</th><th>Notes</th></tr>
+      <tr><td>Month 1</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+      <tr><td>Month 2</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+      <tr><td>Month 3</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+      <tr><td>Month 4</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+      <tr><td>Month 5</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+      <tr><td>Month 6</td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td><td><div class="fill-line" style="margin:0;"></div></td></tr>
+    </table>
+
+    <div class="label-cyan">Iteration Rules</div>
+    <ul class="checklist">
+      <li>Weekly analytics review completed every Sunday</li>
+      <li>Top performing content format identified</li>
+      <li>At least 1 A/B test running at all times</li>
+      <li>Underperforming content types dropped or reworked</li>
+      <li>Winning hooks saved to a swipe file</li>
+      <li>Monthly strategy adjustment based on data</li>
+      <li>Revenue from social tracked separately</li>
+    </ul>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <strong>BEHIKE.CO</strong><br>
+    Built in Puerto Rico
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Cowork for Non-Coders</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0a0a0f;
+    --card: #111111;
+    --border: #222222;
+    --white: #F5F5F7;
+    --gray: #86868B;
+    --cyan: #00D4FF;
+    --cyan-dim: rgba(0, 212, 255, 0.15);
+    --font: -apple-system, 'Helvetica Neue', 'SF Pro Display', sans-serif;
+  }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: var(--font);
+    font-weight: 400;
+    line-height: 1.8;
+    -webkit-font-smoothing: antialiased;
+    padding: 80px 40px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  /* Header — compact */
+  .header { text-align: center; padding: 20px 0 16px; }
+  .header h1 { font-size: 42px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 12px; }
+  .header .line { width: 80px; height: 1px; background: var(--cyan); margin: 20px auto; }
+  .header .subtitle { font-size: 15px; color: var(--gray); letter-spacing: 0.02em; line-height: 1.6; max-width: 500px; margin: 0 auto; }
+
+  /* Content */
+  h1 { font-size: 36px; font-weight: 700; margin: 48px 0 20px; letter-spacing: -0.02em; }
+  h2 { font-size: 28px; font-weight: 600; margin: 40px 0 16px; color: var(--white); }
+  h3 { font-size: 20px; font-weight: 600; margin: 32px 0 12px; color: var(--cyan); }
+  h4 { font-size: 16px; font-weight: 600; margin: 24px 0 8px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  p { margin-bottom: 16px; color: var(--white); font-size: 16px; line-height: 1.8; }
+  .muted { color: var(--gray); }
+
+  ul, ol { margin: 16px 0; padding-left: 24px; }
+  li { margin-bottom: 8px; color: var(--white); line-height: 1.6; }
+  li::marker { color: var(--cyan); }
+
+  strong { color: var(--white); font-weight: 600; }
+  em { color: var(--gray); }
+
+  a { color: var(--cyan); text-decoration: none; }
+
+  code { background: rgba(0, 212, 255, 0.1); color: var(--cyan); padding: 2px 8px; border-radius: 4px; font-size: 14px; }
+
+  blockquote { border-left: 3px solid var(--cyan); padding: 16px 24px; margin: 24px 0; background: var(--card); border-radius: 0 12px 12px 0; }
+  blockquote p { color: var(--gray); margin: 0; font-style: italic; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid var(--border); }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; }
+
+  /* Section cards */
+  .section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; margin: 32px 0;  }
+  .section-inner { background: rgba(0,212,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin: 20px 0; }
+
+  /* Prompt box */
+  .prompt-box { background: var(--bg); border: 1px solid var(--cyan); border-radius: 12px; padding: 20px 24px; margin: 20px 0; position: relative; }
+  .prompt-box::before { content: 'COPY THIS PROMPT'; position: absolute; top: -10px; left: 20px; background: var(--bg); color: var(--cyan); font-size: 10px; font-weight: 600; letter-spacing: 0.15em; padding: 0 8px; }
+  .prompt-box p { color: var(--white); margin: 0; font-size: 15px; line-height: 1.7; }
+
+  /* Checklist */
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li { padding: 8px 0 8px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  .checklist li::before { content: ''; position: absolute; left: 0; top: 12px; width: 18px; height: 18px; border: 2px solid var(--cyan); border-radius: 4px; }
+
+  /* Fill-in field */
+  .fill-in { background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; padding: 16px 20px; margin: 12px 0; min-height: 48px; }
+  .fill-in-label { font-size: 11px; font-weight: 600; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 8px; }
+
+  /* Step indicator */
+  .step { display: flex; gap: 16px; margin: 16px 0; align-items: flex-start; }
+  .step-num { flex-shrink: 0; width: 32px; height: 32px; background: var(--cyan-dim); color: var(--cyan); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; margin-top: 2px; }
+  .step-content { flex: 1; }
+  .step-content p { margin-bottom: 8px; }
+
+  /* Screen description */
+  .screen { background: rgba(0,212,255,0.05); border-left: 3px solid rgba(0,212,255,0.3); padding: 12px 20px; margin: 12px 0; border-radius: 0 8px 8px 0; }
+  .screen p { color: var(--gray); margin: 0; font-size: 14px; }
+  .screen-label { font-size: 10px; font-weight: 600; color: var(--cyan); letter-spacing: 0.15em; margin-bottom: 4px; }
+
+  /* Troubleshoot */
+  .troubleshoot { background: rgba(255, 149, 0, 0.08); border: 1px solid rgba(255, 149, 0, 0.2); border-radius: 12px; padding: 20px 24px; margin: 20px 0; }
+  .troubleshoot-title { font-size: 12px; font-weight: 600; color: #FF9500; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+
+  /* Bonus grid */
+  .bonus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .bonus-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .bonus-num { font-size: 12px; color: var(--cyan); font-weight: 700; margin-bottom: 4px; }
+  .bonus-item p { margin: 0; font-size: 14px; }
+
+  /* Use case header */
+  .use-case-num { font-size: 12px; font-weight: 600; color: var(--cyan); letter-spacing: 0.15em; margin-bottom: 8px; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 16px 0 0; font-size: 12px; color: var(--gray); letter-spacing: 0.1em; }
+  .footer .brand { font-size: 14px; font-weight: 600; letter-spacing: 0.15em; margin-bottom: 8px; color: var(--white); }
+
+  
+    .section {  }
+  }
+
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>Claude Cowork<br>for Non-Coders</h1>
+    <div class="line"></div>
+    <p class="subtitle">Tell your computer what to do. It does it.<br>No coding. No terminal. Just talking.</p>
+  </div>
+
+  <!-- INTRO SECTION -->
+  <div class="section">
+    <h2>What is Claude Cowork?</h2>
+    <p>Claude Cowork (also called "computer use") is a feature where Claude can <strong>see your screen, move your mouse, click buttons, and type for you</strong>. Think of it as having someone sit next to you and operate your computer while you tell them what to do.</p>
+    <p>You talk. Claude acts. No code. No terminal. No technical knowledge required.</p>
+    <p>You stay in control the entire time. Claude shows you what it's about to do, and you approve or redirect. It's a collaboration, not autopilot.</p>
+
+    <h3>How to Access Cowork</h3>
+    <ol>
+      <li>Download the <strong>Claude Desktop app</strong> from <code>claude.ai/download</code></li>
+      <li>Open the app and sign in to your Claude account</li>
+      <li>Look for the <strong>computer use</strong> toggle or start a conversation and ask Claude to interact with your screen</li>
+      <li>Grant screen and accessibility permissions when prompted (Mac: System Settings > Privacy & Security)</li>
+      <li>Start telling Claude what to do in plain English</li>
+    </ol>
+
+    <h3>What Cowork Can Do</h3>
+    <table>
+      <tr><th>CAN DO</th><th>CAN'T DO</th></tr>
+      <tr><td>See everything on your screen</td><td>Access files through terminal/command line</td></tr>
+      <tr><td>Click buttons and links</td><td>Run code or scripts</td></tr>
+      <tr><td>Type in any text field</td><td>Bypass CAPTCHAs or bot detection</td></tr>
+      <tr><td>Navigate between apps and tabs</td><td>Enter passwords for you</td></tr>
+      <tr><td>Read and understand page content</td><td>Work when your screen is locked</td></tr>
+      <tr><td>Scroll, select, copy, paste</td><td>Access things faster than a human could</td></tr>
+      <tr><td>Fill out forms field by field</td><td>Handle 2FA/verification codes automatically</td></tr>
+    </table>
+
+    <h3>When to Use What</h3>
+    <table>
+      <tr><th>TOOL</th><th>BEST FOR</th><th>HOW IT WORKS</th></tr>
+      <tr><td><strong>Cowork</strong></td><td>GUI tasks, clicking through websites, filling forms, visual workflows</td><td>Sees your screen, uses mouse + keyboard</td></tr>
+      <tr><td><strong>Claude Code</strong></td><td>Coding, terminal commands, file editing, building software</td><td>Works in your terminal, reads/writes code files</td></tr>
+      <tr><td><strong>Claude Chat</strong></td><td>Writing, brainstorming, answering questions, analyzing text</td><td>Text conversation, no screen or file access</td></tr>
+    </table>
+    <p class="muted"><em>Rule of thumb: If the task involves clicking things on a screen, use Cowork. If it involves writing code, use Claude Code. If you just need to talk through an idea, use Chat.</em></p>
+  </div>
+
+  <hr>
+
+  <!-- USE CASE 1: EMAIL MANAGEMENT -->
+  <div class="section">
+    <div class="use-case-num">USE CASE 01</div>
+    <h2>Clean Up My Inbox</h2>
+    <p class="muted">Email management: sort, reply, archive — hands free.</p>
+
+    <h3>The Prompt</h3>
+    <div class="prompt-box">
+      <p>Open my Gmail in the browser. Sort my unread emails by importance — anything from a real person goes to the top, newsletters and promotions go to the bottom. Draft replies to the top 3 most important emails. Then archive everything from newsletters I haven't opened in the last 30 days. Don't send anything — just draft and let me review.</p>
+    </div>
+
+    <h3>What Happens on Screen</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <p><strong>Claude opens your browser and navigates to Gmail</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Your default browser opens. Claude types gmail.com in the address bar. If you're already logged in, your inbox loads. If not, Claude will pause and ask you to log in (it won't enter your password).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <p><strong>Claude scans your unread emails</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude scrolls through your inbox, reading sender names, subject lines, and preview text. It mentally categorizes each email: personal, work, newsletter, promotion, notification. You'll see the cursor moving as it reads.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <p><strong>Claude identifies your top 3 priority emails</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude tells you in the chat which 3 emails it considers most important and why. Example: "Your top 3 are: (1) Email from your manager about the project deadline, (2) Client asking about invoice, (3) Friend confirming weekend plans."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <p><strong>Claude drafts replies</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude clicks on the first email, hits Reply, and types a draft response in the compose window. It reads the email content to write a relevant reply. Then it moves to email #2 and #3, repeating the process. All drafts stay unsent — saved in your Drafts folder.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <p><strong>Claude archives old newsletters</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude searches for newsletter senders, checks the dates, selects emails older than 30 days that were never opened, and clicks Archive. You'll see checkboxes being ticked and the archive button being clicked in batches.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>How to Review Before Confirming</h3>
+    <ul>
+      <li>Claude will <strong>pause after each major action</strong> and ask if you want to continue</li>
+      <li>Check your <strong>Drafts folder</strong> to review reply drafts before sending</li>
+      <li>If a draft doesn't sound right, tell Claude: "Rewrite the reply to [name] — make it more casual"</li>
+      <li>If it archived something you wanted to keep, tell Claude: "Undo the last archive" or find it in All Mail</li>
+    </ul>
+
+    <h3>Troubleshooting</h3>
+    <div class="troubleshoot">
+      <div class="troubleshoot-title">If This Happens, Do This</div>
+      <ul>
+        <li><strong>2FA popup appears:</strong> Claude will pause and ask you to complete the verification. Enter your code, then tell Claude to continue.</li>
+        <li><strong>CAPTCHA shows up:</strong> Claude cannot solve CAPTCHAs. Complete it yourself, then say "Done, continue."</li>
+        <li><strong>Page loads slowly:</strong> Say "Wait for the page to fully load before clicking anything."</li>
+        <li><strong>Claude clicks the wrong email:</strong> Say "Stop. Go back. I meant the email from [specific sender]."</li>
+        <li><strong>Gmail layout looks different:</strong> Say "I'm using the new/classic Gmail layout" so Claude can adjust.</li>
+        <li><strong>Claude tries to send instead of draft:</strong> Always include "Don't send anything" in your prompt. If it reaches for Send, say "Stop — save as draft only."</li>
+      </ul>
+    </div>
+
+    <h3>Personalize Your Workflow</h3>
+    <h4>Fill in your email rules</h4>
+
+    <div class="fill-in">
+      <div class="fill-in-label">Priority Senders (always read first)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Auto-Archive Senders (newsletters you never read)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Default Reply Tone (formal / casual / friendly / professional)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Auto-Reply Template for Low-Priority Emails</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Labels or Folders You Use</div>
+    </div>
+
+    <h3>Inbox Zero Checklist</h3>
+    <ul class="checklist">
+      <li>Open Claude Desktop and enable Cowork</li>
+      <li>Paste the email management prompt (customized with your rules)</li>
+      <li>Let Claude scan and categorize your inbox</li>
+      <li>Review the top 3 priority emails Claude identified</li>
+      <li>Review each draft reply in your Drafts folder</li>
+      <li>Approve or edit each draft, then send manually</li>
+      <li>Confirm the newsletter archive list before Claude proceeds</li>
+      <li>Check archived items to make sure nothing important was moved</li>
+      <li>Star or label anything you want to follow up on later</li>
+      <li>Close with zero unread — or close to it</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- USE CASE 2: RESEARCH + WRITING -->
+  <div class="section">
+    <div class="use-case-num">USE CASE 02</div>
+    <h2>Research This and Make a Document</h2>
+    <p class="muted">From blank page to finished comparison doc — with sources.</p>
+
+    <h3>The Prompt</h3>
+    <div class="prompt-box">
+      <p>Research the top 5 project management tools for freelancers. Open each tool's website and check their pricing page and feature list. Then open Google Docs, create a new document called "PM Tool Comparison," and make a comparison table with columns for: Tool Name, Price (free tier + paid), Key Features, Best For, and My Rating. Add a short recommendation paragraph at the bottom. Don't close any tabs — I want to review the sources.</p>
+    </div>
+
+    <h3>What Happens on Screen</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <p><strong>Claude opens your browser and starts researching</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude opens a new browser tab and searches for "best project management tools for freelancers." It reads through the search results, then starts opening individual tool websites — Notion, Trello, Asana, ClickUp, Monday.com (or whichever it determines are the top 5).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <p><strong>Claude visits each tool's pricing and features page</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>For each tool, Claude navigates to the pricing page, reads the tiers and costs, then visits the features page. You'll see it scrolling through each site, spending 20-40 seconds per tool. Each site stays open in its own tab so you can verify later.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <p><strong>Claude opens Google Docs and creates your document</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude opens a new tab, goes to docs.google.com, clicks "Blank document," and renames it "PM Tool Comparison." If you're not logged into Google, Claude will pause and ask you to sign in.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <p><strong>Claude builds the comparison table</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude inserts a table using Google Docs' table tool (Insert > Table), creates the header row with your specified columns, then fills in each row with the data it gathered. You'll see it typing in each cell, switching between the research tabs and the doc to verify details.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <p><strong>Claude writes the recommendation</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Below the table, Claude types a 2-3 paragraph recommendation summarizing which tool is best for different freelancer types — solo creatives, client-heavy freelancers, agency-style operations. The document auto-saves in your Google Drive.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>How to Guide It When It Gets Stuck</h3>
+    <ul>
+      <li><strong>"Skip that tool"</strong> — If Claude is spending too long on one site or the pricing page is behind a paywall</li>
+      <li><strong>"Add [tool name] instead"</strong> — If you want a specific tool included that Claude didn't choose</li>
+      <li><strong>"Use bullet points instead of a table"</strong> — If you prefer a different format midway through</li>
+      <li><strong>"Check the pricing page again, I think it changed"</strong> — If data looks outdated</li>
+      <li><strong>"Make the recommendation more opinionated"</strong> — If the summary is too neutral</li>
+      <li><strong>"Add a column for [X]"</strong> — If you want additional comparison criteria</li>
+    </ul>
+
+    <h3>Tips for Better Research Prompts</h3>
+    <ul>
+      <li>Be specific about <strong>how many</strong> items to research (top 5, top 3, all options under $20/month)</li>
+      <li>Tell Claude <strong>what data to collect</strong> — price, features, reviews, screenshots, etc.</li>
+      <li>Specify the <strong>output format</strong> — table, list, doc, slides, spreadsheet</li>
+      <li>Ask it to <strong>keep tabs open</strong> so you can verify sources yourself</li>
+      <li>Include your <strong>use case</strong> so recommendations are relevant: "I'm a freelance designer managing 3-5 client projects"</li>
+    </ul>
+
+    <h3>Personalize Your Workflow</h3>
+    <h4>Fill in your research template</h4>
+
+    <div class="fill-in">
+      <div class="fill-in-label">What You're Researching</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Specific Info to Collect (price, features, reviews, etc.)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Output Format (Google Doc table / bullet list / spreadsheet)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Your Use Case (so recommendations are relevant to you)</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Must-Have Criteria (deal-breakers, budget limits, specific features)</div>
+    </div>
+
+    <h3>Research Workflow Checklist</h3>
+    <ul class="checklist">
+      <li>Open Claude Desktop and enable Cowork</li>
+      <li>Paste your customized research prompt</li>
+      <li>Let Claude open and read each source website</li>
+      <li>Check in periodically — redirect if it's going off track</li>
+      <li>Review the source tabs Claude left open</li>
+      <li>Read through the finished document</li>
+      <li>Ask Claude to adjust any data that looks wrong</li>
+      <li>Add your own notes or edits to the final doc</li>
+      <li>Save or share the document</li>
+      <li>Close the research tabs when done</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- USE CASE 3: FORM FILLING -->
+  <div class="section">
+    <div class="use-case-num">USE CASE 03</div>
+    <h2>Fill Out This Application / Form</h2>
+    <p class="muted">Data entry, applications, registrations — automated and reviewed before submit.</p>
+
+    <h3>The Prompt</h3>
+    <div class="prompt-box">
+      <p>Open this job application form: [paste URL]. Use the personal info I'm about to give you to fill in every field. For work experience, use my resume that's open in the other tab. For any field you're not sure about, leave it blank and highlight it for me. Do NOT submit the form — let me review everything first.</p>
+    </div>
+
+    <h3>What Happens on Screen</h3>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <p><strong>Claude opens the form URL</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude clicks into the browser address bar, types or pastes the URL you provided, and the application form loads. Claude scans the entire form to understand what fields exist — text inputs, dropdowns, file uploads, date pickers, etc.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <p><strong>Claude switches to your resume tab to gather info</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude clicks on the browser tab where your resume is open (PDF viewer, Google Doc, or Word Online). It reads through your work history, education, skills, and contact info. Then it switches back to the form tab.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <p><strong>Claude fills in each field</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Starting from the top of the form, Claude clicks into each field and types the appropriate info. For dropdowns, it clicks the menu and selects the right option. For date fields, it uses the date picker. You'll see fields being filled one by one, like someone is typing with purpose.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <p><strong>Claude handles tricky fields</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>For multi-page forms, Claude clicks "Next" or "Continue" to move through pages. For conditional fields (like "If yes, explain"), Claude reads the context and fills accordingly. For fields it can't confidently fill, it leaves them blank and tells you in the chat: "I left the 'Salary Expectation' field blank — want me to fill that in?"</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <p><strong>Claude stops before submit</strong></p>
+        <div class="screen">
+          <div class="screen-label">ON YOUR SCREEN</div>
+          <p>Claude finishes filling the form and tells you: "All fields are filled. I left [X] fields blank for your review. The Submit button is at the bottom — I haven't clicked it. Please scroll through and check everything before submitting."</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Handling Special Form Elements</h3>
+    <table>
+      <tr><th>ELEMENT</th><th>HOW CLAUDE HANDLES IT</th></tr>
+      <tr><td>Dropdown menus</td><td>Clicks to open, scrolls to find the right option, clicks to select</td></tr>
+      <tr><td>File uploads</td><td>Claude can click the upload button and navigate your file browser to select a file. Tell it where the file is: "Upload my resume from the Desktop."</td></tr>
+      <tr><td>Multi-page forms</td><td>Clicks Next/Continue, fills each page, moves forward. Can go Back if needed.</td></tr>
+      <tr><td>Radio buttons</td><td>Clicks the correct option based on your info</td></tr>
+      <tr><td>Checkboxes</td><td>Checks the relevant boxes. For "Select all that apply," it chooses based on your resume/info.</td></tr>
+      <tr><td>Date pickers</td><td>Clicks the date field, navigates the calendar widget, selects the date</td></tr>
+      <tr><td>Rich text editors</td><td>Types directly into WYSIWYG editors, can apply basic formatting if requested</td></tr>
+    </table>
+
+    <h3>Safety Tips</h3>
+    <div class="section-inner">
+      <ul>
+        <li><strong>ALWAYS include "Do NOT submit" in your prompt.</strong> Review everything yourself first.</li>
+        <li><strong>Never ask Claude to enter passwords.</strong> Log into sites yourself before starting.</li>
+        <li><strong>Don't paste sensitive data (SSN, bank info) in the chat.</strong> Fill those fields manually.</li>
+        <li><strong>Review every field</strong> before clicking Submit — especially dollar amounts, dates, and legal agreements.</li>
+        <li><strong>For payment forms:</strong> Fill in everything except payment details. Enter card info yourself.</li>
+        <li><strong>Screenshot the completed form</strong> before submitting, in case you need a record.</li>
+      </ul>
+    </div>
+
+    <h3>Personalize Your Workflow</h3>
+    <h4>Fill in your personal info template (for Cowork to reference)</h4>
+
+    <div class="fill-in">
+      <div class="fill-in-label">Full Name</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Email Address</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Phone Number</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Mailing Address</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Current Job Title</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">LinkedIn URL</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Portfolio / Website URL</div>
+    </div>
+    <div class="fill-in">
+      <div class="fill-in-label">Where Your Resume File Lives (Desktop, Google Drive, etc.)</div>
+    </div>
+
+    <h3>Form Automation Checklist</h3>
+    <ul class="checklist">
+      <li>Log into the website where the form lives (before starting Cowork)</li>
+      <li>Open your resume or reference document in another tab</li>
+      <li>Open Claude Desktop and enable Cowork</li>
+      <li>Paste your personal info and the form URL</li>
+      <li>Include "Do NOT submit" in your prompt</li>
+      <li>Let Claude fill in each field</li>
+      <li>Review every field Claude filled in</li>
+      <li>Manually fill in any sensitive fields (SSN, payment, passwords)</li>
+      <li>Complete any CAPTCHA or verification that pops up</li>
+      <li>Screenshot the completed form for your records</li>
+      <li>Submit the form yourself when everything looks correct</li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <!-- BONUS SECTION -->
+  <div class="section">
+    <h2>10 More Things to Try</h2>
+    <p class="muted">Quick tasks you can delegate to Cowork today.</p>
+
+    <div class="bonus-grid">
+      <div class="bonus-item">
+        <div class="bonus-num">01</div>
+        <p><strong>Rename Files on Your Desktop</strong><br>"Look at my Desktop. Rename all the screenshots to include today's date and a short description of what's in each one."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">02</div>
+        <p><strong>Compare Prices on Amazon</strong><br>"Open Amazon and search for [product]. Open the top 5 results in new tabs and tell me which one has the best price-to-review ratio."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">03</div>
+        <p><strong>Update a Spreadsheet</strong><br>"Open this Google Sheet [URL]. Add a new row for today's date with these numbers: [data]. Then update the totals formula."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">04</div>
+        <p><strong>Post on Social Media</strong><br>"Open Instagram in the browser. Create a new post with this caption: [text]. Select the photo that's on my Desktop called [filename]. Don't post yet — let me review."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">05</div>
+        <p><strong>Book an Appointment</strong><br>"Open [business website]. Find their booking page. Book an appointment for next Thursday afternoon. Use my name and email."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">06</div>
+        <p><strong>Organize Photos into Folders</strong><br>"Open my Photos folder. Create subfolders by month. Move each photo into the folder matching the month it was taken."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">07</div>
+        <p><strong>Fill Out a Tax Form</strong><br>"Open this tax form PDF in the browser. Fill in my personal info and the income figures I'm about to give you. Don't submit — save as draft."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">08</div>
+        <p><strong>Create a Presentation</strong><br>"Open Google Slides. Create a 10-slide presentation about [topic]. Use a clean, minimal style. Add a title slide, agenda, main points, and a closing slide."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">09</div>
+        <p><strong>Send Calendar Invites</strong><br>"Open Google Calendar. Create a meeting called [name] for next Tuesday at 2pm. Add [email addresses] as attendees. Set it for 30 minutes with a Zoom link. Don't send yet."</p>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-num">10</div>
+        <p><strong>Update Your LinkedIn Profile</strong><br>"Open LinkedIn. Go to my profile. Update my headline to [new headline]. Add [new skill] to my skills section. Update my current job description with this text: [text]."</p>
+      </div>
+    </div>
+
+    <p class="muted" style="margin-top: 24px;"><em>For any of these: always include "Don't submit/send/post yet — let me review" in your prompt. Stay in control.</em></p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="brand">BEHIKE.CO</div>
+    <p>Built in Puerto Rico</p>
+  </div>
+
+</div>
+</body>
+</html>
