@@ -1,11 +1,13 @@
 # PRIMER - Live State
 Updated: 2026-03-28
+Last Check-in: 2026-03-30
 
-## LIVE STATE
-- Revenue: $0 (11 products LIVE on Gumroad)
-- Products LIVE: starter, ecommerce, behike-os, ai-agency, freelancer, content-creator, coaching, consulting, dropshipping, saas + 1 more Kalani listed
-- Discount code: BEHIKE10 active
-- Git: clean, pushed via SSH
+## ⚡ LIVE STATE
+- Last update: 2026-03-30 — Ceiba v2 built, security audit done, 2 client websites built
+- Focus: Distribution week — 17 products still need Gumroad listing + 2 client websites ready
+- Next action: List remaining 17 products on Gumroad + get photos for client sites
+- Blocker: Client sites need real photos (Luis Tuesday, mum's Facebook photos)
+- Session status: COMMITTED (session end checkpoint)
 
 ## Products LIVE on Gumroad (11)
 - behike.gumroad.com/l/starter (free)
@@ -37,30 +39,34 @@ Updated: 2026-03-28
 
 All in products-organized/ with PDF + cover + thumbnail + GUMROAD_INFO.txt
 
-## What Got Built This Session (2026-03-28)
-- 7 new tutorial products (all audited, CSS fixed, dark PDFs)
-- 2 YouTube scripts (100 Products + Cowork 3 Use Cases)
-- Sprint dashboard rebuilt (kanban 3-column, VHS theme)
-- Lumina upgraded (528Hz + solfeggio frequencies + brown/pink noise)
-- Ceiba v2 architecture doc
-- Ideal Customer Avatar doc
-- Claude Code + Gemini prompts for v2 brain build
-- All blueprint PDFs re-fixed (header padding reduced)
-- All covers regenerated at 2x Retina, no prices
-- All thumbnails redesigned (clean typography, no borders)
-- 10+ ideas captured to IDEAS_BACKLOG.md
+## What Got Done Recently
+- 11 products live on Gumroad (from zero — real milestone)
+- 7 tutorial products built (3/28) — all audited with covers + thumbnails
+- Ceiba v2 memory system BUILT (3/29) — 5 components, all checks passing
+- Security audit completed (3/29) — .env untracked, worker.py hardened, 8 bugs fixed
+- Innova Barber website BUILT (3/29) — dark premium, Booksy data, Bad Bunny cursor
+- Hogar Ana Gabriel website BUILT (3/30) — warm green/gold, Hormozi copy, family story
+- Digital presence kits created for both businesses
+- Creative flooding ad strategy captured in knowledge library
+- Local business package concept documented
+- Hogar SaaS idea documented (AI compliance for nursing homes)
 
 ## NEXT SESSION PRIORITIES
-1. List remaining 17 products on Gumroad
-2. Build Ceiba v2 memory system (prompt ready at Ceiba/inbox/claude-code-prompt-ceiba-v2.md)
-3. Create @behikeai Instagram
-4. Record YouTube video (script ready)
-5. Configure DNS
+1. **List remaining 17 products on Gumroad** — GUMROAD_INFO.txt files ready, this is copy-paste work
+2. **Get photos for client sites** — Luis (Tuesday), mum's Facebook (Cowork or manual)
+3. **Deploy both sites to Naboria** — when DNS is configured
+4. **Create @behikeai Instagram** — 2000+ posts ready, 10 min to create account
+5. Record YouTube video (script ready)
+6. **Rotate API keys** — Telegram, OpenAI, Notion (compromised in git history)
+
+DISTRIBUTION WEEK — no new products until all 28 are listed and Instagram is live.
 
 ## Key Files
 - Sprint dashboard: dashboards/sprint-vhs.html
 - Product folders: READY-TO-SELL/products-organized/
 - YouTube scripts: Ceiba/projects/content-empire/youtube-scripts/
-- Ceiba v2 prompt: Ceiba/inbox/claude-code-prompt-ceiba-v2.md
+- Ceiba v2 memory: mem/ (primer, context_graph, status, verifier, fleet, patterns/)
+- Innova Barber: projects/innova-barber/
+- Hogar Ana Gabriel: projects/hogar-ana-gabriel/
 - Ideal customer: Ceiba/projects/IDEAL_CUSTOMER.md
 - Architecture: Ceiba/projects/CEIBA_V2_ARCHITECTURE.md

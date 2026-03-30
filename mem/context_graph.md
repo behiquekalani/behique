@@ -89,6 +89,31 @@ nodes:
     description: "Configure DNS for behike.store domain"
     links: [person-kalani, machine-naboria]
 
+  - id: project-local-biz-package
+    type: project
+    status: active
+    priority: 3
+    description: "Behike local business package - website, SEO, Google, social for PR businesses"
+    links: [person-kalani, project-gumroad-store, pattern-local-business-site, pattern-creative-flooding]
+
+  - id: project-innova-barber-site
+    type: project
+    status: active
+    description: "Innova Barber Studio website for Luis Anexis in Morovis"
+    links: [project-local-biz-package, tool-claude-code, machine-naboria]
+
+  - id: project-hogar-ana-gabriel
+    type: project
+    status: active
+    description: "Hogar Ana Gabriel website for Kalani's mum - elderly care in Ciales"
+    links: [project-local-biz-package, tool-claude-code, machine-naboria, person-kalani]
+
+  - id: project-hogar-saas
+    type: project
+    status: backlog
+    description: "AI compliance and operations SaaS for nursing homes in PR"
+    links: [project-hogar-ana-gabriel, project-local-biz-package, person-kalani, tool-claude-code]
+
   # === PRODUCTS (grouped) ===
   - id: product-blueprints
     type: product-group
@@ -193,6 +218,16 @@ nodes:
     type: pattern
     file: "mem/patterns/gumroad-listing.md"
     links: [project-gumroad-store, tool-gumroad]
+
+  - id: pattern-local-business-site
+    type: pattern
+    file: "mem/patterns/local-business-site.md"
+    links: [project-local-biz-package, project-innova-barber-site, project-hogar-ana-gabriel]
+
+  - id: pattern-creative-flooding
+    type: pattern
+    file: "mem/patterns/creative-flooding.md"
+    links: [project-local-biz-package, project-gumroad-store]
 
   # === PEOPLE ===
   - id: person-kalani

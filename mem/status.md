@@ -66,6 +66,30 @@ items:
     owner: ceiba
     notes: "dashboards/sprint-vhs.html - 3 column kanban, VHS theme"
 
+  - name: "Innova Barber website"
+    status: active
+    last_modified: 2026-03-30
+    priority: 3
+    context_weight: 2
+    owner: ceiba
+    notes: "Built, needs real photos from Luis. Deploy to Naboria when DNS ready."
+
+  - name: "Hogar Ana Gabriel website"
+    status: active
+    last_modified: 2026-03-30
+    priority: 3
+    context_weight: 3
+    owner: ceiba
+    notes: "Built with Hormozi copy. Needs Facebook photos. Deploy to Naboria."
+
+  - name: "Behike local business package"
+    status: active
+    last_modified: 2026-03-30
+    priority: 4
+    context_weight: 3
+    owner: kalani
+    notes: "Website + SEO + Google + social + job postings. Innova Barber and Hogar are first two clients."
+
   # === TODO (queued, ready to do) ===
   - name: "Create @behikeai Instagram"
     status: todo
@@ -130,6 +154,13 @@ items:
     priority: 99
     context_weight: 3
     notes: "Full vis.js graph of context_graph. Later."
+
+  - name: "Hogar SaaS - AI compliance system"
+    status: backlog
+    last_modified: 2026-03-30
+    priority: 99
+    context_weight: 4
+    notes: "AI compliance and operations system for hogares de ancianos in PR. Test with mum's hogar. Build after distribution week."
 
   - name: "Hermit Crab model-swap testing"
     status: backlog
