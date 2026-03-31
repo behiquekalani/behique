@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumina - Circadian Wellness</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--amber:#FFB347;--bg:#0a0a0a;--card:#141414;--text:#e8e8e8;--muted:#666}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.blue-filter{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,140,0,0);pointer-events:none;z-index:9999;transition:background 0.3s}
+.container{max-width:800px;margin:0 auto;position:relative;z-index:1}
+h1{text-align:center;font-size:1.4rem;font-weight:600;color:var(--amber);letter-spacing:2px;margin-bottom:6px}
+.subtitle{text-align:center;color:var(--muted);font-size:0.8rem;margin-bottom:24px;letter-spacing:1px}
+.clock{text-align:center;font-size:3.2rem;font-weight:200;letter-spacing:4px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+.quote{text-align:center;color:var(--muted);font-size:0.85rem;font-style:italic;margin-bottom:28px;min-height:2.4em;line-height:1.4;padding:0 20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:16px;padding:20px;border:1px solid #222}
+.card-title{font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:14px;font-weight:600}
+.slider-row{display:flex;align-items:center;gap:12px}
+.slider-row span{font-size:0.8rem;color:var(--muted);min-width:36px;text-align:right}
+input[type=range]{-webkit-appearance:none;flex:1;height:4px;background:#333;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--amber);border-radius:50%;cursor:pointer}
+.timer-display{display:flex;flex-direction:column;align-items:center;gap:12px}
+.timer-circle{position:relative;width:120px;height:120px}
+.timer-circle svg{transform:rotate(-90deg)}
+.timer-circle circle{fill:none;stroke-width:3}
+.timer-bg{stroke:#222}
+.timer-progress{stroke:var(--amber);stroke-linecap:round;transition:stroke-dashoffset 0.5s linear}
+.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.6rem;font-weight:300;font-variant-numeric:tabular-nums}
+.timer-label{font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.timer-btns{display:flex;gap:8px}
+.btn{background:#222;color:var(--text);border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:background 0.2s}
+.btn:hover{background:#333}
+.btn.active{background:var(--amber);color:#000}
+.sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sound-btn{background:#1a1a1a;border:1px solid #222;color:var(--text);padding:10px;border-radius:10px;cursor:pointer;font-size:0.8rem;font-family:inherit;transition:all 0.2s}
+.sound-btn:hover{border-color:#444}
+.sound-btn.active{border-color:var(--amber);background:#1f1a10;color:var(--amber)}
+.breath-container{display:flex;flex-direction:column;align-items:center;gap:10px}
+.breath-circle{width:100px;height:100px;border-radius:50%;border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;transition:transform 4s ease-in-out, box-shadow 4s ease-in-out;opacity:0.7}
+.breath-circle.expand{transform:scale(1.4);box-shadow:0 0 30px rgba(255,179,71,0.2);opacity:1}
+.breath-text{font-size:0.85rem;color:var(--amber);font-weight:300}
+.breath-phase{font-size:0.75rem;color:var(--muted);min-height:1.2em}
+footer{text-align:center;color:#333;font-size:0.7rem;padding:20px 0;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="blue-filter" id="blueFilter"></div>
+<div class="container">
+  <h1>LUMINA</h1>
+  <p class="subtitle">CIRCADIAN WELLNESS</p>
+  <div class="clock" id="clock">00:00:00</div>
+  <p class="quote" id="quote"></p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Blue Light Filter</div>
+      <div class="slider-row">
+        <input type="range" id="filterSlider" min="0" max="100" value="0">
+        <span id="filterVal">0%</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ambient Sounds</div>
+      <div class="sound-grid">
+        <button class="sound-btn" data-sound="rain">Rain</button>
+        <button class="sound-btn" data-sound="ocean">Ocean</button>
+        <button class="sound-btn" data-sound="forest">Forest</button>
+        <button class="sound-btn" data-sound="white">White Noise</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Focus Timer</div>
+      <div class="timer-display">
+        <div class="timer-circle">
+          <svg width="120" height="120">
+            <circle class="timer-bg" cx="60" cy="60" r="54"/>
+            <circle class="timer-progress" id="timerProgress" cx="60" cy="60" r="54" stroke-dasharray="339.292" stroke-dashoffset="0"/>
+          </svg>
+          <div class="timer-text" id="timerText">25:00</div>
+        </div>
+        <div class="timer-label" id="timerLabel">Work Session</div>
+        <div class="timer-btns">
+          <button class="btn" id="timerStart">Start</button>
+          <button class="btn" id="timerReset">Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Breathing Exercise</div>
+      <div class="breath-container">
+        <div class="breath-circle" id="breathCircle">
+          <span class="breath-text" id="breathText">Start</span>
+        </div>
+        <div class="breath-phase" id="breathPhase"></div>
+        <button class="btn" id="breathBtn">Begin</button>
+      </div>
+    </div>
+  </div>
+  <footer>Lumina v1.0 | behike.co</footer>
+</div>
+<script>
+const quotes = [
+  "The night is darkest just before the dawn.",
+  "Rest is not idleness. It is the pause that makes the work possible.",
+  "Your calm mind is the ultimate weapon against your challenges.",
+  "Small daily improvements are the key to staggering long-term results.",
+  "Discipline is choosing between what you want now and what you want most.",
+  "The body heals with play, the mind heals with laughter, the spirit heals with silence.",
+  "What you do today can improve all your tomorrows.",
+  "Almost everything will work again if you unplug it for a few minutes, including you.",
+  "Progress, not perfection, is what we should be asking of ourselves.",
+  "Take care of your body. It is the only place you have to live."
+];
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', {hour12: false});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Quote
+let qi = Math.floor(Math.random() * quotes.length);
+document.getElementById('quote').textContent = quotes[qi];
+setInterval(() => { qi = (qi + 1) % quotes.length; document.getElementById('quote').textContent = quotes[qi]; }, 30000);
+
+// Blue light filter
+const filterSlider = document.getElementById('filterSlider');
+const filterVal = document.getElementById('filterVal');
+const blueFilter = document.getElementById('blueFilter');
+const savedFilter = localStorage.getItem('lumina-filter');
+if (savedFilter) { filterSlider.value = savedFilter; }
+function applyFilter() {
+  const v = filterSlider.value;
+  filterVal.textContent = v + '%';
+  blueFilter.style.background = `rgba(255, 140, 0, ${v * 0.003})`;
+  localStorage.setItem('lumina-filter', v);
+}
+filterSlider.addEventListener('input', applyFilter);
+applyFilter();
+
+// Focus Timer
+let timerSeconds = 25 * 60, timerTotal = 25 * 60, timerRunning = false, timerInterval = null, isBreak = false;
+const timerText = document.getElementById('timerText');
+const timerProgress = document.getElementById('timerProgress');
+const timerLabel = document.getElementById('timerLabel');
+const circumference = 2 * Math.PI * 54;
+
+function updateTimer() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  timerText.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const offset = circumference * (1 - timerSeconds / timerTotal);
+  timerProgress.style.strokeDashoffset = offset;
+}
+
+document.getElementById('timerStart').addEventListener('click', function() {
+  if (timerRunning) {
+    clearInterval(timerInterval); timerRunning = false; this.textContent = 'Start';
+  } else {
+    timerRunning = true; this.textContent = 'Pause';
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      if (timerSeconds <= 0) {
+        clearInterval(timerInterval); timerRunning = false;
+        document.getElementById('timerStart').textContent = 'Start';
+        isBreak = !isBreak;
+        timerTotal = isBreak ? 5 * 60 : 25 * 60;
+        timerSeconds = timerTotal;
+        timerLabel.textContent = isBreak ? 'Break Time' : 'Work Session';
+        try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play(); } catch(e) {}
+      }
+      updateTimer();
+    }, 1000);
+  }
+});
+document.getElementById('timerReset').addEventListener('click', () => {
+  clearInterval(timerInterval); timerRunning = false; isBreak = false;
+  timerTotal = 25 * 60; timerSeconds = timerTotal;
+  timerLabel.textContent = 'Work Session';
+  document.getElementById('timerStart').textContent = 'Start';
+  updateTimer();
+});
+updateTimer();
+
+// Ambient sounds via Web Audio API
+let audioCtx = null, activeSound = null, activeNodes = [];
+function getAudioCtx() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
+
+function createNoise(type) {
+  const ctx = getAudioCtx();
+  const bufferSize = 2 * ctx.sampleRate;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  if (type === 'white') {
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+  } else if (type === 'rain') {
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.97 ? 0.8 : 0.15);
+    }
+  } else if (type === 'ocean') {
+    for (let i = 0; i < bufferSize; i++) {
+      const t = i / ctx.sampleRate;
+      data[i] = (Math.random() * 2 - 1) * 0.3 * (0.5 + 0.5 * Math.sin(t * 0.4));
+    }
+  } else if (type === 'forest') {
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (Math.random() > 0.99 ? 0.6 : 0.05);
+    }
+  }
+  const source = ctx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  const gain = ctx.createGain(); gain.gain.value = 0.3;
+  const filter = ctx.createBiquadFilter();
+  if (type === 'rain') { filter.type = 'highpass'; filter.frequency.value = 800; }
+  else if (type === 'ocean') { filter.type = 'lowpass'; filter.frequency.value = 400; }
+  else if (type === 'forest') { filter.type = 'bandpass'; filter.frequency.value = 2000; filter.Q.value = 0.5; }
+  else { filter.type = 'lowpass'; filter.frequency.value = 8000; }
+  source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  source.start();
+  return [source, filter, gain];
+}
+
+function stopSound() {
+  activeNodes.forEach(n => { try { n.disconnect(); } catch(e) {} });
+  activeNodes = []; activeSound = null;
+}
+
+document.querySelectorAll('.sound-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sound = btn.dataset.sound;
+    document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+    if (activeSound === sound) { stopSound(); localStorage.removeItem('lumina-sound'); return; }
+    stopSound();
+    activeNodes = createNoise(sound);
+    activeSound = sound;
+    btn.classList.add('active');
+    localStorage.setItem('lumina-sound', sound);
+  });
+});
+
+const savedSound = localStorage.getItem('lumina-sound');
+if (savedSound) {
+  document.addEventListener('click', function initSound() {
+    if (!activeSound) {
+      const btn = document.querySelector(`[data-sound="${savedSound}"]`);
+      if (btn) btn.click();
+    }
+    document.removeEventListener('click', initSound);
+  }, { once: true });
+}
+
+// Breathing exercise - 4-7-8
+let breathRunning = false, breathTimeout = null;
+const breathCircle = document.getElementById('breathCircle');
+const breathText = document.getElementById('breathText');
+const breathPhase = document.getElementById('breathPhase');
+const breathBtn = document.getElementById('breathBtn');
+
+function breathCycle() {
+  if (!breathRunning) return;
+  // Inhale 4s
+  breathCircle.style.transition = 'transform 4s ease-in-out, box-shadow 4s ease-in-out, opacity 4s ease-in-out';
+  breathCircle.classList.add('expand');
+  breathText.textContent = '4s'; breathPhase.textContent = 'Breathe In';
+  let count = 4;
+  const inhaleInt = setInterval(() => { count--; if (count > 0) breathText.textContent = count + 's'; }, 1000);
+  breathTimeout = setTimeout(() => {
+    clearInterval(inhaleInt);
+    if (!breathRunning) return;
+    // Hold 7s
+    breathText.textContent = '7s'; breathPhase.textContent = 'Hold';
+    let hCount = 7;
+    const holdInt = setInterval(() => { hCount--; if (hCount > 0) breathText.textContent = hCount + 's'; }, 1000);
+    breathTimeout = setTimeout(() => {
+      clearInterval(holdInt);
+      if (!breathRunning) return;
+      // Exhale 8s
+      breathCircle.style.transition = 'transform 8s ease-in-out, box-shadow 8s ease-in-out, opacity 8s ease-in-out';
+      breathCircle.classList.remove('expand');
+      breathText.textContent = '8s'; breathPhase.textContent = 'Breathe Out';
+      let eCount = 8;
+      const exInt = setInterval(() => { eCount--; if (eCount > 0) breathText.textContent = eCount + 's'; }, 1000);
+      breathTimeout = setTimeout(() => { clearInterval(exInt); breathCycle(); }, 8000);
+    }, 7000);
+  }, 4000);
+}
+
+breathBtn.addEventListener('click', () => {
+  if (breathRunning) {
+    breathRunning = false; clearTimeout(breathTimeout);
+    breathCircle.classList.remove('expand');
+    breathCircle.style.transition = 'transform 0.5s, box-shadow 0.5s, opacity 0.5s';
+    breathText.textContent = 'Start'; breathPhase.textContent = '';
+    breathBtn.textContent = 'Begin';
+  } else {
+    breathRunning = true; breathBtn.textContent = 'Stop'; breathCycle();
+  }
+});
+</script>
+</body>
+</html>
