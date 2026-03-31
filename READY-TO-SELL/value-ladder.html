@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Behike - Everything You Need to Build</title>
+  <meta name="description" content="Digital products for builders with ADHD. Blueprints, guides, systems. From $0 to $49. Built by someone who uses these every day.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a; --surface: #111; --border: #1a1a1a;
+      --text: #f0f0f0; --dim: #888; --accent: #00e5ff;
+      --green: #00c853; --red: #ff4444; --gold: #ffd700;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+
+    /* HERO */
+    .hero { text-align:center; padding:100px 24px 60px; max-width:800px; margin:0 auto; }
+    .hero-tag { font-size:13px; color:var(--accent); letter-spacing:3px; text-transform:uppercase; font-weight:600; margin-bottom:16px; }
+    .hero h1 { font-size:clamp(32px,5vw,52px); font-weight:900; line-height:1.1; margin-bottom:20px; }
+    .hero h1 span { color:var(--accent); }
+    .hero p { font-size:17px; color:var(--dim); max-width:550px; margin:0 auto 32px; }
+    .hero-pain { text-align:left; max-width:400px; margin:0 auto 32px; }
+    .hero-pain s { color:#555; font-size:15px; display:block; margin:4px 0; }
+    .hero-check { color:var(--green); font-size:15px; font-weight:600; margin-top:8px; }
+
+    /* TIERS */
+    .tiers { max-width:1100px; margin:0 auto; padding:0 24px 80px; }
+    .tiers-title { text-align:center; font-size:13px; color:var(--accent); letter-spacing:3px; text-transform:uppercase; font-weight:600; margin-bottom:40px; }
+    .tier-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+
+    .tier-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:16px;
+      padding:28px; display:flex; flex-direction:column; transition:all 0.3s;
+      position:relative; overflow:hidden;
+    }
+    .tier-card:hover { border-color:var(--accent); transform:translateY(-4px); }
+    .tier-card.featured { border-color:var(--accent); }
+    .tier-card.featured::before {
+      content:'MOST POPULAR'; position:absolute; top:12px; right:-30px;
+      background:var(--accent); color:#000; font-size:10px; font-weight:800;
+      padding:4px 40px; transform:rotate(45deg); letter-spacing:1px;
+    }
+
+    .tier-badge { font-size:11px; color:var(--accent); letter-spacing:2px; text-transform:uppercase; font-weight:600; margin-bottom:12px; }
+    .tier-name { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .tier-desc { font-size:13px; color:var(--dim); margin-bottom:16px; min-height:40px; }
+    .tier-price { font-size:36px; font-weight:900; color:var(--accent); margin-bottom:4px; }
+    .tier-price .was { font-size:16px; color:#555; text-decoration:line-through; font-weight:400; margin-right:8px; }
+    .tier-save { font-size:12px; color:var(--green); font-weight:600; margin-bottom:16px; }
+
+    .tier-items { list-style:none; margin-bottom:24px; flex-grow:1; }
+    .tier-items li { font-size:13px; padding:6px 0; border-bottom:1px solid var(--border); color:var(--dim); }
+    .tier-items li::before { content:'✓ '; color:var(--green); font-weight:700; }
+
+    .tier-cta {
+      display:block; text-align:center; padding:14px; border-radius:50px;
+      font-weight:700; font-size:14px; text-decoration:none; transition:all 0.3s;
+      letter-spacing:0.5px;
+    }
+    .tier-cta.primary { background:var(--accent); color:#000; }
+    .tier-cta.primary:hover { box-shadow:0 0 20px rgba(0,229,255,0.3); }
+    .tier-cta.secondary { background:transparent; color:var(--accent); border:2px solid var(--accent); }
+    .tier-cta.secondary:hover { background:rgba(0,229,255,0.1); }
+    .tier-cta.free { background:var(--green); color:#000; }
+
+    /* ALL PRODUCTS */
+    .all-products { max-width:1100px; margin:0 auto; padding:40px 24px 80px; }
+    .all-title { font-size:28px; font-weight:800; margin-bottom:8px; text-align:center; }
+    .all-sub { font-size:15px; color:var(--dim); text-align:center; margin-bottom:40px; }
+    .product-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; }
+    .product-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:12px;
+      padding:20px; transition:all 0.3s;
+    }
+    .product-card:hover { border-color:#333; }
+    .product-name { font-size:15px; font-weight:700; margin-bottom:4px; }
+    .product-price { font-size:18px; font-weight:800; color:var(--accent); }
+    .product-pages { font-size:12px; color:var(--dim); }
+    .product-cta {
+      display:block; text-align:center; margin-top:12px; padding:8px;
+      border-radius:50px; font-size:12px; font-weight:600; text-decoration:none;
+      background:transparent; color:var(--accent); border:1px solid var(--border);
+      transition:all 0.3s;
+    }
+    .product-cta:hover { border-color:var(--accent); background:rgba(0,229,255,0.05); }
+
+    /* FOOTER */
+    footer { text-align:center; padding:40px 24px; border-top:1px solid var(--border); }
+    .footer-brand { font-size:18px; font-weight:800; letter-spacing:3px; margin-bottom:8px; }
+    .footer-brand span { color:var(--accent); }
+    .footer-dim { font-size:12px; color:var(--dim); }
+
+    /* DISCOUNT BANNER */
+    .discount-banner {
+      background:linear-gradient(90deg,var(--accent),#00c853);
+      color:#000; text-align:center; padding:12px; font-weight:700; font-size:14px;
+      position:fixed; top:0; width:100%; z-index:100;
+    }
+    .discount-banner code { background:rgba(0,0,0,0.2); padding:2px 8px; border-radius:4px; font-family:inherit; }
+
+    .hero { padding-top:140px; }
+
+    @media (max-width:768px) {
+      .tier-grid { grid-template-columns:1fr; }
+      .product-grid { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="discount-banner">
+    LAUNCH WEEK: Use code <code>BEHIKE10</code> for 10% off everything
+  </div>
+
+  <section class="hero">
+    <div class="hero-tag">Built for ADHD builders</div>
+    <h1>Stop watching. <span>Start building.</span></h1>
+    <p>Blueprints, guides, and systems for people who have 47 ideas and zero launches. Not courses. Not theory. One-page systems you fill in and build from.</p>
+    <div class="hero-pain">
+      <s>Another 40-hour course you'll never finish</s>
+      <s>Motivational content that doesn't change anything</s>
+      <s>$997 programs that teach you what YouTube gives for free</s>
+      <div class="hero-check">One-page systems. Fill in. Launch. $4.99-$49.</div>
+    </div>
+  </section>
+
+  <section class="tiers">
+    <div class="tiers-title">Choose your path</div>
+    <div class="tier-grid">
+
+      <!-- FREE -->
+      <div class="tier-card">
+        <div class="tier-badge">Start here</div>
+        <div class="tier-name">Starter</div>
+        <div class="tier-desc">See if this is for you. No risk.</div>
+        <div class="tier-price">Free</div>
+        <div class="tier-save">&nbsp;</div>
+        <ul class="tier-items">
+          <li>Solopreneur Starter Blueprint</li>
+          <li>Business model on one page</li>
+          <li>Fill-in format</li>
+          <li>Dark theme PDF</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/starter" class="tier-cta free">Download Free</a>
+      </div>
+
+      <!-- SINGLE -->
+      <div class="tier-card">
+        <div class="tier-badge">Pick one</div>
+        <div class="tier-name">Single Blueprint</div>
+        <div class="tier-desc">One business model. One system.</div>
+        <div class="tier-price">$19.99</div>
+        <div class="tier-save">&nbsp;</div>
+        <ul class="tier-items">
+          <li>1 complete blueprint (8 modules)</li>
+          <li>Fill-in action plan</li>
+          <li>Revenue model + timeline</li>
+          <li>Dark theme, print-ready</li>
+        </ul>
+        <a href="https://behike.gumroad.com" class="tier-cta secondary">Browse Blueprints</a>
+      </div>
+
+      <!-- BUNDLE -->
+      <div class="tier-card featured">
+        <div class="tier-badge">Best value</div>
+        <div class="tier-name">All 15 Blueprints</div>
+        <div class="tier-desc">Every business model. One price.</div>
+        <div class="tier-price"><span class="was">$299</span>$49</div>
+        <div class="tier-save">Save $250+</div>
+        <ul class="tier-items">
+          <li>All 15 blueprints in one ZIP</li>
+          <li>E-Commerce, AI Agency, SaaS, YouTube...</li>
+          <li>Try every model, find your fit</li>
+          <li>Lifetime access + future updates</li>
+          <li>Voice Bible template included</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/blueprint-bundle" class="tier-cta primary">Get All 15 — $49</a>
+      </div>
+
+      <!-- OS -->
+      <div class="tier-card">
+        <div class="tier-badge">The system</div>
+        <div class="tier-name">Behike OS</div>
+        <div class="tier-desc">The complete operating system.</div>
+        <div class="tier-price">$97</div>
+        <div class="tier-save">&nbsp;</div>
+        <ul class="tier-items">
+          <li>Full Behike Method framework</li>
+          <li>All blueprints included</li>
+          <li>Content engine templates</li>
+          <li>AI workflow systems</li>
+          <li>ADHD productivity stack</li>
+          <li>Lifetime updates</li>
+        </ul>
+        <a href="https://behike.gumroad.com/l/behike-os" class="tier-cta secondary">Get Behike OS</a>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="all-products">
+    <div class="all-title">All Products</div>
+    <div class="all-sub">45 products. $4.99 to $97. Pick what you need.</div>
+    <div class="product-grid">
+      <div class="product-card"><div class="product-name">First Dollar Guide</div><div class="product-price">$4.99</div><div class="product-pages">5 pages</div><a href="https://behike.gumroad.com/l/first-dollar" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Prompt Engineering Cheat Sheet</div><div class="product-price">$4.99</div><div class="product-pages">18 pages</div><a href="https://behike.gumroad.com/l/prompt-cheatsheet" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Self-Hosted Store Guide</div><div class="product-price">$4.99</div><div class="product-pages">12 pages</div><a href="https://behike.gumroad.com/l/self-hosted-store" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Social Media Pipeline</div><div class="product-price">$4.99</div><div class="product-pages">11 pages</div><a href="https://behike.gumroad.com/l/social-pipeline" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">AI News Tracker Guide</div><div class="product-price">$4.99</div><div class="product-pages">9 pages</div><a href="https://behike.gumroad.com/l/ai-news-tracker" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Gumroad AI Guide</div><div class="product-price">$9.99</div><div class="product-pages">PDF</div><a href="https://behike.gumroad.com/l/gumroad-ai" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Claude Code for Builders</div><div class="product-price">$9.99</div><div class="product-pages">10 lessons</div><a href="https://behike.gumroad.com/l/claude-code" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">AI Copywriting Playbook</div><div class="product-price">$9.99</div><div class="product-pages">15 pages</div><a href="https://behike.gumroad.com/l/ai-copywriting" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Niche Sniper Guide</div><div class="product-price">$9.99</div><div class="product-pages">11 pages</div><a href="https://behike.gumroad.com/l/niche-sniper" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Faceless Creator Blueprint</div><div class="product-price">$9.99</div><div class="product-pages">13 pages</div><a href="https://behike.gumroad.com/l/faceless-creator" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Email List Accelerator</div><div class="product-price">$9.99</div><div class="product-pages">13 pages</div><a href="https://behike.gumroad.com/l/email-list" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Gumroad Seller's Playbook</div><div class="product-price">$9.99</div><div class="product-pages">22 pages</div><a href="https://behike.gumroad.com/l/gumroad-playbook" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">LinkedIn Growth Playbook</div><div class="product-price">$9.99</div><div class="product-pages">15 pages</div><a href="https://behike.gumroad.com/l/linkedin-growth" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Personal Brand Blueprint</div><div class="product-price">$9.99</div><div class="product-pages">20 pages</div><a href="https://behike.gumroad.com/l/personal-brand" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Solopreneur OS</div><div class="product-price">$12.99</div><div class="product-pages">36 pages</div><a href="https://behike.gumroad.com/l/solopreneur-os" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Behike Method v2</div><div class="product-price">$19.99</div><div class="product-pages">34 pages</div><a href="https://behike.gumroad.com/l/behike-method" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">E-Commerce Blueprint</div><div class="product-price">$19.99</div><div class="product-pages">8 modules</div><a href="https://behike.gumroad.com/l/ecommerce" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">AI Agency Blueprint</div><div class="product-price">$19.99</div><div class="product-pages">8 modules</div><a href="https://behike.gumroad.com/l/ai-agency" class="product-cta">Get it</a></div>
+      <div class="product-card"><div class="product-name">Blueprint Bundle</div><div class="product-price">$49</div><div class="product-pages">15 blueprints</div><a href="https://behike.gumroad.com/l/blueprint-bundle" class="product-cta">Get all 15</a></div>
+      <div class="product-card"><div class="product-name">Behike OS</div><div class="product-price">$97</div><div class="product-pages">Complete system</div><a href="https://behike.gumroad.com/l/behike-os" class="product-cta">Get the OS</a></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-brand">BEHIKE<span>.</span></div>
+    <p class="footer-dim">Built for builders with ADHD. Not another course. A system.</p>
+    <p class="footer-dim" style="margin-top:8px">&copy; 2026 Behike. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
