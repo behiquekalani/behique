@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Buddy - ADHD Study System</title>
+<style>
+:root{--bg:#0a0a0f;--surface:#10101a;--card:#161622;--border:#222235;--text:#d8d8e8;--dim:#6a6a80;--accent:#7c5cff;--green:#00c853;--red:#ff4444;--gold:#ffd700;--blue:#00b0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.app{max-width:700px;margin:0 auto;padding:24px}
+
+/* Header */
+.header{text-align:center;padding:40px 0 32px}
+.header h1{font-size:28px;font-weight:900;margin-bottom:4px}.header h1 span{color:var(--accent)}
+.header p{color:var(--dim);font-size:14px}
+
+/* Upload zone */
+.upload-zone{border:2px dashed var(--border);border-radius:16px;padding:48px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:24px}
+.upload-zone:hover{border-color:var(--accent);background:rgba(124,92,255,.05)}
+.upload-zone .icon{font-size:40px;margin-bottom:12px}
+.upload-zone .label{font-size:15px;font-weight:600;margin-bottom:4px}
+.upload-zone .sub{font-size:12px;color:var(--dim)}
+
+/* Study session */
+.session{display:none}
+.session.active{display:block}
+
+/* Progress bar */
+.progress-wrap{margin-bottom:24px}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:6px}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s}
+
+/* Timer */
+.timer-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;text-align:center;margin-bottom:16px}
+.timer-display{font-size:56px;font-weight:900;font-family:'Courier New',monospace;margin-bottom:4px;color:var(--accent)}
+.timer-phase{font-size:13px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.timer-controls{display:flex;gap:12px;justify-content:center}
+.timer-btn{padding:12px 32px;border-radius:50px;border:none;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;font-family:inherit}
+.timer-btn.primary{background:var(--accent);color:#fff}
+.timer-btn.secondary{background:var(--border);color:var(--text)}
+
+/* Content card */
+.content-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.content-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.content-title .badge{background:var(--accent);color:#fff;font-size:11px;padding:2px 10px;border-radius:50px;font-weight:600}
+.content-text{font-size:15px;line-height:1.8;color:var(--dim);white-space:pre-wrap;max-height:400px;overflow-y:auto;padding-right:8px}
+
+/* Quiz */
+.quiz-card{background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:24px;margin-bottom:16px}
+.quiz-question{font-size:16px;font-weight:600;margin-bottom:16px}
+.quiz-options{list-style:none}
+.quiz-option{padding:12px 16px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all .2s;font-size:14px}
+.quiz-option:hover{border-color:var(--accent);background:rgba(124,92,255,.05)}
+.quiz-option.correct{border-color:var(--green);background:rgba(0,200,83,.1);color:var(--green)}
+.quiz-option.wrong{border-color:var(--red);background:rgba(255,68,68,.1);color:var(--red)}
+
+/* XP */
+.xp-bar{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
+.xp-level{width:48px;height:48px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.xp-info{flex:1}
+.xp-label{font-size:12px;color:var(--dim);margin-bottom:4px}
+.xp-track{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;background:var(--gold);border-radius:3px;transition:width .5s}
+.xp-text{font-size:12px;color:var(--gold);margin-top:4px;font-weight:600}
+
+/* Break screen */
+.break-screen{text-align:center;padding:48px 0}
+.break-screen .emoji{font-size:64px;margin-bottom:16px}
+.break-screen h2{font-size:24px;margin-bottom:8px}
+.break-screen p{color:var(--dim);font-size:14px;margin-bottom:24px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:22px;font-weight:800;margin-bottom:2px}
+.stat-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+
+/* Mobile */
+@media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}.timer-display{font-size:40px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <h1>Study <span>Buddy</span></h1>
+    <p>Upload your material. Get a structured study plan. Earn XP.</p>
+  </div>
+
+  <!-- XP BAR -->
+  <div class="xp-bar">
+    <div class="xp-level" id="xp-level">1</div>
+    <div class="xp-info">
+      <div class="xp-label">Level <span id="xp-level-text">1</span> &bull; <span id="xp-total">0</span> XP</div>
+      <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+      <div class="xp-text" id="xp-next">0 / 100 XP to next level</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num" id="s-blocks" style="color:var(--accent)">0</div><div class="stat-label">Blocks</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-minutes" style="color:var(--green)">0</div><div class="stat-label">Minutes</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-quizzes" style="color:var(--gold)">0</div><div class="stat-label">Quizzes</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-streak" style="color:var(--red)">0</div><div class="stat-label">Streak</div></div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="upload-section">
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+      <div class="icon">📄</div>
+      <div class="label">Upload Study Material</div>
+      <div class="sub">Paste text, or drop a .txt file. Content gets split into 25-min study blocks.</div>
+    </div>
+    <input type="file" id="file-input" accept=".txt,.md" style="display:none" onchange="loadFile(event)">
+
+    <div class="content-card">
+      <div class="content-title">Or paste your text here</div>
+      <textarea id="paste-area" style="width:100%;min-height:150px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:inherit;font-size:14px;resize:vertical" placeholder="Paste your study material here..."></textarea>
+      <button class="timer-btn primary" style="margin-top:12px;width:100%" onclick="startStudy()">Start Studying</button>
+    </div>
+  </div>
+
+  <!-- SESSION -->
+  <div class="session" id="study-session">
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-label"><span id="block-label">Block 1 of 1</span><span id="block-pct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-card">
+      <div class="timer-display" id="session-timer">25:00</div>
+      <div class="timer-phase" id="session-phase">Study Block</div>
+      <div class="timer-controls">
+        <button class="timer-btn primary" id="session-play" onclick="toggleSession()">Start</button>
+        <button class="timer-btn secondary" onclick="skipBlock()">Skip →</button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-card" id="study-content">
+      <div class="content-title">Reading <span class="badge" id="content-badge">Block 1</span></div>
+      <div class="content-text" id="content-text"></div>
+    </div>
+
+    <!-- Quiz (hidden until block ends) -->
+    <div class="quiz-card" id="quiz-section" style="display:none">
+      <div class="content-title">Quick Quiz <span class="badge" style="background:var(--gold)">+25 XP</span></div>
+      <div class="quiz-question" id="quiz-q"></div>
+      <ul class="quiz-options" id="quiz-options"></ul>
+    </div>
+
+    <!-- Break screen -->
+    <div class="break-screen" id="break-screen" style="display:none">
+      <div class="emoji">🧘</div>
+      <h2>Break Time</h2>
+      <p>5 minutes. Breathe. Stretch. Don't touch your phone.</p>
+      <div class="timer-display" id="break-timer" style="font-size:40px">5:00</div>
+      <button class="timer-btn primary" style="margin-top:16px" onclick="endBreak()">Skip Break</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+var stats = JSON.parse(localStorage.getItem('study-buddy') || '{}');
+if (!stats.xp) stats.xp = 0;
+if (!stats.level) stats.level = 1;
+if (!stats.blocks) stats.blocks = 0;
+if (!stats.minutes) stats.minutes = 0;
+if (!stats.quizzes) stats.quizzes = 0;
+if (!stats.streak) stats.streak = 0;
+function save(){localStorage.setItem('study-buddy',JSON.stringify(stats))}
+
+var blocks = [];
+var currentBlock = 0;
+var sessionTimer = null;
+var secondsLeft = 25*60;
+var isRunning = false;
+var breakTimer = null;
+
+function updateUI(){
+  document.getElementById('xp-total').textContent = stats.xp;
+  document.getElementById('xp-level').textContent = stats.level;
+  document.getElementById('xp-level-text').textContent = stats.level;
+  var xpForLevel = stats.level * 100;
+  var xpInLevel = stats.xp % xpForLevel;
+  var pct = (xpInLevel / xpForLevel * 100);
+  document.getElementById('xp-fill').style.width = pct + '%';
+  document.getElementById('xp-next').textContent = xpInLevel + ' / ' + xpForLevel + ' XP to next level';
+  document.getElementById('s-blocks').textContent = stats.blocks;
+  document.getElementById('s-minutes').textContent = stats.minutes;
+  document.getElementById('s-quizzes').textContent = stats.quizzes;
+  document.getElementById('s-streak').textContent = stats.streak;
+}
+updateUI();
+
+function addXP(amount){
+  stats.xp += amount;
+  var xpForLevel = stats.level * 100;
+  if (stats.xp >= stats.level * xpForLevel) { stats.level++; }
+  save(); updateUI();
+}
+
+// Load file
+window.loadFile = function(e){
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){ document.getElementById('paste-area').value = ev.target.result; };
+  reader.readAsText(file);
+};
+
+// Start study
+window.startStudy = function(){
+  var text = document.getElementById('paste-area').value.trim();
+  if (!text || text.length < 50) { alert('Paste at least a paragraph of study material.'); return; }
+
+  // Split into blocks (~500 words each for 25-min reading)
+  var words = text.split(/\s+/);
+  var wordsPerBlock = 500;
+  blocks = [];
+  for (var i = 0; i < words.length; i += wordsPerBlock) {
+    blocks.push(words.slice(i, i + wordsPerBlock).join(' '));
+  }
+  if (blocks.length === 0) blocks = [text];
+
+  currentBlock = 0;
+  document.getElementById('upload-section').style.display = 'none';
+  document.getElementById('study-session').classList.add('active');
+  loadBlock();
+};
+
+function loadBlock(){
+  document.getElementById('block-label').textContent = 'Block '+(currentBlock+1)+' of '+blocks.length;
+  var pct = ((currentBlock)/blocks.length*100).toFixed(0);
+  document.getElementById('block-pct').textContent = pct+'%';
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('content-badge').textContent = 'Block '+(currentBlock+1);
+  document.getElementById('content-text').textContent = blocks[currentBlock];
+  document.getElementById('quiz-section').style.display = 'none';
+  document.getElementById('break-screen').style.display = 'none';
+  document.getElementById('study-content').style.display = 'block';
+  secondsLeft = 25*60;
+  updateTimerDisplay();
+  document.getElementById('session-phase').textContent = 'Study Block';
+  document.getElementById('session-play').textContent = 'Start';
+  isRunning = false;
+}
+
+window.toggleSession = function(){
+  if (isRunning) {
+    clearInterval(sessionTimer);
+    isRunning = false;
+    document.getElementById('session-play').textContent = 'Resume';
+  } else {
+    isRunning = true;
+    document.getElementById('session-play').textContent = 'Pause';
+    sessionTimer = setInterval(function(){
+      secondsLeft--;
+      updateTimerDisplay();
+      if (secondsLeft <= 0) {
+        clearInterval(sessionTimer);
+        isRunning = false;
+        blockComplete();
+      }
+    },1000);
+  }
+};
+
+function updateTimerDisplay(){
+  var m = Math.floor(secondsLeft/60);
+  var s = secondsLeft%60;
+  document.getElementById('session-timer').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+
+window.skipBlock = function(){ clearInterval(sessionTimer); isRunning = false; blockComplete(); };
+
+function blockComplete(){
+  stats.blocks++;
+  stats.minutes += 25;
+  addXP(50);
+  save();
+
+  // Show quiz
+  generateQuiz();
+}
+
+function generateQuiz(){
+  var text = blocks[currentBlock];
+  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text.substring(0,100)];
+  var keySentence = sentences[Math.floor(Math.random()*Math.min(sentences.length,5))].trim();
+
+  // Extract a key phrase to blank out
+  var words = keySentence.split(/\s+/);
+  if (words.length < 4) { nextBlockOrEnd(); return; }
+  var blankIdx = Math.floor(Math.random()*(words.length-2))+1;
+  var answer = words[blankIdx];
+  var question = words.map(function(w,i){return i===blankIdx?'_____':w}).join(' ');
+
+  // Generate wrong answers
+  var allWords = text.split(/\s+/).filter(function(w){return w.length>3 && w!==answer});
+  var wrongAnswers = [];
+  while (wrongAnswers.length < 3 && allWords.length > 0) {
+    var w = allWords.splice(Math.floor(Math.random()*allWords.length),1)[0];
+    if (w && wrongAnswers.indexOf(w)===-1) wrongAnswers.push(w);
+  }
+  while (wrongAnswers.length < 3) wrongAnswers.push('N/A');
+
+  var options = wrongAnswers.concat([answer]).sort(function(){return Math.random()-0.5});
+
+  document.getElementById('quiz-q').textContent = 'Fill in the blank: "'+question+'"';
+  var optHtml = '';
+  options.forEach(function(opt,i){
+    optHtml += '<li class="quiz-option" onclick="checkAnswer(this,\''+answer.replace(/'/g,"\\'")+'\',\''+opt.replace(/'/g,"\\'")+'\')">'+opt+'</li>';
+  });
+  document.getElementById('quiz-options').innerHTML = optHtml;
+  document.getElementById('quiz-section').style.display = 'block';
+  document.getElementById('study-content').style.display = 'none';
+  document.getElementById('session-phase').textContent = 'Quiz Time';
+}
+
+window.checkAnswer = function(el,correct,chosen){
+  document.querySelectorAll('.quiz-option').forEach(function(o){o.style.pointerEvents='none'});
+  if (chosen === correct) {
+    el.classList.add('correct');
+    stats.quizzes++;
+    addXP(25);
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('.quiz-option').forEach(function(o){
+      if (o.textContent === correct) o.classList.add('correct');
+    });
+  }
+  save();
+  setTimeout(function(){ nextBlockOrEnd(); }, 1500);
+};
+
+function nextBlockOrEnd(){
+  currentBlock++;
+  if (currentBlock >= blocks.length) {
+    // All done
+    stats.streak++;
+    addXP(100);
+    save();
+    document.getElementById('session-phase').textContent = 'Complete!';
+    document.getElementById('quiz-section').style.display = 'none';
+    document.getElementById('break-screen').style.display = 'block';
+    document.querySelector('#break-screen h2').textContent = 'Study Complete!';
+    document.querySelector('#break-screen p').textContent = 'You finished all '+blocks.length+' blocks. +100 XP bonus. Legend.';
+    document.querySelector('#break-screen .emoji').textContent = '🏆';
+    document.querySelector('#break-screen button').textContent = 'Study Again';
+    document.querySelector('#break-screen button').onclick = function(){
+      document.getElementById('study-session').classList.remove('active');
+      document.getElementById('upload-section').style.display = 'block';
+    };
+  } else {
+    // Show break
+    showBreak();
+  }
+}
+
+function showBreak(){
+  document.getElementById('quiz-section').style.display = 'none';
+  document.getElementById('study-content').style.display = 'none';
+  document.getElementById('break-screen').style.display = 'block';
+  document.getElementById('session-phase').textContent = 'Break Time';
+  var breakSec = 5*60;
+  document.getElementById('break-timer').textContent = '5:00';
+  breakTimer = setInterval(function(){
+    breakSec--;
+    var m=Math.floor(breakSec/60),s=breakSec%60;
+    document.getElementById('break-timer').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if (breakSec<=0) { clearInterval(breakTimer); endBreak(); }
+  },1000);
+}
+
+window.endBreak = function(){
+  clearInterval(breakTimer);
+  loadBlock();
+};
+
+})();
+</script>
+</body>
+</html>

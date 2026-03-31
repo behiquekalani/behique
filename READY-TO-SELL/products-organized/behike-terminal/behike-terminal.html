@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behike Terminal</title>
+<style>
+:root{--bg:#0a0a0a;--surface:#0e0e0e;--border:#1a1a1a;--text:#00ff41;--dim:#006618;--cursor:#00ff41;--input-bg:#000}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+
+/* Scanline effect */
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:100}
+
+/* CRT glow */
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at center,transparent 60%,rgba(0,0,0,0.4) 100%);pointer-events:none;z-index:99}
+
+.terminal{flex:1;padding:16px;overflow-y:auto;max-height:calc(100vh - 56px)}
+
+.output-line{margin-bottom:2px;line-height:1.6;font-size:14px;word-wrap:break-word}
+.output-line.system{color:var(--dim)}
+.output-line.error{color:#ff4444}
+.output-line.success{color:#00c853}
+.output-line.accent{color:#00e5ff}
+.output-line.gold{color:#ffd700}
+.output-line.purple{color:#b44dff}
+.output-line.header{color:#00e5ff;font-weight:bold;font-size:15px}
+.output-line.blank{height:12px}
+
+.input-line{display:flex;align-items:center;padding:8px 16px;background:var(--input-bg);border-top:1px solid var(--border);position:sticky;bottom:0}
+.prompt{color:var(--text);margin-right:8px;font-weight:bold;white-space:nowrap}
+input{flex:1;background:transparent;border:none;color:var(--text);font-family:inherit;font-size:14px;outline:none;caret-color:var(--cursor)}
+
+/* Typing animation */
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.cursor-blink{animation:blink 1s infinite}
+</style>
+</head>
+<body>
+
+<div class="terminal" id="terminal"></div>
+
+<div class="input-line">
+  <span class="prompt">behike &gt;</span>
+  <input type="text" id="cmd-input" autofocus autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')runCommand()">
+</div>
+
+<script>
+(function(){
+var terminal = document.getElementById('terminal');
+var input = document.getElementById('cmd-input');
+var history = [];
+var histIdx = -1;
+
+// Command history navigation
+input.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowUp') { histIdx = Math.min(histIdx+1, history.length-1); if (history.length) input.value = history[history.length-1-histIdx]; e.preventDefault(); }
+  if (e.key === 'ArrowDown') { histIdx = Math.max(histIdx-1, -1); input.value = histIdx >= 0 ? history[history.length-1-histIdx] : ''; e.preventDefault(); }
+});
+
+function print(text, cls){
+  var line = document.createElement('div');
+  line.className = 'output-line' + (cls ? ' '+cls : '');
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function printHTML(html, cls){
+  var line = document.createElement('div');
+  line.className = 'output-line' + (cls ? ' '+cls : '');
+  line.innerHTML = html;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function blank(){ print('','blank'); }
+
+// Boot sequence
+function boot(){
+  print('BEHIKE TERMINAL v1.0', 'header');
+  print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+  print('Type "help" to see commands. Type anything to get started.', 'system');
+  print('Built for builders with ADHD. Not a CLI. A conversation.', 'system');
+  blank();
+}
+
+// Commands
+var commands = {
+  help: function(){
+    print('AVAILABLE COMMANDS', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('  help              Show this menu', 'accent');
+    print('  products          List all Behike products', 'accent');
+    print('  focus [min]       Start a focus timer (default 25m)', 'accent');
+    print('  breathe           Guided breathing exercise', 'accent');
+    print('  budget            Quick budget check', 'accent');
+    print('  idea [text]       Capture an idea', 'accent');
+    print('  quote             Random motivation', 'accent');
+    print('  streak            Check your streak', 'accent');
+    print('  pomodoro          Start Pomodoro (25/5/25/5/25/15)', 'accent');
+    print('  clear             Clear terminal', 'accent');
+    print('  about             About Behike', 'accent');
+    blank();
+    print('Or just type naturally: "how do I start", "what should I build"', 'system');
+  },
+
+  products: function(){
+    print('BEHIKE PRODUCTS', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    var prods = [
+      ['FREE','Solopreneur Starter Blueprint','behike.gumroad.com/l/starter'],
+      ['$4.99','First Dollar Guide','behike.gumroad.com/l/first-dollar'],
+      ['$4.99','Prompt Engineering Cheat Sheet','behike.gumroad.com/l/prompt-cheatsheet'],
+      ['$4.99','Focus DJ','behike.gumroad.com/l/focus-dj'],
+      ['$4.99','Study Buddy','behike.gumroad.com/l/study-buddy'],
+      ['$9.99','Claude Code for Builders','behike.gumroad.com/l/claude-code'],
+      ['$9.99','ADHD Finance App','behike.gumroad.com/l/adhd-finance-app'],
+      ['$9.99','Ceiba Sanctuary','behike.gumroad.com/l/ceiba-sanctuary'],
+      ['$9.99','Niche Sniper Guide','behike.gumroad.com/l/niche-sniper'],
+      ['$12.99','Solopreneur OS','behike.gumroad.com/l/solopreneur-os'],
+      ['$19.99','E-Commerce Blueprint','behike.gumroad.com/l/ecommerce'],
+      ['$19.99','AI Agency Blueprint','behike.gumroad.com/l/ai-agency'],
+      ['$19.99','Behike Method v2','behike.gumroad.com/l/behike-method'],
+      ['$49','Blueprint Bundle (15 blueprints)','behike.gumroad.com/l/blueprint-bundle'],
+      ['$97','Behike OS','behike.gumroad.com/l/behike-os'],
+    ];
+    prods.forEach(function(p){
+      var price = p[0].padEnd(8);
+      print('  '+price+p[1], p[0]==='FREE'?'success':'');
+    });
+    blank();
+    print('  75+ products total. behike.gumroad.com', 'gold');
+  },
+
+  focus: function(args){
+    var mins = parseInt(args[0]) || 25;
+    print('FOCUS MODE: '+mins+' minutes', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('Timer started. Close your eyes for 3 seconds. Then build.', 'system');
+    blank();
+    var secs = mins * 60;
+    var interval = setInterval(function(){
+      secs--;
+      if (secs <= 0) {
+        clearInterval(interval);
+        print('', 'blank');
+        print('FOCUS SESSION COMPLETE! '+mins+' minutes. +50 XP', 'success');
+        addXP(50);
+        print('Take a 5 minute break. You earned it.', 'system');
+      } else if (secs % 300 === 0) {
+        print('  '+Math.floor(secs/60)+' minutes remaining...', 'dim');
+      }
+    }, 1000);
+    // Show countdown in real-time
+    var display = setInterval(function(){
+      if (secs <= 0) { clearInterval(display); return; }
+      var m = Math.floor(secs/60), s = secs%60;
+      document.title = (m<10?'0':'')+m+':'+(s<10?'0':'')+s+' | Focus';
+    }, 1000);
+  },
+
+  breathe: function(){
+    print('BREATHING EXERCISE', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('4-7-8 breathing. Follow along.', 'system');
+    blank();
+    var steps = [
+      {text:'INHALE...', dur:4000, cls:'accent'},
+      {text:'HOLD...', dur:7000, cls:'purple'},
+      {text:'EXHALE...', dur:8000, cls:'success'},
+    ];
+    var cycle = 0;
+    function doStep(i){
+      if (cycle >= 3) { blank(); print('3 cycles complete. You should feel calmer. +10 XP', 'success'); addXP(10); return; }
+      print('  '+steps[i].text+' ('+Math.floor(steps[i].dur/1000)+'s)', steps[i].cls);
+      setTimeout(function(){
+        if (i === 2) { cycle++; blank(); print('  Cycle '+(cycle)+'/3 complete', 'dim'); blank(); }
+        doStep((i+1)%3);
+      }, steps[i].dur);
+    }
+    doStep(0);
+  },
+
+  budget: function(){
+    var data = JSON.parse(localStorage.getItem('adhd-finance') || '{}');
+    var tx = data.transactions || [];
+    var now = new Date();
+    var monthTx = tx.filter(function(t){ var d=new Date(t.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); });
+    var income=0,expense=0;
+    monthTx.forEach(function(t){ if(t.type==='income')income+=t.amount; else expense+=t.amount; });
+
+    print('BUDGET CHECK', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('  Income:  $'+income.toFixed(2), 'success');
+    print('  Spent:   $'+expense.toFixed(2), 'error');
+    print('  Balance: $'+(income-expense).toFixed(2), income>expense?'accent':'error');
+    blank();
+    if (tx.length === 0) print('  No transactions yet. Open ADHD Finance to start tracking.', 'system');
+  },
+
+  idea: function(args){
+    var idea = args.join(' ');
+    if (!idea) { print('Usage: idea <your idea here>', 'error'); return; }
+    var ideas = JSON.parse(localStorage.getItem('behike-ideas') || '[]');
+    ideas.push({text:idea, date:new Date().toISOString()});
+    localStorage.setItem('behike-ideas', JSON.stringify(ideas));
+    print('IDEA CAPTURED ✓', 'success');
+    print('  "'+idea+'"', 'accent');
+    print('  Total ideas: '+ideas.length, 'dim');
+    addXP(5);
+  },
+
+  quote: function(){
+    var quotes = [
+      'Stop watching. Start building.',
+      'Your first dollar is not about the dollar. It is proof.',
+      'One page. Not a 40-hour course.',
+      'You have ADHD. That is your superpower, not your excuse.',
+      'Ship it. Fix it later. Perfect is the enemy of done.',
+      'The system works. You just have to fill it in.',
+      '100 products in 2 weeks. Not talent. A system.',
+      'Every blueprint you fill in is a business you could start today.',
+      'The gap between you and revenue is not knowledge. It is action.',
+      'Built for brains that can not sit through courses.',
+    ];
+    blank();
+    print('  "'+quotes[Math.floor(Math.random()*quotes.length)]+'"', 'gold');
+    print('  — Behike', 'dim');
+    blank();
+  },
+
+  streak: function(){
+    var xpData = JSON.parse(localStorage.getItem('behike-terminal-xp') || '{}');
+    print('YOUR STREAK', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('  XP: '+(xpData.xp||0), 'gold');
+    print('  Level: '+(xpData.level||1), 'accent');
+    print('  Commands run: '+(xpData.commands||0), 'dim');
+    blank();
+  },
+
+  pomodoro: function(){
+    print('POMODORO STARTED', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('  25 min focus → 5 min break → repeat 4x', 'system');
+    print('  Starting first block...', 'accent');
+    commands.focus(['25']);
+  },
+
+  clear: function(){
+    terminal.innerHTML = '';
+  },
+
+  about: function(){
+    print('BEHIKE', 'header');
+    print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'dim');
+    print('  Built by Kalani. Puerto Rico. ADHD brain.', 'system');
+    print('  75+ digital products for builders.', 'system');
+    print('  Blueprints, apps, guides, systems.', 'system');
+    print('  Not courses. Not theory. Systems you fill in and build from.', 'system');
+    blank();
+    print('  behike.gumroad.com', 'accent');
+    blank();
+  },
+};
+
+// Natural language router
+var nlpRoutes = [
+  {patterns:['help','commands','what can','how do i','menu'], cmd:'help'},
+  {patterns:['product','shop','store','buy','catalog','browse'], cmd:'products'},
+  {patterns:['focus','concentrate','work','lock in','zone'], cmd:'focus'},
+  {patterns:['breathe','breath','calm','anxiety','panic','relax'], cmd:'breathe'},
+  {patterns:['budget','money','spent','finance','balance','bank'], cmd:'budget'},
+  {patterns:['idea','thought','remember','capture','note'], cmd:'idea'},
+  {patterns:['quote','motivation','inspire','motivate'], cmd:'quote'},
+  {patterns:['streak','xp','level','progress','stats'], cmd:'streak'},
+  {patterns:['pomodoro','timer','25 min'], cmd:'pomodoro'},
+  {patterns:['clear','reset','clean'], cmd:'clear'},
+  {patterns:['about','who','what is behike'], cmd:'about'},
+];
+
+// XP system
+function addXP(amount){
+  var xpData = JSON.parse(localStorage.getItem('behike-terminal-xp') || '{"xp":0,"level":1,"commands":0}');
+  xpData.xp += amount;
+  xpData.commands = (xpData.commands||0) + 1;
+  if (xpData.xp >= xpData.level * 100) xpData.level++;
+  localStorage.setItem('behike-terminal-xp', JSON.stringify(xpData));
+}
+
+window.runCommand = function(){
+  var raw = input.value.trim();
+  if (!raw) return;
+  history.push(raw);
+  histIdx = -1;
+  input.value = '';
+
+  print('behike > '+raw, 'system');
+  blank();
+
+  var parts = raw.toLowerCase().split(/\s+/);
+  var cmd = parts[0];
+  var args = parts.slice(1);
+
+  // Direct command match
+  if (commands[cmd]) {
+    commands[cmd](args);
+    addXP(2);
+    return;
+  }
+
+  // NLP routing
+  var matched = false;
+  for (var i = 0; i < nlpRoutes.length; i++) {
+    var route = nlpRoutes[i];
+    for (var j = 0; j < route.patterns.length; j++) {
+      if (raw.toLowerCase().indexOf(route.patterns[j]) !== -1) {
+        if (route.cmd === 'idea') {
+          commands.idea(raw.replace(/^(idea|thought|remember|capture|note)\s*/i,'').split(/\s+/));
+        } else {
+          commands[route.cmd](args);
+        }
+        matched = true;
+        addXP(2);
+        break;
+      }
+    }
+    if (matched) break;
+  }
+
+  if (!matched) {
+    print('  I don\'t understand "'+raw+'". Try "help" for commands.', 'error');
+    print('  Or just say what you need: "focus", "breathe", "products"', 'dim');
+  }
+};
+
+boot();
+input.focus();
+document.addEventListener('click', function(){ input.focus(); });
+
+})();
+</script>
+</body>
+</html>

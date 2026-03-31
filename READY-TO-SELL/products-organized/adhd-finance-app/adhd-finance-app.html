@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADHD Finance - Budget App for ADHD Brains</title>
+<style>
+:root{--bg:#0a0a0a;--surface:#111;--card:#161616;--border:#222;--text:#e8e8e8;--dim:#777;--green:#00c853;--red:#ff4444;--blue:#00b0ff;--gold:#ffd700;--accent:#00e5ff;--purple:#b44dff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Nav */
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+.nav-brand{font-size:18px;font-weight:800;letter-spacing:1px}.nav-brand span{color:var(--accent)}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{padding:8px 16px;border-radius:8px;border:none;background:transparent;color:var(--dim);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.nav-tab.active{background:var(--accent);color:#000}
+.nav-tab:hover:not(.active){background:var(--card)}
+
+/* Layout */
+.container{max-width:900px;margin:0 auto;padding:24px}
+.page{display:none}.page.active{display:block}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:14px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;font-weight:600}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:24px;font-weight:800;margin-bottom:2px}
+.stat-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.stat-num.green{color:var(--green)}.stat-num.red{color:var(--red)}.stat-num.blue{color:var(--blue)}.stat-num.gold{color:var(--gold)}
+
+/* Category bars */
+.cat-bar{margin-bottom:12px}
+.cat-header{display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px}
+.cat-name{font-weight:600}.cat-amount{color:var(--dim)}
+.cat-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.cat-fill{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* Transaction list */
+.tx-list{list-style:none}
+.tx-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.tx-item:last-child{border:none}
+.tx-left{display:flex;align-items:center;gap:12px}
+.tx-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tx-name{font-size:14px;font-weight:500}.tx-date{font-size:11px;color:var(--dim)}
+.tx-amount{font-weight:700;font-size:15px}
+.tx-amount.expense{color:var(--red)}.tx-amount.income{color:var(--green)}
+
+/* Add transaction */
+.add-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.add-form .full{grid-column:span 2}
+.form-input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:14px;font-family:inherit}
+.form-input:focus{outline:none;border-color:var(--accent)}
+select.form-input{appearance:none}
+.btn{padding:12px 24px;border:none;border-radius:50px;font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#000}.btn-primary:hover{opacity:.9}
+.btn-danger{background:var(--red);color:#fff}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:8px}
+
+/* Impulse cooldown */
+.cooldown-card{background:linear-gradient(135deg,#1a0a2e,#0a1a2e);border:1px solid var(--purple);border-radius:16px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.cooldown-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--accent))}
+.cooldown-title{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--purple)}
+.cooldown-timer{font-size:48px;font-weight:900;color:var(--accent);font-family:monospace;margin:16px 0}
+.cooldown-desc{font-size:13px;color:var(--dim);margin-bottom:16px}
+.cooldown-item-name{font-size:14px;color:var(--text);margin-bottom:4px}
+.cooldown-item-price{font-size:20px;font-weight:800;color:var(--gold)}
+.cooldown-actions{display:flex;gap:8px;margin-top:16px}
+
+/* Subscriptions */
+.sub-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
+.sub-name{font-weight:600;font-size:14px}.sub-price{color:var(--red);font-weight:700}
+.sub-total{font-size:20px;font-weight:800;color:var(--red);margin-top:16px;text-align:right}
+
+/* Streak/rewards */
+.streak-display{text-align:center;padding:32px}
+.streak-num{font-size:72px;font-weight:900;color:var(--gold);line-height:1}
+.streak-label{font-size:14px;color:var(--dim);margin-top:8px}
+.streak-badge{display:inline-block;padding:6px 16px;border-radius:50px;font-size:12px;font-weight:700;margin-top:16px}
+.streak-badge.fire{background:rgba(255,68,68,.15);color:var(--red)}
+.streak-badge.ice{background:rgba(0,229,255,.15);color:var(--accent)}
+
+/* Particles (celebration) */
+canvas#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100}
+
+/* Mobile */
+@media(max-width:768px){
+.stats-row{grid-template-columns:repeat(2,1fr)}
+.add-form{grid-template-columns:1fr}
+.add-form .full{grid-column:span 1}
+.nav-tabs{overflow-x:auto;flex-wrap:nowrap}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<nav class="nav">
+  <div class="nav-brand">ADHD <span>Finance</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="showPage('add')">+ Add</button>
+    <button class="nav-tab" onclick="showPage('cooldown')">Cooldown</button>
+    <button class="nav-tab" onclick="showPage('subs')">Subscriptions</button>
+    <button class="nav-tab" onclick="showPage('streak')">Streak</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num green" id="income-total">$0</div><div class="stat-label">Income</div></div>
+      <div class="stat-card"><div class="stat-num red" id="expense-total">$0</div><div class="stat-label">Spent</div></div>
+      <div class="stat-card"><div class="stat-num blue" id="balance">$0</div><div class="stat-label">Balance</div></div>
+      <div class="stat-card"><div class="stat-num gold" id="savings">$0</div><div class="stat-label">Saved</div></div>
+      <div class="stat-card"><div class="stat-num" id="streak-mini" style="color:var(--accent)">0</div><div class="stat-label">Day Streak</div></div>
+    </div>
+
+    <!-- 5 categories only -->
+    <div class="card">
+      <div class="card-title">This Month - 5 Categories Only</div>
+      <div id="category-bars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recent Transactions</div>
+      <ul class="tx-list" id="tx-list"></ul>
+    </div>
+  </div>
+
+  <!-- ADD TRANSACTION -->
+  <div class="page" id="page-add">
+    <div class="card">
+      <div class="card-title">Add Transaction</div>
+      <div class="add-form">
+        <input type="text" class="form-input" id="tx-desc" placeholder="What was it?">
+        <input type="number" class="form-input" id="tx-amt" placeholder="Amount ($)" step="0.01">
+        <select class="form-input" id="tx-type">
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+        <select class="form-input" id="tx-cat">
+          <option value="needs">Needs (rent, food, bills)</option>
+          <option value="wants">Wants (fun, shopping)</option>
+          <option value="savings">Savings</option>
+          <option value="debt">Debt Payments</option>
+          <option value="fun">Fun Money</option>
+        </select>
+        <div class="full" style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="addTransaction()" style="flex:1">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="impulse-warning" style="display:none;border-color:var(--purple)">
+      <div class="card-title" style="color:var(--purple)">Impulse Check</div>
+      <p style="color:var(--dim);font-size:14px;margin-bottom:12px">This purchase is over $20. Want to add a 24-hour cooldown instead? If you still want it tomorrow, buy it then.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="addToCooldown()">Add to Cooldown</button>
+        <button class="btn btn-sm" style="background:var(--border);color:var(--text)" onclick="forceAdd()">Buy Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMPULSE COOLDOWN -->
+  <div class="page" id="page-cooldown">
+    <div class="card">
+      <div class="card-title">24-Hour Impulse Cooldown</div>
+      <p style="color:var(--dim);font-size:14px;margin-bottom:16px">Items here need to wait 24 hours. If you still want them after the timer, buy them. Most of the time, you won't.</p>
+      <div id="cooldown-list"></div>
+      <p id="cooldown-empty" style="color:var(--dim);font-size:14px;text-align:center;padding:32px">No items in cooldown. Your impulse control is strong.</p>
+    </div>
+  </div>
+
+  <!-- SUBSCRIPTIONS -->
+  <div class="page" id="page-subs">
+    <div class="card">
+      <div class="card-title">Subscription Audit</div>
+      <p style="color:var(--dim);font-size:14px;margin-bottom:16px">Every recurring charge. Do you actually use it?</p>
+      <div style="margin-bottom:16px;display:flex;gap:8px">
+        <input type="text" class="form-input" id="sub-name" placeholder="Service name" style="flex:1">
+        <input type="number" class="form-input" id="sub-price" placeholder="$/month" step="0.01" style="width:120px">
+        <button class="btn btn-primary btn-sm" onclick="addSub()">Add</button>
+      </div>
+      <div id="sub-list"></div>
+      <div class="sub-total" id="sub-total">$0/month</div>
+    </div>
+  </div>
+
+  <!-- STREAK -->
+  <div class="page" id="page-streak">
+    <div class="card">
+      <div class="streak-display">
+        <div class="streak-num" id="streak-big">0</div>
+        <div class="streak-label">days under budget</div>
+        <div class="streak-badge fire" id="streak-badge">Keep going!</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly Heatmap</div>
+      <div id="heatmap" style="display:flex;gap:4px;justify-content:center;margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Milestones</div>
+      <div id="milestones"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+// Data
+var data = JSON.parse(localStorage.getItem('adhd-finance') || '{}');
+if (!data.transactions) data.transactions = [];
+if (!data.cooldowns) data.cooldowns = [];
+if (!data.subscriptions) data.subscriptions = [];
+if (!data.streak) data.streak = 0;
+if (!data.budget) data.budget = {needs:1500,wants:300,savings:200,debt:200,fun:100};
+if (!data.heatmap) data.heatmap = {};
+
+function save() { localStorage.setItem('adhd-finance', JSON.stringify(data)); }
+
+// Pages
+window.showPage = function(name) {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active')});
+  event.target.classList.add('active');
+  if (name === 'cooldown') renderCooldowns();
+  if (name === 'subs') renderSubs();
+  if (name === 'streak') renderStreak();
+};
+
+// Add transaction
+var pendingTx = null;
+window.addTransaction = function() {
+  var desc = document.getElementById('tx-desc').value;
+  var amt = parseFloat(document.getElementById('tx-amt').value);
+  var type = document.getElementById('tx-type').value;
+  var cat = document.getElementById('tx-cat').value;
+  if (!desc || !amt) return;
+
+  // Impulse check for expenses > $20
+  if (type === 'expense' && amt > 20) {
+    pendingTx = {desc:desc,amount:amt,type:type,category:cat,date:new Date().toISOString()};
+    document.getElementById('impulse-warning').style.display = 'block';
+    return;
+  }
+
+  data.transactions.unshift({desc:desc,amount:amt,type:type,category:cat,date:new Date().toISOString()});
+  save(); clearForm(); render();
+};
+
+window.addToCooldown = function() {
+  if (!pendingTx) return;
+  data.cooldowns.push({desc:pendingTx.desc,amount:pendingTx.amount,category:pendingTx.category,added:Date.now(),expires:Date.now()+86400000});
+  pendingTx = null;
+  document.getElementById('impulse-warning').style.display = 'none';
+  save(); clearForm(); showPage('cooldown');
+};
+
+window.forceAdd = function() {
+  if (!pendingTx) return;
+  data.transactions.unshift(pendingTx);
+  pendingTx = null;
+  document.getElementById('impulse-warning').style.display = 'none';
+  save(); clearForm(); render();
+};
+
+function clearForm() {
+  document.getElementById('tx-desc').value = '';
+  document.getElementById('tx-amt').value = '';
+}
+
+// Subscriptions
+window.addSub = function() {
+  var name = document.getElementById('sub-name').value;
+  var price = parseFloat(document.getElementById('sub-price').value);
+  if (!name || !price) return;
+  data.subscriptions.push({name:name,price:price,id:Date.now()});
+  document.getElementById('sub-name').value = '';
+  document.getElementById('sub-price').value = '';
+  save(); renderSubs();
+};
+
+window.removeSub = function(id) {
+  data.subscriptions = data.subscriptions.filter(function(s){return s.id !== id});
+  save(); renderSubs();
+};
+
+// Cooldown actions
+window.buyCooldown = function(idx) {
+  var item = data.cooldowns[idx];
+  data.transactions.unshift({desc:item.desc,amount:item.amount,type:'expense',category:item.category,date:new Date().toISOString()});
+  data.cooldowns.splice(idx,1);
+  save(); renderCooldowns(); render();
+};
+
+window.skipCooldown = function(idx) {
+  var saved = data.cooldowns[idx].amount;
+  data.cooldowns.splice(idx,1);
+  // Add to savings!
+  data.transactions.unshift({desc:'Impulse saved: '+data.cooldowns.length,amount:saved,type:'income',category:'savings',date:new Date().toISOString()});
+  save(); renderCooldowns(); render();
+  celebrate();
+};
+
+// Render dashboard
+function render() {
+  var now = new Date();
+  var month = now.getMonth();
+  var year = now.getFullYear();
+  var monthTx = data.transactions.filter(function(t){
+    var d = new Date(t.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+
+  var income = 0, expense = 0;
+  var cats = {needs:0,wants:0,savings:0,debt:0,fun:0};
+
+  monthTx.forEach(function(t){
+    if (t.type === 'income') income += t.amount;
+    else { expense += t.amount; cats[t.category] = (cats[t.category]||0) + t.amount; }
+  });
+
+  document.getElementById('income-total').textContent = '$' + income.toFixed(0);
+  document.getElementById('expense-total').textContent = '$' + expense.toFixed(0);
+  document.getElementById('balance').textContent = '$' + (income - expense).toFixed(0);
+  document.getElementById('savings').textContent = '$' + cats.savings.toFixed(0);
+  document.getElementById('streak-mini').textContent = data.streak;
+
+  // Category bars
+  var colors = {needs:'#00b0ff',wants:'#b44dff',savings:'#00c853',debt:'#ff4444',fun:'#ffd700'};
+  var barsHtml = '';
+  Object.keys(cats).forEach(function(cat){
+    var spent = cats[cat];
+    var budget = data.budget[cat] || 500;
+    var pct = Math.min((spent/budget)*100, 100);
+    var over = spent > budget;
+    barsHtml += '<div class="cat-bar"><div class="cat-header"><span class="cat-name" style="text-transform:capitalize">'+cat+'</span><span class="cat-amount"'+(over?' style="color:var(--red)"':'')+'>$'+spent.toFixed(0)+' / $'+budget+'</span></div><div class="cat-track"><div class="cat-fill" style="width:'+pct+'%;background:'+(over?'var(--red)':colors[cat])+'"></div></div></div>';
+  });
+  document.getElementById('category-bars').innerHTML = barsHtml;
+
+  // Recent transactions
+  var icons = {needs:'🏠',wants:'🛍️',savings:'💰',debt:'💳',fun:'🎮'};
+  var txHtml = '';
+  var recent = data.transactions.slice(0,15);
+  recent.forEach(function(t){
+    var d = new Date(t.date);
+    var dateStr = (d.getMonth()+1)+'/'+d.getDate();
+    txHtml += '<li class="tx-item"><div class="tx-left"><div class="tx-icon" style="background:var(--card)">'+(icons[t.category]||'📝')+'</div><div><div class="tx-name">'+t.desc+'</div><div class="tx-date">'+dateStr+' · '+t.category+'</div></div></div><div class="tx-amount '+(t.type==='expense'?'expense':'income')+'">'+(t.type==='expense'?'-':'+')+'$'+t.amount.toFixed(2)+'</div></li>';
+  });
+  document.getElementById('tx-list').innerHTML = txHtml || '<li style="padding:32px;text-align:center;color:var(--dim)">No transactions yet. Add one!</li>';
+
+  // Check streak
+  updateStreak();
+}
+
+// Cooldowns
+function renderCooldowns() {
+  var html = '';
+  var now = Date.now();
+  data.cooldowns.forEach(function(c,i){
+    var remaining = c.expires - now;
+    var expired = remaining <= 0;
+    var hours = Math.max(0,Math.floor(remaining/3600000));
+    var mins = Math.max(0,Math.floor((remaining%3600000)/60000));
+    html += '<div class="cooldown-card"><div class="cooldown-title">'+(expired?'Timer Expired!':'Cooling Down...')+'</div><div class="cooldown-item-name">'+c.desc+'</div><div class="cooldown-item-price">$'+c.amount.toFixed(2)+'</div><div class="cooldown-timer">'+(expired?'00:00':hours+'h '+mins+'m')+'</div><div class="cooldown-desc">'+(expired?'24 hours passed. Do you still want it?':'Wait. If you still want it when the timer hits zero, buy it.')+'</div><div class="cooldown-actions">'+(expired?'<button class="btn btn-primary btn-sm" onclick="buyCooldown('+i+')">Still Want It</button>':'')+'<button class="btn btn-sm" style="background:var(--green);color:#000" onclick="skipCooldown('+i+')">Skip It (Save $'+c.amount.toFixed(0)+')</button></div></div>';
+  });
+  document.getElementById('cooldown-list').innerHTML = html;
+  document.getElementById('cooldown-empty').style.display = data.cooldowns.length ? 'none' : 'block';
+}
+
+// Subscriptions
+function renderSubs() {
+  var html = '';
+  var total = 0;
+  data.subscriptions.forEach(function(s){
+    total += s.price;
+    html += '<div class="sub-item"><div><div class="sub-name">'+s.name+'</div></div><div style="display:flex;align-items:center;gap:12px"><div class="sub-price">$'+s.price.toFixed(2)+'/mo</div><button class="btn btn-danger btn-sm" onclick="removeSub('+s.id+')">Cancel</button></div></div>';
+  });
+  document.getElementById('sub-list').innerHTML = html || '<p style="color:var(--dim);text-align:center;padding:24px">No subscriptions tracked. Add your recurring charges.</p>';
+  document.getElementById('sub-total').textContent = '$' + total.toFixed(2) + '/month ($' + (total*12).toFixed(0) + '/year)';
+}
+
+// Streak
+function updateStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  var todayTx = data.transactions.filter(function(t){return t.date.slice(0,10)===today && t.type==='expense'});
+  var todaySpent = todayTx.reduce(function(s,t){return s+t.amount},0);
+  var dailyBudget = Object.values(data.budget).reduce(function(s,v){return s+v},0) / 30;
+
+  if (!data.lastStreakDate) data.lastStreakDate = today;
+
+  if (today !== data.lastStreakDate) {
+    // Check if yesterday was under budget
+    var yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    var yTx = data.transactions.filter(function(t){return t.date.slice(0,10)===yesterday && t.type==='expense'});
+    var ySpent = yTx.reduce(function(s,t){return s+t.amount},0);
+    if (ySpent <= dailyBudget) {
+      data.streak++;
+      if (data.streak % 7 === 0) celebrate();
+    } else {
+      data.streak = 0;
+    }
+    data.lastStreakDate = today;
+    data.heatmap[today] = todaySpent <= dailyBudget ? 1 : 0;
+    save();
+  }
+}
+
+function renderStreak() {
+  document.getElementById('streak-big').textContent = data.streak;
+  var badge = document.getElementById('streak-badge');
+  if (data.streak >= 30) { badge.textContent = '🔥 30 Day Beast!'; badge.className = 'streak-badge fire'; }
+  else if (data.streak >= 14) { badge.textContent = '❄️ 2 Week Ice!'; badge.className = 'streak-badge ice'; }
+  else if (data.streak >= 7) { badge.textContent = '🔥 1 Week Fire!'; badge.className = 'streak-badge fire'; }
+  else { badge.textContent = 'Keep going!'; badge.className = 'streak-badge ice'; }
+
+  // Heatmap
+  var heatHtml = '';
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(Date.now() - i*86400000).toISOString().slice(0,10);
+    var dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(d).getDay()];
+    var status = data.heatmap[d];
+    var color = status === 1 ? 'var(--green)' : status === 0 ? 'var(--red)' : 'var(--border)';
+    heatHtml += '<div style="text-align:center"><div style="width:40px;height:40px;border-radius:8px;background:'+color+';margin-bottom:4px"></div><div style="font-size:10px;color:var(--dim)">'+dayName+'</div></div>';
+  }
+  document.getElementById('heatmap').innerHTML = heatHtml;
+
+  // Milestones
+  var milestones = [
+    {days:3,label:'3 Days',emoji:'⭐'},
+    {days:7,label:'1 Week',emoji:'🔥'},
+    {days:14,label:'2 Weeks',emoji:'❄️'},
+    {days:30,label:'1 Month',emoji:'👑'},
+    {days:90,label:'3 Months',emoji:'💎'},
+    {days:365,label:'1 Year',emoji:'🏆'},
+  ];
+  var mHtml = '';
+  milestones.forEach(function(m){
+    var done = data.streak >= m.days;
+    mHtml += '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;'+(done?'':'opacity:.4')+'"><span style="font-size:24px">'+m.emoji+'</span><span style="font-weight:600">'+m.label+'</span>'+(done?'<span style="color:var(--green);font-size:12px;font-weight:700">UNLOCKED</span>':'')+'</div>';
+  });
+  document.getElementById('milestones').innerHTML = mHtml;
+}
+
+// Particle celebration
+function celebrate() {
+  var canvas = document.getElementById('particles');
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  var particles = [];
+  var colors = ['#ffd700','#00e5ff','#00c853','#b44dff','#ff4444'];
+
+  for (var i = 0; i < 80; i++) {
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: canvas.height + 20,
+      vx: (Math.random()-0.5)*8,
+      vy: -(Math.random()*12+5),
+      size: Math.random()*6+2,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      life: 1,
+      decay: Math.random()*0.015+0.005
+    });
+  }
+
+  var frames = 0;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(function(p){
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.15;
+      p.life -= p.decay;
+      if (p.life > 0) {
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+        ctx.fill();
+      }
+    });
+    ctx.globalAlpha = 1;
+    frames++;
+    if (frames < 120) requestAnimationFrame(animate);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  animate();
+}
+
+// Init
+render();
+setInterval(renderCooldowns, 60000); // Update cooldowns every minute
+})();
+</script>
+</body>
+</html>

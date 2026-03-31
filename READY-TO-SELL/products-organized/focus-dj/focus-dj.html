@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Focus DJ - AI Music for ADHD Focus</title>
+<style>
+:root{--bg:#060810;--surface:#0c0e18;--card:#12141e;--border:#1a1c2a;--text:#d0d4e0;--dim:#5a5e70;--focus:#00f0ff;--break:#b44dff;--sleep:#00ff88;--accent:#00f0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+
+.app{width:100%;max-width:500px;padding:24px;text-align:center;position:relative;z-index:1}
+
+/* Visualizer canvas */
+canvas#viz{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+
+/* Mode selector */
+.modes{display:flex;gap:8px;justify-content:center;margin-bottom:32px}
+.mode-btn{padding:12px 28px;border-radius:50px;border:2px solid var(--border);background:transparent;color:var(--dim);font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;font-family:inherit}
+.mode-btn.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px rgba(0,240,255,.15)}
+.mode-btn[data-mode="focus"]{--accent:var(--focus)}
+.mode-btn[data-mode="break"]{--accent:var(--break)}
+.mode-btn[data-mode="sleep"]{--accent:var(--sleep)}
+.mode-btn[data-mode="focus"].active{border-color:var(--focus);color:var(--focus);box-shadow:0 0 20px rgba(0,240,255,.15)}
+.mode-btn[data-mode="break"].active{border-color:var(--break);color:var(--break);box-shadow:0 0 20px rgba(180,77,255,.15)}
+.mode-btn[data-mode="sleep"].active{border-color:var(--sleep);color:var(--sleep);box-shadow:0 0 20px rgba(0,255,136,.15)}
+
+/* Timer */
+.timer{font-size:72px;font-weight:900;font-family:'Courier New',monospace;margin-bottom:8px;letter-spacing:4px}
+.timer-label{font-size:13px;color:var(--dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:32px}
+
+/* Controls */
+.controls{display:flex;gap:12px;justify-content:center;margin-bottom:32px}
+.ctrl-btn{width:56px;height:56px;border-radius:50%;border:2px solid var(--border);background:var(--card);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.ctrl-btn:hover{border-color:var(--accent);transform:scale(1.05)}
+.ctrl-btn.playing{border-color:var(--accent);background:var(--accent);color:#000}
+
+/* Sliders */
+.slider-group{margin-bottom:20px}
+.slider-label{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:6px}
+input[type="range"]{width:100%;height:4px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer}
+
+/* Binaural info */
+.binaural-info{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:24px;font-size:12px;color:var(--dim);line-height:1.6}
+.binaural-info strong{color:var(--text)}
+
+/* Stats */
+.stats{display:flex;gap:16px;justify-content:center;margin-top:24px}
+.stat{text-align:center}
+.stat-num{font-size:20px;font-weight:800;color:var(--accent)}
+.stat-label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+
+/* Brand */
+.brand{position:fixed;bottom:16px;right:16px;font-size:10px;color:#1a1c2a;letter-spacing:3px;z-index:2}
+
+@media(max-width:600px){
+  .timer{font-size:48px}
+  .modes{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<canvas id="viz"></canvas>
+
+<div class="app">
+  <div class="modes">
+    <button class="mode-btn active" data-mode="focus" onclick="setMode('focus')">Focus</button>
+    <button class="mode-btn" data-mode="break" onclick="setMode('break')">Break</button>
+    <button class="mode-btn" data-mode="sleep" onclick="setMode('sleep')">Sleep</button>
+  </div>
+
+  <div class="timer" id="timer">25:00</div>
+  <div class="timer-label" id="timer-label">Focus Session</div>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="togglePlay()" id="play-btn">▶</button>
+    <button class="ctrl-btn" onclick="resetTimer()">↺</button>
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-label"><span>Volume</span><span id="vol-val">70%</span></div>
+    <input type="range" min="0" max="100" value="70" oninput="setVolume(this.value)">
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-label"><span>Binaural Frequency</span><span id="bin-val">40 Hz</span></div>
+    <input type="range" min="1" max="60" value="40" oninput="setBinaural(this.value)" id="bin-slider">
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="sessions-today">0</div><div class="stat-label">Sessions</div></div>
+    <div class="stat"><div class="stat-num" id="minutes-today">0</div><div class="stat-label">Minutes</div></div>
+    <div class="stat"><div class="stat-num" id="streak-count">0</div><div class="stat-label">Day Streak</div></div>
+  </div>
+
+  <div class="binaural-info">
+    <strong>How it works:</strong> Binaural beats play two slightly different frequencies in each ear. Your brain perceives the difference as a pulsing tone. <strong>40Hz = gamma waves (focus)</strong>. 10Hz = alpha (relaxation). 4Hz = theta (deep rest). Headphones required.
+  </div>
+</div>
+
+<div class="brand">BEHIKE</div>
+
+<script>
+(function(){
+var audioCtx = null;
+var masterGain = null;
+var oscL = null, oscR = null, gainL = null, gainR = null;
+var noiseNode = null, noiseGain = null;
+var playing = false;
+var mode = 'focus';
+var timerSeconds = 25 * 60;
+var timerRunning = false;
+var timerInterval = null;
+var binauralFreq = 40;
+var volume = 0.7;
+
+// Mode configs
+var modes = {
+  focus: { time: 25*60, baseFreq: 200, binaural: 40, noiseType: 'brown', label: 'Focus Session', color: '#00f0ff' },
+  break: { time: 5*60, baseFreq: 150, binaural: 10, noiseType: 'pink', label: 'Break Time', color: '#b44dff' },
+  sleep: { time: 30*60, baseFreq: 100, binaural: 4, noiseType: 'brown', label: 'Sleep Mode', color: '#00ff88' }
+};
+
+// Stats
+var stats = JSON.parse(localStorage.getItem('focus-dj-stats') || '{}');
+var today = new Date().toISOString().slice(0,10);
+if (stats.date !== today) { stats = {date:today, sessions:0, minutes:0}; }
+if (!stats.streak) stats.streak = parseInt(localStorage.getItem('focus-dj-streak')||'0');
+
+function saveStats() {
+  localStorage.setItem('focus-dj-stats', JSON.stringify(stats));
+  localStorage.setItem('focus-dj-streak', stats.streak);
+  document.getElementById('sessions-today').textContent = stats.sessions;
+  document.getElementById('minutes-today').textContent = stats.minutes;
+  document.getElementById('streak-count').textContent = stats.streak;
+}
+saveStats();
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = volume;
+  masterGain.connect(audioCtx.destination);
+
+  // Binaural beat - left channel
+  var merger = audioCtx.createChannelMerger(2);
+  gainL = audioCtx.createGain(); gainL.gain.value = 0.3;
+  gainR = audioCtx.createGain(); gainR.gain.value = 0.3;
+
+  oscL = audioCtx.createOscillator();
+  oscR = audioCtx.createOscillator();
+  oscL.type = 'sine'; oscR.type = 'sine';
+
+  var cfg = modes[mode];
+  oscL.frequency.value = cfg.baseFreq;
+  oscR.frequency.value = cfg.baseFreq + cfg.binaural;
+
+  oscL.connect(gainL); gainL.connect(merger, 0, 0);
+  oscR.connect(gainR); gainR.connect(merger, 0, 1);
+  merger.connect(masterGain);
+
+  oscL.start(); oscR.start();
+
+  // Noise
+  createNoise(cfg.noiseType);
+}
+
+function createNoise(type) {
+  if (noiseNode) { noiseNode.disconnect(); }
+  var bufferSize = audioCtx.sampleRate * 2;
+  var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  var data = buffer.getChannelData(0);
+
+  if (type === 'brown') {
+    var last = 0;
+    for (var i = 0; i < bufferSize; i++) {
+      var white = Math.random() * 2 - 1;
+      data[i] = (last + (0.02 * white)) / 1.02;
+      last = data[i];
+      data[i] *= 3.5;
+    }
+  } else { // pink
+    var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for (var i = 0; i < bufferSize; i++) {
+      var white = Math.random() * 2 - 1;
+      b0 = 0.99886*b0 + white*0.0555179;
+      b1 = 0.99332*b1 + white*0.0750759;
+      b2 = 0.96900*b2 + white*0.1538520;
+      b3 = 0.86650*b3 + white*0.3104856;
+      b4 = 0.55000*b4 + white*0.5329522;
+      b5 = -0.7616*b5 - white*0.0168980;
+      data[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362)*0.11;
+      b6 = white*0.115926;
+    }
+  }
+
+  noiseNode = audioCtx.createBufferSource();
+  noiseNode.buffer = buffer;
+  noiseNode.loop = true;
+  noiseGain = audioCtx.createGain();
+  noiseGain.gain.value = 0.15;
+  noiseNode.connect(noiseGain);
+  noiseGain.connect(masterGain);
+  noiseNode.start();
+}
+
+window.setMode = function(m) {
+  mode = m;
+  var cfg = modes[m];
+  timerSeconds = cfg.time;
+  binauralFreq = cfg.binaural;
+  document.getElementById('bin-slider').value = cfg.binaural;
+  document.getElementById('bin-val').textContent = cfg.binaural + ' Hz';
+  updateTimerDisplay();
+  document.getElementById('timer-label').textContent = cfg.label;
+
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelector('[data-mode="'+m+'"]').classList.add('active');
+
+  // Update accent color
+  document.documentElement.style.setProperty('--accent', cfg.color);
+
+  if (playing) {
+    oscL.frequency.value = cfg.baseFreq;
+    oscR.frequency.value = cfg.baseFreq + cfg.binaural;
+    createNoise(cfg.noiseType);
+  }
+
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+};
+
+window.togglePlay = function() {
+  if (!playing) {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    masterGain.gain.value = volume;
+    playing = true;
+    document.getElementById('play-btn').textContent = '⏸';
+    document.getElementById('play-btn').classList.add('playing');
+
+    // Start timer
+    timerRunning = true;
+    timerInterval = setInterval(function(){
+      timerSeconds--;
+      if (timerSeconds <= 0) {
+        // Session complete
+        clearInterval(timerInterval);
+        timerRunning = false;
+        stats.sessions++;
+        stats.minutes += modes[mode].time / 60;
+        saveStats();
+
+        // Auto-switch
+        if (mode === 'focus') setMode('break');
+        else if (mode === 'break') setMode('focus');
+      }
+      updateTimerDisplay();
+    }, 1000);
+  } else {
+    masterGain.gain.value = 0;
+    playing = false;
+    document.getElementById('play-btn').textContent = '▶';
+    document.getElementById('play-btn').classList.remove('playing');
+    if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+  }
+};
+
+window.resetTimer = function() {
+  timerSeconds = modes[mode].time;
+  updateTimerDisplay();
+  if (timerRunning) { clearInterval(timerInterval); timerRunning = false; }
+};
+
+window.setVolume = function(v) {
+  volume = v / 100;
+  document.getElementById('vol-val').textContent = v + '%';
+  if (masterGain) masterGain.gain.value = volume;
+};
+
+window.setBinaural = function(v) {
+  binauralFreq = parseInt(v);
+  document.getElementById('bin-val').textContent = v + ' Hz';
+  if (oscR) oscR.frequency.value = modes[mode].baseFreq + binauralFreq;
+};
+
+function updateTimerDisplay() {
+  var m = Math.floor(timerSeconds / 60);
+  var s = timerSeconds % 60;
+  document.getElementById('timer').textContent = (m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+
+// Visualizer
+var canvas = document.getElementById('viz');
+var ctx = canvas.getContext('2d');
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+
+var particles = [];
+for (var i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: (Math.random() - 0.5) * 0.5,
+    size: Math.random() * 3 + 1,
+    alpha: Math.random() * 0.3 + 0.1
+  });
+}
+
+function drawViz() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var cfg = modes[mode];
+  var color = cfg.color;
+
+  particles.forEach(function(p) {
+    var speed = playing ? 1.5 : 0.3;
+    p.x += p.vx * speed;
+    p.y += p.vy * speed;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+
+    var pulse = playing ? (Math.sin(Date.now() / (1000 / binauralFreq * 10)) * 0.3 + 0.7) : 1;
+    ctx.globalAlpha = p.alpha * pulse;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * (playing ? 1.5 : 1), 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Draw connections
+  ctx.globalAlpha = 0.05;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 0.5;
+  for (var i = 0; i < particles.length; i++) {
+    for (var j = i + 1; j < particles.length; j++) {
+      var dx = particles[i].x - particles[j].x;
+      var dy = particles[i].y - particles[j].y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  requestAnimationFrame(drawViz);
+}
+drawViz();
+
+})();
+</script>
+</body>
+</html>
