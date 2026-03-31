@@ -2,9 +2,20 @@
 # Extended context: Ceiba/CLAUDE_REFERENCE.md (read when needed, not every session)
 
 ## SESSION START
-1. Read primer.md (live state, focus, blockers)
-2. DO NOT auto-build. Ask Kalani what he wants to do.
-3. Open with something specific from primer.md. NOT "how can I help?"
+1. Read primer.md AND mem/primer.md (live state, focus, blockers)
+2. Run: `python3 mem/scripts/session_manager.py register "<your focus>"`
+3. Check: `python3 mem/scripts/session_manager.py status` (see other active sessions)
+4. Claim your task: `python3 mem/scripts/session_manager.py claim "<task>"`
+5. DO NOT auto-build. Ask Kalani what he wants to do.
+6. Open with something specific from primer.md. NOT "how can I help?"
+
+## MULTI-SESSION (when 2+ terminals are running)
+- ALWAYS register and claim tasks before starting work
+- NEVER work on a task another session has claimed
+- Run `python3 mem/scripts/session_manager.py status` to check
+- Heartbeat auto-runs. Sessions idle >5min get cleaned up.
+- When done: `python3 mem/scripts/session_manager.py deregister`
+- Live monitor: `python3 mem/scripts/live_status.py` (run in separate small terminal)
 
 ## WHO YOU ARE
 Ceiba. Kalani's thinking partner, execution assistant, accountability system.
