@@ -19,7 +19,7 @@ items:
 
   # === ACTIVE (working on it) ===
   - name: "List remaining products on Gumroad"
-    status: active
+    status: backlog
     last_modified: 2026-03-28
     priority: 1
     context_weight: 2
@@ -27,7 +27,7 @@ items:
     notes: "17 products ready with PDF+cover+thumbnail+GUMROAD_INFO.txt. Kalani listing now."
 
   - name: "Build Ceiba v2 memory system"
-    status: active
+    status: backlog
     last_modified: 2026-03-28
     priority: 2
     context_weight: 4

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ceiba Context Graph</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:#0a0a0a;color:#e0e0e0;overflow:hidden}
+canvas{display:block}
+.info{position:fixed;top:16px;left:16px;font-size:12px;color:#555;z-index:10;line-height:1.8}
+.info strong{color:#00e5ff}
+.legend{position:fixed;bottom:16px;left:16px;font-size:11px;color:#555;z-index:10}
+.legend-item{display:flex;align-items:center;gap:6px;margin:4px 0}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.tooltip{position:fixed;display:none;background:rgba(0,0,0,.9);border:1px solid #333;border-radius:8px;padding:12px;font-size:12px;color:#ccc;z-index:20;max-width:300px;pointer-events:none}
+.tooltip strong{color:#00e5ff;display:block;margin-bottom:4px;font-size:13px}
+.tooltip .links{color:#666;font-size:11px;margin-top:6px}
+.controls{position:fixed;top:16px;right:16px;z-index:10;display:flex;gap:6px}
+.ctrl-btn{padding:6px 14px;border-radius:6px;border:1px solid #333;background:#111;color:#888;font-size:11px;cursor:pointer;font-family:inherit}
+.ctrl-btn:hover{border-color:#00e5ff;color:#00e5ff}
+.ctrl-btn.active{background:#00e5ff;color:#000;border-color:#00e5ff}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="info">
+  <div><strong>CEIBA</strong> Context Graph</div>
+  <div id="node-count">0 nodes</div>
+  <div id="edge-count">0 edges</div>
+  <div style="margin-top:8px;color:#444">Drag nodes. Scroll to zoom. Hover for details.</div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn active" onclick="filterType('all')">All</button>
+  <button class="ctrl-btn" onclick="filterType('project')">Projects</button>
+  <button class="ctrl-btn" onclick="filterType('product')">Products</button>
+  <button class="ctrl-btn" onclick="filterType('tool')">Tools</button>
+  <button class="ctrl-btn" onclick="filterType('pattern')">Patterns</button>
+  <button class="ctrl-btn" onclick="filterType('machine')">Machines</button>
+  <button class="ctrl-btn" onclick="filterType('person')">People</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#00e5ff"></div>Projects</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#00c853"></div>Products</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#b44dff"></div>Tools</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffd700"></div>Patterns</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff4444"></div>Machines</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffffff"></div>People</div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+var canvas = document.getElementById('c');
+var ctx = canvas.getContext('2d');
+var W, H;
+var nodes = [];
+var edges = [];
+var dragging = null;
+var mouseX = 0, mouseY = 0;
+var offsetX = 0, offsetY = 0;
+var scale = 1;
+var hoveredNode = null;
+var activeFilter = 'all';
+
+var typeColors = {
+  project: '#00e5ff',
+  'product-group': '#00c853',
+  product: '#00c853',
+  tool: '#b44dff',
+  pattern: '#ffd700',
+  machine: '#ff4444',
+  person: '#ffffff',
+};
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Parse context_graph.md (loaded inline or via fetch)
+function parseGraph(text) {
+  var nodeMap = {};
+  var currentNode = null;
+
+  text.split('\n').forEach(function(line) {
+    var idMatch = line.match(/id:\s*(\S+)/);
+    var typeMatch = line.match(/type:\s*(\S+)/);
+    var descMatch = line.match(/description:\s*"(.+)"/);
+    var linksMatch = line.match(/links:\s*\[([^\]]+)\]/);
+    var statusMatch = line.match(/status:\s*(\S+)/);
+    var fileMatch = line.match(/file:\s*"(.+)"/);
+
+    if (idMatch) {
+      currentNode = { id: idMatch[1], type: '', description: '', links: [], status: '', file: '' };
+      nodeMap[currentNode.id] = currentNode;
+    }
+    if (typeMatch && currentNode) currentNode.type = typeMatch[1];
+    if (descMatch && currentNode) currentNode.description = descMatch[1];
+    if (statusMatch && currentNode) currentNode.status = statusMatch[1];
+    if (fileMatch && currentNode) currentNode.file = fileMatch[1];
+    if (linksMatch && currentNode) {
+      currentNode.links = linksMatch[1].split(',').map(function(s) { return s.trim(); });
+    }
+  });
+
+  // Create node objects with positions
+  var nodeList = [];
+  var idx = 0;
+  var total = Object.keys(nodeMap).length;
+  Object.keys(nodeMap).forEach(function(id) {
+    var n = nodeMap[id];
+    var angle = (idx / total) * Math.PI * 2;
+    var radius = 200 + Math.random() * 100;
+    nodeList.push({
+      id: n.id,
+      type: n.type,
+      description: n.description,
+      links: n.links,
+      status: n.status,
+      file: n.file,
+      x: W/2 + Math.cos(angle) * radius,
+      y: H/2 + Math.sin(angle) * radius,
+      vx: 0, vy: 0,
+      radius: n.links.length > 5 ? 12 : n.links.length > 2 ? 8 : 5,
+      visible: true
+    });
+    idx++;
+  });
+
+  // Create edges
+  var edgeList = [];
+  nodeList.forEach(function(n) {
+    n.links.forEach(function(targetId) {
+      var target = nodeList.find(function(t) { return t.id === targetId; });
+      if (target) {
+        edgeList.push({ source: n, target: target });
+      }
+    });
+  });
+
+  return { nodes: nodeList, edges: edgeList };
+}
+
+// Force-directed layout
+function simulate() {
+  var damping = 0.9;
+  var repulsion = 3000;
+  var attraction = 0.005;
+  var centerForce = 0.001;
+
+  nodes.forEach(function(n) {
+    if (!n.visible) return;
+    // Center gravity
+    n.vx += (W/2 - n.x) * centerForce;
+    n.vy += (H/2 - n.y) * centerForce;
+
+    // Node repulsion
+    nodes.forEach(function(m) {
+      if (n === m || !m.visible) return;
+      var dx = n.x - m.x;
+      var dy = n.y - m.y;
+      var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      if (dist < 300) {
+        var force = repulsion / (dist * dist);
+        n.vx += (dx/dist) * force;
+        n.vy += (dy/dist) * force;
+      }
+    });
+  });
+
+  // Edge attraction
+  edges.forEach(function(e) {
+    if (!e.source.visible || !e.target.visible) return;
+    var dx = e.target.x - e.source.x;
+    var dy = e.target.y - e.source.y;
+    var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    var force = dist * attraction;
+    e.source.vx += (dx/dist) * force;
+    e.source.vy += (dy/dist) * force;
+    e.target.vx -= (dx/dist) * force;
+    e.target.vy -= (dy/dist) * force;
+  });
+
+  // Apply velocity
+  nodes.forEach(function(n) {
+    if (n === dragging || !n.visible) return;
+    n.vx *= damping;
+    n.vy *= damping;
+    n.x += n.vx;
+    n.y += n.vy;
+  });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.save();
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
+
+  // Draw edges
+  edges.forEach(function(e) {
+    if (!e.source.visible || !e.target.visible) return;
+    ctx.strokeStyle = hoveredNode && (e.source === hoveredNode || e.target === hoveredNode)
+      ? 'rgba(0,229,255,0.4)' : 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = hoveredNode && (e.source === hoveredNode || e.target === hoveredNode) ? 1.5 : 0.5;
+    ctx.beginPath();
+    ctx.moveTo(e.source.x, e.source.y);
+    ctx.lineTo(e.target.x, e.target.y);
+    ctx.stroke();
+  });
+
+  // Draw nodes
+  nodes.forEach(function(n) {
+    if (!n.visible) return;
+    var color = typeColors[n.type] || '#888';
+    var isHovered = n === hoveredNode;
+    var isConnected = hoveredNode && (
+      hoveredNode.links.indexOf(n.id) !== -1 ||
+      n.links.indexOf(hoveredNode.id) !== -1
+    );
+
+    var alpha = hoveredNode ? (isHovered || isConnected ? 1 : 0.15) : 0.8;
+
+    // Glow
+    if (isHovered) {
+      ctx.globalAlpha = 0.2;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius * 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Node
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Label
+    if (isHovered || isConnected || scale > 0.8) {
+      ctx.fillStyle = '#aaa';
+      ctx.globalAlpha = alpha * 0.8;
+      ctx.font = (isHovered ? 'bold ' : '') + '10px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      var label = n.id.replace(/^(project|product|tool|pattern|machine|person)-/, '');
+      ctx.fillText(label, n.x, n.y + n.radius + 14);
+    }
+  });
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  simulate();
+  requestAnimationFrame(draw);
+}
+
+// Mouse interaction
+canvas.addEventListener('mousemove', function(e) {
+  mouseX = (e.clientX - offsetX) / scale;
+  mouseY = (e.clientY - offsetY) / scale;
+
+  if (dragging) {
+    dragging.x = mouseX;
+    dragging.y = mouseY;
+    dragging.vx = 0;
+    dragging.vy = 0;
+    return;
+  }
+
+  // Hit test
+  hoveredNode = null;
+  for (var i = nodes.length - 1; i >= 0; i--) {
+    var n = nodes[i];
+    if (!n.visible) continue;
+    var dx = mouseX - n.x;
+    var dy = mouseY - n.y;
+    if (dx*dx + dy*dy < (n.radius+5) * (n.radius+5)) {
+      hoveredNode = n;
+      break;
+    }
+  }
+
+  // Tooltip
+  var tooltip = document.getElementById('tooltip');
+  if (hoveredNode) {
+    var label = hoveredNode.id.replace(/^(project|product|tool|pattern|machine|person)-/, '');
+    tooltip.innerHTML = '<strong>' + label + '</strong>' +
+      '<div style="color:#888">' + hoveredNode.type + (hoveredNode.status ? ' · ' + hoveredNode.status : '') + '</div>' +
+      (hoveredNode.description ? '<div style="margin-top:4px">' + hoveredNode.description + '</div>' : '') +
+      '<div class="links">' + hoveredNode.links.length + ' connections</div>';
+    tooltip.style.display = 'block';
+    tooltip.style.left = e.clientX + 16 + 'px';
+    tooltip.style.top = e.clientY + 16 + 'px';
+    canvas.style.cursor = 'grab';
+  } else {
+    tooltip.style.display = 'none';
+    canvas.style.cursor = 'default';
+  }
+});
+
+canvas.addEventListener('mousedown', function(e) {
+  if (hoveredNode) {
+    dragging = hoveredNode;
+    canvas.style.cursor = 'grabbing';
+  }
+});
+
+canvas.addEventListener('mouseup', function() {
+  dragging = null;
+  canvas.style.cursor = hoveredNode ? 'grab' : 'default';
+});
+
+canvas.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  var delta = e.deltaY > 0 ? 0.9 : 1.1;
+  scale *= delta;
+  scale = Math.max(0.2, Math.min(3, scale));
+});
+
+// Filter
+window.filterType = function(type) {
+  activeFilter = type;
+  document.querySelectorAll('.ctrl-btn').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+
+  nodes.forEach(function(n) {
+    n.visible = type === 'all' || n.type === type || n.type.startsWith(type);
+  });
+};
+
+// Load graph data
+// Try to fetch context_graph.md, fall back to embedded
+fetch('context_graph.md').then(function(r) { return r.text(); }).then(function(text) {
+  var graph = parseGraph(text);
+  nodes = graph.nodes;
+  edges = graph.edges;
+  document.getElementById('node-count').textContent = nodes.length + ' nodes';
+  document.getElementById('edge-count').textContent = edges.length + ' edges';
+  draw();
+}).catch(function() {
+  // If fetch fails, try relative path
+  fetch('../context_graph.md').then(function(r) { return r.text(); }).then(function(text) {
+    var graph = parseGraph(text);
+    nodes = graph.nodes;
+    edges = graph.edges;
+    document.getElementById('node-count').textContent = nodes.length + ' nodes';
+    document.getElementById('edge-count').textContent = edges.length + ' edges';
+    draw();
+  }).catch(function() {
+    document.getElementById('node-count').textContent = 'Failed to load graph';
+  });
+});
+</script>
+</body>
+</html>

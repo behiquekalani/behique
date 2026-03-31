@@ -367,6 +367,210 @@ def calculate_session_weight():
         return 0
 
 
+def auto_sort_status():
+    """Enforce auto-sort rules on status.md items."""
+    print(cyan("\n[5.5] Auto-Sort Status"))
+    try:
+        content = STATUS.read_text()
+        now = datetime.now()
+        changes = 0
+
+        # Parse items
+        lines = content.split('\n')
+        new_lines = []
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+
+            # Find last_modified dates and check staleness
+            last_mod_match = re.search(r'last_modified:\s*(\d{4}-\d{2}-\d{2})', line)
+            if last_mod_match:
+                item_date = datetime.strptime(last_mod_match.group(1), "%Y-%m-%d")
+                age_days = (now - item_date).days
+
+                # Look backward for the status line of this item
+                status_line_idx = None
+                for j in range(max(0, i-5), i):
+                    if re.search(r'status:\s*(active|todo)', lines[j]):
+                        status_line_idx = j
+                        break
+
+                # Demote active/todo items not touched in 7+ days to backlog
+                if age_days >= DEMOTE_DAYS and status_line_idx is not None:
+                    old_status = re.search(r'status:\s*(\w+)', lines[status_line_idx])
+                    if old_status and old_status.group(1) in ('active', 'todo'):
+                        new_lines_copy = list(new_lines)  # Don't modify while iterating
+                        # We already added the status line to new_lines
+                        for k in range(len(new_lines_copy)):
+                            if new_lines_copy[k] == lines[status_line_idx]:
+                                new_lines[k] = re.sub(
+                                    r'status:\s*(active|todo)',
+                                    'status: backlog',
+                                    new_lines[k]
+                                )
+                                changes += 1
+
+                                # Find item name for logging
+                                for m in range(max(0, status_line_idx-3), status_line_idx):
+                                    name_match = re.search(r'name:\s*"(.+)"', lines[m])
+                                    if name_match:
+                                        print(yellow(f"  DEMOTED: '{name_match.group(1)}' ({age_days} days stale → backlog)"))
+                                        break
+                                break
+
+            new_lines.append(line)
+            i += 1
+
+        if changes > 0:
+            STATUS.write_text('\n'.join(new_lines))
+            print(yellow(f"  {changes} item(s) demoted to backlog"))
+        else:
+            print(green("  No items need demotion"))
+
+        return changes
+    except Exception as e:
+        print(red(f"  ERROR: {e}"))
+        return 0
+
+
+def auto_branch_if_needed(weight):
+    """Create a new branch if session weight exceeds hard limit."""
+    if weight < HARD_LIMIT:
+        return
+
+    print(cyan("\n[5.6] Auto-Branch"))
+    branch_name = f"session/{datetime.now().strftime('%Y-%m-%d-%H%M')}"
+
+    try:
+        # Commit current state first
+        subprocess.run(['git', 'add', 'mem/', 'primer.md'], cwd=REPO, check=True)
+        subprocess.run(
+            ['git', 'commit', '-m', f'mem: checkpoint before branch {branch_name}'],
+            capture_output=True, text=True, cwd=REPO
+        )
+
+        if weight >= CRITICAL_LIMIT:
+            print(red(f"  CRITICAL WEIGHT ({weight}). Creating branch: {branch_name}"))
+            # Create branch from current state
+            subprocess.run(['git', 'branch', branch_name], cwd=REPO, check=True)
+            print(green(f"  Branch created: {branch_name}"))
+            print(red(f"  START NEW SESSION. Run: git checkout main"))
+        elif weight >= HARD_LIMIT:
+            print(yellow(f"  HARD WEIGHT ({weight}). Branch recommended: {branch_name}"))
+
+    except Exception as e:
+        print(red(f"  ERROR: {e}"))
+
+
+def auto_rewrite_primer():
+    """Auto-rewrite primer.md with current state from git and status.md."""
+    print(cyan("\n[6.5] Auto-Rewrite Primer"))
+    try:
+        # Gather current state
+        today = datetime.now().strftime("%Y-%m-%d")
+
+        # Count products
+        products_dir = REPO / "READY-TO-SELL" / "products-organized"
+        product_count = len(list(products_dir.iterdir())) if products_dir.exists() else 0
+
+        # Get recent commits
+        result = subprocess.run(
+            ['git', 'log', '--oneline', '-5', '--format=%s'],
+            capture_output=True, text=True, cwd=REPO
+        )
+        recent_commits = [l.strip() for l in result.stdout.strip().split('\n') if l.strip()]
+
+        # Get active items from status.md
+        active_items = []
+        todo_items = []
+        try:
+            status_content = STATUS.read_text()
+            current_name = None
+            for line in status_content.split('\n'):
+                name_match = re.search(r'name:\s*"(.+)"', line)
+                status_match = re.search(r'status:\s*(\w+)', line)
+                if name_match:
+                    current_name = name_match.group(1)
+                elif status_match and current_name:
+                    if status_match.group(1) == 'active':
+                        active_items.append(current_name)
+                    elif status_match.group(1) == 'todo':
+                        todo_items.append(current_name)
+                    current_name = None
+        except:
+            pass
+
+        # Check session manager for active sessions
+        sessions_file = MEM / "sessions.json"
+        active_sessions = 0
+        if sessions_file.exists():
+            try:
+                import json, time
+                sdata = json.loads(sessions_file.read_text())
+                active_sessions = len([s for s in sdata.get("sessions", [])
+                                       if time.time() - s.get("last_heartbeat", 0) < 300])
+            except:
+                pass
+
+        # Rewrite primer
+        primer_content = f"""---
+layer: L1-cache
+purpose: Current session state and immediate goals
+rewrite_frequency: every session end
+last_modified: {today}
+session_id: auto-{datetime.now().strftime('%H%M')}
+---
+
+# Primer - Live State
+
+## What Just Happened
+- Auto-rewritten by session_end.py at {datetime.now().strftime('%Y-%m-%d %H:%M')}
+- Recent: {'; '.join(recent_commits[:3])}
+
+## Active Right Now
+- Products ready: {product_count}
+- Active sessions: {active_sessions}
+
+## Active Tasks
+{chr(10).join('- ' + item for item in active_items[:5])}
+
+## Next Up
+{chr(10).join('- ' + item for item in todo_items[:5])}
+
+## Session Weight
+- files_modified: 0
+- lines_changed: 0
+- new_nodes: 0
+- checkpoint_needed: false
+"""
+        PRIMER.write_text(primer_content)
+        print(green(f"  Primer auto-rewritten with {product_count} products, {len(active_items)} active tasks"))
+
+    except Exception as e:
+        print(red(f"  ERROR: {e}"))
+
+
+def deregister_session():
+    """Deregister this session from the session manager."""
+    try:
+        import json, time
+        sessions_file = MEM / "sessions.json"
+        if sessions_file.exists():
+            data = json.loads(sessions_file.read_text())
+            pid = os.getpid()
+            data["sessions"] = [s for s in data["sessions"] if s.get("pid") != pid]
+            # Release claimed tasks
+            session_ids = {s["id"] for s in data["sessions"]}
+            data["claimed_tasks"] = {
+                k: v for k, v in data.get("claimed_tasks", {}).items()
+                if v in session_ids
+            }
+            sessions_file.write_text(json.dumps(data, indent=2))
+            print(green("  Session deregistered"))
+    except Exception as e:
+        print(dim(f"  Session deregister skipped: {e}"))
+
+
 def git_checkpoint(message="mem: session checkpoint"):
     """Quick git add + commit."""
     print(cyan("\n[GIT] Checkpoint"))
@@ -489,11 +693,23 @@ def main():
     results["no_contradictions"] = check_primer_graph_contradictions()
     results["weight"] = calculate_session_weight()
 
+    # Auto-sort (runs in both verify and full mode)
+    sort_changes = auto_sort_status()
+
     if not verify_only:
         # Update timestamps
         print(cyan("\n[6] Updates"))
         update_primer_timestamp()
         update_verifier_results(results)
+
+        # Auto-rewrite primer with current state
+        auto_rewrite_primer()
+
+        # Auto-branch if weight is too high
+        auto_branch_if_needed(results["weight"])
+
+        # Deregister this session from session manager
+        deregister_session()
 
         # Git operations
         git_checkpoint(f"mem: session end {datetime.now().strftime('%Y-%m-%d %H:%M')}")
