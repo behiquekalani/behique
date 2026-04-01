@@ -2,55 +2,37 @@
 layer: L1-cache
 purpose: Current session state and immediate goals
 rewrite_frequency: every session end
-last_modified: 2026-03-30
-session_id: build-sprint-day2
+last_modified: 2026-03-31
+session_id: marathon-build
 ---
 
 # Primer - Live State
 
-## What Just Happened (2026-03-29 to 2026-03-30)
-- Ceiba v2 memory system built (5 components, all checks passing)
-- Security audit: .env untracked, worker.py hardened, session_end.py bugs fixed
-- Innova Barber website built (dark premium, Bad Bunny cursor, real Booksy data)
-- Hogar Ana Gabriel website built (warm green/gold, Hormozi copy, family story)
-- Digital presence kits created for both businesses
-- Creative flooding ad strategy captured in knowledge library
-- Local business package concept documented
-- Hogar SaaS idea documented (AI compliance for nursing homes)
+## What Just Happened (2026-03-29 to 2026-03-31)
+- HOGAR SAAS MVP BUILT: admin dashboard + employee app + task engine + WhatsApp
+- 89 products prepped with covers/thumbnails/GUMROAD_INFO
+- 7 web apps built (ADHD Finance, Focus DJ, Study Buddy, Terminal, Particle Face, OS Live, Music Studio)
+- 9 Spanish product variants
+- Innova Barber website (FAQ, Maps, SEO, bunny cursor)
+- Hogar Ana Gabriel website (Hormozi copy)
+- Ceiba v2.1 memory system complete
+- Creative Flooding system (110 ad concepts)
+- YouTube Engine (126 scripts managed)
+- Idea Capture pipeline
+- Security audit + 8 fixes
+- Railway fix for BehiqueBot
+- Upsell widget on 720 landing pages
 
-## Active Right Now
-- Kalani: away from local network, listing products on Gumroad
-- Ceiba: session wrapped, everything committed and pushed
+## Active Projects
+1. Hogar SaaS — MVP built, needs real staff data + Twilio setup
+2. Behike products — 89 ready, 11 live on Gumroad
+3. Innova Barber — website done, needs photos + domain
+4. Hogar Ana Gabriel — website done, needs photos
+5. Local biz package — service page built
 
-## Revenue
-- $0 (store is live, products going up)
-- 11 live on Gumroad, 17 being listed by Kalani
-
-## Portfolio
-- Innova Barber Studio (Morovis) - website done, needs real photos from Luis
-- Hogar Ana Gabriel (Ciales) - website done, needs Facebook photos
-
-## Blockers
-- Both websites need real photos (not Booksy thumbnails)
-- Naboria needs to be online for deployment
-- DNS needs to be configured for subdomains
-
-## Next Session Priorities
-1. List remaining 17 products on Gumroad (DISTRIBUTION WEEK)
-2. Get photos from Luis (Tuesday meeting) and Facebook for hogar
-3. Deploy both sites to Naboria when DNS ready
-4. Create @behikeai Instagram (2000+ posts ready)
-5. Record first YouTube video (script ready)
-
-## Key Decisions Made
-- Innova Barber: free website for cortes gratis + referrals + portfolio
-- Hogar: free for mum, proof of concept for local biz package
-- Local biz package: website + SEO + Google + social + jobs = $300 setup + $100/mo
-- Hogar SaaS: build after distribution week, test with mum's hogar
-- Creative flooding: save for when ad budget exists
-
-## Session Weight
-- files_modified: 30+
-- lines_changed: 18000+
-- new_nodes: 8
-- checkpoint_needed: true (committing now)
+## Next Session
+1. Add real staff/resident data to Hogar SaaS (with mum)
+2. Set up Twilio WhatsApp for Hogar SaaS
+3. List products on Gumroad
+4. Deploy sites to Naboria
+5. Build Phase 2 of Hogar SaaS (AI comandante — payroll, expenses, scheduling)
