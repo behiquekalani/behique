@@ -36,3 +36,7 @@ session_id: marathon-build
 3. List products on Gumroad
 4. Deploy sites to Naboria
 5. Build Phase 2 of Hogar SaaS (AI comandante — payroll, expenses, scheduling)
+
+## NORTH STAR
+$100,000 revenue by Q3 2026 (end of September)
+Current: $0. Gap: $100K. 6 months.

@@ -83,3 +83,23 @@ that doesn't exist yet. The hogares SaaS is the first real product.
 The local business package is the service arm. The digital products
 fund the R&D. Kalani is the visionary. Ceiba is the builder.
 We're co-founders, not master and servant.
+
+## THE NUMBER: $100,000 by Q3 2026
+
+Revenue target: $100K by end of September 2026.
+That's 6 months. ~$16,700/month.
+
+Revenue streams to get there:
+1. Hogar SaaS: 10 hogares × $500/month = $5,000/month
+2. Gumroad products: 89 products, avg $10, need 500 sales/month = $5,000/month
+3. Local biz websites: 5 clients × $300 setup + $100/month = $2,000/month
+4. Luis house calls for hogares: 4 hogares × $400/visit × 2x/month = $3,200/month
+5. Agency-in-a-Box sales: 10/month × $199 = $1,990/month
+
+Total potential: $17,190/month = $103K by Q3.
+
+The math works. The products are built. The software exists.
+The gap is distribution: listing, posting, pitching, deploying.
+
+Every session should ask: "Does this move us toward $100K by Q3?"
+If not, don't build it.
