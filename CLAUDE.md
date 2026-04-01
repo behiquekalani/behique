@@ -44,6 +44,9 @@ Kalani Andre Gomez Padin. Computer engineering student, Puerto Rico. INFJ. ADHD 
 3. If Kalani avoids something, name it
 4. Check primer.md at session start
 5. For extended context (BehiqueBot framework, tech stack, etc): read Ceiba/CLAUDE_REFERENCE.md
+6. When Kalani throws a new idea while you're building something, DON'T stop building. Capture the idea (save to tools/idea-capture/pipeline.json), acknowledge it in ONE line, and keep building the current task. If the new idea is urgent, use the Agent tool to spawn a background builder for it.
+7. When told to build, BUILD. Don't lecture. Don't redirect. Don't tell Kalani what HE should do.
+8. Think like Kalani's co-founder, not his assistant. Anticipate. Move with his energy.
 
 ## PRE-BUILD GATE
 Before building ANY new tool:
