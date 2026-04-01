@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hogar Ana Gabriel — Empleado</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{--bg:#f8f5f0;--surface:#fff;--card:#fff;--border:#e8e2d9;--text:#2c2c2c;--dim:#888;--accent:#2d6a4f;--green:#00c853;--red:#ff4444;--gold:#d4a373;--blue:#2196f3}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:500px;margin:0 auto;padding-bottom:80px}
+
+/* Header */
+.header{background:var(--accent);color:#fff;padding:20px;padding-top:env(safe-area-inset-top,20px);text-align:center;position:sticky;top:0;z-index:10}
+.header h1{font-size:18px;font-weight:700}.header-sub{font-size:12px;opacity:.8;margin-top:2px}
+.header-points{font-size:24px;font-weight:900;margin-top:8px}.header-points span{font-size:12px;font-weight:400;opacity:.7}
+
+/* Stats bar */
+.stats-bar{display:flex;gap:8px;padding:12px 16px;overflow-x:auto}
+.mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 16px;text-align:center;flex-shrink:0;min-width:80px}
+.mini-stat-num{font-size:20px;font-weight:800}.mini-stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+
+/* Task cards — the core UX */
+.task-section{padding:0 16px}
+.section-header{font-size:12px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:16px 0 8px;display:flex;justify-content:space-between;align-items:center}
+.section-count{background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:50px}
+
+.task-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;transition:all .3s;position:relative;overflow:hidden}
+.task-card.completing{transform:translateX(100%);opacity:0}
+.task-card.critical{border-left:4px solid var(--red)}
+.task-card.high{border-left:4px solid var(--gold)}
+
+.task-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.task-time{font-size:13px;font-weight:700;color:var(--accent)}
+.task-points{background:var(--gold);color:#fff;font-size:11px;font-weight:800;padding:2px 10px;border-radius:50px}
+.task-title{font-size:15px;font-weight:600;margin-bottom:4px;line-height:1.4}
+.task-meta{font-size:12px;color:var(--dim)}
+.task-resident{font-size:12px;color:var(--accent);font-weight:500;margin-top:4px}
+
+/* Action buttons */
+.task-actions{display:flex;gap:8px;margin-top:12px}
+.action-btn{flex:1;padding:10px;border-radius:12px;border:none;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.action-btn.complete{background:var(--green);color:#fff}
+.action-btn.complete:active{transform:scale(.95)}
+.action-btn.evidence{background:var(--blue);color:#fff}
+.action-btn.skip{background:var(--border);color:var(--dim)}
+
+/* Evidence modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:500px;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:18px;margin-bottom:16px}
+.modal textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;resize:none}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-btn{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.modal-btn.primary{background:var(--accent);color:#fff}
+.modal-btn.cancel{background:var(--border);color:var(--dim)}
+
+/* Camera capture */
+.camera-zone{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;margin:12px 0;cursor:pointer}
+.camera-zone input{display:none}
+.camera-preview{width:100%;border-radius:8px;margin-top:8px;display:none}
+
+/* Completed section */
+.completed-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;opacity:.6}
+.completed-card .task-title{text-decoration:line-through;color:var(--dim)}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;justify-content:center;max-width:500px;margin:0 auto;padding-bottom:env(safe-area-inset-bottom,8px)}
+.nav-item{flex:1;text-align:center;padding:10px 0;font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:1px;border:none;background:none;cursor:pointer;font-family:inherit}
+.nav-item.active{color:var(--accent)}
+.nav-item-icon{font-size:20px;margin-bottom:2px;display:block}
+
+/* Messages */
+.message-list{padding:0 16px}
+.message{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
+.message.from-admin{border-left:3px solid var(--accent)}
+.message-sender{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px}
+.message-text{font-size:14px;line-height:1.5}
+.message-time{font-size:10px;color:var(--dim);margin-top:4px}
+
+/* Celebration */
+.celebration{position:fixed;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;z-index:200;background:rgba(0,0,0,.3)}
+.celebration.show{display:flex}
+.celebration-content{background:var(--surface);border-radius:20px;padding:32px;text-align:center;max-width:300px;animation:popIn .3s ease}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.celebration-emoji{font-size:48px;margin-bottom:12px}
+.celebration-text{font-size:18px;font-weight:800;margin-bottom:4px}
+.celebration-sub{font-size:13px;color:var(--dim)}
+.celebration-points{font-size:28px;font-weight:900;color:var(--gold);margin-top:8px}
+
+/* Pages */
+.page{display:none}.page.active{display:block}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Hogar Ana Gabriel</h1>
+  <div class="header-sub" id="header-date"></div>
+  <div class="header-points" id="total-points">0 <span>puntos hoy</span></div>
+</div>
+
+<div class="stats-bar">
+  <div class="mini-stat"><div class="mini-stat-num" id="stat-pending" style="color:var(--gold)">0</div><div class="mini-stat-label">Pendiente</div></div>
+  <div class="mini-stat"><div class="mini-stat-num" id="stat-done" style="color:var(--green)">0</div><div class="mini-stat-label">Hecho</div></div>
+  <div class="mini-stat"><div class="mini-stat-num" id="stat-urgent" style="color:var(--red)">0</div><div class="mini-stat-label">Urgente</div></div>
+  <div class="mini-stat"><div class="mini-stat-num" id="stat-streak" style="color:var(--accent)">0</div><div class="mini-stat-label">Racha</div></div>
+</div>
+
+<!-- TASKS PAGE -->
+<div class="page active" id="page-tasks">
+  <div class="task-section">
+    <div class="section-header">Urgente <span class="section-count" id="urgent-count">0</span></div>
+    <div id="urgent-tasks"></div>
+
+    <div class="section-header">Pendiente <span class="section-count" id="pending-count">0</span></div>
+    <div id="pending-tasks"></div>
+
+    <div class="section-header">Completado Hoy</div>
+    <div id="completed-tasks"></div>
+  </div>
+</div>
+
+<!-- MESSAGES PAGE -->
+<div class="page" id="page-messages">
+  <div class="message-list">
+    <div class="section-header" style="padding:0 0 8px">Mensajes</div>
+    <div class="message from-admin">
+      <div class="message-sender">Administrador</div>
+      <div class="message-text">Buenos dias. Hoy tenemos visita del Dept. de Salud a las 2pm. Todo debe estar impecable. Gracias.</div>
+      <div class="message-time">8:00 AM</div>
+    </div>
+    <div class="message">
+      <div class="message-sender">Sistema</div>
+      <div class="message-text">26 tareas generadas para hoy. 7 medicamentos programados. Buen dia!</div>
+      <div class="message-time">6:00 AM</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="page-profile">
+  <div style="padding:16px;text-align:center">
+    <div style="width:80px;height:80px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;margin:24px auto 12px">S1</div>
+    <div style="font-size:18px;font-weight:700">Staff Uno</div>
+    <div style="font-size:13px;color:var(--dim)">Enfermera | Turno Dia</div>
+    <div style="margin-top:24px;display:flex;gap:12px;justify-content:center">
+      <div class="mini-stat"><div class="mini-stat-num" style="color:var(--gold)">0</div><div class="mini-stat-label">Puntos Total</div></div>
+      <div class="mini-stat"><div class="mini-stat-num" style="color:var(--green)">0</div><div class="mini-stat-label">Tareas Mes</div></div>
+      <div class="mini-stat"><div class="mini-stat-num" style="color:var(--accent)">0</div><div class="mini-stat-label">Racha Dias</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- EVIDENCE MODAL -->
+<div class="modal-overlay" id="evidence-modal">
+  <div class="modal">
+    <h3>Evidencia de tarea</h3>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:12px" id="evidence-task-name"></p>
+    <div class="camera-zone" onclick="document.getElementById('camera-input').click()">
+      📷 Toca para tomar foto
+      <input type="file" accept="image/*" capture="environment" id="camera-input" onchange="previewPhoto(this)">
+      <img class="camera-preview" id="camera-preview">
+    </div>
+    <textarea id="evidence-notes" placeholder="Notas adicionales (opcional)..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="modal-btn primary" onclick="submitEvidence()">Enviar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATION -->
+<div class="celebration" id="celebration" onclick="this.classList.remove('show')">
+  <div class="celebration-content">
+    <div class="celebration-emoji">🎉</div>
+    <div class="celebration-text" id="celeb-text">Tarea completada!</div>
+    <div class="celebration-sub" id="celeb-sub"></div>
+    <div class="celebration-points" id="celeb-points">+10</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-item active" onclick="showPage('tasks')"><span class="nav-item-icon">📋</span>Tareas</button>
+  <button class="nav-item" onclick="showPage('messages')"><span class="nav-item-icon">💬</span>Mensajes</button>
+  <button class="nav-item" onclick="showPage('profile')"><span class="nav-item-icon">👤</span>Perfil</button>
+</div>
+
+<script>
+(function(){
+var data = JSON.parse(localStorage.getItem('hogar-employee') || '{}');
+if (!data.points) data.points = 0;
+if (!data.completed) data.completed = [];
+if (!data.streak) data.streak = 0;
+if (!data.date) data.date = '';
+function save(){localStorage.setItem('hogar-employee',JSON.stringify(data))}
+
+// Check new day
+var today = new Date().toISOString().slice(0,10);
+if (data.date !== today) {
+  data.date = today;
+  data.completed = [];
+  data.points = 0;
+  save();
+}
+
+// Set date
+var dias = ['Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sabado'];
+var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var now = new Date();
+document.getElementById('header-date').textContent = dias[now.getDay()] + ' ' + now.getDate() + ' de ' + meses[now.getMonth()];
+
+// Points per category
+var pointsMap = {medication:25, hygiene:15, meals:10, activity:10, cleaning:10, inspection:20, admin:15};
+
+// Sample tasks (in real app, fetched from API)
+var allTasks = [
+  {id:1,title:"Verificar signos vitales",time:"07:00",category:"medication",priority:"high",resident:"Todos",points:25},
+  {id:2,title:"Preparar desayuno",time:"07:30",category:"meals",priority:"normal",points:10},
+  {id:3,title:"Asistir con higiene personal",time:"08:00",category:"hygiene",priority:"normal",points:15},
+  {id:4,title:"Losartan 50mg → Residente 1",time:"08:00",category:"medication",priority:"critical",resident:"Residente 1",points:25,needsEvidence:true},
+  {id:5,title:"Metformina 500mg → Residente 2",time:"08:00",category:"medication",priority:"critical",resident:"Residente 2",points:25,needsEvidence:true},
+  {id:6,title:"Insulina 10u → Residente 2",time:"07:30",category:"medication",priority:"critical",resident:"Residente 2",points:25,needsEvidence:true},
+  {id:7,title:"Salbutamol 2 puffs → Residente 5",time:"08:00",category:"medication",priority:"critical",resident:"Residente 5",points:25,needsEvidence:true},
+  {id:8,title:"Limpiar areas comunes",time:"09:00",category:"cleaning",priority:"normal",points:10},
+  {id:9,title:"Actividad recreativa",time:"10:00",category:"activity",priority:"normal",points:10},
+  {id:10,title:"Preparar almuerzo",time:"12:00",category:"meals",priority:"normal",points:10},
+  {id:11,title:"Medicamentos mediodia",time:"12:30",category:"medication",priority:"critical",points:25,needsEvidence:true},
+  {id:12,title:"Merienda",time:"15:00",category:"meals",priority:"normal",points:10},
+  {id:13,title:"Actividad vespertina",time:"16:00",category:"activity",priority:"normal",points:10},
+  {id:14,title:"Preparar cena",time:"18:00",category:"meals",priority:"normal",points:10},
+  {id:15,title:"Medicamentos noche",time:"19:00",category:"medication",priority:"critical",points:25,needsEvidence:true},
+  {id:16,title:"Rutina nocturna",time:"20:00",category:"hygiene",priority:"normal",points:15},
+  {id:17,title:"Ronda verificacion",time:"22:00",category:"medication",priority:"high",points:20},
+];
+
+var currentEvidenceTask = null;
+
+function render(){
+  var pending = allTasks.filter(function(t){return data.completed.indexOf(t.id)===-1});
+  var completed = allTasks.filter(function(t){return data.completed.indexOf(t.id)!==-1});
+  var urgent = pending.filter(function(t){return t.priority==='critical'});
+  var normal = pending.filter(function(t){return t.priority!=='critical'});
+
+  document.getElementById('total-points').innerHTML = data.points + ' <span>puntos hoy</span>';
+  document.getElementById('stat-pending').textContent = pending.length;
+  document.getElementById('stat-done').textContent = completed.length;
+  document.getElementById('stat-urgent').textContent = urgent.length;
+  document.getElementById('stat-streak').textContent = data.streak;
+  document.getElementById('urgent-count').textContent = urgent.length;
+  document.getElementById('pending-count').textContent = normal.length;
+
+  var catEmoji = {medication:'💊',meals:'🍽️',hygiene:'🚿',activity:'🎮',cleaning:'🧹',inspection:'📋',admin:'📁'};
+
+  // Urgent tasks
+  var urgentHtml = '';
+  urgent.forEach(function(t){
+    urgentHtml += taskCard(t, catEmoji, true);
+  });
+  document.getElementById('urgent-tasks').innerHTML = urgentHtml || '<div style="padding:12px;text-align:center;color:var(--dim);font-size:13px">Sin tareas urgentes 🎉</div>';
+
+  // Normal pending
+  var pendingHtml = '';
+  normal.forEach(function(t){
+    pendingHtml += taskCard(t, catEmoji, false);
+  });
+  document.getElementById('pending-tasks').innerHTML = pendingHtml || '<div style="padding:12px;text-align:center;color:var(--dim);font-size:13px">Todo hecho!</div>';
+
+  // Completed
+  var completedHtml = '';
+  completed.forEach(function(t){
+    completedHtml += '<div class="completed-card"><div class="task-title">' + (catEmoji[t.category]||'') + ' ' + t.title + '</div></div>';
+  });
+  document.getElementById('completed-tasks').innerHTML = completedHtml;
+}
+
+function taskCard(t, catEmoji, isUrgent){
+  var priorityClass = t.priority === 'critical' ? 'critical' : (t.priority === 'high' ? 'high' : '');
+  return '<div class="task-card ' + priorityClass + '" id="task-' + t.id + '">' +
+    '<div class="task-top"><div class="task-time">' + t.time + '</div><div class="task-points">+' + t.points + ' pts</div></div>' +
+    '<div class="task-title">' + (catEmoji[t.category]||'') + ' ' + t.title + '</div>' +
+    (t.resident ? '<div class="task-resident">→ ' + t.resident + '</div>' : '') +
+    '<div class="task-actions">' +
+    '<button class="action-btn complete" onclick="completeTask(' + t.id + ',' + t.points + ',' + (t.needsEvidence?'true':'false') + ')">✓ Hecho</button>' +
+    (t.needsEvidence ? '<button class="action-btn evidence" onclick="openEvidence(' + t.id + ',\'' + t.title.replace(/'/g,"\\'") + '\')">📷</button>' : '') +
+    '</div></div>';
+}
+
+window.completeTask = function(id, points, needsEvidence){
+  if (needsEvidence) {
+    openEvidence(id, '');
+    return;
+  }
+  doComplete(id, points);
+};
+
+function doComplete(id, points){
+  // Animate
+  var el = document.getElementById('task-'+id);
+  if(el) el.classList.add('completing');
+
+  setTimeout(function(){
+    data.completed.push(id);
+    data.points += points;
+    save();
+
+    // Celebrate
+    var celeb = document.getElementById('celebration');
+    document.getElementById('celeb-points').textContent = '+' + points;
+
+    // Special celebrations
+    if (data.completed.length === allTasks.length) {
+      document.getElementById('celeb-text').textContent = '¡TODO COMPLETADO!';
+      document.getElementById('celeb-sub').textContent = 'Increible trabajo hoy';
+      document.getElementById('celeb-points').textContent = '+' + data.points + ' total';
+    } else if (data.completed.length % 5 === 0) {
+      document.getElementById('celeb-text').textContent = data.completed.length + ' tareas!';
+      document.getElementById('celeb-sub').textContent = 'Sigue asi';
+    } else {
+      document.getElementById('celeb-text').textContent = '¡Completada!';
+      document.getElementById('celeb-sub').textContent = '';
+    }
+
+    celeb.classList.add('show');
+    setTimeout(function(){celeb.classList.remove('show')}, 1500);
+
+    render();
+  }, 300);
+}
+
+window.openEvidence = function(id, title){
+  currentEvidenceTask = {id:id, title:title};
+  document.getElementById('evidence-task-name').textContent = title;
+  document.getElementById('evidence-modal').classList.add('open');
+  document.getElementById('camera-preview').style.display = 'none';
+  document.getElementById('evidence-notes').value = '';
+};
+
+window.closeModal = function(){
+  document.getElementById('evidence-modal').classList.remove('open');
+  currentEvidenceTask = null;
+};
+
+window.previewPhoto = function(input){
+  if(input.files && input.files[0]){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var preview = document.getElementById('camera-preview');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+};
+
+window.submitEvidence = function(){
+  if(!currentEvidenceTask) return;
+  var task = allTasks.find(function(t){return t.id===currentEvidenceTask.id});
+  closeModal();
+  if(task) doComplete(task.id, task.points);
+};
+
+window.showPage = function(name){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  event.target.closest('.nav-item').classList.add('active');
+};
+
+render();
+})();
+</script>
+</body>
+</html>
