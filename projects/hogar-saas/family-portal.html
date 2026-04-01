@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hogar Ana Gabriel — Portal Familiar</title>
+<style>
+:root{--bg:#f8f5f0;--surface:#fff;--border:#e8e2d9;--text:#2c2c2c;--dim:#888;--accent:#2d6a4f;--green:#00c853;--red:#ff4444;--gold:#d4a373;--warm:#faedcd}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:600px;margin:0 auto}
+
+.header{background:var(--accent);color:#fff;padding:24px;text-align:center}
+.header h1{font-size:20px;font-weight:700}.header-sub{font-size:12px;opacity:.8;margin-top:4px}
+
+.resident-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin:16px;padding:20px;display:flex;gap:16px;align-items:center}
+.resident-avatar{width:60px;height:60px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;flex-shrink:0}
+.resident-name{font-size:18px;font-weight:700}.resident-meta{font-size:12px;color:var(--dim);margin-top:2px}
+
+.section{padding:0 16px;margin-bottom:24px}
+.section-title{font-size:12px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:12px}
+
+/* Timeline */
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:16px}
+.timeline-dot{position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.timeline-dot.photo{background:var(--gold)}
+.timeline-dot.med{background:var(--green)}
+.timeline-dot.alert{background:var(--red)}
+
+.timeline-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.timeline-time{font-size:11px;color:var(--dim);margin-bottom:4px}
+.timeline-text{font-size:14px;line-height:1.5}
+.timeline-photo{width:100%;border-radius:8px;margin-top:8px;background:var(--warm);height:200px;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px}
+.timeline-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin-top:6px}
+.badge-activity{background:rgba(45,106,79,.1);color:var(--accent)}
+.badge-meal{background:rgba(212,163,115,.15);color:var(--gold)}
+.badge-med{background:rgba(0,200,83,.1);color:var(--green)}
+
+/* Vitals card */
+.vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.vital{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center}
+.vital-num{font-size:20px;font-weight:800}.vital-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.vital-num.normal{color:var(--green)}.vital-num.warning{color:var(--gold)}.vital-num.danger{color:var(--red)}
+
+/* Medication log */
+.med-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;font-size:13px}
+.med-status{font-size:16px}
+
+.footer{text-align:center;padding:24px;font-size:11px;color:var(--dim)}
+.footer a{color:var(--accent);text-decoration:none}
+
+/* Login screen */
+.login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.login h2{font-size:22px;margin-bottom:8px}
+.login p{color:var(--dim);font-size:14px;margin-bottom:24px}
+.login input{width:100%;max-width:300px;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;margin-bottom:12px;text-align:center;font-family:inherit}
+.login input:focus{outline:none;border-color:var(--accent)}
+.login button{width:100%;max-width:300px;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+
+.page{display:none}.page.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="page active" id="page-login">
+  <div class="login">
+    <div style="font-size:48px;margin-bottom:16px">🏠</div>
+    <h2>Hogar Ana Gabriel</h2>
+    <p>Portal Familiar</p>
+    <input type="text" id="login-code" placeholder="Codigo de acceso" maxlength="6">
+    <button onclick="login()">Entrar</button>
+    <p style="margin-top:16px;font-size:12px;color:var(--dim)">El codigo fue enviado por WhatsApp por el hogar.</p>
+  </div>
+</div>
+
+<!-- PORTAL -->
+<div class="page" id="page-portal">
+  <div class="header">
+    <h1>Hogar Ana Gabriel</h1>
+    <div class="header-sub">Portal Familiar</div>
+  </div>
+
+  <div class="resident-card">
+    <div class="resident-avatar">M</div>
+    <div>
+      <div class="resident-name">Maria</div>
+      <div class="resident-meta">Habitacion 3 &bull; Desde enero 2024</div>
+    </div>
+  </div>
+
+  <!-- Today's Vitals -->
+  <div class="section">
+    <div class="section-title">Signos Vitales Hoy</div>
+    <div class="vitals">
+      <div class="vital"><div class="vital-num normal">120/78</div><div class="vital-label">Presion</div></div>
+      <div class="vital"><div class="vital-num normal">72</div><div class="vital-label">Pulso</div></div>
+      <div class="vital"><div class="vital-num normal">97%</div><div class="vital-label">Oxigeno</div></div>
+      <div class="vital"><div class="vital-num normal">36.5&deg;</div><div class="vital-label">Temp</div></div>
+      <div class="vital"><div class="vital-num normal">145</div><div class="vital-label">Peso (lbs)</div></div>
+      <div class="vital"><div class="vital-num normal">110</div><div class="vital-label">Azucar</div></div>
+    </div>
+  </div>
+
+  <!-- Medications -->
+  <div class="section">
+    <div class="section-title">Medicamentos Hoy</div>
+    <div class="med-item"><span>Acetaminofen 500mg — 8:00am</span><span class="med-status">✅</span></div>
+    <div class="med-item"><span>Acetaminofen 500mg — 2:00pm</span><span class="med-status">⏳</span></div>
+    <div class="med-item"><span>Acetaminofen 500mg — 8:00pm</span><span class="med-status">⏳</span></div>
+  </div>
+
+  <!-- Activity Timeline -->
+  <div class="section">
+    <div class="section-title">Actividades de Hoy</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot photo"></div>
+        <div class="timeline-card">
+          <div class="timeline-time">10:30 AM</div>
+          <div class="timeline-text">Jugando domino con las companeras. Se rio mucho hoy.</div>
+          <div class="timeline-photo">📸 Foto de la actividad</div>
+          <span class="timeline-badge badge-activity">Actividad recreativa</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <div class="timeline-time">8:15 AM</div>
+          <div class="timeline-text">Desayuno: avena con frutas, jugo de china, pan tostado. Comio todo.</div>
+          <span class="timeline-badge badge-meal">Comida</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot med"></div>
+        <div class="timeline-card">
+          <div class="timeline-time">8:02 AM</div>
+          <div class="timeline-text">Medicamento administrado: Acetaminofen 500mg</div>
+          <span class="timeline-badge badge-med">Medicamento ✓</span>
+        </div>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-card">
+          <div class="timeline-time">7:30 AM</div>
+          <div class="timeline-text">Buenos dias. Amanecio con buen animo. Signos vitales normales.</div>
+          <span class="timeline-badge badge-activity">Check-in matutino</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Summary -->
+  <div class="section">
+    <div class="section-title">Resumen Semanal</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px">Medicamentos a tiempo</span>
+        <span style="font-size:13px;font-weight:700;color:var(--green)">97%</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px">
+        <div style="height:100%;width:97%;background:var(--green);border-radius:3px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px">Actividades participadas</span>
+        <span style="font-size:13px;font-weight:700;color:var(--accent)">5 de 7 dias</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px">Comidas completadas</span>
+        <span style="font-size:13px;font-weight:700;color:var(--accent)">100%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:13px">Estado de animo general</span>
+        <span style="font-size:13px;font-weight:700;color:var(--gold)">😊 Positivo</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Con carino, <a href="tel:+17875014445">Hogar Ana Gabriel</a> 💚<br>
+    (787) 501-4445
+  </div>
+</div>
+
+<script>
+function login() {
+  var code = document.getElementById('login-code').value;
+  if (code.length >= 4) {
+    document.getElementById('page-login').classList.remove('active');
+    document.getElementById('page-portal').classList.add('active');
+  }
+}
+document.getElementById('login-code').addEventListener('keyup', function(e) {
+  if (e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>
