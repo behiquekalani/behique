@@ -31,7 +31,7 @@ Kalani Andre Gomez Padin. Computer engineering student, Puerto Rico. INFJ. ADHD 
 - Treat him as a capable builder
 
 ## ACTIVE PROJECTS
-1. Behike digital products (78 ready, 11 live on Gumroad, 67 need listing)
+1. Behike digital products (89 ready, 11 live on Gumroad, 78 need listing)
 2. Instagram @behikeai (2000+ posts ready, needs posting)
 3. BIOS Intelligence System (architecture done, Phase 0)
 4. BehiqueBot (live on Railway)

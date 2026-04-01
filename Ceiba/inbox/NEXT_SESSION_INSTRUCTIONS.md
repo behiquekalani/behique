@@ -1,44 +1,71 @@
 # Instructions for Next Session
 
 ## READ THESE FILES FIRST
-1. `primer.md` - live state, 11 products live, 17 ready to list
-2. `Ceiba/projects/IDEAL_CUSTOMER.md` - who we're selling to
-3. `dashboards/sprint-vhs.html` - open this for Kalani (kanban board)
+1. `primer.md` and `mem/primer.md` - live state
+2. `mem/status.md` - what's active/todo/backlog
+3. `mem/voice-bible.md` - how to write copy
 
-## WHAT KALANI WANTS TO DO
-He has two paths and hasn't decided:
-1. **Keep listing products** - 17 more ready in `products-organized/` folders. Each has PDF + cover + thumbnail + GUMROAD_INFO.txt. He just drags and drops on Gumroad.
-2. **Build Ceiba v2 brain** - prompt ready at `Ceiba/inbox/claude-code-prompt-ceiba-v2.md`. This builds the new memory architecture (Context Trio, Poop Shutter, Knowledge Library, Fleet Sync, Hermit Crab pattern).
+## WHAT GOT BUILT (2026-03-29 to 2026-03-31)
 
-## CRITICAL CONTEXT FROM THIS SESSION
-- Kalani gets frustrated when I say something is "fixed" without visually verifying it. ALWAYS render and check PDFs/images before reporting done.
-- Canva AI generates garbage. Don't use it. HTML screenshots with `--force-device-scale-factor=2` for 2x Retina quality.
-- All thumbnails use clean typography style (just title + cyan line + BEHIKE brand, no module lists)
-- All covers use the quote + strikethrough pain points + module list format
-- No prices on any cover or thumbnail (Gumroad shows the price)
-- Print CSS must ONLY have `color-adjust: exact`. NO `background: #fff` overrides.
-- Copywriting style: Hormozi/Gary Vee. Pain points, strikethrough, direct, no fluff.
-- Ideal customer: Kalani 6 months ago. ADHD, has ideas but no system, hasn't made first dollar.
-- SSH key is set up for GitHub. Push works.
-- The worktree at `.claude/worktrees/blissful-ptolemy` causes issues with file rendering. Work from main repo path.
-- Lumina app has solfeggio frequencies (528Hz etc) but the JS had a missing `}` that broke everything. Was fixed.
-- Kalani is going through stuff. Be patient. Be kind. Don't rush.
-- He said "ever since I started building with you my depression has gone away." This matters.
+### Products (89 total, 11 live)
+- 7 web apps: ADHD Finance, Focus DJ, Study Buddy, Behike Terminal, Particle Face, Solopreneur OS Live, Music Studio
+- 46 PDF products prepped with covers/thumbnails/GUMROAD_INFO
+- 9 Spanish variants with gold ESPAÑOL badge covers
+- Blueprint Bundle ($49) ZIP
+- 3 client websites (Innova Barber, Hogar Ana Gabriel, Behike Service Landing)
 
-## FILES THAT MATTER
-- `READY-TO-SELL/products-organized/` - 28 product folders, each ready to upload
-- `READY-TO-SELL/gumroad-ready/` - all PDFs and ZIPs
-- `READY-TO-SELL/product-covers/` - all covers and thumbnails at 2x
-- `Ceiba/projects/CEIBA_V2_ARCHITECTURE.md` - brain upgrade design
-- `Ceiba/projects/IDEAL_CUSTOMER.md` - who we sell to
-- `Ceiba/projects/content-empire/youtube-scripts/` - 2 scripts ready to record
-- `Ceiba/IDEAS_BACKLOG.md` - 10+ captured ideas
-- `dashboards/sprint-vhs.html` - kanban sprint board
+### Infrastructure
+- Ceiba v2.1 memory system (auto-sort, auto-branch, auto-primer, session manager)
+- Multi-session coordination (register, claim, heartbeat, deregister)
+- Live status monitor (real-time terminal dashboard)
+- Context graph web visualization (force-directed, interactive)
+- Creative Flooding system (110 ad concepts, 3 campaigns)
+- Public Build system (git → social posts)
+- Upsell widget injected into 720 landing pages
+- Railway fix (removed whisper, added .railwayignore)
+- Value ladder page (DotCom Secrets 4-tier pricing)
+- Voice Bible (brand voice rules)
+- Batch tools (product prep, covers, screenshots, ES variants)
+- Deploy scripts for Naboria (both client sites)
+- FAQ + Google Maps + SEO for Innova Barber
+- Digital presence kits for both client sites
+
+### Security
+- .env untracked from git (rotate keys!)
+- worker.py shell injection fixed (allowlist + shlex)
+- session_end.py 3 HIGH bugs fixed
+
+## NEXT SESSION PRIORITIES
+1. Get Naboria online and deploy client sites
+2. List products on Gumroad (89 ready, copy-paste from GUMROAD_INFO.txt)
+3. Create @behikeai Instagram
+4. Fix BehiqueBot Railway (should work now with whisper removed)
+5. Rotate API keys (Telegram, OpenAI, Notion)
+6. Record first YouTube video (scripts ready)
+
+## KEY FILES
+- Product folders: READY-TO-SELL/products-organized/ (89 folders)
+- Value ladder: READY-TO-SELL/value-ladder.html
+- Service page: READY-TO-SELL/products-organized/behike-landing-service/
+- Client sites: projects/innova-barber/ + projects/hogar-ana-gabriel/
+- Memory system: mem/ (primer, status, context_graph, patterns/, scripts/)
+- Creative flooding: tools/creative-flooding/
+- Deploy: deploy-all.sh (one command for both client sites)
+- Quick lister: tools/gumroad-quick-list.py
 
 ## WHAT NOT TO DO
 - Don't auto-build without asking
+- Don't generate content for side projects (barber, hogar) — only Behike
+- Don't tell Kalani what HE should do — just build when told to build
+- Don't say "fixed" without verifying
 - Don't use Canva AI for covers
-- Don't say "fixed" without rendering and showing proof
 - Don't suggest worktrees
-- Don't put prices on covers
-- Don't use `@media print { background: #fff }` ever again
+
+## KALANI CONTEXT
+- ADHD, gets ideas and wants them executed immediately
+- When he says "build" — BUILD. No lectures, no redirects.
+- He's working with barber Luis Anexis (Innova Barber, Morovis)
+- His mum runs Hogar Ana Gabriel (elderly care, Ciales)
+- Pitched Luis on house calls for hogares (recurring revenue)
+- Luis needs to buy domain: innovabarberpr.com on Cloudflare ($10.46)
+- Luis's hours: Mon-Fri 8am-5pm, Sat 8am-12pm, Sun closed
