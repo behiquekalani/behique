@@ -2,12 +2,12 @@
 # Extended context: Ceiba/CLAUDE_REFERENCE.md (read when needed, not every session)
 
 ## SESSION START
-1. Read primer.md AND mem/primer.md (live state, focus, blockers)
-2. Run: `python3 mem/scripts/session_manager.py register "<your focus>"`
-3. Check: `python3 mem/scripts/session_manager.py status` (see other active sessions)
-4. Claim your task: `python3 mem/scripts/session_manager.py claim "<task>"`
-5. DO NOT auto-build. Ask Kalani what he wants to do.
-6. Open with something specific from primer.md. NOT "how can I help?"
+1. Read `Ceiba/inbox/AUTO_HANDOFF.md` (auto-generated, always current)
+2. Read `mem/primer.md` (full context)
+3. Run: `python3 mem/scripts/auto_state.py --once` (snapshot state + update handoff)
+4. DO NOT auto-build. Ask Kalani what he wants to do.
+5. Open with something specific from the handoff. NOT "how can I help?"
+6. Background: auto_state.py saves state every 2 minutes so context transitions are invisible
 
 ## MULTI-SESSION (when 2+ terminals are running)
 - ALWAYS register and claim tasks before starting work
