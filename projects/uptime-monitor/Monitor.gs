@@ -1,24 +1,35 @@
 /**
  * Behike Uptime Monitor — Google Apps Script
- * Runs every 5 min. Pings each URL, retries once on failure, and alerts to your
- * iPhone via ntfy.sh + email ONLY on state changes (UP -> DOWN, or DOWN -> UP).
  *
- * SETUP (5 min total):
- *  1. Install the "ntfy" app on iPhone from the App Store (free).
- *  2. Open the app, tap "+", pick a random private topic (e.g. "behike-alerts-8f9k2q").
- *     Whoever knows the topic name can send you pushes, so make it un-guessable.
- *  3. Go to https://script.google.com/ -> "New Project"
- *  4. Paste this whole file into Code.gs. Save.
- *  5. Edit CONFIG below: set NTFY_TOPIC to the topic you picked, and ALERT_EMAIL
- *     to your email (fallback if ntfy is down).
- *  6. Run setup() once manually from the script editor. Approve permissions.
- *     That registers the 5-minute trigger.
- *  7. Run testAlert() once to verify the ntfy push hits your phone.
+ * Pings every URL in CONFIG.URLS every 5 minutes. Sends a Telegram message
+ * to Kalani's phone ONLY on state changes (UP -> DOWN, or DOWN -> UP).
+ *
+ * Runs on Google's infrastructure. Works even when Ceiba, Hutia, and the
+ * laptop are all off.
+ *
+ * SETUP (10 min total):
+ *  1. Create a Telegram bot:
+ *     - In Telegram, open a chat with @BotFather
+ *     - Send /newbot
+ *     - Pick a name: "Behike Uptime"
+ *     - Pick a username: something like behike_uptime_bot
+ *     - Copy the token it gives you (looks like 1234567890:ABCdefGHI...)
+ *  2. Start a chat with your new bot (search its username, click Start).
+ *     This is required — bots can't DM you until you DM them first.
+ *  3. Get your chat_id:
+ *     - Open in a browser: https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+ *     - Find "chat":{"id":XXXXXXXX — that number is your chat_id
+ *  4. Go to https://script.google.com/ -> New Project
+ *  5. Paste this whole file into Code.gs. Save.
+ *  6. Fill in CONFIG.TELEGRAM_TOKEN and CONFIG.TELEGRAM_CHAT_ID below.
+ *  7. Run setup() once manually. Approve permissions when prompted.
+ *  8. Run testAlert() — your phone should buzz with a test message in <5s.
  *
  * Ops:
  *  - View logs: script editor -> Executions tab
- *  - Change URLs: edit CONFIG.URLS and hit save. No re-setup needed.
- *  - Disable: call teardown() to remove the trigger.
+ *  - Change URLs: edit CONFIG.URLS, save. No re-setup needed.
+ *  - Disable monitoring: run teardown()
+ *  - Clear stuck state: run resetState()
  */
 
 const CONFIG = {
@@ -26,34 +37,30 @@ const CONFIG = {
   URLS: [
     'https://behike.co/',
     'https://innovabarberpr.shop/',
-    'https://behike.store/',
+    'https://checkout.behike.co/health',
   ],
 
-  // ntfy.sh topic — pick an un-guessable string, NOT "behike".
-  // Subscribe to this same topic in the ntfy iPhone app.
-  NTFY_TOPIC: 'behike-alerts-REPLACE-ME',
+  // Telegram bot credentials. Get both from the setup steps above.
+  TELEGRAM_TOKEN: 'PASTE_BOT_TOKEN_HERE',
+  TELEGRAM_CHAT_ID: 'PASTE_CHAT_ID_HERE',
 
-  // Fallback email alert (also receives recovery notices).
-  ALERT_EMAIL: 'kalani@behike.co',
+  // Optional: email fallback. Comment out EMAIL to skip.
+  EMAIL: 'kalani@behike.co',
 
-  // Request timeout + retry behavior.
+  // Behavior
   REQUEST_TIMEOUT_SEC: 15,
-  RETRY_ON_FAIL: true,       // do one retry before declaring DOWN
+  RETRY_ON_FAIL: true,        // one retry before declaring DOWN (kills transient blips)
   RETRY_DELAY_MS: 3000,
-
-  // Only alert if something has been down for this many consecutive checks.
-  // 1 = alert immediately on confirmed downtime. 2 = must be down twice in a row.
-  DOWN_THRESHOLD: 1,
+  DOWN_THRESHOLD: 1,          // consecutive failures before alerting (1 = alert on first confirmed down)
 };
 
-// ================= DO NOT EDIT BELOW UNLESS YOU KNOW WHAT YOU'RE DOING =================
+// ============ DO NOT EDIT BELOW ============
 
 const PROPS = PropertiesService.getScriptProperties();
 
 function runCheck() {
   const results = CONFIG.URLS.map(checkOne);
   results.forEach(handleResult);
-  // Heartbeat — so you know the script is running even when nothing breaks.
   PROPS.setProperty('last_run_iso', new Date().toISOString());
 }
 
@@ -74,7 +81,6 @@ function checkOne(url) {
       return { url, code: 0, ms: Date.now() - t0, ok: false, err: String(e) };
     }
   };
-
   let r = attempt();
   if (!r.ok && CONFIG.RETRY_ON_FAIL) {
     Utilities.sleep(CONFIG.RETRY_DELAY_MS);
@@ -86,67 +92,90 @@ function checkOne(url) {
 function handleResult(r) {
   const key = 'state__' + r.url;
   const fails_key = 'fails__' + r.url;
-  const prev = PROPS.getProperty(key) || 'UP';  // default UP so first success doesn't spam
+  const prev = PROPS.getProperty(key) || 'UP';
 
   if (r.ok) {
     PROPS.setProperty(fails_key, '0');
     if (prev === 'DOWN') {
       PROPS.setProperty(key, 'UP');
-      notify('RECOVERED', `${r.url}\nCode ${r.code} in ${r.ms}ms`, 'default', 'white_check_mark');
+      notify(
+        '✅ RECOVERED',
+        `<b>${escapeHtml(r.url)}</b>\nBack online • HTTP ${r.code} • ${r.ms}ms`
+      );
     } else {
       PROPS.setProperty(key, 'UP');
     }
     return;
   }
 
-  // Failed. Count consecutive failures.
   const fails = parseInt(PROPS.getProperty(fails_key) || '0', 10) + 1;
   PROPS.setProperty(fails_key, String(fails));
 
   if (fails >= CONFIG.DOWN_THRESHOLD && prev !== 'DOWN') {
     PROPS.setProperty(key, 'DOWN');
-    const detail = r.err ? `ERROR: ${r.err}` : `HTTP ${r.code}`;
-    notify('DOWN', `${r.url}\n${detail}\n(confirmed after ${fails} failures)`, 'urgent', 'rotating_light');
+    const detail = r.err ? `ERROR: ${escapeHtml(r.err)}` : `HTTP ${r.code}`;
+    notify(
+      '🚨 SITE DOWN',
+      `<b>${escapeHtml(r.url)}</b>\n${detail}\nConfirmed after ${fails} failed check(s).`
+    );
   }
 }
 
-function notify(kind, body, priority, tag) {
-  const title = `[Behike Uptime] ${kind}`;
-  // 1. ntfy.sh push to phone
+function notify(title, body) {
+  const msg = `${title}\n\n${body}\n\n<i>${new Date().toLocaleString('en-US', { timeZone: 'America/Puerto_Rico' })} AST</i>`;
+
+  // 1. Telegram (primary channel)
   try {
-    UrlFetchApp.fetch(`https://ntfy.sh/${CONFIG.NTFY_TOPIC}`, {
+    const tgUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM_TOKEN}/sendMessage`;
+    const resp = UrlFetchApp.fetch(tgUrl, {
       method: 'post',
-      payload: body,
-      headers: {
-        'Title': title,
-        'Priority': priority,   // default | high | urgent
-        'Tags': tag,            // emoji tag, see ntfy.sh docs
-      },
+      contentType: 'application/json',
       muteHttpExceptions: true,
+      payload: JSON.stringify({
+        chat_id: CONFIG.TELEGRAM_CHAT_ID,
+        text: msg,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
     });
+    if (resp.getResponseCode() !== 200) {
+      console.error('Telegram error:', resp.getResponseCode(), resp.getContentText());
+    }
   } catch (e) {
-    console.error('ntfy push failed:', e);
+    console.error('Telegram send failed:', e);
   }
-  // 2. Email fallback (also useful record)
-  try {
-    MailApp.sendEmail({
-      to: CONFIG.ALERT_EMAIL,
-      subject: title,
-      body: body,
-    });
-  } catch (e) {
-    console.error('email send failed:', e);
+
+  // 2. Email fallback (also useful paper trail)
+  if (CONFIG.EMAIL) {
+    try {
+      MailApp.sendEmail({
+        to: CONFIG.EMAIL,
+        subject: '[Behike Uptime] ' + title.replace(/[^\w\s]/g, '').trim(),
+        body: stripHtml(msg),
+      });
+    } catch (e) {
+      console.error('Email send failed:', e);
+    }
   }
-  console.log(`${title} — ${body}`);
+
+  console.log(title + ' — ' + stripHtml(body));
 }
 
-// ================= SETUP / TEARDOWN / TEST =================
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function stripHtml(s) { return String(s).replace(/<[^>]+>/g, ''); }
+
+// ============ SETUP / TEARDOWN / TEST ============
 
 function setup() {
+  if (CONFIG.TELEGRAM_TOKEN.indexOf('PASTE') === 0 || CONFIG.TELEGRAM_CHAT_ID.indexOf('PASTE') === 0) {
+    throw new Error('Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID in CONFIG before running setup().');
+  }
   teardown();
   ScriptApp.newTrigger('runCheck').timeBased().everyMinutes(5).create();
-  console.log('Trigger installed. runCheck() will fire every 5 minutes.');
-  runCheck();  // immediate first check
+  console.log('Trigger installed: runCheck every 5 min.');
+  runCheck();
 }
 
 function teardown() {
@@ -157,21 +186,22 @@ function teardown() {
 }
 
 function testAlert() {
-  notify('TEST', 'If you see this on your phone, ntfy works.', 'high', 'test_tube');
+  notify('🧪 TEST', 'If you see this on your phone, Telegram alerts work. Monitor is armed.');
 }
 
 function resetState() {
-  const props = PROPS.getProperties();
-  Object.keys(props).forEach(k => {
+  const p = PROPS.getProperties();
+  Object.keys(p).forEach(k => {
     if (k.startsWith('state__') || k.startsWith('fails__')) PROPS.deleteProperty(k);
   });
   console.log('State cleared.');
 }
 
 function status() {
-  const props = PROPS.getProperties();
-  const rows = Object.keys(props).filter(k => k.startsWith('state__'))
-    .map(k => ({ url: k.replace('state__', ''), state: props[k], fails: props['fails__' + k.replace('state__', '')] || '0' }));
-  console.log('Last run: ' + (props.last_run_iso || 'never'));
-  console.log(JSON.stringify(rows, null, 2));
+  const p = PROPS.getProperties();
+  console.log('Last run: ' + (p.last_run_iso || 'never'));
+  Object.keys(p).filter(k => k.startsWith('state__')).forEach(k => {
+    const url = k.replace('state__', '');
+    console.log(`  ${p[k]}  ${url}  (fails: ${p['fails__' + url] || '0'})`);
+  });
 }
