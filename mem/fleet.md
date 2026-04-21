@@ -1,94 +1,68 @@
 ---
-purpose: Machine fleet registry and task delegation
-last_modified: 2026-03-28
-machines_online: 1
+purpose: Machine fleet registry — current reality
+last_modified: 2026-04-21
+machines_online: 2
 ---
 
-# Fleet Sync
+# Fleet — 2026-04-21
 
-## Machines
+**Hutia is retired. Naboria is retired.** Two machines only.
+
+## Current fleet
 
 machines:
+  cobo:
+    role: PRIMARY — production web server + dev + everything
+    os: Windows
+    hostname: (desktop tower)
+    capabilities:
+      - hosts behike.co (via Cloudflare Tunnel)
+      - hosts innova-barber, any other live sites
+      - UPS protected (CyberPower, PowerPanel connected as of 2026-04-21)
+      - Ollama / local LLM
+      - Syncthing endpoint
+    status: online
+    notes: |
+      When "the PC" / "the server" / "this machine" is mentioned
+      without qualification, it means Cobo. Default assumption.
+
   ceiba:
-    role: primary
+    role: Mac dev machine — Kalani's daily driver
     os: macOS
-    hostname: Kalanis-MacBook-Pro
+    hostname: Kalanis-MacBook-Air.local (per recent commits)
     capabilities:
       - claude-code (primary build tool)
-      - brave-pdf (PDF rendering with --force-device-scale-factor=2)
-      - git-push (SSH key configured, GitHub connected)
-      - gumroad (web access for product listing)
-      - file-system (full read/write to ~/behique)
+      - git-push (SSH + GitHub connected)
+      - web/browser work
+      - Syncthing endpoint
+      - full ~/behique read/write
     status: online
-    ip: local
+    notes: |
+      Only the "Mac" / "Ceiba" when Kalani explicitly names it.
+      Everything else defaults to Cobo.
 
-  cobo:
-    role: content-generation
-    os: linux
-    capabilities:
-      - ollama (local LLM inference)
-      - free-tier-rotation (ChatGPT, Gemini, etc.)
-      - batch-content (generate social posts, blog drafts)
-    status: offline
-    ip: 192.168.0.151
-    notes: "Use for bulk content generation to save Claude credits"
+## Retired (do not reference as active)
+- **Hutia** — Windows laptop, was previous prod server. All `ops/hutia/*` docs are LEGACY. Patterns inside are still useful but the machine name is stale; read them as "how we did it before" not "current setup".
+- **Naboria** — was the 24/7 Linux worker. Replaced by Cobo. `bios/fleet/NABORIA-*` files are historical. Railway still hosts BehiqueBot; that's separate from Naboria.
 
-  naboria:
-    role: always-on-worker
-    os: linux
-    capabilities:
-      - hosting (behike.store, Railway)
-      - background-tasks (cron jobs, scrapers)
-      - discord-bot (BehiqueBot)
-      - telegram-bot (live on Railway)
-    status: offline
-    ip: 192.168.0.152
-    notes: "Always-on server for 24/7 services"
-
-## Sync Configuration
+## Sync
 
 sync:
   method: syncthing
-  shared_folders:
-    - mem/                              # Memory system synced across all machines
-    - READY-TO-SELL/products-organized/  # Product folders (PDF+cover+thumb+info)
-    - READY-TO-SELL/gumroad-ready/       # Final ZIPs and PDFs for upload
-  sync_interval: realtime
-  conflict_resolution: newest-wins
+  endpoints: [cobo, ceiba]
+  shared_folder: ~/behique
+  known issues:
+    - macOS drops .DS_Store / ._* metadata that pollutes Cobo
+    - Occasional `*.sync-conflict-*` files when both machines edit same file
+  mitigation: needs .stignore (see ops/cobo/ for template when created)
 
-## Task Delegation
+## Power / outage resilience (Cobo)
 
-### Cobo Tasks (when online)
-- Generate 10 social media captions using Gemini free tier
-- Generate 5 blog post drafts using ChatGPT free tier
-- Run niche research with local Ollama
-- Batch process content templates
-- Generate Instagram post variations
+| Layer | Protects against | Status |
+|---|---|---|
+| UPS (CyberPower + PowerPanel) | Brief power dips | ✅ Connected 2026-04-21, config pending |
+| BIOS "Restore AC Power" | Power returned after UPS drained | ⏳ Needs configuration |
+| Auto-login + NSSM services | Cold boot to services online | ⏳ Needs configuration |
+| Telegram uptime monitor | Everything above failed | ✅ Live |
 
-### Naboria Tasks (when online)
-- Run Discord bot 24/7
-- Host behike.store
-- Run niche scanner on schedule
-- Process webhook events
-- Background data collection
-
-### Ceiba Tasks (always)
-- All product building (PDFs, covers, thumbnails)
-- Git operations (commit, push)
-- Memory system management
-- Interactive work with Kalani
-
-## How to Delegate
-1. Check machine status in this file
-2. If target machine is online: write task to shared sync folder
-3. If offline: queue in status.md as todo with owner tag
-4. Task results appear in synced output folders
-
-## Wake Commands
-```bash
-# Wake Cobo
-ssh kalani@192.168.0.151 'echo "online"' 2>/dev/null && echo "Cobo: ONLINE" || echo "Cobo: OFFLINE"
-
-# Wake Naboria
-ssh kalani@192.168.0.152 'echo "online"' 2>/dev/null && echo "Naboria: ONLINE" || echo "Naboria: OFFLINE"
-```
+Next steps tracked in `Ceiba/inbox/FLEET_REALITY_2026-04-21.md`.
