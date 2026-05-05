@@ -19,9 +19,9 @@
 
 ## 2. PITCH AL DUEÑO (30 segundos máximo)
 
-> "Mire, una pregunta rápida — **¿el hogar tiene página web actualmente?**"
+> "**Gracias por contestar** — pregunta rápida, **¿el hogar tiene página web actualmente?**"
 
-> *(Sin honorífico, sin nombre en el opener. "Don/Doña" envejece a alguien joven; el primer nombre suelto puede sonar irrespetuoso a alguien mayor. "Mire" funciona con todos. Una vez que la conversación fluye, puedes usar el nombre si te lo dieron — pero en la apertura, no.)*
+> *(Sin honorífico, sin nombre. "Gracias por contestar" reconoce su tiempo, suena profesional pero no robótico, funciona con joven o mayor. Alternativas si la situación cambia: "Le robo 30 segundos —" (más confiado) o "Disculpe que le interrumpa —" (más conservador, voz mayor/seria). Improvisa según lo que escuches.)*
 
 **Si dice NO:**
 > "Perfecto, eso es lo que vine a ofrecerle. En **Behike** hacemos páginas web profesionales para hogares como el suyo, manejamos su Google y SEO para que las familias lo encuentren primero cuando buscan, y también hacemos diseño gráfico — uniformes, tarjetas de presentación, todo lo de imagen. **¿Le interesaría una llamada breve, 15 minutos, para ver cómo podemos ayudarle?**"
