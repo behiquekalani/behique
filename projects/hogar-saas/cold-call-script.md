@@ -19,7 +19,9 @@
 
 ## 2. PITCH AL DUEÑO (30 segundos máximo)
 
-> "Don/Doña **[nombre]**, una pregunta rápida — **¿el hogar tiene página web actualmente?**"
+> "Mire, una pregunta rápida — **¿el hogar tiene página web actualmente?**"
+
+> *(Sin honorífico, sin nombre en el opener. "Don/Doña" envejece a alguien joven; el primer nombre suelto puede sonar irrespetuoso a alguien mayor. "Mire" funciona con todos. Una vez que la conversación fluye, puedes usar el nombre si te lo dieron — pero en la apertura, no.)*
 
 **Si dice NO:**
 > "Perfecto, eso es lo que vine a ofrecerle. En **Behike** hacemos páginas web profesionales para hogares como el suyo, manejamos su Google y SEO para que las familias lo encuentren primero cuando buscan, y también hacemos diseño gráfico — uniformes, tarjetas de presentación, todo lo de imagen. **¿Le interesaría una llamada breve, 15 minutos, para ver cómo podemos ayudarle?**"
