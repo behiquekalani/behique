@@ -20,9 +20,9 @@ Score = `2pts sin website` + `1pt es hogar real (no lab/hospicio/ama de llaves)`
 
 | # | Hogar | Municipio | Dirección | Tel | Email | Dueño | Notas |
 |---|-------|-----------|-----------|-----|-------|-------|-------|
-| 1 | **Fajardo Housing For The Elderly** | Fajardo | 1 Calle 5 Urb. Monte Vista | ⚠ scrape | — | — | "Los hacemos sentir en su casa" — slogan listo, sin web |
-| 2 | **Hogar de Ancianos Colón Rivas** | Moca | Carr 495 Km 6 Cerro Gordo | ⚠ scrape | — | — | "Especialistas trabajando con pacientes" — sin tel listado tampoco |
-| 3 | **Hogar de Envejecientes Ebenezer** | San Juan | 432-B Calle 31 | ⚠ scrape | — | — | Sin descripción, sin web — lead virgen |
+| 1 | **Hogar de Ancianos Colón Rivas** | Moca | Carr 495 Km 6 Cerro Gordo | **(787) 877-0049** | — | — | Real hogar privado. 30 reviews en Birdeye. Sin web propia. **MÁS HOT.** |
+| 2 | **Hogar de Envejecientes Ebenezer** | San Juan | 432-B Calle 31 (superpages) / 1269 Calle Julián Bengochea, Urb. San Martín | **(787) 319-5479** / **(787) 394-5527** | — | — | Tiene Facebook (`facebook.com/hogarebenezer`) pero NO website. 2 direcciones — verificar si es 1 o 2 sucursales. |
+| ~~3~~ | ~~Fajardo Housing For The Elderly~~ | ~~Fajardo~~ | ~~1 Calle 5 Urb. Monte Vista~~ | ~~(787) 863-5990~~ | — | — | **❌ NO ES LEAD** — es HUD/RHF Section 8 (subsidized housing, 60 apartamentos). Tiene management institucional (rhf.org). No compraría SaaS. |
 
 ---
 
